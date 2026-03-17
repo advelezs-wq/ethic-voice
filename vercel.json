@@ -9,21 +9,6 @@
       "schedule": "0 6 * * 1"
     }
   ],
-  "functions": {
-    
-    "src/app/api/payments/create-subscription/route.ts": {
-      "maxDuration": 30
-    },
-    
-    "src/app/api/admin/security/validate-plans/route.ts": { "maxDuration": 300 },
-    "src/app/api/admin/process-queue/route.ts": { "maxDuration": 300 },
-    "src/app/api/admin/maintenance/route.ts": { "maxDuration": 300 },
-    "src/app/api/admin/daily-runner/route.ts": { "maxDuration": 300 },
-    "src/app/api/digest/daily/route.ts": { "maxDuration": 120 },
-    "src/app/api/digest/weekly/route.ts": {
-      "maxDuration": 120
-    }
-  },
   "env": {
     "NODE_ENV": "production"
   }

@@ -21,6 +21,10 @@ import { Spinner } from "@heroui/react";
 import { useSubmissionQueueInfo } from "../../hooks/useSubmissionQueueInfo";
 import { formatEtaShort } from "../../utils/date.utils";
 import { AIQueueInlineStatus } from "../../components/ai/AIQueueInlineStatus";
+import { useRouter } from "next/navigation";
+import { deleteReport } from "@/actions/reports.actions";
+import { useUserRole } from "@/modules/core/hooks/useUserRole";
+import { UserRole } from "@/types/auth.types";
 
 interface AssignedReportsTableProps {
   reports: Report[];
@@ -29,9 +33,14 @@ interface AssignedReportsTableProps {
 export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
   reports,
 }) => {
+  const router = useRouter();
   const { planInfo } = usePlanPermissions();
+  const { role } = useUserRole();
   const { showSuccess, showError, showWarning } = useSafeToast();
   const [aiLoadingId, setAiLoadingId] = React.useState<number | null>(null);
+  const [deletingReportId, setDeletingReportId] = React.useState<number | null>(
+    null
+  );
   const { submissionIdToStatus, refresh: refreshQueue } = useAiQueue(8000);
   const [optimisticQueuedIds, setOptimisticQueuedIds] = React.useState<
     Set<number>
@@ -136,6 +145,33 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
   });
 
   const sortedReports = [...urgentReports, ...normalReports];
+  const canDeleteReports =
+    role === UserRole.ORG_ADMIN || role === UserRole.SUPER_ADMIN;
+
+  const handleDeleteReport = async (reportId: number, title?: string) => {
+    const confirmed = window.confirm(
+      `¿Seguro que deseas eliminar este reporte${
+        title ? `: "${title}"` : ""
+      }? Esta acción no se puede deshacer.`
+    );
+    if (!confirmed) return;
+
+    try {
+      setDeletingReportId(reportId);
+      await deleteReport(reportId);
+      showSuccess("Reporte eliminado correctamente");
+      window.dispatchEvent(new CustomEvent("manual-report-created"));
+      router.refresh();
+    } catch (error) {
+      showError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo eliminar el reporte"
+      );
+    } finally {
+      setDeletingReportId(null);
+    }
+  };
 
   return (
     <Card>
@@ -453,7 +489,21 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
                     </div>
 
                     {/* Action Button */}
-                    <div className="flex-shrink-0 sm:self-auto self-end">
+                    <div className="flex-shrink-0 sm:self-auto self-end flex items-center gap-1">
+                      {canDeleteReports && (
+                        <Button
+                          isIconOnly
+                          variant="light"
+                          color="danger"
+                          size="sm"
+                          isLoading={deletingReportId === report.idTable}
+                          onPress={() =>
+                            handleDeleteReport(report.idTable, reportInfo.title)
+                          }
+                        >
+                          <i className="icon-[lucide--trash-2] size-4" />
+                        </Button>
+                      )}
                       <Button
                         as={Link}
                         href={`/app/reports/${report.idTable}`}

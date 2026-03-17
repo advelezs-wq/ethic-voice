@@ -29,7 +29,7 @@ import {
 } from "../../utils/dashboard.utils";
 import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
-import { updateReportStatus } from "@/actions/reports.actions";
+import { deleteReport, updateReportStatus } from "@/actions/reports.actions";
 import { UserRole } from "@/types/auth.types";
 import { useSafeToast } from "../../hooks/useSafeToast";
 import { useAiQueue } from "../../hooks/useAiQueue";
@@ -64,6 +64,7 @@ export function ReportsTable({
   const { role: userRole } = useUserRole();
   const { showSuccess, showError, showWarning } = useSafeToast();
   const [aiLoadingId, setAiLoadingId] = useState<number | null>(null);
+  const [deletingReportId, setDeletingReportId] = useState<number | null>(null);
   const { submissionIdToStatus, refresh: refreshQueue } = useAiQueue(8000);
   const [optimisticQueuedIds, setOptimisticQueuedIds] = useState<Set<number>>(
     new Set()
@@ -298,6 +299,32 @@ export function ReportsTable({
     }
   };
 
+  const handleDeleteReport = async (reportId: number, title?: string) => {
+    const confirmed = window.confirm(
+      `¿Seguro que deseas eliminar este reporte${
+        title ? `: "${title}"` : ""
+      }? Esta acción no se puede deshacer.`
+    );
+    if (!confirmed) return;
+
+    try {
+      setDeletingReportId(reportId);
+      await deleteReport(reportId);
+      onSelectionChange(selectedReports.filter((id) => id !== reportId));
+      showSuccess("Reporte eliminado correctamente");
+      window.dispatchEvent(new CustomEvent("manual-report-created"));
+      router.refresh();
+    } catch (error) {
+      showError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo eliminar el reporte"
+      );
+    } finally {
+      setDeletingReportId(null);
+    }
+  };
+
   if (viewMode === "cards") {
     return (
       <div className="space-y-4">
@@ -435,6 +462,19 @@ export function ReportsTable({
                             >
                               Archivar
                             </DropdownItem>
+                            <DropdownItem
+                              key="delete"
+                              className="text-danger"
+                              color="danger"
+                              startContent={
+                                <i className="icon-[lucide--trash-2] size-4" />
+                              }
+                              onPress={() =>
+                                handleDeleteReport(report.id, reportInfo.title)
+                              }
+                            >
+                              Eliminar reporte
+                            </DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </div>
@@ -567,6 +607,26 @@ export function ReportsTable({
                               Asignar
                             </Button>
                           )}
+                          <Button
+                            size="sm"
+                            color="danger"
+                            variant="light"
+                            isLoading={deletingReportId === report.id}
+                            startContent={
+                              <i className="icon-[lucide--trash-2] size-4" />
+                            }
+                            onPress={() =>
+                              handleDeleteReport(report.id, reportInfo.title)
+                            }
+                            className={
+                              userRole === UserRole.ORG_ADMIN ||
+                              userRole === UserRole.SUPER_ADMIN
+                                ? ""
+                                : "hidden"
+                            }
+                          >
+                            Eliminar
+                          </Button>
                           <Button
                             as={Link}
                             href={`/app/reports/${report.id}`}
@@ -1001,6 +1061,19 @@ export function ReportsTable({
                                   }}
                                 >
                                   Archivar
+                                </DropdownItem>
+                                <DropdownItem
+                                  key="delete"
+                                  className="text-danger"
+                                  color="danger"
+                                  startContent={
+                                    <i className="icon-[lucide--trash-2] size-4" />
+                                  }
+                                  onPress={() =>
+                                    handleDeleteReport(report.id, reportInfo.title)
+                                  }
+                                >
+                                  Eliminar reporte
                                 </DropdownItem>
                               </DropdownMenu>
                             </Dropdown>

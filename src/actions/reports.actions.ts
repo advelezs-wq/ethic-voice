@@ -31,6 +31,7 @@ import {
   ReportComment,
 } from "@/types/reports";
 import { SubmissionSource } from "@/types/submission.types";
+import { userHasPermission } from "@/modules/core/utils/permissions";
 
 // ============================
 // ORIGINAL DASHBOARD METHODS
@@ -690,6 +691,61 @@ export async function updateReportStatus(
     console.error("Error updating report status:", error);
     throw error;
   }
+}
+
+export async function deleteReport(reportId: number): Promise<void> {
+  const { userId } = await auth();
+  const orgId = await resolveOrgId();
+  const user = await currentUser();
+
+  if (!userId || !orgId) {
+    throw new Error("Unauthorized");
+  }
+
+  const userEmail = user?.primaryEmailAddress?.emailAddress || undefined;
+  const canManageOrganization = await userHasPermission(
+    userId,
+    orgId,
+    "canManageOrganization",
+    userEmail
+  );
+
+  if (!canManageOrganization) {
+    throw new Error("No tienes permisos para eliminar reportes");
+  }
+
+  const existingReport = await prisma.formSubmission.findFirst({
+    where: {
+      id: reportId,
+      orgId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!existingReport) {
+    throw new Error("Reporte no encontrado");
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.aiProcessingJob.deleteMany({
+      where: {
+        orgId,
+        submissionId: reportId,
+      },
+    });
+
+    await tx.formSubmission.delete({
+      where: {
+        id: reportId,
+      },
+    });
+  });
+
+  revalidatePath("/app");
+  revalidatePath("/app/reports");
+  revalidatePath("/app/reports/archived");
 }
 
 export async function updateReportProcessedAt(

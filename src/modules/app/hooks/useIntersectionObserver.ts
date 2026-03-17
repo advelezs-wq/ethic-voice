@@ -7,7 +7,7 @@ interface UseIntersectionObserverProps {
 }
 
 export function useIntersectionObserver(
-  elementRef: React.RefObject<Element>,
+  elementRef: React.RefObject<Element | null>,
   {
     threshold = 0,
     root = null,

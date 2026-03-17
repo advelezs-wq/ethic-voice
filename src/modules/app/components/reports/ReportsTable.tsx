@@ -441,25 +441,7 @@ export function ReportsTable({
                           <ul className="text-xs text-gray-600 space-y-1">
                             {reportInfo.keyFindings
                               .slice(0, 2)
-                              .map(
-                                (
-                                  finding:
-                                    | string
-                                    | number
-                                    | bigint
-                                    | boolean
-                                    | React.ReactElement<
-                                        any,
-                                        | string
-                                        | React.JSXElementConstructor<any>
-                                      >
-                                    | Iterable<React.ReactNode>
-                                    | React.ReactPortal
-                                    | Promise<React.AwaitedReactNode>
-                                    | null
-                                    | undefined,
-                                  idx: React.Key | null | undefined
-                                ) => (
+                              .map((finding: React.ReactNode, idx: number) => (
                                   <li
                                     key={idx}
                                     className="flex items-start gap-1"
@@ -734,22 +716,8 @@ export function ReportsTable({
                                     <ul className="text-xs space-y-1">
                                       {reportInfo.keyFindings.map(
                                         (
-                                          finding:
-                                            | string
-                                            | number
-                                            | bigint
-                                            | boolean
-                                            | React.ReactElement<
-                                                any,
-                                                | string
-                                                | React.JSXElementConstructor<any>
-                                              >
-                                            | Iterable<React.ReactNode>
-                                            | React.ReactPortal
-                                            | Promise<React.AwaitedReactNode>
-                                            | null
-                                            | undefined,
-                                          idx: React.Key | null | undefined
+                                          finding: React.ReactNode,
+                                          idx: number
                                         ) => (
                                           <li key={idx}>• {finding}</li>
                                         )

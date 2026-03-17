@@ -565,7 +565,7 @@ const CompliancePlatformDemo = () => {
 const ComplianceStats = ({
   statsRef,
 }: {
-  statsRef: React.RefObject<HTMLDivElement>;
+  statsRef: React.RefObject<HTMLDivElement | null>;
 }) => {
   const stats = [
     {

@@ -1,26 +1,22 @@
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  Chip,
-} from "@heroui/react";
 import { Form } from "@prisma/client";
 import { formatDistance } from "date-fns";
 import Link from "next/link";
 
 export const FormCard = ({ form }: { form: Form }) => {
   return (
-    <Card>
-      <CardHeader className="flex-col items-start">
+    <div className="rounded-xl border border-gray-200 bg-white">
+      <div className="flex-col items-start p-4">
         <div className="flex items-center gap-2 justify-between w-full">
           <span className="truncate font-bold">{form.title}</span>
-          {form.isPublished && <Chip size="sm">Published</Chip>}
+          {form.isPublished && (
+            <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+              Published
+            </span>
+          )}
           {!form.isPublished && (
-            <Chip size="sm" variant="faded">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
               Draft
-            </Chip>
+            </span>
           )}
         </div>
         <div className="w-full flex flex-row items-center justify-between text-gray-700 text-sm flex-none">
@@ -44,42 +40,38 @@ export const FormCard = ({ form }: { form: Form }) => {
             </span>
           )}
         </div>
-      </CardHeader>
-      <CardBody className="h-[20px] truncate text-sm text-gray-700">
+      </div>
+      <div className="h-[20px] truncate text-sm text-gray-700 px-4">
         {form.description || "No description"}
-      </CardBody>
-      <CardFooter className="justify-center">
+      </div>
+      <div className="justify-center p-4 flex">
         {form.isPublished && (
-          <Button
-            as={Link}
+          <Link
             href={`/app/your-forms/builder/${form.id}`}
-            endContent={
-              <i
-                className="icon-[bx--right-arrow-alt]"
-                role="img"
-                aria-hidden="true"
-              />
-            }
+            className="inline-flex items-center gap-2 rounded-lg bg-primary text-white px-4 py-2 text-sm font-medium hover:opacity-90"
           >
             View submissions
-          </Button>
+            <i
+              className="icon-[bx--right-arrow-alt]"
+              role="img"
+              aria-hidden="true"
+            />
+          </Link>
         )}
         {!form.isPublished && (
-          <Button
-            as={Link}
+          <Link
             href={`/app/your-forms/builder/${form.id}`}
-            endContent={
-              <i
-                className="icon-[ant-design--form-outlined]"
-                role="img"
-                aria-hidden="true"
-              />
-            }
+            className="inline-flex items-center gap-2 rounded-lg bg-primary text-white px-4 py-2 text-sm font-medium hover:opacity-90"
           >
             Edit form
-          </Button>
+            <i
+              className="icon-[ant-design--form-outlined]"
+              role="img"
+              aria-hidden="true"
+            />
+          </Link>
         )}
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };

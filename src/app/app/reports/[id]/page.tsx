@@ -7,7 +7,6 @@ import { ReportHeader } from "@/modules/app/components/report/ReportHeader";
 import { ReportSidebar } from "@/modules/app/components/report/ReportSidebar";
 import { ReportTabsContainer } from "@/modules/app/components/report/ReportTabsContainer";
 import { ReportError } from "@/modules/app/components/report/ReportError";
-import { Button } from "@heroui/react";
 
 interface ReportDetailsPageProps {
   params: Promise<{
@@ -45,21 +44,17 @@ export default async function ReportDetailsPage({
       <div className="min-h-screen bg-gray-50">
         <main className="pt-8 sm:pt-12">
           <div className="container mx-auto max-w-[1440px] px-4 sm:px-6 py-6 sm:py-8">
-            <Button
-              as={Link}
+            <Link
               href="/app/reports"
-              variant="light"
-              className="mb-6"
-              startContent={
-                <i
-                  className="icon-[bx--left-arrow-alt] size-4 group-hover:-translate-x-1 transition-transform"
-                  role="img"
-                  aria-hidden="true"
-                />
-              }
+              className="mb-6 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
+              <i
+                className="icon-[bx--left-arrow-alt] size-4 group-hover:-translate-x-1 transition-transform"
+                role="img"
+                aria-hidden="true"
+              />
               Todas las denuncias
-            </Button>
+            </Link>
             <ReportHeader report={report} parsedContent={parsedContent} />
 
             {/* Content Layout */}

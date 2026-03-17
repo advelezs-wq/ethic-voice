@@ -1,8 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import prisma from "@/modules/prisma/lib/prisma";
-import { Card, CardBody, CardHeader } from "@heroui/react";
-import { Spinner } from "@heroui/react";
 
 // Force dynamic rendering since we use searchParams and database queries
 export const dynamic = "force-dynamic";
@@ -51,8 +49,8 @@ async function CheckoutContent({
           </p>
         </div>
 
-        <Card className="shadow-lg">
-          <CardHeader>
+        <div className="shadow-lg rounded-xl border border-gray-200 bg-white">
+          <div className="p-6 border-b border-gray-100">
             <div className="w-full">
               <h2 className="text-xl font-semibold">{subscription.planName}</h2>
               <p className="text-gray-600">
@@ -61,8 +59,8 @@ async function CheckoutContent({
                 {subscription.billingCycle === "YEARLY" ? "year" : "month"}
               </p>
             </div>
-          </CardHeader>
-          <CardBody>
+          </div>
+          <div className="p-6">
             <div className="text-center py-12">
               <div className="bg-blue-50 rounded-lg p-6 mb-6">
                 <h3 className="text-lg font-semibold text-blue-900 mb-2">
@@ -87,8 +85,8 @@ async function CheckoutContent({
                 </p>
               </div>
             </div>
-          </CardBody>
-        </Card>
+          </div>
+        </div>
 
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>🔒 Payments are processed securely by Rebill</p>
@@ -106,7 +104,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
       fallback={
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <Spinner size="lg" color="primary" />
+            <div className="mx-auto size-10 rounded-full border-4 border-gray-200 border-t-primary animate-spin" />
             <p className="mt-2 text-gray-600">Loading checkout...</p>
           </div>
         </div>

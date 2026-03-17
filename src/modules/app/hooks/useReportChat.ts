@@ -44,7 +44,7 @@ export function useReportChat({
   const [typingUsers, setTypingUsers] = useState<
     Map<string, { userName: string; timestamp: number }>
   >(new Map());
-  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const { isIntersecting } = useIntersectionObserver(loadMoreRef, {
@@ -53,7 +53,7 @@ export function useReportChat({
   });
 
   const visibleMessages = useRef<Set<number>>(new Set());
-  const markAsReadTimeoutRef = useRef<NodeJS.Timeout>();
+  const markAsReadTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Define functions first before using them in useEffect
   const loadMessages = useCallback(async () => {
@@ -210,7 +210,9 @@ export function useReportChat({
   useEffect(() => {
     if (!autoMarkAsRead || messages.length === 0) return;
 
-    clearTimeout(markAsReadTimeoutRef.current);
+    if (markAsReadTimeoutRef.current) {
+      clearTimeout(markAsReadTimeoutRef.current);
+    }
     markAsReadTimeoutRef.current = setTimeout(() => {
       const unreadMessages = messages
         .filter((msg) => !msg.readBy.some((r) => r.userId === user?.id))
@@ -222,7 +224,11 @@ export function useReportChat({
       }
     }, 1000);
 
-    return () => clearTimeout(markAsReadTimeoutRef.current);
+    return () => {
+      if (markAsReadTimeoutRef.current) {
+        clearTimeout(markAsReadTimeoutRef.current);
+      }
+    };
   }, [messages, autoMarkAsRead, user?.id]);
 
   const sendMessageOptimistic = useCallback(
@@ -381,7 +387,9 @@ export function useReportChat({
       userName: user.fullName || "Unknown User",
     });
 
-    clearTimeout(typingTimeoutRef.current);
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
     typingTimeoutRef.current = setTimeout(() => {
       channel.trigger("client-user-stopped-typing", {
         userId: user.id,

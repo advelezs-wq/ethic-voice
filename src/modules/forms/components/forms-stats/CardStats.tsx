@@ -1,4 +1,3 @@
-import { Card, CardBody, CardHeader, Skeleton } from "@heroui/react";
 import React, { ReactNode } from "react";
 
 interface CardStatsProps {
@@ -19,22 +18,18 @@ export const CardStats = ({
   icon,
 }: CardStatsProps) => {
   return (
-    <Card className={className}>
-      <CardHeader className="flex-col items-start">
+    <div className={`rounded-xl border border-gray-200 bg-white p-4 ${className}`}>
+      <div className="flex-col items-start">
         {icon}
         <h3 className="text-sm text-gray-700 font-medium">{title}</h3>
-      </CardHeader>
-      <CardBody>
+      </div>
+      <div className="pt-2">
         <div className="text-2xl font-bold">
-          {isLoading && (
-            <Skeleton>
-              <span>0</span>
-            </Skeleton>
-          )}
+          {isLoading && <span className="inline-block h-6 w-16 rounded bg-gray-200 animate-pulse" />}
           {!isLoading && value}
         </div>
         <p className="text-xs text-gray-700 pt-1">{helperText}</p>
-      </CardBody>
-    </Card>
+      </div>
+    </div>
   );
 };

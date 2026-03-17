@@ -1,4 +1,3 @@
-import { Image } from "@heroui/react";
 import Link from "next/link";
 
 export const Footer = () => {
@@ -10,7 +9,7 @@ export const Footer = () => {
           <div className="space-y-4">
             <div className="max-w-[200px]">
               <Link href="/" className="flex items-center">
-                <Image
+                <img
                   className="w-full object-cover"
                   src="/brand/logo-nobg.png"
                   alt="EthicVoice"

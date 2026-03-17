@@ -8,6 +8,7 @@ import {
 } from "@/modules/app/lib/queue/queue-manager";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
 import { submissionProcessor } from "@/modules/app/services/submission-processor.service";
+import { resolveOrgId } from "@/modules/core/utils/org-resolver";
 
 const ManualProcessSchema = z.object({
   content: z.string().min(10),
@@ -27,7 +28,8 @@ class SyncTimeoutError extends Error {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, orgId } = await auth();
+    const { userId } = await auth();
+    const orgId = await resolveOrgId();
 
     if (!userId || !orgId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });

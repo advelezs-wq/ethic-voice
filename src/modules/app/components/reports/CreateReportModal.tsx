@@ -102,9 +102,9 @@ export function CreateReportModal({
   // Limpiar campos del reportante cuando se marca como anónimo
   React.useEffect(() => {
     if (isAnonymous) {
-      setValue("reporterName", "");
-      setValue("reporterEmail", "");
-      setValue("reporterPhone", "");
+      setValue("reporterName", "", { shouldValidate: true, shouldDirty: true });
+      setValue("reporterEmail", "", { shouldValidate: true, shouldDirty: true });
+      setValue("reporterPhone", "", { shouldValidate: true, shouldDirty: true });
       // Limpiar errores manualmente
       clearErrors(["reporterName", "reporterEmail", "reporterPhone"]);
     }
@@ -217,7 +217,12 @@ export function CreateReportModal({
                 </h3>
                 <Checkbox
                   isSelected={isAnonymous}
-                  onValueChange={(value) => setValue("isAnonymous", value)}
+                  onValueChange={(value) =>
+                    setValue("isAnonymous", value, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
+                  }
                   size="sm"
                 >
                   Reporte Anónimo

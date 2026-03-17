@@ -17,6 +17,7 @@ import {
   getStatusLabel,
   getReportTypeLabel,
 } from "../../utils/dashboard.utils";
+import { useRouter } from "next/navigation";
 import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
 import { useSafeToast } from "../../hooks/useSafeToast";
 import { useAiQueue } from "../../hooks/useAiQueue";
@@ -58,7 +59,8 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
   const aiAnalysis = extractAIAnalysis();
   const hasAIAnalysis = !!aiAnalysis || !!report.aiSummary;
   const { planInfo } = usePlanPermissions();
-  const { showSuccess, showError } = useSafeToast();
+  const { showSuccess, showError, showWarning } = useSafeToast();
+  const router = useRouter();
   const { submissionIdToStatus, refresh: refreshQueue } = useAiQueue(8000);
   const [aiLoading, setAiLoading] = React.useState(false);
   const [optimisticQueued, setOptimisticQueued] = React.useState(false);
@@ -121,15 +123,30 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                           content,
-                          source: "ETHIC_LINE",
+                          source: report.source as any,
                           metadata: { submissionId: report.id },
+                          sync: true,
+                          timeoutMs: 12000,
+                          fallbackToQueue: true,
                         }),
                       });
-                      if (!res.ok) throw new Error("AI process failed");
-                      showSuccess("Análisis de IA encolado");
-                      refreshQueue();
+                      const payload = await res.json();
+                      if (!res.ok || payload?.success === false) {
+                        throw new Error("AI process failed");
+                      }
+                      if (payload.mode === "sync") {
+                        showSuccess("Análisis de IA completado");
+                        setOptimisticQueued(false);
+                        router.refresh();
+                      } else {
+                        showWarning(
+                          "Análisis encolado automáticamente",
+                          payload.message
+                        );
+                        refreshQueue();
+                      }
                     } catch (e) {
-                      showError("No se pudo encolar el análisis de IA");
+                      showError("No se pudo procesar el análisis de IA");
                       setOptimisticQueued(false);
                     } finally {
                       setAiLoading(false);

@@ -53,6 +53,7 @@ interface AnalyticsContextType extends AnalyticsState {
   refreshMemberStats: () => Promise<void>;
   refreshOrganizationStats: () => Promise<void>;
   refreshAll: () => Promise<void>;
+  invalidateAfterReportCreate: () => Promise<void>;
 
   // Clear methods
   clearDashboardData: () => void;
@@ -339,6 +340,21 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     }
   }, [loadDashboardData, loadReportsStats, user]);
 
+  const invalidateAfterReportCreate = useCallback(async () => {
+    setState((prev) => ({
+      ...prev,
+      lastDashboardUpdate: null,
+      lastReportsStatsUpdate: null,
+    }));
+    const orgId = user?.organizationMemberships?.[0]?.organization.id;
+    if (orgId) {
+      await Promise.all([
+        loadDashboardData(orgId, true),
+        loadReportsStats(orgId, true),
+      ]);
+    }
+  }, [loadDashboardData, loadReportsStats, user]);
+
   // Clear methods
   const clearDashboardData = useCallback(() => {
     setState((prev) => ({
@@ -400,6 +416,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     refreshMemberStats,
     refreshOrganizationStats,
     refreshAll,
+    invalidateAfterReportCreate,
     clearDashboardData,
     clearReportsStats,
     clearMemberStats,

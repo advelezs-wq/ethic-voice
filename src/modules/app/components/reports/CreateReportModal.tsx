@@ -17,52 +17,14 @@ import {
 } from "@heroui/react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { addToast } from "@/modules/core/utils/safe-toast";
 import { createManualReport } from "@/actions/manual-report.actions";
-
-const createReportSchema = z.object({
-  // Información del reportante
-  reporterName: z.string().optional(),
-  reporterEmail: z
-    .string()
-    .optional()
-    .refine(
-      (val) => {
-        // Si está vacío, no validar
-        if (!val || val.trim() === "") return true;
-        // Si tiene contenido, validar formato de email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(val);
-      },
-      {
-        message: "Debe ser un email válido",
-      }
-    ),
-  reporterPhone: z.string().optional(),
-  isAnonymous: z.boolean().default(false),
-
-  // Canal de recepción
-  channelType: z.enum(["phone", "whatsapp", "email", "in_person"]),
-
-  // Información del reporte
-  title: z.string().min(5, "El título debe tener al menos 5 caracteres"),
-  description: z
-    .string()
-    .min(20, "La descripción debe tener al menos 20 caracteres"),
-  irregularityType: z.string().min(1, "Selecciona un tipo de irregularidad"),
-  priority: z.enum(["LOW", "MEDIUM", "HIGH"]).default("MEDIUM"),
-
-  // Información adicional (todos opcionales)
-  location: z.string().optional(),
-  involvedPersons: z.string().optional(),
-  evidenceDescription: z.string().optional(),
-
-  // Notas del administrador
-  adminNotes: z.string().optional(),
-});
-
-type CreateReportForm = z.infer<typeof createReportSchema>;
+import { useRouter } from "next/navigation";
+import {
+  createManualReportSchema,
+  type CreateManualReportData,
+} from "@/modules/app/lib/schemas/manual-report";
+import { useAnalytics } from "../../context/AnalyticsContext";
 
 interface CreateReportModalProps {
   isOpen: boolean;
@@ -102,6 +64,8 @@ export function CreateReportModal({
   organizationId,
 }: CreateReportModalProps) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const { invalidateAfterReportCreate } = useAnalytics();
 
   const {
     register,
@@ -111,10 +75,9 @@ export function CreateReportModal({
     reset,
     control,
     clearErrors,
-    trigger,
     formState: { errors, isValid, isSubmitting },
-  } = useForm<CreateReportForm>({
-    resolver: zodResolver(createReportSchema),
+  } = useForm<CreateManualReportData>({
+    resolver: zodResolver(createManualReportSchema),
     mode: "onChange", // Show errors immediately as user types
     reValidateMode: "onChange",
     defaultValues: {
@@ -147,16 +110,8 @@ export function CreateReportModal({
     }
   }, [isAnonymous, setValue, clearErrors]);
 
-  const onSubmit = async (data: CreateReportForm) => {
-    console.log("=== FORM SUBMIT TRIGGERED ===");
-    console.log("Form data:", data);
-    console.log("Form errors:", errors);
-    console.log("Form is valid:", isValid);
-    console.log("Is submitting:", isSubmitting);
-
-    // Check if form has errors
+  const onSubmit = async (data: CreateManualReportData) => {
     if (Object.keys(errors).length > 0) {
-      console.log("❌ Form has validation errors:", errors);
       addToast({
         title: "Errores en el formulario",
         description: "Por favor corrige los errores antes de continuar",
@@ -167,8 +122,10 @@ export function CreateReportModal({
 
     startTransition(async () => {
       try {
-        console.log("🚀 Sending data to server...");
         await createManualReport(organizationId, data);
+        await invalidateAfterReportCreate();
+        router.refresh();
+        window.dispatchEvent(new CustomEvent("manual-report-created"));
         addToast({
           title: "Reporte creado exitosamente",
           description: "El reporte ha sido registrado en el sistema",
@@ -177,7 +134,6 @@ export function CreateReportModal({
         reset();
         onClose();
       } catch (error) {
-        console.error("❌ Error creating manual report:", error);
         const errorMessage =
           error instanceof Error ? error.message : "Error desconocido";
         addToast({
@@ -273,6 +229,7 @@ export function CreateReportModal({
                   <Input
                     label="Nombre Completo"
                     placeholder="Nombre del reportante"
+                    isRequired
                     {...register("reporterName")}
                     errorMessage={errors.reporterName?.message}
                     size="sm"
@@ -281,6 +238,7 @@ export function CreateReportModal({
                     label="Email"
                     type="email"
                     placeholder="email@ejemplo.com"
+                    isRequired
                     {...register("reporterEmail")}
                     errorMessage={errors.reporterEmail?.message}
                     size="sm"
@@ -448,7 +406,7 @@ export function CreateReportModal({
               color="primary"
               type="submit"
               isLoading={isPending}
-              disabled={isSubmitting || isPending}
+              disabled={isSubmitting || isPending || !isValid}
               size="sm"
             >
               {isPending ? "Creando..." : "Crear Reporte"}

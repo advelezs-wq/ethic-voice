@@ -7,31 +7,11 @@ import { randomBytes } from "crypto";
 import { addSubmissionToQueue } from "@/modules/app/lib/queue/queue-manager";
 import { SubmissionSource } from "@/types/submission.types";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
-
-interface CreateManualReportData {
-  // Información del reportante
-  reporterName?: string;
-  reporterEmail?: string;
-  reporterPhone?: string;
-  isAnonymous: boolean;
-
-  // Canal de recepción
-  channelType: "phone" | "whatsapp" | "email" | "in_person";
-
-  // Información del reporte
-  title: string;
-  description: string;
-  irregularityType: string;
-  priority: "LOW" | "MEDIUM" | "HIGH";
-
-  // Información adicional
-  location?: string;
-  involvedPersons?: string;
-  evidenceDescription?: string;
-
-  // Notas del administrador
-  adminNotes?: string;
-}
+import {
+  createManualReportSchema,
+  type CreateManualReportData,
+} from "@/modules/app/lib/schemas/manual-report";
+import { userHasPermission } from "@/modules/core/utils/permissions";
 
 /**
  * Generate a unique tracking code for the report
@@ -47,7 +27,7 @@ function generateTrackingCode(): string {
  */
 export async function createManualReport(
   organizationId: string,
-  data: CreateManualReportData
+  rawData: CreateManualReportData
 ) {
   const { userId } = await auth();
   const user = await currentUser();
@@ -56,21 +36,19 @@ export async function createManualReport(
     throw new Error("No autorizado");
   }
 
-  // Verify user is admin of the organization
-  const membership = await prisma.organizationMembership.findUnique({
-    where: {
-      userId_orgId: {
-        userId,
-        orgId: organizationId,
-      },
-    },
-  });
-
-  if (!membership || membership.role !== "ADMIN") {
+  const userEmail = user.primaryEmailAddress?.emailAddress;
+  const canManageOrganization = await userHasPermission(
+    userId,
+    organizationId,
+    "canManageOrganization",
+    userEmail
+  );
+  if (!canManageOrganization) {
     throw new Error("No tienes permisos para crear reportes manuales");
   }
 
   try {
+    const data = createManualReportSchema.parse(rawData);
     const trackingCode = generateTrackingCode();
 
     // Build form data object to match ETHIC_LINE structure exactly
@@ -121,6 +99,8 @@ export async function createManualReport(
         adminNotes: data.adminNotes || "",
         createdManually: true,
       },
+      subject: data.title,
+      title: data.title,
     };
 
     // Create the report submission
@@ -151,6 +131,7 @@ export async function createManualReport(
             channelType: data.channelType,
             createdManually: true,
             createdBy: userId,
+            subject: data.title,
           },
         },
       });
@@ -276,7 +257,14 @@ Fecha de envío: ${new Date().toLocaleString()}`;
       trackingCode: trackingCode,
     };
   } catch (error) {
-    console.error("Error creating manual report:", error);
+    console.error("[MANUAL] Error creating manual report:", {
+      organizationId,
+      userId,
+      error,
+    });
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
     throw new Error("Error al crear el reporte manual");
   }
 }

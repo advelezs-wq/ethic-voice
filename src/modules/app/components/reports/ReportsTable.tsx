@@ -62,7 +62,7 @@ export function ReportsTable({
   const { currentOrganization } = useOrganization();
   const { planInfo } = usePlanPermissions();
   const { role: userRole } = useUserRole();
-  const { showSuccess, showError } = useSafeToast();
+  const { showSuccess, showError, showWarning } = useSafeToast();
   const [aiLoadingId, setAiLoadingId] = useState<number | null>(null);
   const { submissionIdToStatus, refresh: refreshQueue } = useAiQueue(8000);
   const [optimisticQueuedIds, setOptimisticQueuedIds] = useState<Set<number>>(
@@ -230,10 +230,25 @@ export function ReportsTable({
             aiAnalysis.immediateActions ||
             [];
         }
+      } else if (report.source === "API") {
+        title =
+          content.subject ||
+          content.title ||
+          report.metadata?.subject ||
+          report.aiSummary ||
+          "Reporte manual";
+        description = extractReportSummary(report) || content.questionnaire?.whatHappened || "";
+        if (aiAnalysis) {
+          keyFindings = aiAnalysis.keyFindings || [];
+          immediateActions =
+            aiAnalysis.recommendedActions?.immediate ||
+            aiAnalysis.immediateActions ||
+            [];
+        }
       }
 
       return {
-        title,
+        title: title || report.aiSummary || "Reporte",
         description,
         category,
         keyFindings,
@@ -807,21 +822,39 @@ export function ReportsTable({
                                                 : JSON.stringify(
                                                     report.content
                                                   ),
-                                            source: "ETHIC_LINE",
+                                            source: report.source as any,
                                             metadata: {
                                               submissionId: report.id,
                                             },
+                                            sync: true,
+                                            timeoutMs: 12000,
+                                            fallbackToQueue: true,
                                           }),
                                         }
                                       );
-                                      if (!res.ok)
+                                      const payload = await res.json();
+                                      if (!res.ok || payload?.success === false) {
                                         throw new Error("AI process failed");
-                                      showSuccess("Análisis de IA encolado");
-                                      // Forzar actualización inmediata del estado de la cola
-                                      refreshQueue();
+                                      }
+                                      if (payload.mode === "sync") {
+                                        showSuccess("Análisis de IA completado");
+                                        setOptimisticQueuedIds((prev) => {
+                                          const next = new Set(prev);
+                                          next.delete(report.id);
+                                          return next;
+                                        });
+                                        router.refresh();
+                                      } else {
+                                        showWarning(
+                                          "Análisis encolado automáticamente",
+                                          payload.message
+                                        );
+                                        // Forzar actualización inmediata del estado de la cola
+                                        refreshQueue();
+                                      }
                                     } catch (e) {
                                       showError(
-                                        "No se pudo encolar el análisis de IA"
+                                        "No se pudo procesar el análisis de IA"
                                       );
                                       // Revertir optimismo si falló
                                       setOptimisticQueuedIds((prev) => {

@@ -36,6 +36,19 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
     }
   }, [organizationId, loadDashboardData]);
 
+  useEffect(() => {
+    const handleManualReportCreated = async () => {
+      await refreshDashboard();
+    };
+    window.addEventListener("manual-report-created", handleManualReportCreated);
+    return () => {
+      window.removeEventListener(
+        "manual-report-created",
+        handleManualReportCreated
+      );
+    };
+  }, [refreshDashboard]);
+
   const handleRefresh = async () => {
     try {
       await refreshDashboard();

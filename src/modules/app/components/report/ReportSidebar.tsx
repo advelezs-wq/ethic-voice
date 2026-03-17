@@ -2,6 +2,7 @@
 
 import { FormSubmission } from "@/types/reports";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useReport } from "../../hooks/useReport";
 import { addReportNote } from "@/actions/reports.actions";
 import { removeAssignmentFromReport } from "@/actions/report-assignments.actions";
@@ -9,6 +10,7 @@ import {
   calculateReportDeadline,
   formatDate,
   generateReportReference,
+  getSourceLabel,
 } from "../../utils/reports";
 import {
   getPriorityLabel,
@@ -61,6 +63,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
   const { permissions } = useUserRole();
   const { showSuccess, showError, showWarning } = useSafeToast();
   const { planInfo } = usePlanPermissions();
+  const router = useRouter();
 
   const [departments, setDepartments] = React.useState<
     { id: string; name: string }[]
@@ -115,12 +118,23 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content,
-          source: "ETHIC_LINE",
+          source: report.source as any,
           metadata: { submissionId: report.id },
+          sync: true,
+          timeoutMs: 12000,
+          fallbackToQueue: true,
         }),
       });
-      if (!res.ok) throw new Error("AI process failed");
-      showSuccess("Análisis de IA encolado. Se actualizará al finalizar.");
+      const payload = await res.json();
+      if (!res.ok || payload?.success === false) {
+        throw new Error("AI process failed");
+      }
+      if (payload.mode === "sync") {
+        showSuccess("Análisis de IA completado");
+        router.refresh();
+      } else {
+        showWarning("Análisis encolado automáticamente", payload.message);
+      }
     } catch (e) {
       showError("No se pudo iniciar el análisis de IA");
     } finally {
@@ -573,11 +587,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
           <div>
             <p className="text-sm text-gray-600">Fuente:</p>
             <Chip variant="flat" size="sm">
-              {report.source === "ETHIC_LINE"
-                ? "Línea Ética"
-                : report.source === "EMAIL"
-                  ? "Correo Electrónico"
-                  : "Formulario Personalizado"}
+              {getSourceLabel(report.source)}
             </Chip>
           </div>
 

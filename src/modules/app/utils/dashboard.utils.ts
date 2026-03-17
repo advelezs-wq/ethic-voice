@@ -291,6 +291,7 @@ export function getSourceLabel(source: string): string {
     EMAIL: "Correo electrónico",
     ETHIC_LINE: "Línea ética",
     CUSTOM_FORM: "Formulario personalizado",
+    API: "Reporte manual",
   };
 
   return sourceLabels[source] || source;

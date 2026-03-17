@@ -64,6 +64,20 @@ export function ReportsContent({
     }
   }, [loadReportsStats, organizationId, searchParams]); // Fixed: Now loadReportsStats has stable reference
 
+  useEffect(() => {
+    const handleManualReportCreated = async () => {
+      await refreshReportsStats();
+      router.refresh();
+    };
+    window.addEventListener("manual-report-created", handleManualReportCreated);
+    return () => {
+      window.removeEventListener(
+        "manual-report-created",
+        handleManualReportCreated
+      );
+    };
+  }, [refreshReportsStats, router]);
+
   const handleFiltersChange = (filters: ReportFilters) => {
     const params = new URLSearchParams(searchParams);
 

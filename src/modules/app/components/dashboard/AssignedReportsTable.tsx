@@ -30,7 +30,7 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
   reports,
 }) => {
   const { planInfo } = usePlanPermissions();
-  const { showSuccess, showError } = useSafeToast();
+  const { showSuccess, showError, showWarning } = useSafeToast();
   const [aiLoadingId, setAiLoadingId] = React.useState<number | null>(null);
   const { submissionIdToStatus, refresh: refreshQueue } = useAiQueue(8000);
   const [optimisticQueuedIds, setOptimisticQueuedIds] = React.useState<
@@ -275,20 +275,40 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
                                           typeof report.content === "string"
                                             ? report.content
                                             : JSON.stringify(report.content),
-                                        source: "ETHIC_LINE",
+                                        source: report.source as any,
                                         metadata: {
                                           submissionId: report.idTable,
                                         },
+                                        sync: true,
+                                        timeoutMs: 12000,
+                                        fallbackToQueue: true,
                                       }),
                                     }
                                   );
-                                  if (!res.ok)
+                                  const payload = await res.json();
+                                  if (!res.ok || payload?.success === false) {
                                     throw new Error("AI process failed");
-                                  showSuccess("Análisis de IA encolado");
-                                  refreshQueue();
+                                  }
+                                  if (payload.mode === "sync") {
+                                    showSuccess("Análisis de IA completado");
+                                    setOptimisticQueuedIds((prev) => {
+                                      const next = new Set(prev);
+                                      next.delete(report.idTable);
+                                      return next;
+                                    });
+                                    window.dispatchEvent(
+                                      new CustomEvent("manual-report-created")
+                                    );
+                                  } else {
+                                    showWarning(
+                                      "Análisis encolado automáticamente",
+                                      payload.message
+                                    );
+                                    refreshQueue();
+                                  }
                                 } catch (err) {
                                   showError(
-                                    "No se pudo encolar el análisis de IA"
+                                    "No se pudo procesar el análisis de IA"
                                   );
                                   setOptimisticQueuedIds((prev) => {
                                     const next = new Set(prev);

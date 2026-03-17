@@ -42,6 +42,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
   };
 
   const aiAnalysis = extractAIAnalysis();
+  const hasAiAnalysis = Boolean(aiAnalysis || report.aiSummary);
 
   const translateYesNo = (value: unknown): string => {
     if (typeof value === "boolean") return value ? "Sí" : "No";
@@ -176,7 +177,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
   return (
     <div className="space-y-6">
       {/* AI Analysis Summary Card */}
-      {aiAnalysis && (
+      {hasAiAnalysis && (
         <Card className="border-2 border-blue-200 bg-blue-50/30">
           <CardHeader className="bg-blue-100/50">
             <div className="flex items-center gap-3">
@@ -196,10 +197,12 @@ export const ReportContent: React.FC<ReportContentProps> = ({
           </CardHeader>
           <CardBody className="space-y-6">
             {/* Summary */}
-            {aiAnalysis.summary && (
+            {(aiAnalysis?.summary || report.aiSummary) && (
               <div>
                 <h3 className="font-semibold text-gray-900 mb-2">Resumen</h3>
-                <p className="text-gray-700">{aiAnalysis.summary}</p>
+                <p className="text-gray-700">
+                  {aiAnalysis?.summary || report.aiSummary}
+                </p>
               </div>
             )}
 
@@ -369,14 +372,19 @@ export const ReportContent: React.FC<ReportContentProps> = ({
             {/* Confidence and Type */}
             <div className="flex items-center gap-4 pt-4 border-t">
               <Chip color="primary" variant="flat">
-                Confianza: {aiAnalysis.confidence}%
+                Confianza:{" "}
+                {aiAnalysis?.confidence ||
+                  (report.metadata as { analysisConfidence?: number } | null)
+                    ?.analysisConfidence ||
+                  0}
+                %
               </Chip>
-              {aiAnalysis.type && (
+              {aiAnalysis?.type && (
                 <Chip color="secondary" variant="flat">
                   Tipo: {aiAnalysis.type}
                 </Chip>
               )}
-              {aiAnalysis.suggestedDepartment && (
+              {aiAnalysis?.suggestedDepartment && (
                 <Chip color="warning" variant="flat">
                   Dept. Sugerido: {aiAnalysis.suggestedDepartment}
                 </Chip>

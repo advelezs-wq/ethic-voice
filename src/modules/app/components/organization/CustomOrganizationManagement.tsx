@@ -5,6 +5,7 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Tabs, Tab } from "@heroui/tabs";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
+import { Select, SelectItem } from "@heroui/select";
 import {
   Modal,
   ModalContent,
@@ -45,6 +46,9 @@ export function CustomOrganizationManagement({
   // State
   const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [membersLoading, setMembersLoading] = useState(true);
+  const [updatingRoleMemberId, setUpdatingRoleMemberId] = useState<string | null>(
+    null
+  );
 
   // Modals
   const {
@@ -168,6 +172,63 @@ export function CustomOrganizationManagement({
         description: "No se pudo remover al miembro de la organización",
         color: "danger",
       });
+    }
+  };
+
+  const handleRoleChange = async (
+    memberId: string,
+    memberEmail: string,
+    nextRole: "ADMIN" | "MEMBER"
+  ) => {
+    if (!currentOrganization?.id) return;
+
+    try {
+      setUpdatingRoleMemberId(memberId);
+
+      const response = await fetch(
+        `/api/organization/${currentOrganization.id}/members`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            memberId,
+            role: nextRole,
+          }),
+        }
+      );
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data?.error || "No se pudo cambiar el rol");
+      }
+
+      addToast({
+        title: "Rol actualizado",
+        description: `${memberEmail} ahora es ${
+          nextRole === "ADMIN" ? "Administrador" : "Investigador"
+        }`,
+        color: "success",
+      });
+
+      setMembers((prev) =>
+        prev.map((member) =>
+          member.id === memberId ? { ...member, role: nextRole } : member
+        )
+      );
+    } catch (error) {
+      addToast({
+        title: "Error al actualizar rol",
+        description:
+          error instanceof Error
+            ? error.message
+            : "No se pudo actualizar el rol del miembro",
+        color: "danger",
+      });
+    } finally {
+      setUpdatingRoleMemberId(null);
     }
   };
 
@@ -312,17 +373,53 @@ export function CustomOrganizationManagement({
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Chip
-                              color={
-                                member.role === "ADMIN" ? "primary" : "default"
-                              }
-                              size="sm"
-                              variant="flat"
-                            >
-                              {member.role === "ADMIN"
-                                ? "Admin"
-                                : "Investigador"}
-                            </Chip>
+                            {rolePermissions.canManageOrganization &&
+                            member.user.email !==
+                              user?.primaryEmailAddress?.emailAddress ? (
+                              <Select
+                                aria-label={`Rol de ${member.user.email}`}
+                                selectedKeys={[member.role]}
+                                className="min-w-[170px]"
+                                size="sm"
+                                onSelectionChange={(keys) => {
+                                  const selectedValue = Array.from(
+                                    keys
+                                  )[0] as "ADMIN" | "MEMBER";
+                                  if (
+                                    selectedValue &&
+                                    selectedValue !== member.role
+                                  ) {
+                                    handleRoleChange(
+                                      member.id,
+                                      member.user.email,
+                                      selectedValue
+                                    );
+                                  }
+                                }}
+                                isDisabled={updatingRoleMemberId === member.id}
+                              >
+                                <SelectItem key="ADMIN">
+                                  Administrador
+                                </SelectItem>
+                                <SelectItem key="MEMBER">
+                                  Investigador
+                                </SelectItem>
+                              </Select>
+                            ) : (
+                              <Chip
+                                color={
+                                  member.role === "ADMIN"
+                                    ? "primary"
+                                    : "default"
+                                }
+                                size="sm"
+                                variant="flat"
+                              >
+                                {member.role === "ADMIN"
+                                  ? "Admin"
+                                  : "Investigador"}
+                              </Chip>
+                            )}
                             {member.isBlocked && (
                               <Chip
                                 color="danger"

@@ -38,7 +38,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
 
   useEffect(() => {
     const handleManualReportCreated = async () => {
-      await refreshDashboard();
+      await refreshDashboard(organizationId);
     };
     window.addEventListener("manual-report-created", handleManualReportCreated);
     return () => {
@@ -47,11 +47,11 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
         handleManualReportCreated
       );
     };
-  }, [refreshDashboard]);
+  }, [refreshDashboard, organizationId]);
 
   const handleRefresh = async () => {
     try {
-      await refreshDashboard();
+      await refreshDashboard(organizationId);
     } catch (error) {
       console.error("Error refreshing dashboard:", error);
     }

@@ -123,7 +123,7 @@ export function CreateReportModal({
     startTransition(async () => {
       try {
         await createManualReport(organizationId, data);
-        await invalidateAfterReportCreate();
+        await invalidateAfterReportCreate(organizationId);
         router.refresh();
         window.dispatchEvent(new CustomEvent("manual-report-created"));
         addToast({

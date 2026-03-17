@@ -48,12 +48,12 @@ interface AnalyticsContextType extends AnalyticsState {
   ) => Promise<void>;
 
   // Refresh methods
-  refreshDashboard: () => Promise<void>;
-  refreshReportsStats: () => Promise<void>;
+  refreshDashboard: (orgIdOverride?: string) => Promise<void>;
+  refreshReportsStats: (orgIdOverride?: string) => Promise<void>;
   refreshMemberStats: () => Promise<void>;
   refreshOrganizationStats: () => Promise<void>;
-  refreshAll: () => Promise<void>;
-  invalidateAfterReportCreate: () => Promise<void>;
+  refreshAll: (orgIdOverride?: string) => Promise<void>;
+  invalidateAfterReportCreate: (orgId: string) => Promise<void>;
 
   // Clear methods
   clearDashboardData: () => void;
@@ -306,19 +306,25 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
   );
 
   // Refresh methods
-  const refreshDashboard = useCallback(async () => {
-    const orgId = user?.organizationMemberships?.[0]?.organization.id;
+  const resolvePreferredOrgId = useCallback(
+    (orgIdOverride?: string) =>
+      orgIdOverride || user?.organizationMemberships?.[0]?.organization.id,
+    [user]
+  );
+
+  const refreshDashboard = useCallback(async (orgIdOverride?: string) => {
+    const orgId = resolvePreferredOrgId(orgIdOverride);
     if (orgId) {
       await loadDashboardData(orgId, true);
     }
-  }, [loadDashboardData, user]);
+  }, [loadDashboardData, resolvePreferredOrgId]);
 
-  const refreshReportsStats = useCallback(async () => {
-    const orgId = user?.organizationMemberships?.[0]?.organization.id;
+  const refreshReportsStats = useCallback(async (orgIdOverride?: string) => {
+    const orgId = resolvePreferredOrgId(orgIdOverride);
     if (orgId) {
       await loadReportsStats(orgId, true);
     }
-  }, [loadReportsStats, user]);
+  }, [loadReportsStats, resolvePreferredOrgId]);
 
   const refreshMemberStats = useCallback(async () => {
     // This would need to be called with specific member and org IDs
@@ -330,30 +336,29 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     console.log("Refresh organization stats called - needs specific org ID");
   }, []);
 
-  const refreshAll = useCallback(async () => {
-    const orgId = user?.organizationMemberships?.[0]?.organization.id;
+  const refreshAll = useCallback(async (orgIdOverride?: string) => {
+    const orgId = resolvePreferredOrgId(orgIdOverride);
     if (orgId) {
       await Promise.all([
         loadDashboardData(orgId, true),
         loadReportsStats(orgId, true),
       ]);
     }
-  }, [loadDashboardData, loadReportsStats, user]);
+  }, [loadDashboardData, loadReportsStats, resolvePreferredOrgId]);
 
-  const invalidateAfterReportCreate = useCallback(async () => {
+  const invalidateAfterReportCreate = useCallback(async (orgId: string) => {
     setState((prev) => ({
       ...prev,
       lastDashboardUpdate: null,
       lastReportsStatsUpdate: null,
     }));
-    const orgId = user?.organizationMemberships?.[0]?.organization.id;
     if (orgId) {
       await Promise.all([
         loadDashboardData(orgId, true),
         loadReportsStats(orgId, true),
       ]);
     }
-  }, [loadDashboardData, loadReportsStats, user]);
+  }, [loadDashboardData, loadReportsStats]);
 
   // Clear methods
   const clearDashboardData = useCallback(() => {

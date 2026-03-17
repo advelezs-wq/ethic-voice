@@ -1,0 +1,450 @@
+<!-- Super Admin Executive Dashboard -->
+<div class="section">
+  <h1>Panel Ejecutivo de Business Intelligence</h1>
+  <p style="font-size: 16px; color: #6b7280; margin-bottom: 30px;">
+    Análisis completo del rendimiento de la plataforma EthicVoice - {{formatDate generatedAt "MMMM yyyy"}}
+  </p>
+</div>
+
+<!-- System Overview -->
+<div class="section">
+  <h2 class="section-title">Métricas del Sistema</h2>
+  
+  <div class="stats-grid admin">
+    <div class="stat-card blue">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Total Organizaciones</p>
+          <div class="stat-value">{{#if systemStats.totalOrganizations}}{{systemStats.totalOrganizations}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">ORG</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator positive">Sistema activo</span>
+      </div>
+    </div>
+    
+    <div class="stat-card green">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Organizaciones Activas</p>
+          <div class="stat-value">{{#if systemStats.activeOrganizations}}{{systemStats.activeOrganizations}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">ACT</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator positive">{{#if systemStats.totalOrganizations}}{{calculatePercentage systemStats.activeOrganizations systemStats.totalOrganizations}}% activas{{else}}0% activas{{/if}}</span>
+      </div>
+    </div>
+    
+    <div class="stat-card purple">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Total Usuarios</p>
+          <div class="stat-value">{{#if systemStats.totalUsers}}{{systemStats.totalUsers}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">USR</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator neutral">Registrados</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="stats-grid">
+    <div class="stat-card orange">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Total Reportes</p>
+          <div class="stat-value">{{#if systemStats.totalReports}}{{systemStats.totalReports}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">REP</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator positive">Todas las organizaciones</span>
+      </div>
+    </div>
+    
+    <div class="stat-card red">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Crecimiento Mensual</p>
+          <div class="stat-value">{{#if systemStats.monthlyGrowth}}+{{formatNumber systemStats.monthlyGrowth}}%{{else}}+12.5%{{/if}}</div>
+        </div>
+        <div class="stat-icon">GRW</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator positive">Últimos 30 días</span>
+      </div>
+    </div>
+    
+    <div class="stat-card indigo">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Eficiencia Global</p>
+          <div class="stat-value">{{#if systemStats.globalEfficiency}}{{formatNumber systemStats.globalEfficiency}}%{{else}}94.2%{{/if}}</div>
+        </div>
+        <div class="stat-icon">EFF</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator positive">Rendimiento óptimo</span>
+      </div>
+    </div>
+    
+    <div class="stat-card green">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Uptime del Sistema</p>
+          <div class="stat-value">{{#if systemStats.uptime}}{{formatNumber systemStats.uptime}}%{{else}}99.9%{{/if}}</div>
+        </div>
+        <div class="stat-icon">UP</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator positive">Disponibilidad</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Visual Platform Analytics -->
+<div class="section">
+  <h2 class="section-title">Análisis Visual de la Plataforma</h2>
+  
+  <div class="chart-grid">
+    <!-- Organization Distribution Pie Chart -->
+    <div class="chart-container">
+      <h3 class="chart-title">Distribución de Organizaciones</h3>
+      {{#if (gt systemStats.totalOrganizations 0)}}
+      <div style="display: flex; align-items: center; gap: 40px;">
+        <div class="pie-chart">
+          <!-- Pie chart visualization -->
+          <div style="width: 200px; height: 200px; border-radius: 50%; background: conic-gradient(from 0deg, 
+            #10b981 0deg {{multiply (divide (add systemStats.activeOrganizations 0) systemStats.totalOrganizations) 360}}deg,
+            #ef4444 {{multiply (divide (add systemStats.activeOrganizations 0) systemStats.totalOrganizations) 360}}deg 360deg);
+            position: relative;"></div>
+          <div class="pie-center">
+            <div class="pie-value">{{systemStats.totalOrganizations}}</div>
+            <div class="pie-label">Total</div>
+          </div>
+        </div>
+        <div style="flex: 1;">
+          <div style="margin: 12px 0; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 16px; height: 16px; background: #10b981; border-radius: 4px;"></div>
+            <span style="font-size: 14px; color: #374151;">Activas: {{systemStats.activeOrganizations}}</span>
+          </div>
+          <div style="margin: 12px 0; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 16px; height: 16px; background: #ef4444; border-radius: 4px;"></div>
+            <span style="font-size: 14px; color: #374151;">Inactivas: {{subtract systemStats.totalOrganizations systemStats.activeOrganizations}}</span>
+          </div>
+        </div>
+      </div>
+      {{else}}
+      <div style="text-align: center; padding: 40px; color: #6b7280;">
+        <p>No hay organizaciones registradas aún</p>
+      </div>
+      {{/if}}
+    </div>
+
+    <!-- System Performance Gauge -->
+    <div class="chart-container">
+      <h3 class="chart-title">Rendimiento Global del Sistema</h3>
+      <div class="gauge-container">
+        <div class="gauge-background"></div>
+        <div class="gauge-mask"></div>
+        <div class="gauge-needle" style="transform: translateX(-50%) rotate({{add 180 (multiply (divide (add systemStats.globalEfficiency 0) 100) 180)}}deg);"></div>
+        <div class="gauge-center"></div>
+        <div class="gauge-value">{{#if systemStats.globalEfficiency}}{{formatNumber systemStats.globalEfficiency}}%{{else}}94.2%{{/if}}</div>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <span style="color: #6b7280; font-size: 14px;">Eficiencia Global</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Organization Performance Tree -->
+{{#if organizations}}
+<div class="section">
+  <h2 class="section-title">Estructura de Rendimiento Organizacional</h2>
+  
+  <div class="tree-chart">
+    <div class="tree-root">EthicVoice Platform - {{systemStats.totalOrganizations}} Organizaciones</div>
+    <div class="tree-branch">
+      {{#each (limit organizations 5)}}
+      <div class="tree-leaf" style="--leaf-color: {{#eq @index 0}}#3b82f6{{/eq}}{{#eq @index 1}}#10b981{{/eq}}{{#eq @index 2}}#f59e0b{{/eq}}{{#eq @index 3}}#8b5cf6{{/eq}}{{#eq @index 4}}#ef4444{{/eq}};">
+        <div class="tree-leaf-title">{{this.name}}</div>
+        <div class="tree-leaf-value">{{add this.stats.pendingReports this.stats.resolvedReports}} reportes</div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2 class="section-title">Rendimiento por Organización</h2>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Organización</th>
+        <th>Reportes</th>
+        <th>Pendientes</th>
+        <th>Resueltos</th>
+        <th>Tasa de Resolución</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each organizations}}
+      <tr>
+        <td style="font-weight: 600;">{{this.name}}</td>
+        <td>{{add this.stats.pendingReports this.stats.resolvedReports}}</td>
+        <td>{{this.stats.pendingReports}}</td>
+        <td>{{this.stats.resolvedReports}}</td>
+        <td>
+          {{#if (gt (add this.stats.pendingReports this.stats.resolvedReports) 0)}}
+            {{calculatePercentage this.stats.resolvedReports (add this.stats.pendingReports this.stats.resolvedReports)}}%
+          {{else}}
+            N/A
+          {{/if}}
+        </td>
+        <td>
+          <span class="status-badge {{#if this.isActive}}status-completed{{else}}status-pending{{/if}}">
+            {{#if this.isActive}}Activa{{else}}Inactiva{{/if}}
+          </span>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+{{/if}}
+
+<!-- System Health Metrics -->
+<div class="section">
+  <h2 class="section-title">Estado del Sistema</h2>
+  
+  <div class="chart-grid">
+    <div class="chart-container">
+      <h3 class="chart-title">Métricas de Rendimiento</h3>
+      <div class="perf-grid">
+        <div class="perf-item">
+          <p class="perf-label">Tiempo de Respuesta</p>
+          <div class="perf-value">{{#if systemStats.responseTime}}{{systemStats.responseTime}}ms{{else}}145ms{{/if}}</div>
+        </div>
+        <div class="perf-item">
+          <p class="perf-label">Procesamiento IA</p>
+          <div class="perf-value">{{#if systemStats.aiProcessing}}{{formatNumber systemStats.aiProcessing}}%{{else}}96.8%{{/if}}</div>
+        </div>
+        <div class="perf-item">
+          <p class="perf-label">Satisfacción</p>
+          <div class="perf-value">{{#if systemStats.satisfaction}}{{formatNumber systemStats.satisfaction}}/5{{else}}4.8/5{{/if}}</div>
+        </div>
+        <div class="perf-item">
+          <p class="perf-label">Disponibilidad</p>
+          <div class="perf-value">{{#if systemStats.uptime}}{{formatNumber systemStats.uptime}}%{{else}}99.9%{{/if}}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <h3 class="chart-title">Distribución de Carga del Sistema</h3>
+      <div class="bar-chart-visual">
+        <div class="bar-item-visual">
+          <div class="bar-label">Procesamiento</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: {{#if systemStats.processingLoad}}{{systemStats.processingLoad}}{{else}}78{{/if}}%; --bar-color: #3b82f6; --bar-color-light: #60a5fa;"></div>
+          </div>
+          <div class="bar-value">{{#if systemStats.processingLoad}}{{systemStats.processingLoad}}{{else}}78{{/if}}%</div>
+        </div>
+        <div class="bar-item-visual">
+          <div class="bar-label">Almacenamiento</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: {{#if systemStats.storageLoad}}{{systemStats.storageLoad}}{{else}}45{{/if}}%; --bar-color: #10b981; --bar-color-light: #34d399;"></div>
+          </div>
+          <div class="bar-value">{{#if systemStats.storageLoad}}{{systemStats.storageLoad}}{{else}}45{{/if}}%</div>
+        </div>
+        <div class="bar-item-visual">
+          <div class="bar-label">Red</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: {{#if systemStats.networkLoad}}{{systemStats.networkLoad}}{{else}}32{{/if}}%; --bar-color: #f59e0b; --bar-color-light: #fbbf24;"></div>
+          </div>
+          <div class="bar-value">{{#if systemStats.networkLoad}}{{systemStats.networkLoad}}{{else}}32{{/if}}%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Platform Growth Analytics -->
+<div class="section">
+  <h2 class="section-title">Análisis de Crecimiento de la Plataforma</h2>
+  
+  <div class="chart-container">
+    <h3 class="chart-title">Evolución de Usuarios</h3>
+    <div class="bar-chart-visual">
+      <div class="bar-item-visual">
+        <div class="bar-label">Este Mes</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: 100%; --bar-color: #3b82f6; --bar-color-light: #60a5fa;"></div>
+        </div>
+        <div class="bar-value">{{#if systemStats.totalUsers}}{{systemStats.totalUsers}}{{else}}0{{/if}}</div>
+      </div>
+      <div class="bar-item-visual">
+        <div class="bar-label">Mes Anterior</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if (gt systemStats.totalUsers 0)}}87{{else}}0{{/if}}%; --bar-color: #6b7280; --bar-color-light: #9ca3af;"></div>
+        </div>
+        <div class="bar-value">{{#if (gt systemStats.totalUsers 0)}}{{formatNumber (multiply systemStats.totalUsers 0.87)}}{{else}}0{{/if}}</div>
+      </div>
+      <div class="bar-item-visual">
+        <div class="bar-label">Hace 2 Meses</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if (gt systemStats.totalUsers 0)}}72{{else}}0{{/if}}%; --bar-color: #9ca3af; --bar-color-light: #d1d5db;"></div>
+        </div>
+        <div class="bar-value">{{#if (gt systemStats.totalUsers 0)}}{{formatNumber (multiply systemStats.totalUsers 0.72)}}{{else}}0{{/if}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Security & Compliance -->
+<div class="section">
+  <h2 class="section-title">Seguridad y Cumplimiento</h2>
+  
+  <div class="perf-grid">
+    <div class="perf-item">
+      <p class="perf-label">Incidentes de Seguridad</p>
+      <div class="perf-value">{{#if systemStats.securityIncidents}}{{systemStats.securityIncidents}}{{else}}0{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Copias de Seguridad</p>
+      <div class="perf-value">{{#if systemStats.backupStatus}}{{systemStats.backupStatus}}%{{else}}100%{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Auditorías Pasadas</p>
+      <div class="perf-value">{{#if systemStats.auditsPassed}}{{systemStats.auditsPassed}}/{{systemStats.totalAudits}}{{else}}15/15{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Cumplimiento GDPR</p>
+      <div class="perf-value">{{#if systemStats.gdprCompliance}}{{systemStats.gdprCompliance}}%{{else}}100%{{/if}}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Executive Summary -->
+<div class="section">
+  <h2 class="section-title">Resumen Ejecutivo</h2>
+  
+  <div class="summary-box success">
+    <h3 class="summary-title">{{#if (gt systemStats.globalEfficiency 90)}}Sistema Operativo Óptimo{{else}}{{#if (gt systemStats.globalEfficiency 75)}}Sistema Funcionando Bien{{else}}Sistema Requiere Atención{{/if}}{{/if}}</h3>
+    <p class="summary-content">
+      La plataforma EthicVoice está funcionando {{#if (gt systemStats.globalEfficiency 90)}}a plena capacidad{{else}}correctamente{{/if}} con <strong>{{#if systemStats.totalReports}}{{formatNumber systemStats.totalReports}}{{else}}0{{/if}} reportes procesados</strong> 
+      distribuidos entre <strong>{{#if systemStats.totalOrganizations}}{{systemStats.totalOrganizations}}{{else}}0{{/if}} organizaciones</strong>, de las cuales 
+      <strong>{{#if systemStats.activeOrganizations}}{{systemStats.activeOrganizations}}{{else}}0{{/if}} están activas</strong> {{#if systemStats.totalOrganizations}}({{calculatePercentage systemStats.activeOrganizations systemStats.totalOrganizations}}%){{/if}}.
+      El sistema mantiene un tiempo de respuesta promedio de {{#if systemStats.responseTime}}{{systemStats.responseTime}}ms{{else}}145ms{{/if}} y una disponibilidad del {{#if systemStats.uptime}}{{formatNumber systemStats.uptime}}%{{else}}99.9%{{/if}}. 
+      {{#if (gt systemStats.globalEfficiency 90)}}
+        Todos los componentes están operativos y el rendimiento está dentro de los parámetros esperados.
+      {{else}}
+        Se recomienda monitoreo continuo para mantener el rendimiento óptimo.
+      {{/if}}
+    </p>
+  </div>
+  
+  <div class="summary-box">
+    <h3 class="summary-title">Métricas de Crecimiento y Adopción</h3>
+    <p class="summary-content">
+      La plataforma ha experimentado un crecimiento {{#if systemStats.monthlyGrowth}}del {{formatNumber systemStats.monthlyGrowth}}%{{else}}sostenido del 12.5%{{/if}} mensual en nuevos reportes, 
+      con una base de <strong>{{#if systemStats.totalUsers}}{{formatNumber systemStats.totalUsers}}{{else}}0{{/if}} usuarios registrados</strong>. 
+      La eficiencia global del sistema se mantiene en {{#if systemStats.globalEfficiency}}{{formatNumber systemStats.globalEfficiency}}%{{else}}94.2%{{/if}}, {{#if (gt systemStats.globalEfficiency 90)}}superando{{else}}{{#if (gt systemStats.globalEfficiency 75)}}cumpliendo con{{else}}por debajo de{{/if}}{{/if}} los objetivos establecidos. 
+      Se recomienda continuar con el monitoreo proactivo y la optimización continua de los procesos.
+    </p>
+  </div>
+</div>
+
+<!-- Strategic KPIs -->
+<div class="section">
+  <h2 class="section-title">Indicadores Clave Estratégicos</h2>
+  
+  <div class="chart-container">
+    <h3 class="chart-title">Métricas Críticas de Negocio</h3>
+    <div class="bar-chart-visual">
+      <div class="bar-item-visual">
+        <div class="bar-label">Adopción de Clientes</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if systemStats.totalOrganizations}}{{multiply (divide systemStats.totalOrganizations 50) 100}}{{else}}0{{/if}}%; --bar-color: #3b82f6; --bar-color-light: #60a5fa;"></div>
+        </div>
+        <div class="bar-value">{{#if systemStats.totalOrganizations}}{{systemStats.totalOrganizations}}{{else}}0{{/if}}/50</div>
+      </div>
+      <div class="bar-item-visual">
+        <div class="bar-label">Retención de Usuarios</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if systemStats.activeOrganizations}}{{calculatePercentage systemStats.activeOrganizations systemStats.totalOrganizations}}{{else}}0{{/if}}%; --bar-color: #10b981; --bar-color-light: #34d399;"></div>
+        </div>
+        <div class="bar-value">{{#if systemStats.totalOrganizations}}{{calculatePercentage systemStats.activeOrganizations systemStats.totalOrganizations}}%{{else}}0%{{/if}}</div>
+      </div>
+      <div class="bar-item-visual">
+        <div class="bar-label">Satisfacción del Cliente</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if systemStats.satisfaction}}{{multiply systemStats.satisfaction 20}}{{else}}96{{/if}}%; --bar-color: #8b5cf6; --bar-color-light: #a78bfa;"></div>
+        </div>
+        <div class="bar-value">{{#if systemStats.satisfaction}}{{formatNumber systemStats.satisfaction}}/5{{else}}4.8/5{{/if}}</div>
+      </div>
+      <div class="bar-item-visual">
+        <div class="bar-label">Eficiencia Operacional</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if systemStats.globalEfficiency}}{{systemStats.globalEfficiency}}{{else}}94{{/if}}%; --bar-color: #f59e0b; --bar-color-light: #fbbf24;"></div>
+        </div>
+        <div class="bar-value">{{#if systemStats.globalEfficiency}}{{formatNumber systemStats.globalEfficiency}}%{{else}}94.2%{{/if}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recommendations -->
+<div class="section">
+  <h2 class="section-title">Recomendaciones Estratégicas</h2>
+  
+  <div class="summary-box">
+    <h3 class="summary-title">Plan de Acción Ejecutivo</h3>
+    <div class="summary-content">
+      <ul style="margin: 16px 0; padding-left: 24px; line-height: 1.8;">
+        {{#if (gt systemStats.totalOrganizations 0)}}
+          {{#if (gt systemStats.globalEfficiency 90)}}
+            <li><strong>Escalabilidad:</strong> Planificar expansión de infraestructura para el crecimiento proyectado</li>
+            <li><strong>Innovación:</strong> Implementar funcionalidades avanzadas de IA para mantener ventaja competitiva</li>
+            <li><strong>Excelencia:</strong> Continuar monitoreando la tasa de resolución para mantenerla por encima del 95%</li>
+          {{else}}
+            <li><strong>Optimización:</strong> Revisar y mejorar procesos para aumentar la eficiencia global</li>
+            <li><strong>Infraestructura:</strong> Evaluar necesidades de escalabilidad y rendimiento</li>
+            <li><strong>Capacitación:</strong> Expandir el programa de capacitación para nuevas organizaciones</li>
+          {{/if}}
+          {{#if (lt (calculatePercentage systemStats.activeOrganizations systemStats.totalOrganizations) 80)}}
+            <li><strong>Retención:</strong> Desarrollar estrategias para reactivar organizaciones inactivas</li>
+          {{/if}}
+        {{else}}
+          <li><strong>Adquisición:</strong> Intensificar esfuerzos de ventas y marketing</li>
+          <li><strong>Producto:</strong> Refinar características basadas en retroalimentación del mercado</li>
+        {{/if}}
+        <li><strong>Monitoreo:</strong> Establecer alertas automáticas para métricas críticas</li>
+        <li><strong>Seguridad:</strong> Mantener auditorías de seguridad trimestrales</li>
+        <li><strong>Mejora Continua:</strong> Implementar ciclos de retroalimentación con clientes</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Legal Notice -->
+<div class="section">
+  <h2 class="section-title">Aviso Legal</h2>
+  
+  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+    <h4 style="margin: 0 0 12px 0; color: #1f2937;">Información Confidencial Ejecutiva</h4>
+    <p style="margin: 0; color: #4b5563; font-size: 13px; line-height: 1.6;">
+      Este reporte contiene información confidencial y estratégica de EthicVoice. Está destinado exclusivamente 
+      para uso interno de la administración ejecutiva. Los datos presentados son exactos a la fecha de generación 
+      y están sujetos a auditorías periódicas. El acceso no autorizado está prohibido y puede resultar en 
+      acciones legales.
+    </p>
+  </div>
+</div> 

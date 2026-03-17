@@ -1,0 +1,98 @@
+@import "../styles/base.css";
+@import "../styles/variables.css";
+@import "../styles/components.css";
+@import "../styles/utilities.css";
+@import "../styles/animations.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+
+  /* SIDEBAR */
+  .sidebar-item {
+    @apply flex items-center gap-8 py-4 rounded-md transition-all duration-200 text-primary/30;
+  }
+
+  .sidebar-item.active {
+    @apply text-primary font-bold;
+  }
+
+  .sidebar-item-icon {
+    @apply size-5;
+  }
+
+  .sidebar-item-text {
+    @apply text-xl mt-[1px];
+  }
+
+  .purple-shape-container {
+    position: relative;
+  }
+
+  .purple-shape-border {
+    position: absolute;
+    inset: 0;
+    background: black;
+    /* Border color */
+    clip-path: polygon(10.2% 0%,
+        100% 0%,
+        100% 100%,
+        2.4% 100%,
+        12.3% 90.3%,
+        12% 66.3%,
+        16.2% 40.3%,
+        16.1% 28%,
+        0% 16.3%);
+    /* Makes it slightly larger to create border effect */
+    z-index: 1;
+  }
+
+  .purple-shape {
+    position: relative;
+    background-color: theme("colors.purple.500");
+    clip-path: polygon(10.2% 0%,
+        100% 0%,
+        100% 100%,
+        2.4% 100%,
+        12.3% 90.3%,
+        12% 66.3%,
+        16.2% 40.3%,
+        16.1% 28%,
+        0% 16.3%);
+    z-index: 2;
+  }
+
+  /* Hide create organization button only in specific contexts, not in modals */
+  .sidebar .button__createOrganization,
+  .header .button__createOrganization {
+    display: none !important;
+  }
+
+
+}
+
+.bg-dots {
+  --dot-bg: #f9f9fb;
+  --dot-color: #e0e0e0;
+  --dot-size: 1.48px;
+  --dot-space: 8px;
+  background:
+    linear-gradient(90deg,
+      var(--dot-bg) calc(var(--dot-space) - var(--dot-size)),
+      transparent 1%) center / var(--dot-space) var(--dot-space),
+    linear-gradient(var(--dot-bg) calc(var(--dot-space) - var(--dot-size)),
+      transparent 1%) center / var(--dot-space) var(--dot-space),
+    var(--dot-color);
+}
+
+/* Soft curved background, subtle and friendly */
+.bg-curves {
+  background-color: #fefcf8; /* más claro */
+  background-image: url('/patterns/bg-curves.svg');
+  background-repeat: no-repeat; /* evita repetición */
+  background-size: cover; /* ocupa todo el viewport */
+  background-position: center top; /* centrado respecto al header */
+  background-attachment: fixed; /* efecto sutil al hacer scroll */
+}

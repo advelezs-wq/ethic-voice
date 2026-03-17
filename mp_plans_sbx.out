@@ -1,0 +1,19 @@
+✅ EthicVoice Starter Mensual: c5668f16500a4d62b5ec8a3e15d503cc
+✅ EthicVoice Starter Anual: 36f1b6d8edf749a2ada2051b114bb671
+✅ EthicVoice Grow Mensual: 8e8be18390c94287b361dfcea3638f08
+✅ EthicVoice Grow Anual: 219fee7aba2b45e4b49be09533dc7e37
+✅ EthicVoice Grow Pro Mensual: 2e9e6a79cd8d462ca9cb49e5a174fcd4
+✅ EthicVoice Grow Pro Anual: 758b0a2656684340a0daa42a2649d200
+✅ EthicVoice Premium Mensual: 867e27b0ed3d4198916fc4cf62defaa4
+✅ EthicVoice Premium Anual: eea25ee5a1cd42d29f379bc560ea5033
+
+Add these to your .env.local:
+
+MP_STARTER_MONTHLY_PLAN_ID=c5668f16500a4d62b5ec8a3e15d503cc
+MP_STARTER_YEARLY_PLAN_ID=36f1b6d8edf749a2ada2051b114bb671
+MP_GROW_MONTHLY_PLAN_ID=8e8be18390c94287b361dfcea3638f08
+MP_GROW_YEARLY_PLAN_ID=219fee7aba2b45e4b49be09533dc7e37
+MP_GROW_PRO_MONTHLY_PLAN_ID=2e9e6a79cd8d462ca9cb49e5a174fcd4
+MP_GROW_PRO_YEARLY_PLAN_ID=758b0a2656684340a0daa42a2649d200
+MP_PREMIUM_MONTHLY_PLAN_ID=867e27b0ed3d4198916fc4cf62defaa4
+MP_PREMIUM_YEARLY_PLAN_ID=eea25ee5a1cd42d29f379bc560ea5033

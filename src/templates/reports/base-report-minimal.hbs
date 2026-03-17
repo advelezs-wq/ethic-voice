@@ -1,0 +1,247 @@
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{title}} - EthicVoice</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 16mm 16mm 18mm 16mm;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        color: #111;
+        margin: 0;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 2mm 0;
+        font-weight: 700;
+      }
+      h2 {
+        font-size: 13px;
+        margin: 0 0 4mm 0;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #333;
+      }
+      h3 {
+        font-size: 12px;
+        margin: 0 0 2mm 0;
+        font-weight: 600;
+        color: #333;
+      }
+      p,
+      li,
+      td,
+      th {
+        font-size: 11px;
+        line-height: 1.45;
+      }
+
+      /* Fixed header on every page */
+      .fixed-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 30mm;
+        padding: 5mm 16mm;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fff;
+        z-index: 10;
+      }
+      .header-inner {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 6mm;
+        align-items: center;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 4mm;
+      }
+      .meta {
+        text-align: right;
+        color: #666;
+        font-size: 10px;
+      }
+      .meta .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 2mm;
+        align-items: flex-end;
+      }
+      .brand-logo {
+        height: 10mm;
+        width: auto;
+        object-fit: contain;
+        filter: grayscale(100%);
+      }
+
+      .page-content {
+        position: relative;
+        z-index: 0;
+        margin-top: 34mm;
+        padding-top: 4mm;
+      }
+
+      .divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 6mm 0;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6mm;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6mm;
+      }
+      .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6mm;
+      }
+
+      .panel {
+        padding: 0;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+      }
+      .panel .panel-h {
+        padding: 4mm;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fafafa;
+      }
+      .panel .panel-b {
+        padding: 4mm;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border-bottom: 1px solid #eee;
+        padding: 3mm 2mm;
+        text-align: left;
+      }
+      th {
+        font-size: 10px;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        background: #fafafa;
+      }
+
+      .kpi {
+        display: grid;
+        gap: 1mm;
+      }
+      .kpi .label {
+        color: #666;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .kpi .value {
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .kpi .note {
+        color: #666;
+        font-size: 10px;
+      }
+
+      .legend {
+        display: grid;
+        gap: 2mm;
+      }
+      .legend .row {
+        display: flex;
+        align-items: center;
+        gap: 3mm;
+      }
+      .box {
+        width: 8px;
+        height: 8px;
+        background: #bbb;
+      }
+
+      .bar {
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .bar > span {
+        display: block;
+        height: 100%;
+        background: #000;
+      }
+
+      .muted {
+        color: #666;
+      }
+      .mono {
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+      }
+
+      .footer {
+        margin-top: 10mm;
+        color: #666;
+        font-size: 10px;
+        display: flex;
+        justify-content: space-between;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="fixed-header">
+      <div class="header-inner">
+        <div class="brand">
+          <div>
+            <h1>{{title}}</h1>
+            <div class="muted">{{subtitle}}</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="stack">
+            {{#if ethicVoiceLogo}}<img
+                src="{{ethicVoiceLogo}}"
+                alt="EthicVoice"
+                class="brand-logo"
+              />{{/if}}
+            <div>Generado: {{formatDate generatedAt "dd/MM/yyyy HH:mm"}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      {{{content}}}
+
+      <div class="footer">
+        <div>EthicVoice • Confidencial</div>
+        <div>{{formatDate generatedAt "yyyy"}}</div>
+      </div>
+    </div>
+  </body>
+</html>

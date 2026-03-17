@@ -1,0 +1,25 @@
+<svg width="1800" height="1200" viewBox="0 0 1800 1200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#fffaf2" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#g1)"/>
+  <g fill="none" stroke="#f0ebe3" stroke-width="10" opacity="0.35">
+    <path d="M-100 100 C 200 60, 400 140, 700 100 S 1200 40, 1600 120"/>
+    <path d="M-120 220 C 240 180, 520 260, 860 220 S 1400 160, 1820 240"/>
+    <path d="M-140 360 C 320 320, 640 380, 980 340 S 1560 280, 1900 360"/>
+    <path d="M-160 520 C 380 480, 760 560, 1120 520 S 1720 440, 2000 520"/>
+    <path d="M-180 700 C 420 660, 860 720, 1240 680 S 1840 600, 2100 680"/>
+  </g>
+  <g fill="none" stroke="#f7f2ea" stroke-width="18" opacity="0.22">
+    <path d="M-100 0 C 260 80, 620 0, 980 80 S 1700 160, 2060 80"/>
+  </g>
+  <!-- random soft shapes -->
+  <g opacity="0.06">
+    <circle cx="150" cy="980" r="180" fill="#efe8de" />
+    <circle cx="1680" cy="260" r="140" fill="#efe8de" />
+    <ellipse cx="980" cy="1080" rx="220" ry="120" fill="#f5efe8" />
+  </g>
+</svg>

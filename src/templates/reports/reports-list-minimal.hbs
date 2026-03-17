@@ -1,0 +1,47 @@
+<section class="panel" style="margin-bottom: 6mm;">
+  <div class="panel-h"><h2>Resumen</h2></div>
+  <div class="panel-b grid-4">
+    <div class="kpi"><div class="label">Total reportes</div><div
+        class="value"
+      >{{rows.length}}</div></div>
+    <div class="kpi"><div class="label">Fecha de exportación</div><div
+        class="value"
+      >{{formatDate generatedAt "dd/MM/yyyy"}}</div></div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-h"><h2>Listado de Reportes</h2></div>
+  <div class="panel-b">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:22mm;">ID</th>
+          <th>Asunto</th>
+          <th style="width:26mm;">Categoría</th>
+          <th style="width:18mm;">Severidad</th>
+          <th style="width:22mm;">Estado</th>
+          <th style="width:26mm;">Departamento</th>
+          <th style="width:22mm;">Asignado</th>
+          <th style="width:26mm;">Fecha</th>
+          <th style="width:18mm;">Anónimo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each rows}}
+          <tr>
+            <td class="mono">{{id}}</td>
+            <td>{{subject}}</td>
+            <td>{{category}}</td>
+            <td>{{severity}}</td>
+            <td>{{status}}</td>
+            <td>{{department}}</td>
+            <td>{{assignee}}</td>
+            <td class="mono">{{formatDate submittedAt "dd/MM/yyyy"}}</td>
+            <td>{{isAnonymous}}</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</section>

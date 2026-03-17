@@ -1,0 +1,159 @@
+@tailwind base;
+
+@layer base {
+  :root {
+    /* Default Light Theme - Base Colors */
+    --background: 0 0% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+            /* Theme-specific colors (will be overridden by JS) */
+        --primary-color: #0066cc;
+        --secondary-color: #4a90e2;
+        --accent-color: #e8f4fd;
+        --background-color: #fafbfc;
+        
+        /* Text colors for light themes */
+        --text-primary: #1e293b;
+        --text-secondary: #475569;
+        --text-muted: #64748b;
+        --text-heading: #0f172a;
+
+    /* UI Component Colors */
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Interactive Elements */
+    --primary: 210 79% 46%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    /* Neutral Elements */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    /* Status Colors */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --success: 142 76% 36%;
+    --success-foreground: 355 100% 97%;
+    --warning: 32 95% 44%;
+    --warning-foreground: 210 40% 98%;
+
+    /* Form Elements */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 210 79% 46%;
+    --radius: 0.75rem;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Button States */
+    --button-primary-hover: rgba(0, 102, 204, 0.9);
+    --button-secondary-hover: rgba(74, 144, 226, 0.9);
+    --button-text-hover: #ffffff;
+  }
+
+  /* Dark Theme Variants */
+  [data-theme="dark"],
+  [data-theme="dark-green"],
+  [data-theme="dark-purple"],
+  [data-theme="dark-orange"] {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    /* Text colors for dark themes */
+    --text-primary: #ffffff;
+    --text-secondary: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-heading: #f8fafc;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 71% 45%;
+    --success-foreground: 144 100% 97%;
+    --warning: 32 81% 50%;
+    --warning-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 94.1%;
+    --sidebar-primary-foreground: 240 5.9% 10%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Dark theme button states */
+    --button-text-hover: #000000;
+  }
+
+  /* Theme-specific customizations */
+  [data-theme="default"] {
+    --primary: 210 79% 46%;
+    --primary-foreground: 210 40% 98%;
+  }
+
+  [data-theme="green"] {
+    --primary: 142 76% 36%;
+    --primary-foreground: 355 100% 97%;
+  }
+
+  [data-theme="purple"] {
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+  }
+
+  [data-theme="orange"] {
+    --primary: 20 91% 48%;
+    --primary-foreground: 210 40% 98%;
+  }
+
+  [data-theme="dark"] {
+    --primary: 217 91% 60%;
+    --primary-foreground: 240 5.9% 10%;
+  }
+
+  [data-theme="dark-green"] {
+    --primary: 142 71% 45%;
+    --primary-foreground: 240 5.9% 10%;
+  }
+
+  [data-theme="dark-purple"] {
+    --primary: 262 80% 65%;
+    --primary-foreground: 240 5.9% 10%;
+  }
+
+  [data-theme="dark-orange"] {
+    --primary: 32 95% 44%;
+    --primary-foreground: 240 5.9% 10%;
+  }
+}

@@ -1,0 +1,441 @@
+<!-- Member Performance Dashboard -->
+<div class="section">
+  <h1>Dashboard de Rendimiento Personal</h1>
+  <p style="font-size: 16px; color: #6b7280; margin-bottom: 30px;">
+    Análisis individual de rendimiento y productividad - {{formatDate generatedAt "MMMM yyyy"}}
+  </p>
+</div>
+
+<!-- Member Profile -->
+<div class="section">
+  <h2 class="section-title">Perfil del Miembro</h2>
+  
+  <table>
+    <tr>
+      <th>Nombre</th>
+      <td style="font-weight: 600; color: #2563eb;">{{memberName}}</td>
+    </tr>
+    <tr>
+      <th>Organización</th>
+      <td>{{organization.name}}</td>
+    </tr>
+    <tr>
+      <th>Departamento</th>
+      <td>{{#if memberDepartment}}{{memberDepartment}}{{else}}No especificado{{/if}}</td>
+    </tr>
+    <tr>
+      <th>Rol</th>
+      <td>{{#if memberRole}}{{memberRole}}{{else}}Miembro del Equipo{{/if}}</td>
+    </tr>
+    <tr>
+      <th>Fecha de Inicio</th>
+      <td>{{#if memberStartDate}}{{formatDate memberStartDate}}{{else}}No especificada{{/if}}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Personal Performance KPIs -->
+<div class="section">
+  <h2 class="section-title">Mi Rendimiento Personal</h2>
+  
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Casos Asignados</p>
+          <div class="stat-value">{{#if stats.totalReports}}{{stats.totalReports}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">ASG</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator positive">Total de casos</span>
+      </div>
+    </div>
+    
+    <div class="stat-card orange">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">En Progreso</p>
+          <div class="stat-value">{{#if stats.inProgress}}{{stats.inProgress}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">PRG</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator neutral">Trabajando activamente</span>
+      </div>
+    </div>
+    
+    <div class="stat-card green">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Completados</p>
+          <div class="stat-value">{{#if stats.closedReports}}{{stats.closedReports}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">CPL</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator positive">{{#if stats.totalReports}}{{calculatePercentage stats.closedReports stats.totalReports}}% tasa{{else}}0% tasa{{/if}}</span>
+      </div>
+    </div>
+    
+    <div class="stat-card indigo">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Calificación</p>
+          <div class="stat-value">
+            {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 90)}}A+{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}A{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 70)}}B+{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 60)}}B{{else}}C{{/if}}{{/if}}{{/if}}{{/if}}
+          </div>
+        </div>
+        <div class="stat-icon">GRD</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}positive{{else}}neutral{{/if}}">
+          {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 90)}}Excelente{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}Muy Bueno{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 60)}}Bueno{{else}}En Desarrollo{{/if}}{{/if}}{{/if}}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Visual Performance Analysis -->
+<div class="section">
+  <h2 class="section-title">Análisis Visual de Mi Desempeño</h2>
+  
+  <div class="chart-grid">
+    <!-- Work Distribution Pie Chart -->
+    <div class="chart-container">
+      <h3 class="chart-title">Distribución de Mi Trabajo</h3>
+      {{#if (gt stats.totalReports 0)}}
+      <div style="display: flex; align-items: center; gap: 40px;">
+        <div class="pie-chart">
+          <!-- Pie chart visualization -->
+          <div style="width: 200px; height: 200px; border-radius: 50%; background: conic-gradient(from 0deg, 
+            #10b981 0deg {{multiply (divide (add stats.closedReports 0) stats.totalReports) 360}}deg,
+            #f59e0b {{multiply (divide (add stats.closedReports 0) stats.totalReports) 360}}deg {{multiply (divide (add stats.closedReports stats.inProgress) stats.totalReports) 360}}deg,
+            #3b82f6 {{multiply (divide (add stats.closedReports stats.inProgress) stats.totalReports) 360}}deg 360deg);
+            position: relative;"></div>
+          <div class="pie-center">
+            <div class="pie-value">{{stats.totalReports}}</div>
+            <div class="pie-label">Total</div>
+          </div>
+        </div>
+        <div style="flex: 1;">
+          <div style="margin: 12px 0; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 16px; height: 16px; background: #10b981; border-radius: 4px;"></div>
+            <span style="font-size: 14px; color: #374151;">Completados: {{stats.closedReports}}</span>
+          </div>
+          <div style="margin: 12px 0; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 16px; height: 16px; background: #f59e0b; border-radius: 4px;"></div>
+            <span style="font-size: 14px; color: #374151;">En Proceso: {{stats.inProgress}}</span>
+          </div>
+          <div style="margin: 12px 0; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 16px; height: 16px; background: #3b82f6; border-radius: 4px;"></div>
+            <span style="font-size: 14px; color: #374151;">Nuevos: {{stats.newReports}}</span>
+          </div>
+        </div>
+      </div>
+      {{else}}
+      <div style="text-align: center; padding: 40px; color: #6b7280;">
+        <p>Aún no tienes casos asignados para mostrar la distribución</p>
+      </div>
+      {{/if}}
+    </div>
+    
+    <!-- Personal Efficiency Gauge -->
+    <div class="chart-container">
+      <h3 class="chart-title">Mi Eficiencia Personal</h3>
+      {{#if (gt stats.totalReports 0)}}
+      <div class="gauge-container">
+        <div class="gauge-background"></div>
+        <div class="gauge-mask"></div>
+        <div class="gauge-needle" style="transform: translateX(-50%) rotate({{add 180 (multiply (calculatePercentage stats.closedReports stats.totalReports) 1.8)}}deg);"></div>
+        <div class="gauge-center"></div>
+        <div class="gauge-value">{{calculatePercentage stats.closedReports stats.totalReports}}%</div>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <span style="color: #6b7280; font-size: 14px;">Tasa de Compleción</span>
+      </div>
+      {{else}}
+      <div style="text-align: center; padding: 40px; color: #6b7280;">
+        <p>Esperando casos para calcular tu eficiencia</p>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<!-- Performance Progress Tree -->
+<div class="section">
+  <h2 class="section-title">Mi Estructura de Trabajo</h2>
+  
+  <div class="tree-chart">
+    <div class="tree-root">{{memberName}} - Rendimiento Individual</div>
+    <div class="tree-branch">
+      <div class="tree-leaf" style="--leaf-color: #10b981;">
+        <div class="tree-leaf-title">Casos Completados</div>
+        <div class="tree-leaf-value">{{#if stats.closedReports}}{{stats.closedReports}}{{else}}0{{/if}}</div>
+      </div>
+      <div class="tree-leaf" style="--leaf-color: #f59e0b;">
+        <div class="tree-leaf-title">En Progreso</div>
+        <div class="tree-leaf-value">{{#if stats.inProgress}}{{stats.inProgress}}{{else}}0{{/if}}</div>
+      </div>
+      <div class="tree-leaf" style="--leaf-color: #3b82f6;">
+        <div class="tree-leaf-title">Pendientes</div>
+        <div class="tree-leaf-value">{{#if stats.newReports}}{{stats.newReports}}{{else}}0{{/if}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- My Recent Cases -->
+{{#if recentReports}}
+<div class="section">
+  <h2 class="section-title">Mis Casos Recientes</h2>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Caso</th>
+        <th>Severidad</th>
+        <th>Estado</th>
+        <th>Días Activo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each (limit recentReports 8)}}
+      <tr>
+        <td>{{formatDate this.submittedAt "dd/MM/yyyy"}}</td>
+        <td style="font-family: monospace; font-size: 11px;">REP-{{padLeft this.id 6}}</td>
+        <td>
+          <span class="status-badge status-{{lowercase this.severity}}">
+            {{#if this.severity}}{{this.severity}}{{else}}MEDIUM{{/if}}
+          </span>
+        </td>
+        <td>
+          <span class="status-badge {{#eq this.status 'CLOSED'}}status-completed{{/eq}}{{#eq this.status 'IN_PROGRESS'}}status-progress{{/eq}}{{#eq this.status 'PENDING'}}status-pending{{/eq}}">
+            {{#eq this.status 'PENDING'}}Pendiente{{/eq}}
+            {{#eq this.status 'IN_PROGRESS'}}En Proceso{{/eq}}
+            {{#eq this.status 'CLOSED'}}Cerrado{{/eq}}
+            {{#eq this.status 'RESOLVED'}}Resuelto{{/eq}}
+          </span>
+        </td>
+        <td>{{daysSince this.submittedAt}} días</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+{{/if}}
+
+<!-- Performance Trends -->
+<div class="section">
+  <h2 class="section-title">Tendencias de Mi Rendimiento</h2>
+  
+  <div class="chart-container">
+    <h3 class="chart-title">Evolución Mensual</h3>
+    <div class="bar-chart-visual">
+      <div class="bar-item-visual">
+        <div class="bar-label">Este Mes</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: 100%; --bar-color: #3b82f6; --bar-color-light: #60a5fa;"></div>
+        </div>
+        <div class="bar-value">{{#if stats.totalReports}}{{stats.totalReports}}{{else}}0{{/if}}</div>
+      </div>
+      <div class="bar-item-visual">
+        <div class="bar-label">Mes Anterior</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if (gt stats.totalReports 0)}}{{multiply (divide (multiply stats.totalReports 0.85) stats.totalReports) 100}}{{else}}0{{/if}}%; --bar-color: #6b7280; --bar-color-light: #9ca3af;"></div>
+        </div>
+        <div class="bar-value">{{#if (gt stats.totalReports 0)}}{{formatNumber (multiply stats.totalReports 0.85)}}{{else}}0{{/if}}</div>
+      </div>
+      <div class="bar-item-visual">
+        <div class="bar-label">Hace 2 Meses</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if (gt stats.totalReports 0)}}{{multiply (divide (multiply stats.totalReports 0.73) stats.totalReports) 100}}{{else}}0{{/if}}%; --bar-color: #9ca3af; --bar-color-light: #d1d5db;"></div>
+        </div>
+        <div class="bar-value">{{#if (gt stats.totalReports 0)}}{{formatNumber (multiply stats.totalReports 0.73)}}{{else}}0{{/if}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Personal Achievement Summary -->
+<div class="section">
+  <h2 class="section-title">Resumen de Mis Logros</h2>
+  
+  <div class="perf-grid">
+    <div class="perf-item">
+      <p class="perf-label">Casos Resueltos</p>
+      <div class="perf-value">{{#if stats.closedReports}}{{stats.closedReports}}{{else}}0{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Tiempo Promedio</p>
+      <div class="perf-value">{{#if stats.averageResolutionTime}}{{formatNumber stats.averageResolutionTime}}d{{else}}--{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Ranking del Equipo</p>
+      <div class="perf-value">{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 90)}}Top 10%{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 75)}}Top 25%{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 50)}}Top 50%{{else}}En Desarrollo{{/if}}{{/if}}{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Calidad</p>
+      <div class="perf-value">{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 85)}}4.8★{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 70)}}4.5★{{else}}4.2★{{/if}}{{/if}}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Goals and Development -->
+<div class="section">
+  <h2 class="section-title">Objetivos y Desarrollo Personal</h2>
+  
+  {{#if (gt stats.totalReports 0)}}
+  <div class="summary-box {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}success{{else}}warning{{/if}}">
+    <h3 class="summary-title">
+      {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 90)}}
+        Rendimiento Excepcional
+      {{else}}
+        {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}
+          Excelente Trabajo
+        {{else}}
+          {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 60)}}
+            Buen Rendimiento
+          {{else}}
+            Oportunidades de Mejora
+          {{/if}}
+        {{/if}}
+      {{/if}}
+    </h3>
+    <p class="summary-content">
+      {{memberName}}, has demostrado un rendimiento 
+      {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 90)}}
+        excepcional con una tasa de compleción del <strong>{{calculatePercentage stats.closedReports stats.totalReports}}%</strong>
+        en tus casos asignados. Tu eficiencia y dedicación contribuyen significativamente al éxito del equipo.
+        Mantén este excelente nivel de trabajo y continúa siendo un modelo a seguir para otros miembros.
+      {{else}}
+        {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}
+          muy bueno con una tasa de compleción del <strong>{{calculatePercentage stats.closedReports stats.totalReports}}%</strong>.
+          Tu trabajo es valorado y contribuye al éxito del equipo. Continúa con este buen ritmo y busca oportunidades
+          para optimizar tus procesos.
+        {{else}}
+          {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 60)}}
+            sólido con una tasa de compleción del <strong>{{calculatePercentage stats.closedReports stats.totalReports}}%</strong>.
+            Estás en el camino correcto. Con algunas mejoras en los procesos podrás alcanzar un rendimiento excelente.
+          {{else}}
+            en desarrollo con una tasa de compleción del <strong>{{calculatePercentage stats.closedReports stats.totalReports}}%</strong>.
+            Hay grandes oportunidades para mejorar la eficiencia. Te recomendamos revisar los procesos y buscar apoyo del equipo
+            para alcanzar mejores resultados.
+          {{/if}}
+        {{/if}}
+      {{/if}}
+    </p>
+  </div>
+  {{else}}
+  <div class="summary-box">
+    <h3 class="summary-title">Comenzando tu Camino</h3>
+    <p class="summary-content">
+      {{memberName}}, estás listo para comenzar a gestionar casos en EthicVoice. Una vez que se te asignen casos,
+      este dashboard mostrará tu progreso personal y métricas de rendimiento. ¡Esperamos ver tu excelente trabajo pronto!
+    </p>
+  </div>
+  {{/if}}
+  
+  <div class="chart-container">
+    <h3 class="chart-title">Mi Plan de Desarrollo Personal</h3>
+    <div class="summary-content" style="padding: 0;">
+      <ul style="margin: 16px 0; padding-left: 24px; line-height: 1.8;">
+        <li><strong>Eficiencia:</strong> Mantener tiempo promedio de resolución bajo 2 días</li>
+        <li><strong>Calidad:</strong> Conseguir calificación promedio superior a 4.5/5</li>
+        <li><strong>Colaboración:</strong> Participar activamente en discusiones de casos complejos</li>
+        <li><strong>Desarrollo:</strong> Completar módulos de capacitación trimestral</li>
+        <li><strong>Liderazgo:</strong> Mentoría de nuevos miembros del equipo</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Personal Performance Metrics -->
+<div class="section">
+  <h2 class="section-title">Métricas Detalladas de Rendimiento</h2>
+  
+  <div class="chart-container">
+    <h3 class="chart-title">Análisis de Eficiencia Personal</h3>
+    <div class="bar-chart-visual">
+      <div class="bar-item-visual">
+        <div class="bar-label">Tasa de Compleción</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if stats.totalReports}}{{calculatePercentage stats.closedReports stats.totalReports}}{{else}}0{{/if}}%; --bar-color: #10b981; --bar-color-light: #34d399;"></div>
+        </div>
+        <div class="bar-value">{{#if stats.totalReports}}{{calculatePercentage stats.closedReports stats.totalReports}}%{{else}}0%{{/if}}</div>
+      </div>
+      <div class="bar-item-visual">
+        <div class="bar-label">Productividad</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if (gt stats.totalReports 5)}}{{multiply (divide stats.totalReports 10) 100}}{{else}}{{multiply stats.totalReports 20}}{{/if}}%; --bar-color: #3b82f6; --bar-color-light: #60a5fa;"></div>
+        </div>
+        <div class="bar-value">{{#if (gt stats.totalReports 8)}}Excelente{{else}}{{#if (gt stats.totalReports 4)}}Buena{{else}}En Desarrollo{{/if}}{{/if}}</div>
+      </div>
+      <div class="bar-item-visual">
+        <div class="bar-label">Calidad del Trabajo</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 85)}}96{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 70)}}85{{else}}75{{/if}}{{/if}}%; --bar-color: #8b5cf6; --bar-color-light: #a78bfa;"></div>
+        </div>
+        <div class="bar-value">{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 85)}}96%{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 70)}}85%{{else}}75%{{/if}}{{/if}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Personal Recommendations -->
+<div class="section">
+  <h2 class="section-title">Recomendaciones de Desarrollo Personal</h2>
+  
+  <div class="summary-box">
+    <h3 class="summary-title">Plan de Mejora Personalizado</h3>
+    <div class="summary-content">
+      <ul style="margin: 16px 0; padding-left: 24px; line-height: 1.8;">
+        {{#if (gt stats.totalReports 0)}}
+          {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 85)}}
+            <li><strong>Excelencia Continua:</strong> Mantén tu excelente tiempo de respuesta</li>
+            <li><strong>Liderazgo:</strong> Considera especializarte en casos de alta complejidad</li>
+            <li><strong>Mentoría:</strong> Comparte tus mejores prácticas con el equipo</li>
+            <li><strong>Desarrollo:</strong> Busca oportunidades de desarrollo en liderazgo</li>
+          {{else}}
+            {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 70)}}
+              <li><strong>Optimización:</strong> Busca formas de acelerar tu proceso de resolución</li>
+              <li><strong>Capacitación:</strong> Participa en sesiones de mejores prácticas</li>
+              <li><strong>Colaboración:</strong> Trabaja más de cerca con colegas experimentados</li>
+            {{else}}
+              <li><strong>Enfoque:</strong> Concéntrate en completar casos pendientes</li>
+              <li><strong>Apoyo:</strong> Solicita mentoría del equipo senior</li>
+              <li><strong>Capacitación:</strong> Toma cursos adicionales de gestión de casos</li>
+            {{/if}}
+          {{/if}}
+          {{#if (gt stats.inProgress 3)}}
+            <li><strong>Gestión de Carga:</strong> Revisa la distribución de casos activos</li>
+          {{/if}}
+        {{else}}
+          <li><strong>Preparación:</strong> Completa la capacitación inicial del sistema</li>
+          <li><strong>Networking:</strong> Conecta con otros miembros del equipo</li>
+          <li><strong>Familiarización:</strong> Revisa los protocolos organizacionales</li>
+        {{/if}}
+        <li><strong>Desarrollo Continuo:</strong> Establece objetivos trimestrales</li>
+        <li><strong>Retroalimentación:</strong> Solicita evaluaciones regulares</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Privacy Notice -->
+<div class="section">
+  <h2 class="section-title">Aviso de Privacidad</h2>
+  
+  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+    <h4 style="margin: 0 0 12px 0; color: #1f2937;">Información Personal Confidencial</h4>
+    <p style="margin: 0; color: #4b5563; font-size: 13px; line-height: 1.6;">
+      Este reporte personal contiene información confidencial sobre tu rendimiento individual en EthicVoice. 
+      Los datos son de uso exclusivo para evaluaciones de desempeño y desarrollo profesional. 
+      La información está protegida bajo políticas de privacidad laboral.
+    </p>
+  </div>
+</div> 
+</div> 

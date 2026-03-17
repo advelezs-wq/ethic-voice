@@ -1,0 +1,88 @@
+name: Process Redis Queue
+
+on:
+  schedule:
+    # Run every minute (GitHub Actions cron format: min hour day month dayofweek)
+    - cron: "* * * * *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  process-queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2 # Maximum 2 minutes per run
+
+    steps:
+      - name: Process Queue Jobs
+        run: |
+          echo "🔄 Processing Redis queue..."
+
+          # Get your deployed URL from environment or use a default
+          VERCEL_URL="${{ secrets.VERCEL_DEPLOYMENT_URL || vars.VERCEL_DEPLOYMENT_URL }}"
+          ADMIN_API_KEY="${{ secrets.ADMIN_API_KEY }}"
+
+          if [ -z "$VERCEL_URL" ]; then
+            echo "❌ Error: VERCEL_DEPLOYMENT_URL not set in secrets or variables"
+            echo "📝 Please add your Vercel deployment URL (e.g., https://your-app.vercel.app) to:"
+            echo "   - GitHub Repository Settings > Secrets and variables > Actions > Secrets"
+            echo "   - Or Repository Settings > Secrets and variables > Actions > Variables"
+            exit 1
+          fi
+
+          if [ -z "$ADMIN_API_KEY" ]; then
+            echo "❌ Error: ADMIN_API_KEY not set in secrets"
+            echo "📝 Please add your admin API key to:"
+            echo "   - GitHub Repository Settings > Secrets and variables > Actions > Secrets"
+            echo "   - The same key should be set as ADMIN_API_KEY in your Vercel environment variables"
+            exit 1
+          fi
+
+          # Call the queue processing API
+          response=$(curl -s -w "%{http_code}" -X POST \
+            "${VERCEL_URL}/api/admin/process-queue" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: GitHub-Actions-Queue-Processor" \
+            -H "x-admin-api-key: ${ADMIN_API_KEY}" \
+            --max-time 90 \
+            --connect-timeout 10)
+
+          # Extract HTTP status code (last 3 characters)
+          http_code="${response: -3}"
+          body="${response%???}"
+
+          echo "📊 Response Code: $http_code"
+
+          if [ "$http_code" = "200" ]; then
+            echo "✅ Queue processing successful"
+            echo "📋 Response: $body"
+          elif [ "$http_code" = "500" ]; then
+            echo "⚠️ Queue processing failed (server error)"
+            echo "📋 Response: $body"
+            # Don't fail the action for server errors (Redis might be down temporarily)
+          else
+            echo "❌ Unexpected response code: $http_code"
+            echo "📋 Response: $body"
+            exit 1
+          fi
+
+      - name: Health Check
+        if: always() # Run even if previous step failed
+        run: |
+          echo "🏥 Checking queue health..."
+
+          VERCEL_URL="${{ secrets.VERCEL_DEPLOYMENT_URL || vars.VERCEL_DEPLOYMENT_URL }}"
+          ADMIN_API_KEY="${{ secrets.ADMIN_API_KEY }}"
+
+          if [ -n "$VERCEL_URL" ] && [ -n "$ADMIN_API_KEY" ]; then
+            health_response=$(curl -s -w "%{http_code}" -X GET \
+              "${VERCEL_URL}/api/admin/process-queue" \
+              -H "Content-Type: application/json" \
+              -H "x-admin-api-key: ${ADMIN_API_KEY}" \
+              --max-time 30 \
+              --connect-timeout 10)
+            
+            health_code="${health_response: -3}"
+            health_body="${health_response%???}"
+            
+            echo "📊 Health Check Code: $health_code"
+            echo "📋 Health Response: $health_body"
+          fi

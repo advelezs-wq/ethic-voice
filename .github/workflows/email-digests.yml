@@ -1,0 +1,89 @@
+name: 📧 Email Digests
+
+# Cuándo se ejecuta este workflow
+on:
+  schedule:
+    # Digest diario: Todos los días a las 9:00 AM UTC (4:00 AM Colombia)
+    - cron: '0 9 * * *'
+    # Digest semanal: Todos los lunes a las 9:00 AM UTC (4:00 AM Colombia)
+    - cron: '0 9 * * 1'
+  
+  # Permite ejecutar manualmente desde GitHub
+  workflow_dispatch:
+    inputs:
+      digest_type:
+        description: 'Tipo de digest a ejecutar'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - daily
+          - weekly
+
+jobs:
+  # Job para digest diario
+  daily-digest:
+    name: 📅 Enviar Digest Diario
+    runs-on: ubuntu-latest
+    # Solo ejecutar si es el cron diario O si se ejecuta manualmente con 'daily' o 'both'
+    if: |
+      github.event.schedule == '0 9 * * *' || 
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.digest_type == 'daily' || github.event.inputs.digest_type == 'both'))
+    
+    steps:
+      - name: 🚀 Enviar Digest Diario
+        run: |
+          echo "🔄 Enviando digest diario..."
+          
+          response=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            -H "Authorization: Bearer ${{ secrets.DIGEST_CRON_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            ${{ secrets.APP_URL }}/api/digest/daily)
+          
+          if [ $response -eq 200 ]; then
+            echo "✅ Digest diario enviado exitosamente"
+          else
+            echo "❌ Error enviando digest diario. Código HTTP: $response"
+            exit 1
+          fi
+
+  # Job para digest semanal
+  weekly-digest:
+    name: 📊 Enviar Digest Semanal
+    runs-on: ubuntu-latest
+    # Solo ejecutar si es el cron semanal O si se ejecuta manualmente con 'weekly' o 'both'
+    if: |
+      github.event.schedule == '0 9 * * 1' || 
+      (github.event_name == 'workflow_dispatch' && (github.event.inputs.digest_type == 'weekly' || github.event.inputs.digest_type == 'both'))
+    
+    steps:
+      - name: 🚀 Enviar Digest Semanal
+        run: |
+          echo "🔄 Enviando digest semanal..."
+          
+          response=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            -H "Authorization: Bearer ${{ secrets.DIGEST_CRON_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            ${{ secrets.APP_URL }}/api/digest/weekly)
+          
+          if [ $response -eq 200 ]; then
+            echo "✅ Digest semanal enviado exitosamente"
+          else
+            echo "❌ Error enviando digest semanal. Código HTTP: $response"
+            exit 1
+          fi
+
+  # Job de notificación en caso de error
+  notify-on-failure:
+    name: 🚨 Notificar Error
+    runs-on: ubuntu-latest
+    needs: [daily-digest, weekly-digest]
+    if: failure()
+    
+    steps:
+      - name: 📧 Notificar Error
+        run: |
+          echo "🚨 Error en el envío de digests"
+          echo "Revisa los logs en GitHub Actions"
+          # Aquí podrías agregar notificación a Slack, Discord, etc. 

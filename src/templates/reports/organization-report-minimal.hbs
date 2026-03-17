@@ -1,0 +1,157 @@
+<!-- Minimal Organization Analytics, greyscale and report-style -->
+<section class="grid-4" style="margin-bottom: 6mm;">
+	<div class="panel">
+		<div class="panel-h"><h2>KPIs</h2></div>
+		<div class="panel-b grid-4">
+			<div class="kpi"><div class="label">Nuevos</div><div class="value">{{stats.newReports}}</div><div class="note">últimos 30 días</div></div>
+			<div class="kpi"><div class="label">En progreso</div><div class="value">{{stats.inProgress}}</div><div class="note">activos</div></div>
+			<div class="kpi"><div class="label">Cerrados</div><div class="value">{{stats.closedReports}}</div><div class="note">30 días</div></div>
+			<div class="kpi"><div class="label">Total</div><div class="value">{{stats.totalReports}}</div><div class="note">histórico</div></div>
+		</div>
+	</div>
+	<div class="panel">
+		<div class="panel-h"><h2>Anonimato</h2></div>
+		<div class="panel-b">
+			<div class="kpi"><div class="label">Denuncias Anónimas</div><div class="value">{{stats.anonymousReports}}</div><div class="note">{{calculatePercentage stats.anonymousReports stats.totalReports}}% del total</div></div>
+		</div>
+	</div>
+	<div class="panel">
+		<div class="panel-h"><h2>Resolución</h2></div>
+		<div class="panel-b">
+			<div class="kpi"><div class="label">Tiempo Promedio</div><div class="value">{{stats.averageResolutionTime}} días</div><div class="note">promedio histórico</div></div>
+		</div>
+	</div>
+	<div class="panel">
+		<div class="panel-h"><h2>Críticos</h2></div>
+		<div class="panel-b">
+			<div class="kpi"><div class="label">Reportes Críticos</div><div class="value">{{stats.criticalReports}}</div><div class="note">requieren atención</div></div>
+		</div>
+	</div>
+</section>
+
+<section class="grid-2" style="margin-bottom: 6mm;">
+	<div class="panel">
+		<div class="panel-h"><h2>Tendencia semanal</h2></div>
+		<div class="panel-b">
+			{{#if weeklyTrend}}
+			<div style="height: 44mm;">
+				<svg width="100%" height="100%" viewBox="0 0 300 140" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+					<rect x="0" y="0" width="300" height="140" fill="#fff" stroke="#eee" />
+					<g stroke="#eee" stroke-width="1">
+						<line x1="0" y1="120" x2="300" y2="120" />
+						<line x1="0" y1="80" x2="300" y2="80" />
+						<line x1="0" y1="40" x2="300" y2="40" />
+					</g>
+					<path d="{{weeklyPath}}" fill="none" stroke="#111" stroke-width="2" />
+				</svg>
+			</div>
+			<div style="display:grid; grid-template-columns: repeat(7, 1fr); gap: 2mm; margin-top: 2mm;">
+				{{#each weeklyTrend}}
+					<div class="muted" style="text-align:center; font-size:10px;">{{this.name}}</div>
+				{{/each}}
+			</div>
+			{{else}}
+			<div class="muted">Sin datos semanales.</div>
+			{{/if}}
+		</div>
+	</div>
+	<div class="panel">
+		<div class="panel-h"><h2>Indicador de Severidad</h2></div>
+		<div class="panel-b legend">
+			<div class="row"><div class="box"></div><div class="muted" style="width:28mm;">Alta</div><div class="bar" style="flex:1"><span style="width: {{calculatePercentage severityDistribution.high (add (add (add severityDistribution.high severityDistribution.medium) severityDistribution.low) severityDistribution.unknown)}}%;"></span></div><div class="mono" style="width:14mm; text-align:right;">{{severityDistribution.high}}</div></div>
+			<div class="row"><div class="box"></div><div class="muted" style="width:28mm;">Media</div><div class="bar" style="flex:1"><span style="width: {{calculatePercentage severityDistribution.medium (add (add (add severityDistribution.high severityDistribution.medium) severityDistribution.low) severityDistribution.unknown)}}%;"></span></div><div class="mono" style="width:14mm; text-align:right;">{{severityDistribution.medium}}</div></div>
+			<div class="row"><div class="box"></div><div class="muted" style="width:28mm;">Baja</div><div class="bar" style="flex:1"><span style="width: {{calculatePercentage severityDistribution.low (add (add (add severityDistribution.high severityDistribution.medium) severityDistribution.low) severityDistribution.unknown)}}%;"></span></div><div class="mono" style="width:14mm; text-align:right;">{{severityDistribution.low}}</div></div>
+			<div class="row"><div class="box"></div><div class="muted" style="width:28mm;">Sin clasificar</div><div class="bar" style="flex:1"><span style="width: {{calculatePercentage severityDistribution.unknown (add (add (add severityDistribution.high severityDistribution.medium) severityDistribution.low) severityDistribution.unknown)}}%;"></span></div><div class="mono" style="width:14mm; text-align:right;">{{severityDistribution.unknown}}</div></div>
+		</div>
+	</div>
+</section>
+
+<section class="panel" style="margin-bottom: 6mm;">
+	<div class="panel-h"><h2>Estadística mensual (barras)</h2></div>
+	<div class="panel-b" style="padding-top: 6mm;">
+		{{#if chartData}}
+		<div style="height: 44mm; display:flex; align-items:flex-end; gap:6mm;">
+			{{#each chartData}}
+				<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3mm;">
+					<div class="bar" style="height: 30mm; width: 100%;">
+						<span style="width:100%; height: {{multiply (divide this.reports ../monthlyMax) 100}}%; background:#111;"></span>
+					</div>
+					<div class="muted" style="font-size:10px;">{{this.name}}</div>
+				</div>
+			{{/each}}
+		</div>
+		{{else}}
+		<div class="muted">Sin datos mensuales.</div>
+		{{/if}}
+	</div>
+</section>
+
+<section class="panel" style="margin-bottom: 6mm;">
+	<div class="panel-h"><h2>Overview de contenido</h2></div>
+	<div class="panel-b">
+		<table>
+			<thead>
+				<tr>
+					<th>Página / Tipo</th>
+					<th style="width:25mm;">Reportes</th>
+					<th style="width:18mm;">%</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#each categoryData}}
+				<tr>
+					<td>{{this.name}}</td>
+					<td class="mono">{{this.value}}</td>
+					<td class="mono">{{this.percentage}}%</td>
+				</tr>
+				{{/each}}
+			</tbody>
+		</table>
+	</div>
+</section>
+
+<section class="grid-2" style="margin-bottom: 6mm;">
+	<div class="panel">
+		<div class="panel-h"><h2>Fuentes de reportes</h2></div>
+		<div class="panel-b">
+			<table>
+				<tr><th>Fuente</th><th style="width:25mm;">Visitas</th><th style="width:18mm;">%</th></tr>
+				<tr><td>google</td><td class="mono">{{sourceDistribution.ethicLine}}</td><td class="mono">{{calculatePercentage sourceDistribution.ethicLine stats.totalReports}}%</td></tr>
+				<tr><td>(direct)</td><td class="mono">{{sourceDistribution.customForm}}</td><td class="mono">{{calculatePercentage sourceDistribution.customForm stats.totalReports}}%</td></tr>
+				{{#if sourceDistribution.email}}<tr><td>email</td><td class="mono">{{sourceDistribution.email}}</td><td class="mono">{{calculatePercentage sourceDistribution.email stats.totalReports}}%</td></tr>{{/if}}
+				{{#if sourceDistribution.api}}<tr><td>api</td><td class="mono">{{sourceDistribution.api}}</td><td class="mono">{{calculatePercentage sourceDistribution.api stats.totalReports}}%</td></tr>{{/if}}
+			</table>
+		</div>
+	</div>
+	<div class="panel">
+		<div class="panel-h"><h2>Reportes recientes</h2></div>
+		<div class="panel-b">
+			<table>
+				<tr><th>Id</th><th>Tipo</th><th>Severidad</th><th>Estado</th></tr>
+				{{#each (limit recentReports 5)}}
+				<tr>
+					<td class="mono">REP-{{padLeft this.idTable 6}}</td>
+					<td>{{#if this.category}}{{this.category}}{{else}}Sin clasificar{{/if}}</td>
+					<td>{{this.severity}}</td>
+					<td>{{this.status}}</td>
+				</tr>
+				{{/each}}
+			</table>
+		</div>
+	</div>
+</section>
+
+<section class="panel">
+	<div class="panel-h"><h2>Logs</h2></div>
+	<div class="panel-b">
+		<table>
+			<tr><th>Fecha</th><th>Mensaje</th></tr>
+			{{#each (limit recentReports 10)}}
+			<tr>
+				<td class="mono">{{formatDate this.submittedAt "dd.MM.yyyy HH:mm"}}</td>
+				<td>Reporte {{this.id}} • {{this.category}} • {{#if this.isAnonymous}}Anónimo{{else}}Identificado{{/if}}</td>
+			</tr>
+			{{/each}}
+		</table>
+	</div>
+</section>

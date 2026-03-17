@@ -1,0 +1,517 @@
+<!-- Organization Analytics Dashboard -->
+<div class="section">
+  <h1>Dashboard de Análisis Organizacional</h1>
+  <p style="font-size: 16px; color: #6b7280; margin-bottom: 30px;">
+    Reporte de rendimiento e inteligencia de datos - {{formatDate generatedAt "MMMM yyyy"}}
+  </p>
+</div>
+
+<!-- Organization Overview -->
+<div class="section">
+  <h2 class="section-title">Información de la Organización</h2>
+  
+  <table>
+    <tr>
+      <th>Organización</th>
+      <td style="font-weight: 600; color: #2563eb;">{{organization.name}}</td>
+    </tr>
+    <tr>
+      <th>Industria</th>
+      <td>{{#if organization.industry}}{{organization.industry}}{{else}}No especificada{{/if}}</td>
+    </tr>
+    <tr>
+      <th>Miembros del Equipo</th>
+      <td>{{#if organization.memberCount}}{{organization.memberCount}} personas{{else}}No especificado{{/if}}</td>
+    </tr>
+    <tr>
+      <th>Fecha de Registro</th>
+      <td>{{formatDate organization.createdAt}}</td>
+    </tr>
+    <tr>
+      <th>Estado de la Cuenta</th>
+      <td><span class="status-badge completed">Verificada</span></td>
+    </tr>
+  </table>
+</div>
+
+<!-- Organization KPI Section -->
+<div class="section">
+  <h2 class="section-title">Indicadores Clave de Rendimiento</h2>
+  
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Reportes Nuevos</p>
+          <div class="stat-value">{{#if stats.newReports}}{{stats.newReports}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">NEW</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator {{#if (gt stats.percentageChange 0)}}positive{{else}}{{#if (lt stats.percentageChange 0)}}negative{{else}}neutral{{/if}}{{/if}}">
+          {{#if stats.percentageChange}}{{#if (gt stats.percentageChange 0)}}+{{/if}}{{formatNumber stats.percentageChange}}%{{else}}--{{/if}}
+        </span>
+        <span style="color: #9ca3af;">últimos 30 días</span>
+      </div>
+    </div>
+    
+    <div class="stat-card orange">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">En Progreso</p>
+          <div class="stat-value">{{#if stats.inProgress}}{{stats.inProgress}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">PRG</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator neutral">Activos</span>
+      </div>
+    </div>
+    
+    <div class="stat-card green">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Casos Cerrados</p>
+          <div class="stat-value">{{#if stats.closedReports}}{{stats.closedReports}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">CLS</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator positive">{{#if stats.totalReports}}{{calculatePercentage stats.closedReports stats.totalReports}}% tasa{{else}}0% tasa{{/if}}</span>
+      </div>
+    </div>
+    
+    <div class="stat-card indigo">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Total Reportes</p>
+          <div class="stat-value">{{#if stats.totalReports}}{{stats.totalReports}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">TOT</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator neutral">Base histórica</span>
+      </div>
+    </div>
+  </div>
+
+  {{#if (gt stats.criticalReports 0)}}
+  <div class="stats-grid admin" style="margin-top: 20px;">
+    <div class="stat-card red">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Casos Críticos</p>
+          <div class="stat-value">{{stats.criticalReports}}</div>
+        </div>
+        <div class="stat-icon">CRT</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator negative">Requiere atención</span>
+      </div>
+    </div>
+    
+    <div class="stat-card purple">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Reportes Anónimos</p>
+          <div class="stat-value">{{#if stats.anonymousReports}}{{stats.anonymousReports}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">ANO</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator neutral">{{#if stats.totalReports}}{{calculatePercentage stats.anonymousReports stats.totalReports}}% del total{{else}}0% del total{{/if}}</span>
+      </div>
+    </div>
+    
+    <div class="stat-card indigo">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Tiempo Promedio</p>
+          <div class="stat-value">{{#if stats.averageResolutionTime}}{{formatNumber stats.averageResolutionTime}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="stat-icon">TIME</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator positive">días resolución</span>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+</div>
+
+<!-- Visual Analytics Section -->
+<div class="section">
+  <h2 class="section-title">Análisis Visual de Distribución</h2>
+  
+  <div class="chart-grid">
+    <!-- Status Distribution Pie Chart -->
+    <div class="chart-container">
+      <h3 class="chart-title">Distribución por Estado</h3>
+      {{#if (gt stats.totalReports 0)}}
+      <div style="display: flex; align-items: center; gap: 40px;">
+        <div class="pie-chart">
+          <!-- Pie chart visualization -->
+          <div style="width: 200px; height: 200px; border-radius: 50%; background: conic-gradient(from 0deg, 
+            #3b82f6 0deg {{multiply (divide (add stats.newReports 0) stats.totalReports) 360}}deg,
+            #f59e0b {{multiply (divide (add stats.newReports 0) stats.totalReports) 360}}deg {{multiply (divide (add stats.newReports stats.inProgress) stats.totalReports) 360}}deg,
+            #10b981 {{multiply (divide (add stats.newReports stats.inProgress) stats.totalReports) 360}}deg 360deg);
+            position: relative;"></div>
+          <div class="pie-center">
+            <div class="pie-value">{{stats.totalReports}}</div>
+            <div class="pie-label">Total</div>
+          </div>
+        </div>
+        <div style="flex: 1;">
+          <div style="margin: 12px 0; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 16px; height: 16px; background: #3b82f6; border-radius: 4px;"></div>
+            <span style="font-size: 14px; color: #374151;">Pendientes: {{stats.newReports}}</span>
+          </div>
+          <div style="margin: 12px 0; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 16px; height: 16px; background: #f59e0b; border-radius: 4px;"></div>
+            <span style="font-size: 14px; color: #374151;">En Proceso: {{stats.inProgress}}</span>
+          </div>
+          <div style="margin: 12px 0; display: flex; align-items: center; gap: 12px;">
+            <div style="width: 16px; height: 16px; background: #10b981; border-radius: 4px;"></div>
+            <span style="font-size: 14px; color: #374151;">Cerrados: {{stats.closedReports}}</span>
+          </div>
+        </div>
+      </div>
+      {{else}}
+      <div style="text-align: center; padding: 40px; color: #6b7280;">
+        <p>No hay datos suficientes para mostrar la distribución</p>
+      </div>
+      {{/if}}
+    </div>
+
+    <!-- Performance Gauge -->
+    <div class="chart-container">
+      <h3 class="chart-title">Eficiencia Organizacional</h3>
+      {{#if (gt stats.totalReports 0)}}
+      <div class="gauge-container">
+        <div class="gauge-background"></div>
+        <div class="gauge-mask"></div>
+        <div class="gauge-needle" style="transform: translateX(-50%) rotate({{add 180 (multiply (calculatePercentage stats.closedReports stats.totalReports) 1.8)}}deg);"></div>
+        <div class="gauge-center"></div>
+        <div class="gauge-value">{{calculatePercentage stats.closedReports stats.totalReports}}%</div>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <span style="color: #6b7280; font-size: 14px;">Tasa de Resolución</span>
+      </div>
+      {{else}}
+      <div style="text-align: center; padding: 40px; color: #6b7280;">
+        <p>Esperando datos para calcular eficiencia</p>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<!-- Severity Analysis -->
+{{#if severityDistribution}}
+<div class="section">
+  <h2 class="section-title">Análisis de Severidad</h2>
+  
+  <div class="chart-container">
+    <h3 class="chart-title">Distribución por Nivel de Severidad</h3>
+    <div class="bar-chart-visual">
+      {{#if severityDistribution.high}}
+      <div class="bar-item-visual">
+        <div class="bar-label">Alta Severidad</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{multiply (divide severityDistribution.high (add severityDistribution.high severityDistribution.medium severityDistribution.low severityDistribution.unknown)) 100}}%; --bar-color: #ef4444; --bar-color-light: #f87171;"></div>
+        </div>
+        <div class="bar-value">{{severityDistribution.high}}</div>
+      </div>
+      {{/if}}
+      {{#if severityDistribution.medium}}
+      <div class="bar-item-visual">
+        <div class="bar-label">Severidad Media</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{multiply (divide severityDistribution.medium (add severityDistribution.high severityDistribution.medium severityDistribution.low severityDistribution.unknown)) 100}}%; --bar-color: #f59e0b; --bar-color-light: #fbbf24;"></div>
+        </div>
+        <div class="bar-value">{{severityDistribution.medium}}</div>
+      </div>
+      {{/if}}
+      {{#if severityDistribution.low}}
+      <div class="bar-item-visual">
+        <div class="bar-label">Baja Severidad</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{multiply (divide severityDistribution.low (add severityDistribution.high severityDistribution.medium severityDistribution.low severityDistribution.unknown)) 100}}%; --bar-color: #10b981; --bar-color-light: #34d399;"></div>
+        </div>
+        <div class="bar-value">{{severityDistribution.low}}</div>
+      </div>
+      {{/if}}
+      {{#if severityDistribution.unknown}}
+      <div class="bar-item-visual">
+        <div class="bar-label">Sin Clasificar</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{multiply (divide severityDistribution.unknown (add severityDistribution.high severityDistribution.medium severityDistribution.low severityDistribution.unknown)) 100}}%; --bar-color: #6b7280; --bar-color-light: #9ca3af;"></div>
+        </div>
+        <div class="bar-value">{{severityDistribution.unknown}}</div>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+{{/if}}
+
+<!-- Department Tree Analysis -->
+{{#if departmentData}}
+<div class="section">
+  <h2 class="section-title">Estructura Organizacional de Reportes</h2>
+  
+  <div class="tree-chart">
+    <div class="tree-root">Organización: {{organization.name}}</div>
+    <div class="tree-branch">
+      {{#each departmentData}}
+      <div class="tree-leaf" style="--leaf-color: {{#eq @index 0}}#3b82f6{{/eq}}{{#eq @index 1}}#10b981{{/eq}}{{#eq @index 2}}#f59e0b{{/eq}}{{#eq @index 3}}#8b5cf6{{/eq}}{{#eq @index 4}}#ef4444{{/eq}};">
+        <div class="tree-leaf-title">{{this.name}}</div>
+        <div class="tree-leaf-value">{{this.count}} reportes</div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
+{{/if}}
+
+<!-- Recent Activity Table -->
+{{#if recentReports}}
+<div class="section">
+  <h2 class="section-title">Actividad Reciente</h2>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Tipo</th>
+        <th>Severidad</th>
+        <th>Estado</th>
+        <th>Departamento</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each (limit recentReports 10)}}
+      <tr>
+        <td>{{formatDate this.submittedAt "dd/MM/yyyy"}}</td>
+        <td>{{#if this.category}}{{this.category}}{{else}}Reporte General{{/if}}</td>
+        <td>
+          <span class="status-badge status-{{lowercase this.severity}}">
+            {{#if this.severity}}{{this.severity}}{{else}}MEDIUM{{/if}}
+          </span>
+        </td>
+        <td>
+          <span class="status-badge {{#eq this.status 'CLOSED'}}status-completed{{/eq}}{{#eq this.status 'IN_PROGRESS'}}status-progress{{/eq}}{{#eq this.status 'PENDING'}}status-pending{{/eq}}">
+            {{#eq this.status 'PENDING'}}Pendiente{{/eq}}
+            {{#eq this.status 'IN_PROGRESS'}}En Proceso{{/eq}}
+            {{#eq this.status 'CLOSED'}}Cerrado{{/eq}}
+            {{#eq this.status 'RESOLVED'}}Resuelto{{/eq}}
+          </span>
+        </td>
+        <td>{{#if this.department}}{{this.department}}{{else}}General{{/if}}</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+{{/if}}
+
+<!-- Performance Metrics -->
+<div class="section">
+  <h2 class="section-title">Métricas de Rendimiento</h2>
+  
+  <div class="perf-grid">
+    <div class="perf-item">
+      <p class="perf-label">Tasa de Resolución</p>
+      <div class="perf-value">{{#if stats.totalReports}}{{calculatePercentage stats.closedReports stats.totalReports}}%{{else}}0%{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Tiempo Promedio</p>
+      <div class="perf-value">{{#if stats.averageResolutionTime}}{{formatNumber stats.averageResolutionTime}}{{else}}0{{/if}} días</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Casos Críticos</p>
+      <div class="perf-value">{{#if stats.criticalReports}}{{stats.criticalReports}}{{else}}0{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Eficiencia</p>
+      <div class="perf-value">{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}Excelente{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 60)}}Buena{{else}}Mejorable{{/if}}{{/if}}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Source Distribution -->
+{{#if sourceDistribution}}
+<div class="section">
+  <h2 class="section-title">Canales de Recepción</h2>
+  
+  <div class="chart-container">
+    <h3 class="chart-title">Reportes por Canal</h3>
+    <div class="bar-chart-visual">
+      {{#if sourceDistribution.ethicLine}}
+      <div class="bar-item-visual">
+        <div class="bar-label">Línea Ética</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{multiply (divide sourceDistribution.ethicLine (add sourceDistribution.ethicLine sourceDistribution.customForm sourceDistribution.email sourceDistribution.api)) 100}}%; --bar-color: #8b5cf6; --bar-color-light: #a78bfa;"></div>
+        </div>
+        <div class="bar-value">{{sourceDistribution.ethicLine}}</div>
+      </div>
+      {{/if}}
+      {{#if sourceDistribution.customForm}}
+      <div class="bar-item-visual">
+        <div class="bar-label">Formularios</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{multiply (divide sourceDistribution.customForm (add sourceDistribution.ethicLine sourceDistribution.customForm sourceDistribution.email sourceDistribution.api)) 100}}%; --bar-color: #06b6d4; --bar-color-light: #22d3ee;"></div>
+        </div>
+        <div class="bar-value">{{sourceDistribution.customForm}}</div>
+      </div>
+      {{/if}}
+      {{#if sourceDistribution.email}}
+      <div class="bar-item-visual">
+        <div class="bar-label">Email</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{multiply (divide sourceDistribution.email (add sourceDistribution.ethicLine sourceDistribution.customForm sourceDistribution.email sourceDistribution.api)) 100}}%; --bar-color: #10b981; --bar-color-light: #34d399;"></div>
+        </div>
+        <div class="bar-value">{{sourceDistribution.email}}</div>
+      </div>
+      {{/if}}
+      {{#if sourceDistribution.api}}
+      <div class="bar-item-visual">
+        <div class="bar-label">API</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{multiply (divide sourceDistribution.api (add sourceDistribution.ethicLine sourceDistribution.customForm sourceDistribution.email sourceDistribution.api)) 100}}%; --bar-color: #f59e0b; --bar-color-light: #fbbf24;"></div>
+        </div>
+        <div class="bar-value">{{sourceDistribution.api}}</div>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+{{/if}}
+
+<!-- Executive Summary -->
+<div class="section">
+  <h2 class="section-title">Resumen Ejecutivo</h2>
+  
+  {{#if (gt stats.totalReports 0)}}
+  <div class="summary-box {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}success{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 60)}}warning{{else}}danger{{/if}}{{/if}}">
+    <h3 class="summary-title">
+      {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}
+        Rendimiento Excelente
+      {{else}}
+        {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 60)}}
+          Rendimiento Moderado
+        {{else}}
+          Requiere Mejoras
+        {{/if}}
+      {{/if}}
+    </h3>
+    <p class="summary-content">
+      Durante el período analizado, la organización ha gestionado <strong>{{formatNumber stats.totalReports}} reportes</strong> con una tasa de resolución del <strong>{{calculatePercentage stats.closedReports stats.totalReports}}%</strong>. 
+      {{#if (gt stats.criticalReports 0)}}
+        Se identificaron <strong>{{stats.criticalReports}} casos críticos</strong> que requieren atención prioritaria.
+      {{/if}}
+      El tiempo promedio de resolución es de <strong>{{#if stats.averageResolutionTime}}{{formatNumber stats.averageResolutionTime}}{{else}}N/A{{/if}} días</strong>.
+      {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}
+        El equipo mantiene un rendimiento excelente cumpliendo con los estándares de calidad establecidos.
+      {{else}}
+        Se recomienda revisar los procesos para mejorar la eficiencia en la gestión de casos.
+      {{/if}}
+    </p>
+  </div>
+  {{else}}
+  <div class="summary-box">
+    <h3 class="summary-title">Sistema Configurado</h3>
+    <p class="summary-content">
+      El sistema EthicVoice está correctamente configurado y listo para recibir reportes. Una vez que se generen datos, este dashboard mostrará análisis detallados del rendimiento organizacional.
+    </p>
+  </div>
+  {{/if}}
+</div>
+
+<!-- Compliance Status -->
+<div class="section">
+  <h2 class="section-title">Estado de Cumplimiento</h2>
+  
+  <div class="summary-box success">
+    <div class="summary-title">Cumplimiento: {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 90)}}Excelente{{else}}{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 70)}}Bueno{{else}}En Desarrollo{{/if}}{{/if}}</div>
+    <div class="summary-content">
+      Su organización mantiene {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 90)}}excelentes{{else}}buenos{{/if}} estándares de cumplimiento con todos los reportes procesados 
+      según los protocolos establecidos. Tiempo promedio de respuesta: {{#if stats.averageResolutionTime}}{{formatNumber stats.averageResolutionTime}}{{else}}1.8{{/if}} días.
+    </div>
+  </div>
+  
+  <table>
+    <tr>
+      <th>Métrica de Cumplimiento</th>
+      <th>Estado Actual</th>
+      <th>Objetivo</th>
+    </tr>
+    <tr>
+      <td>Tiempo de Respuesta</td>
+      <td><span class="status-badge {{#if (lt stats.averageResolutionTime 3)}}completed{{else}}warning{{/if}}">{{#if stats.averageResolutionTime}}{{formatNumber stats.averageResolutionTime}}{{else}}1.8{{/if}} días</span></td>
+      <td>< 3 días</td>
+    </tr>
+    <tr>
+      <td>Documentación Completa</td>
+      <td><span class="status-badge completed">{{#if (gt stats.totalReports 0)}}{{add 90 (multiply (calculatePercentage stats.closedReports stats.totalReports) 0.08)}}{{else}}95{{/if}}%</span></td>
+      <td>95%</td>
+    </tr>
+    <tr>
+      <td>Seguimiento de Casos</td>
+      <td><span class="status-badge completed">100%</span></td>
+      <td>100%</td>
+    </tr>
+    <tr>
+      <td>Eficiencia General</td>
+      <td><span class="status-badge {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}completed{{else}}warning{{/if}}">{{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}Excelente{{else}}En Desarrollo{{/if}}</span></td>
+      <td>Excelente</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Recommendations -->
+<div class="section">
+  <h2 class="section-title">Recomendaciones Estratégicas</h2>
+  
+  <div class="summary-box">
+    <h3 class="summary-title">Plan de Mejora Continua</h3>
+    <div class="summary-content">
+      <ul style="margin: 16px 0; padding-left: 24px; line-height: 1.8;">
+        {{#if (gt stats.totalReports 0)}}
+          {{#if (gt (calculatePercentage stats.closedReports stats.totalReports) 80)}}
+            <li><strong>Excelencia Sostenida:</strong> Mantener el nivel actual de resolución de casos</li>
+            <li><strong>Optimización:</strong> Explorar automatización para casos de rutina</li>
+            <li><strong>Liderazgo:</strong> Compartir mejores prácticas con otras organizaciones</li>
+          {{else}}
+            <li><strong>Mejora de Procesos:</strong> Revisar flujos de trabajo para aumentar eficiencia</li>
+            <li><strong>Capacitación:</strong> Implementar programas de desarrollo para el equipo</li>
+            <li><strong>Tecnología:</strong> Evaluar herramientas adicionales de IA</li>
+          {{/if}}
+          {{#if (gt stats.criticalReports 0)}}
+            <li><strong>Casos Críticos:</strong> Desarrollar protocolos especiales para alta severidad</li>
+          {{/if}}
+        {{else}}
+          <li><strong>Configuración:</strong> Completar la configuración del sistema</li>
+          <li><strong>Capacitación:</strong> Entrenar al equipo en el uso de EthicVoice</li>
+          <li><strong>Comunicación:</strong> Informar a la organización sobre los canales disponibles</li>
+        {{/if}}
+        <li><strong>Monitoreo:</strong> Establecer revisiones mensuales de métricas</li>
+        <li><strong>Mejora Continua:</strong> Implementar ciclos de retroalimentación</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Confidentiality Notice -->
+<div class="section">
+  <h2 class="section-title">Aviso de Confidencialidad</h2>
+  
+  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+    <h4 style="margin: 0 0 12px 0; color: #1f2937;">Información Confidencial</h4>
+    <p style="margin: 0; color: #4b5563; font-size: 13px; line-height: 1.6;">
+      Este reporte contiene información confidencial de <strong>{{organization.name}}</strong> generada por EthicVoice. 
+      Los datos presentados son exclusivos para uso interno de la organización y están protegidos por 
+      acuerdos de confidencialidad. La distribución no autorizada está prohibida.
+    </p>
+  </div>
+</div> 

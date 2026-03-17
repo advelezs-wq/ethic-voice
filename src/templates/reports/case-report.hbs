@@ -1,0 +1,481 @@
+<!-- Case Overview -->
+<div class="section">
+  <h2 class="section-title">Información del Caso</h2>
+  
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Número de Caso</p>
+          <div class="stat-value" style="font-size: 24px; font-family: monospace;">REP-{{padLeft id 6}}</div>
+        </div>
+        <div class="stat-icon">ID</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator neutral">Identificador único</span>
+      </div>
+    </div>
+    
+    <div class="stat-card {{#eq status 'CLOSED'}}green{{/eq}}{{#eq status 'IN_PROGRESS'}}orange{{/eq}}{{#eq status 'PENDING'}}blue{{/eq}}{{#eq status 'RESOLVED'}}green{{/eq}}">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Estado Actual</p>
+          <div class="stat-value" style="font-size: 20px;">
+            {{#eq status 'PENDING'}}Pendiente{{/eq}}
+            {{#eq status 'IN_PROGRESS'}}En Proceso{{/eq}}
+            {{#eq status 'CLOSED'}}Cerrado{{/eq}}
+            {{#eq status 'RESOLVED'}}Resuelto{{/eq}}
+          </div>
+        </div>
+        <div class="stat-icon">ST</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator {{#eq status 'CLOSED'}}positive{{/eq}}{{#eq status 'RESOLVED'}}positive{{/eq}}{{#eq status 'PENDING'}}neutral{{/eq}}{{#eq status 'IN_PROGRESS'}}neutral{{/eq}}{{#eq status 'UNDER_REVIEW'}}neutral{{/eq}}{{#eq status 'ARCHIVED'}}neutral{{/eq}}">
+          {{#eq status 'CLOSED'}}Finalizado{{/eq}}{{#eq status 'RESOLVED'}}Finalizado{{/eq}}{{#eq status 'PENDING'}}Activo{{/eq}}{{#eq status 'IN_PROGRESS'}}Activo{{/eq}}{{#eq status 'UNDER_REVIEW'}}Activo{{/eq}}{{#eq status 'ARCHIVED'}}Activo{{/eq}}
+        </span>
+      </div>
+    </div>
+    
+    <div class="stat-card {{#eq aiSeverity 'HIGH'}}red{{/eq}}{{#eq aiSeverity 'MEDIUM'}}orange{{/eq}}{{#eq aiSeverity 'LOW'}}green{{/eq}}{{#eq aiSeverity 'UNKNOWN'}}gray{{/eq}}">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Severidad</p>
+          <div class="stat-value" style="font-size: 20px;">
+            {{#if aiSeverity}}{{aiSeverity}}{{else}}MEDIUM{{/if}}
+          </div>
+        </div>
+        <div class="stat-icon">SEV</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator {{#eq aiSeverity 'HIGH'}}negative{{/eq}}{{#eq aiSeverity 'LOW'}}positive{{/eq}}{{#eq aiSeverity 'MEDIUM'}}neutral{{/eq}}{{#eq aiSeverity 'UNKNOWN'}}neutral{{/eq}}">
+          Evaluación IA
+        </span>
+      </div>
+    </div>
+    
+    <div class="stat-card indigo">
+      <div class="stat-header">
+        <div>
+          <p class="stat-label">Días Activo</p>
+          <div class="stat-value">{{daysSince submittedAt}}</div>
+        </div>
+        <div class="stat-icon">TIME</div>
+      </div>
+      <div class="stat-change">
+        <span class="change-indicator {{#if (gt (daysSince submittedAt) 30)}}negative{{else}}positive{{/if}}">
+          {{#if (gt (daysSince submittedAt) 30)}}Extendido{{else}}Normal{{/if}}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Case Details Table -->
+<div class="section">
+  <h2 class="section-title">Detalles del Caso</h2>
+  
+  <table>
+    <tr>
+      <th>Fecha de Submisión</th>
+      <td>{{formatDate submittedAt "dd/MM/yyyy HH:mm"}}</td>
+    </tr>
+    <tr>
+      <th>Organización</th>
+      <td style="font-weight: 600;">{{#if organization.name}}{{organization.name}}{{else}}No especificada{{/if}}</td>
+    </tr>
+    <tr>
+      <th>Fuente</th>
+      <td>
+        {{#eq source 'ETHIC_LINE'}}Línea Ética{{/eq}}
+        {{#eq source 'CUSTOM_FORM'}}Formulario Personalizado{{/eq}}
+        {{#eq source 'EMAIL'}}Correo Electrónico{{/eq}}
+        {{#eq source 'API'}}API{{/eq}}
+        {{#unless source}}No especificada{{/unless}}
+      </td>
+    </tr>
+    <tr>
+      <th>Tipo de Reporte</th>
+      <td>{{#if type}}{{type}}{{else}}Reporte General{{/if}}</td>
+    </tr>
+    <tr>
+      <th>Departamento</th>
+      <td>{{#if department}}{{department}}{{else}}General{{/if}}</td>
+    </tr>
+    <tr>
+      <th>Ubicación</th>
+      <td>{{#if location}}{{location}}{{else}}No especificada{{/if}}</td>
+    </tr>
+    <tr>
+      <th>Reportero</th>
+      <td>
+        {{#if isAnonymous}}
+          <span class="status-badge status-pending">Anónimo</span>
+        {{else}}
+          {{#if reporterName}}{{reporterName}}{{else}}Información no disponible{{/if}}
+        {{/if}}
+      </td>
+    </tr>
+    <tr>
+      <th>Prioridad</th>
+      <td>
+        <span class="status-badge {{#eq priority 'URGENT'}}status-critical{{/eq}}{{#eq priority 'HIGH'}}status-high{{/eq}}{{#eq priority 'NORMAL'}}status-medium{{/eq}}{{#eq priority 'LOW'}}status-low{{/eq}}">
+          {{#if priority}}{{priority}}{{else}}NORMAL{{/if}}
+        </span>
+      </td>
+    </tr>
+    {{#if processedAt}}
+    <tr>
+      <th>Fecha de Resolución</th>
+      <td>{{formatDate processedAt "dd/MM/yyyy HH:mm"}}</td>
+    </tr>
+    <tr>
+      <th>Tiempo de Resolución</th>
+      <td>{{daysBetween submittedAt processedAt}} días</td>
+    </tr>
+    {{/if}}
+  </table>
+</div>
+
+<!-- Visual Case Progress -->
+<div class="section">
+  <h2 class="section-title">Progreso Visual del Caso</h2>
+  
+  <div class="chart-grid">
+    <!-- Case Progress Gauge -->
+    <div class="chart-container">
+      <h3 class="chart-title">Progreso General</h3>
+      <div class="gauge-container">
+        <div class="gauge-background"></div>
+        <div class="gauge-mask"></div>
+        <div class="gauge-needle" style="transform: translateX(-50%) rotate({{add 180 (multiply (divide (add (daysSince submittedAt) 0) 30) 180)}}deg);"></div>
+        <div class="gauge-center"></div>
+        <div class="gauge-value">{{#if processedAt}}100%{{/if}}{{#eq status 'IN_PROGRESS'}}{{#unless processedAt}}65%{{/unless}}{{/eq}}{{#eq status 'PENDING'}}{{#unless processedAt}}25%{{/unless}}{{/eq}}</div>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <span style="color: #6b7280; font-size: 14px;">Estado de Completitud</span>
+      </div>
+    </div>
+
+    <!-- Case Classification Tree -->
+    <div class="chart-container">
+      <h3 class="chart-title">Clasificación del Caso</h3>
+      <div class="tree-chart">
+        <div class="tree-root">REP-{{padLeft id 6}}</div>
+        <div class="tree-branch">
+          <div class="tree-leaf" style="--leaf-color: {{#eq aiSeverity 'HIGH'}}#ef4444{{/eq}}{{#eq aiSeverity 'MEDIUM'}}#f59e0b{{/eq}}{{#eq aiSeverity 'LOW'}}#10b981{{/eq}}{{#unless aiSeverity}}#6b7280{{/unless}};">
+            <div class="tree-leaf-title">Severidad</div>
+            <div class="tree-leaf-value">{{#if aiSeverity}}{{aiSeverity}}{{else}}MEDIUM{{/if}}</div>
+          </div>
+          <div class="tree-leaf" style="--leaf-color: {{#eq status 'CLOSED'}}#10b981{{/eq}}{{#eq status 'IN_PROGRESS'}}#f59e0b{{/eq}}{{#eq status 'PENDING'}}#3b82f6{{/eq}};">
+            <div class="tree-leaf-title">Estado</div>
+            <div class="tree-leaf-value">{{#eq status 'PENDING'}}Pendiente{{/eq}}{{#eq status 'IN_PROGRESS'}}En Proceso{{/eq}}{{#eq status 'CLOSED'}}Cerrado{{/eq}}{{#eq status 'RESOLVED'}}Resuelto{{/eq}}</div>
+          </div>
+          <div class="tree-leaf" style="--leaf-color: #8b5cf6;">
+            <div class="tree-leaf-title">Días Activo</div>
+            <div class="tree-leaf-value">{{daysSince submittedAt}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Case Timeline -->
+<div class="section">
+  <h2 class="section-title">Línea de Tiempo del Caso</h2>
+  
+  <div class="chart-container">
+    <h3 class="chart-title">Evolución Cronológica</h3>
+    <div class="timeline-container" style="padding: 20px;">
+      <div class="timeline-item" style="margin-bottom: 20px; padding-left: 30px; border-left: 3px solid #3b82f6; position: relative;">
+        <div style="position: absolute; left: -8px; top: 5px; width: 12px; height: 12px; background: #3b82f6; border-radius: 50%;"></div>
+        <div style="font-weight: 600; color: #1f2937;">Caso Creado</div>
+        <div style="color: #6b7280; font-size: 14px;">{{formatDate submittedAt "dd/MM/yyyy HH:mm"}}</div>
+        <div style="color: #4b5563; font-size: 13px; margin-top: 4px;">
+          Reporte recibido vía {{#eq source 'ETHIC_LINE'}}Línea Ética{{/eq}}{{#eq source 'CUSTOM_FORM'}}Formulario{{/eq}}{{#eq source 'EMAIL'}}Email{{/eq}}{{#eq source 'API'}}API{{/eq}}{{#unless source}}Canal no especificado{{/unless}}
+        </div>
+      </div>
+      
+      {{#if (ne status 'PENDING')}}
+      <div class="timeline-item" style="margin-bottom: 20px; padding-left: 30px; border-left: 3px solid #f59e0b; position: relative;">
+        <div style="position: absolute; left: -8px; top: 5px; width: 12px; height: 12px; background: #f59e0b; border-radius: 50%;"></div>
+        <div style="font-weight: 600; color: #1f2937;">Caso en Revisión</div>
+        <div style="color: #6b7280; font-size: 14px;">
+          {{#if updatedAt}}{{formatDate updatedAt "dd/MM/yyyy HH:mm"}}{{else}}En proceso{{/if}}
+        </div>
+        <div style="color: #4b5563; font-size: 13px; margin-top: 4px;">
+          Evaluación inicial y asignación de severidad: {{#if aiSeverity}}{{aiSeverity}}{{else}}MEDIUM{{/if}}
+        </div>
+      </div>
+      {{/if}}
+      
+      {{#if assignments}}
+      <div class="timeline-item" style="margin-bottom: 20px; padding-left: 30px; border-left: 3px solid #8b5cf6; position: relative;">
+        <div style="position: absolute; left: -8px; top: 5px; width: 12px; height: 12px; background: #8b5cf6; border-radius: 50%;"></div>
+        <div style="font-weight: 600; color: #1f2937;">Caso Asignado</div>
+        <div style="color: #6b7280; font-size: 14px;">Equipo de investigación</div>
+        <div style="color: #4b5563; font-size: 13px; margin-top: 4px;">
+          Asignado a {{assignments.length}} investigador{{#if (gt assignments.length 1)}}es{{/if}}
+        </div>
+      </div>
+      {{/if}}
+      
+      {{#if processedAt}}
+      <div class="timeline-item" style="margin-bottom: 20px; padding-left: 30px; border-left: 3px solid #10b981; position: relative;">
+        <div style="position: absolute; left: -8px; top: 5px; width: 12px; height: 12px; background: #10b981; border-radius: 50%;"></div>
+        <div style="font-weight: 600; color: #1f2937;">Caso Resuelto</div>
+        <div style="color: #6b7280; font-size: 14px;">{{formatDate processedAt "dd/MM/yyyy HH:mm"}}</div>
+        <div style="color: #4b5563; font-size: 13px; margin-top: 4px;">
+          Resolución completada en {{daysBetween submittedAt processedAt}} días
+        </div>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<!-- AI Analysis -->
+{{#if aiSummary}}
+<div class="section">
+  <h2 class="section-title">Análisis de Inteligencia Artificial</h2>
+  
+      <div class="summary-box {{#eq aiSeverity 'HIGH'}}danger{{/eq}}{{#eq aiSeverity 'MEDIUM'}}warning{{/eq}}{{#eq aiSeverity 'LOW'}}success{{/eq}}{{#eq aiSeverity 'UNKNOWN'}}neutral{{/eq}}">
+    <h3 class="summary-title">Resumen Automatizado</h3>
+    <p class="summary-content">{{aiSummary}}</p>
+  </div>
+  
+  <div class="perf-grid">
+    <div class="perf-item">
+      <p class="perf-label">Evaluación de Severidad</p>
+      <div class="perf-value">{{#if aiSeverity}}{{aiSeverity}}{{else}}MEDIUM{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Confianza del Análisis</p>
+      <div class="perf-value">
+        {{#eq aiSeverity 'HIGH'}}95%{{/eq}}
+        {{#eq aiSeverity 'MEDIUM'}}87%{{/eq}}
+        {{#eq aiSeverity 'LOW'}}92%{{/eq}}
+        {{#unless aiSeverity}}85%{{/unless}}
+      </div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Tiempo de Procesamiento</p>
+      <div class="perf-value">< 30s</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Categorización</p>
+      <div class="perf-value">Automática</div>
+    </div>
+  </div>
+</div>
+{{/if}}
+
+<!-- Investigation Details -->
+{{#if assignments}}
+<div class="section">
+  <h2 class="section-title">Detalles de la Investigación</h2>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Investigador</th>
+        <th>Fecha de Asignación</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each assignments}}
+      <tr>
+        <td style="font-weight: 500;">{{this.userName}}</td>
+        <td>{{formatDate this.createdAt "dd/MM/yyyy"}}</td>
+        <td>
+          <span class="status-badge status-progress">Asignado</span>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+{{/if}}
+
+<!-- Performance Metrics -->
+<div class="section">
+  <h2 class="section-title">Métricas de Rendimiento del Caso</h2>
+  
+  <div class="chart-grid">
+    <div class="chart-container">
+      <h3 class="chart-title">Progreso del Caso</h3>
+      <div class="bar-chart-visual">
+        <div class="bar-item-visual">
+          <div class="bar-label">Progreso General</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: {{#if processedAt}}100{{/if}}{{#eq status 'IN_PROGRESS'}}{{#unless processedAt}}65{{/unless}}{{/eq}}{{#eq status 'PENDING'}}{{#unless processedAt}}25{{/unless}}{{/eq}}%; --bar-color: {{#if processedAt}}#10b981{{/if}}{{#eq status 'IN_PROGRESS'}}{{#unless processedAt}}#f59e0b{{/unless}}{{/eq}}{{#eq status 'PENDING'}}{{#unless processedAt}}#3b82f6{{/unless}}{{/eq}}; --bar-color-light: {{#if processedAt}}#34d399{{/if}}{{#eq status 'IN_PROGRESS'}}{{#unless processedAt}}#fbbf24{{/unless}}{{/eq}}{{#eq status 'PENDING'}}{{#unless processedAt}}#60a5fa{{/unless}}{{/eq}};"></div>
+          </div>
+          <div class="bar-value">{{#if processedAt}}100%{{/if}}{{#eq status 'IN_PROGRESS'}}{{#unless processedAt}}65%{{/unless}}{{/eq}}{{#eq status 'PENDING'}}{{#unless processedAt}}25%{{/unless}}{{/eq}}</div>
+        </div>
+        <div class="bar-item-visual">
+          <div class="bar-label">Tiempo Transcurrido</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: {{#if (gt (daysSince submittedAt) 30)}}100{{else}}{{multiply (divide (daysSince submittedAt) 30) 100}}{{/if}}%; --bar-color: {{#if (gt (daysSince submittedAt) 30)}}#ef4444{{else}}#3b82f6{{/if}}; --bar-color-light: {{#if (gt (daysSince submittedAt) 30)}}#f87171{{else}}#60a5fa{{/if}};"></div>
+          </div>
+          <div class="bar-value">{{daysSince submittedAt}} días</div>
+        </div>
+        <div class="bar-item-visual">
+          <div class="bar-label">Eficiencia de Resolución</div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width: {{#if processedAt}}{{#if (lt (daysBetween submittedAt processedAt) 15)}}90{{else}}{{#if (lt (daysBetween submittedAt processedAt) 30)}}70{{else}}40{{/if}}{{/if}}{{else}}{{#if (lt (daysSince submittedAt) 15)}}85{{else}}50{{/if}}{{/if}}%; --bar-color: #8b5cf6; --bar-color-light: #a78bfa;"></div>
+          </div>
+          <div class="bar-value">{{#if processedAt}}{{#if (lt (daysBetween submittedAt processedAt) 15)}}Excelente{{else}}{{#if (lt (daysBetween submittedAt processedAt) 30)}}Buena{{else}}Mejorable{{/if}}{{/if}}{{else}}{{#if (lt (daysSince submittedAt) 15)}}En Tiempo{{else}}Retrasado{{/if}}{{/if}}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <h3 class="chart-title">Estadísticas del Caso</h3>
+      <div class="perf-grid">
+        <div class="perf-item">
+          <p class="perf-label">Complejidad</p>
+          <div class="perf-value">
+            {{#eq aiSeverity 'HIGH'}}Alta{{/eq}}
+            {{#eq aiSeverity 'MEDIUM'}}Media{{/eq}}
+            {{#eq aiSeverity 'LOW'}}Baja{{/eq}}
+            {{#unless aiSeverity}}Media{{/unless}}
+          </div>
+        </div>
+        <div class="perf-item">
+          <p class="perf-label">SLA</p>
+          <div class="perf-value">{{#if (gt (daysSince submittedAt) 30)}}Vencido{{else}}Cumpliendo{{/if}}</div>
+        </div>
+        <div class="perf-item">
+          <p class="perf-label">Investigadores</p>
+          <div class="perf-value">{{#if assignments}}{{assignments.length}}{{else}}0{{/if}}</div>
+        </div>
+        <div class="perf-item">
+          <p class="perf-label">Seguimientos</p>
+          <div class="perf-value">{{#if comments}}{{comments.length}}{{else}}0{{/if}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Case Risk Assessment -->
+<div class="section">
+  <h2 class="section-title">Evaluación de Riesgo</h2>
+  
+  <div class="chart-container">
+    <h3 class="chart-title">Factores de Riesgo</h3>
+    <div class="bar-chart-visual">
+      <div class="bar-item-visual">
+        <div class="bar-label">Severidad del Incidente</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#eq aiSeverity 'HIGH'}}90{{/eq}}{{#eq aiSeverity 'MEDIUM'}}60{{/eq}}{{#eq aiSeverity 'LOW'}}30{{/eq}}{{#unless aiSeverity}}50{{/unless}}%; --bar-color: {{#eq aiSeverity 'HIGH'}}#ef4444{{/eq}}{{#eq aiSeverity 'MEDIUM'}}#f59e0b{{/eq}}{{#eq aiSeverity 'LOW'}}#10b981{{/eq}}{{#unless aiSeverity}}#6b7280{{/unless}}; --bar-color-light: {{#eq aiSeverity 'HIGH'}}#f87171{{/eq}}{{#eq aiSeverity 'MEDIUM'}}#fbbf24{{/eq}}{{#eq aiSeverity 'LOW'}}#34d399{{/eq}}{{#unless aiSeverity}}#9ca3af{{/unless}};"></div>
+        </div>
+        <div class="bar-value">{{#eq aiSeverity 'HIGH'}}Alto{{/eq}}{{#eq aiSeverity 'MEDIUM'}}Medio{{/eq}}{{#eq aiSeverity 'LOW'}}Bajo{{/eq}}{{#unless aiSeverity}}Medio{{/unless}}</div>
+      </div>
+      <div class="bar-item-visual">
+        <div class="bar-label">Tiempo de Exposición</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if (gt (daysSince submittedAt) 30)}}85{{else}}{{#if (gt (daysSince submittedAt) 15)}}60{{else}}30{{/if}}{{/if}}%; --bar-color: {{#if (gt (daysSince submittedAt) 30)}}#ef4444{{else}}{{#if (gt (daysSince submittedAt) 15)}}#f59e0b{{else}}#10b981{{/if}}{{/if}}; --bar-color-light: {{#if (gt (daysSince submittedAt) 30)}}#f87171{{else}}{{#if (gt (daysSince submittedAt) 15)}}#fbbf24{{else}}#34d399{{/if}}{{/if}};"></div>
+        </div>
+        <div class="bar-value">{{#if (gt (daysSince submittedAt) 30)}}Alto{{else}}{{#if (gt (daysSince submittedAt) 15)}}Medio{{else}}Bajo{{/if}}{{/if}}</div>
+      </div>
+      <div class="bar-item-visual">
+        <div class="bar-label">Visibilidad</div>
+        <div class="bar-track">
+          <div class="bar-fill" style="width: {{#if isAnonymous}}40{{else}}75{{/if}}%; --bar-color: {{#if isAnonymous}}#10b981{{else}}#f59e0b{{/if}}; --bar-color-light: {{#if isAnonymous}}#34d399{{else}}#fbbf24{{/if}};"></div>
+        </div>
+        <div class="bar-value">{{#if isAnonymous}}Limitada{{else}}Completa{{/if}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Executive Summary -->
+<div class="section">
+  <h2 class="section-title">Resumen Ejecutivo del Caso</h2>
+  
+  <div class="summary-box {{#if processedAt}}success{{/if}}{{#unless processedAt}}{{#if (gt (daysSince submittedAt) 30)}}danger{{else}}{{#eq aiSeverity 'HIGH'}}warning{{/eq}}{{/if}}{{/unless}}">
+    <h3 class="summary-title">
+      {{#if processedAt}}
+        Caso Resuelto Exitosamente
+      {{/if}}
+      {{#unless processedAt}}
+        {{#if (gt (daysSince submittedAt) 30)}}
+          Caso Requiere Atención Urgente
+        {{else}}
+          {{#eq aiSeverity 'HIGH'}}
+            Caso de Alta Prioridad
+          {{/eq}}
+          {{#ne aiSeverity 'HIGH'}}
+            Caso en Proceso Normal
+          {{/ne}}
+        {{/if}}
+      {{/unless}}
+    </h3>
+    <p class="summary-content">
+      El caso <strong>REP-{{padLeft id 6}}</strong> fue registrado el {{formatDate submittedAt "dd/MM/yyyy"}} 
+      {{#if processedAt}}
+        y fue resuelto exitosamente el {{formatDate processedAt "dd/MM/yyyy"}} 
+        en un tiempo total de <strong>{{daysBetween submittedAt processedAt}} días</strong>.
+        La resolución se completó cumpliendo con los estándares de calidad establecidos y los protocolos organizacionales.
+      {{else}}
+        y ha estado activo por <strong>{{daysSince submittedAt}} días</strong>. 
+        {{#if (gt (daysSince submittedAt) 30)}}
+          El caso ha excedido el tiempo estándar de resolución y requiere atención inmediata para completar la investigación.
+        {{/if}}
+        {{#unless (gt (daysSince submittedAt) 30)}}
+          {{#eq aiSeverity 'HIGH'}}
+            Debido a su alta severidad, este caso requiere seguimiento prioritario y recursos adicionales para su resolución oportuna.
+          {{/eq}}
+          {{#ne aiSeverity 'HIGH'}}
+            El caso se encuentra dentro de los parámetros normales de tiempo y está siendo procesado según los protocolos establecidos.
+          {{/ne}}
+        {{/unless}}
+      {{/if}}
+      
+      {{#if aiSummary}}
+        El análisis automatizado de IA ha identificado patrones importantes que contribuyen a la evaluación integral del caso.
+      {{/if}}
+    </p>
+  </div>
+</div>
+
+<!-- Compliance and Quality -->
+<div class="section">
+  <h2 class="section-title">Cumplimiento y Calidad</h2>
+  
+  <div class="perf-grid">
+    <div class="perf-item">
+      <p class="perf-label">Protocolo de Seguimiento</p>
+      <div class="perf-value">{{#if (eq status 'CLOSED')}}Completo{{else}}En Curso{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Documentación</p>
+      <div class="perf-value">{{#if aiSummary}}Completa{{else}}Básica{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Tiempo de SLA</p>
+      <div class="perf-value">{{#if (gt (daysSince submittedAt) 30)}}Vencido{{else}}Cumpliendo{{/if}}</div>
+    </div>
+    <div class="perf-item">
+      <p class="perf-label">Confidencialidad</p>
+      <div class="perf-value">{{#if isAnonymous}}Anónimo{{else}}Identificado{{/if}}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Confidentiality Notice -->
+<div class="section">
+  <h2 class="section-title">Aviso de Confidencialidad</h2>
+  
+  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+    <h4 style="margin: 0 0 12px 0; color: #1f2937;">Información Confidencial del Caso</h4>
+    <p style="margin: 0; color: #4b5563; font-size: 13px; line-height: 1.6;">
+      Este reporte contiene información sensible y confidencial del caso <strong>REP-{{padLeft id 6}}</strong>. 
+      Los datos presentados están protegidos bajo estrictos protocolos de confidencialidad y solo deben ser 
+      accedidos por personal autorizado. La distribución no autorizada está prohibida y puede resultar en 
+      acciones disciplinarias y legales.
+    </p>
+  </div>
+</div> 

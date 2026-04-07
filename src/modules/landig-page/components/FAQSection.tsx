@@ -2,6 +2,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Accordion, AccordionItem } from "@heroui/react";
+import {
+  LANDING_VIEWPORT,
+  landingTransition,
+} from "@/modules/landig-page/lib/landingMotion";
 
 export const FAQSection = () => {
   const faqs = [
@@ -41,10 +45,10 @@ export const FAQSection = () => {
     <section className="bg-white px-4 py-12 sm:px-6 sm:py-16 md:py-20 lg:px-8">
       <div className="container mx-auto w-full max-w-4xl">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+          transition={landingTransition(0)}
+          viewport={LANDING_VIEWPORT}
           className="mb-8 text-center sm:mb-12 md:mb-14"
         >
           <h2 className="mb-3 text-2xl font-bold text-gray-900 sm:mb-4 sm:text-3xl md:text-4xl">
@@ -57,10 +61,10 @@ export const FAQSection = () => {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
+          transition={landingTransition(0.08)}
+          viewport={LANDING_VIEWPORT}
         >
           <Accordion
             defaultExpandedKeys={["0"]}

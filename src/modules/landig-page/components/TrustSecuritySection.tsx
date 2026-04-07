@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { SectionReveal } from "@/modules/landig-page/components/motion/SectionReveal";
 
 const PILLARS = [
   {
@@ -68,21 +69,24 @@ export const TrustSecuritySection = () => {
       <TrustDecor />
 
       <div className="relative z-10 mx-auto w-full max-w-5xl">
-        <header className="mb-8 text-center sm:mb-10 md:mb-12">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0a1f14]/75">
-            Confianza
-          </p>
-          <h2 className="mt-2 text-balance text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
-            Seguridad y confianza
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-gray-600 sm:text-base">
-            Priorizamos la seguridad y la confianza con un lenguaje claro: sin
-            usar sellos de certificación que no correspondan a nuestra situación
-            actual.
-          </p>
-        </header>
+        <SectionReveal className="mb-8 text-center sm:mb-10 md:mb-12">
+          <header>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0a1f14]/75">
+              Confianza
+            </p>
+            <h2 className="mt-2 text-balance text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
+              Seguridad y confianza
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-pretty text-sm leading-relaxed text-gray-600 sm:text-base">
+              Priorizamos la seguridad y la confianza con un lenguaje claro: sin
+              usar sellos de certificación que no correspondan a nuestra situación
+              actual.
+            </p>
+          </header>
+        </SectionReveal>
 
         {/* Bloque principal — ancho completo */}
+        <SectionReveal delay={0.06} y={10}>
         <div className="overflow-hidden rounded-3xl border border-[#0a1f14]/20 bg-[#0a1f14] p-6 shadow-xl shadow-[#0a1f14]/20 sm:p-8 md:p-10">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-10">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-lime-400/15 ring-2 ring-lime-400/35 sm:h-[4.5rem] sm:w-[4.5rem]">
@@ -101,8 +105,10 @@ export const TrustSecuritySection = () => {
             </div>
           </div>
         </div>
+        </SectionReveal>
 
         {/* Dos pilares en fila con acentos distintos */}
+        <SectionReveal delay={0.1} y={10}>
         <div className="mt-5 flex flex-col gap-5 md:mt-6 md:flex-row md:items-stretch md:gap-5 lg:gap-6">
           <article className="relative flex flex-1 flex-col overflow-hidden rounded-3xl border border-[#0a1f14]/12 bg-white/90 p-6 shadow-md shadow-[#0a1f14]/[0.04] backdrop-blur-sm sm:p-7 md:min-h-[200px]">
             <div
@@ -140,8 +146,10 @@ export const TrustSecuritySection = () => {
             </div>
           </article>
         </div>
+        </SectionReveal>
 
         {/* Cumplimiento — bloque tipo nota / pie */}
+        <SectionReveal delay={0.12} y={8}>
         <article className="mt-5 rounded-2xl border border-gray-200/90 bg-[#faf9f6] px-5 py-5 sm:mt-6 sm:px-8 sm:py-6 md:flex md:items-start md:gap-6 md:rounded-3xl">
           <div className="mx-auto mb-4 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-[#0a1f14] shadow-sm md:mx-0 md:mb-0">
             <i className={`${compliance.icon} h-5 w-5`} aria-hidden />
@@ -155,7 +163,9 @@ export const TrustSecuritySection = () => {
             </p>
           </div>
         </article>
+        </SectionReveal>
 
+        <SectionReveal delay={0.14} y={6}>
         <p className="mx-auto mt-8 max-w-2xl px-1 text-center text-xs leading-relaxed text-gray-500 sm:mt-10 sm:text-sm">
           <i
             className="icon-[lucide--info] mr-1 inline-block h-3.5 w-3.5 align-middle text-[#0a1f14]/70"
@@ -165,6 +175,7 @@ export const TrustSecuritySection = () => {
           sector, país y políticas internas; podemos orientarte en la
           implementación, pero la responsabilidad final es de tu organización.
         </p>
+        </SectionReveal>
       </div>
     </section>
   );

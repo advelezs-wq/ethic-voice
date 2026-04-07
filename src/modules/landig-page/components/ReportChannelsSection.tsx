@@ -1,10 +1,15 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
+import {
+  LANDING_VIEWPORT,
+  landingTransition,
+} from "@/modules/landig-page/lib/landingMotion";
 
 export const ReportChannelsSection = () => {
+  const reduce = useReducedMotion();
   const channels = [
     {
       id: "phone",
@@ -98,22 +103,22 @@ export const ReportChannelsSection = () => {
   ];
 
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: reduce ? 1 : 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
+        staggerChildren: reduce ? 0 : 0.09,
+        delayChildren: reduce ? 0 : 0.05,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
+    hidden: { y: reduce ? 0 : 12, opacity: reduce ? 1 : 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+      transition: landingTransition(0),
     },
   };
 
@@ -121,10 +126,10 @@ export const ReportChannelsSection = () => {
     <section className="py-20 px-6 bg-gray-50">
       <div className="container mx-auto max-w-7xl">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
+          transition={landingTransition(0)}
+          viewport={LANDING_VIEWPORT}
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -142,7 +147,7 @@ export const ReportChannelsSection = () => {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={LANDING_VIEWPORT}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-12"
         >
           {channels.map((channel) => (
@@ -200,10 +205,10 @@ export const ReportChannelsSection = () => {
 
         {/* Combined Action Section: Submit + Track */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          viewport={{ once: true }}
+          transition={landingTransition(0.1)}
+          viewport={LANDING_VIEWPORT}
           className="text-center bg-white rounded-2xl p-7 sm:p-10 border border-gray-200 shadow-sm"
         >
           <div className="max-w-3xl mx-auto">
@@ -253,10 +258,10 @@ export const ReportChannelsSection = () => {
 
         {/* Security Note */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          viewport={{ once: true }}
+          transition={landingTransition(0.12)}
+          viewport={LANDING_VIEWPORT}
           className="text-center mt-16"
         >
           <div className="flex flex-wrap justify-center items-center gap-10 text-base text-gray-600 px-2">

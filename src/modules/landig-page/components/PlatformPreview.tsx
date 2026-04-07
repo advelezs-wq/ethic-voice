@@ -2,7 +2,12 @@
 
 import React, { useRef } from "react";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  LANDING_VIEWPORT,
+  landingTransition,
+} from "@/modules/landig-page/lib/landingMotion";
+import { SectionReveal } from "@/modules/landig-page/components/motion/SectionReveal";
 import { Image } from "@heroui/react";
 
 type PreviewSidebarItem = {
@@ -49,14 +54,21 @@ const PREVIEW_PROFILE_ICON =
   "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z";
 
 /** Mock del panel (ventana navegador + islas flotantes). Reutilizable en la landing. */
-export const CompliancePlatformDemo = () => {
+export const CompliancePlatformDemo = ({
+  skipEntranceAnimation = false,
+}: {
+  skipEntranceAnimation?: boolean;
+} = {}) => {
+  const reduce = useReducedMotion();
+  const skipMotion = skipEntranceAnimation || reduce;
+
   return (
     <div className="relative mx-auto w-full max-w-6xl px-1 sm:px-3 md:px-5 min-w-0">
-      {/* Browser Window — escala contenida en viewport */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
+        initial={skipMotion ? false : { opacity: 0, y: 16 }}
+        whileInView={skipMotion ? undefined : { opacity: 1, y: 0 }}
+        viewport={skipMotion ? undefined : LANDING_VIEWPORT}
+        transition={skipMotion ? { duration: 0 } : landingTransition(0)}
         className="relative max-w-full rounded-lg sm:rounded-xl shadow-xl sm:shadow-2xl overflow-hidden bg-white isolate"
       >
         {/* Browser Header */}
@@ -629,13 +641,16 @@ export const CompliancePlatformDemo = () => {
 
       {/* Islas flotantes: solo lg+ para no cortarse en tablet; tamaño compacto */}
       <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.8, duration: 0.6 }}
-        className="hidden lg:flex absolute z-[2] max-w-[11rem] xl:max-w-[14rem] left-1 xl:-left-6 2xl:-left-14 bottom-24 xl:bottom-28 bg-white rounded-lg shadow-lg p-2.5 xl:p-3 items-center gap-2 animate-floating pointer-events-none"
-        style={{
-          animation: "floating 3s ease-in-out infinite",
-        }}
+        initial={skipMotion ? false : { opacity: 0, x: -12 }}
+        whileInView={skipMotion ? undefined : { opacity: 1, x: 0 }}
+        viewport={skipMotion ? undefined : LANDING_VIEWPORT}
+        transition={skipMotion ? { duration: 0 } : landingTransition(0.1)}
+        className="hidden lg:flex absolute z-[2] max-w-[11rem] xl:max-w-[14rem] left-1 xl:-left-6 2xl:-left-14 bottom-24 xl:bottom-28 bg-white rounded-lg shadow-lg p-2.5 xl:p-3 items-center gap-2 pointer-events-none"
+        style={
+          reduce
+            ? undefined
+            : { animation: "floating 3s ease-in-out infinite" }
+        }
       >
         <div className="w-9 h-9 xl:w-10 xl:h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
           <svg
@@ -661,13 +676,16 @@ export const CompliancePlatformDemo = () => {
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 1, duration: 0.6 }}
-        className="hidden lg:block absolute z-[2] right-1 xl:-right-6 2xl:-right-14 top-16 xl:top-20 bg-white rounded-lg shadow-lg p-2.5 xl:p-3 animate-floating max-w-[10rem]"
-        style={{
-          animation: "floating 3s ease-in-out infinite 1.5s",
-        }}
+        initial={skipMotion ? false : { opacity: 0, x: 12 }}
+        whileInView={skipMotion ? undefined : { opacity: 1, x: 0 }}
+        viewport={skipMotion ? undefined : LANDING_VIEWPORT}
+        transition={skipMotion ? { duration: 0 } : landingTransition(0.16)}
+        className="hidden lg:block absolute z-[2] right-1 xl:-right-6 2xl:-right-14 top-16 xl:top-20 bg-white rounded-lg shadow-lg p-2.5 xl:p-3 max-w-[10rem]"
+        style={
+          reduce
+            ? undefined
+            : { animation: "floating 3s ease-in-out infinite 1.5s" }
+        }
       >
         <div className="flex items-center gap-1.5 mb-1 flex-wrap">
           <span className="text-lg xl:text-xl font-bold text-gray-900 tabular-nums">0</span>
@@ -702,6 +720,7 @@ const ComplianceStats = ({
 }: {
   statsRef: React.RefObject<HTMLDivElement | null>;
 }) => {
+  const reduce = useReducedMotion();
   const stats = [
     {
       value: "98%",
@@ -788,19 +807,19 @@ const ComplianceStats = ({
   return (
     <div ref={statsRef} className="mt-20">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={reduce ? false : { opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
+        transition={landingTransition(0)}
+        viewport={LANDING_VIEWPORT}
         className="grid grid-cols-2 md:grid-cols-4 gap-6"
       >
         {stats.map((stat, index) => (
           <motion.div
             key={index}
-            initial={{ opacity: 0, y: 20 }}
+            initial={reduce ? false : { opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: index * 0.1 }}
-            viewport={{ once: true }}
+            transition={landingTransition(reduce ? 0 : index * 0.06)}
+            viewport={LANDING_VIEWPORT}
             className="text-center"
           >
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-50 text-green-600 mb-3">
@@ -825,25 +844,25 @@ export const PlatformPreviewSection = () => {
   const statsRef = useRef<HTMLDivElement>(null);
   const demoRef = useRef<HTMLDivElement>(null);
   const { openCalendly } = useCalendlyGate();
+  const reduce = useReducedMotion();
 
-  // Animation variants
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: reduce ? 1 : 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.3,
+        staggerChildren: reduce ? 0 : 0.1,
+        delayChildren: reduce ? 0 : 0.06,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 40, opacity: 0 },
+    hidden: { y: reduce ? 0 : 12, opacity: reduce ? 1 : 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
     },
   };
 
@@ -855,7 +874,8 @@ export const PlatformPreviewSection = () => {
       <div className="container-section relative z-10">
         <motion.div
           initial="hidden"
-          animate="visible"
+          whileInView="visible"
+          viewport={LANDING_VIEWPORT}
           variants={containerVariants}
           className="max-w-5xl mx-auto text-center"
         >
@@ -912,7 +932,7 @@ export const PlatformPreviewSection = () => {
 
           {/* Compliance Platform Showcase */}
           <motion.div ref={demoRef} variants={itemVariants}>
-            <CompliancePlatformDemo />
+            <CompliancePlatformDemo skipEntranceAnimation />
           </motion.div>
 
           {/* Compliance Stats Section */}
@@ -993,7 +1013,7 @@ export const PlatformPreviewShowcaseSection = () => {
   return (
     <section className="relative overflow-x-hidden bg-[#fafaf8] px-3 py-10 sm:px-6 sm:py-12 md:py-14 lg:px-8">
       <PlatformPreviewWaveBackground />
-      <div className="relative z-10 mx-auto mb-6 max-w-3xl px-1 text-center sm:mb-8 sm:px-2 md:mb-10">
+      <SectionReveal className="relative z-10 mx-auto mb-6 max-w-3xl px-1 text-center sm:mb-8 sm:px-2 md:mb-10">
         <h2 className="mb-2 text-xl font-bold text-gray-900 sm:mb-3 sm:text-2xl md:text-3xl">
           La plataforma en acción
         </h2>
@@ -1001,7 +1021,7 @@ export const PlatformPreviewShowcaseSection = () => {
           Vista previa del panel: gestión de denuncias, métricas y flujo de trabajo en un solo
           entorno.
         </p>
-      </div>
+      </SectionReveal>
       <div className="relative z-10">
         <CompliancePlatformDemo />
       </div>

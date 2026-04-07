@@ -1,6 +1,13 @@
 "use client";
 
 import React from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  LANDING_VIEWPORT,
+  landingTransition,
+  staggerContainerVariants,
+  staggerItemVariants,
+} from "@/modules/landig-page/lib/landingMotion";
 
 const STEPS = [
   {
@@ -130,26 +137,41 @@ function StepVisual({
 }
 
 export const HowItWorks = () => {
+  const reduce = useReducedMotion();
+
   return (
     <section className="relative overflow-hidden bg-[#f5f3ee] px-4 py-12 sm:px-6 sm:py-14 md:py-16 lg:px-8">
       <HowItWorksDecor />
 
       <div className="relative z-10 mx-auto w-full max-w-5xl">
-        <header className="mb-10 text-center sm:mb-12 md:mb-14">
+        <motion.header
+          className="mb-10 text-center sm:mb-12 md:mb-14"
+          initial={reduce ? false : { opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={LANDING_VIEWPORT}
+          transition={landingTransition(0)}
+        >
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-green-800/75">
             Tres pasos
           </p>
           <h2 className="mt-2 text-balance text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
             Cómo funciona
           </h2>
-        </header>
+        </motion.header>
 
-        <div className="flex flex-col gap-8 sm:gap-10 md:gap-12">
+        <motion.div
+          className="flex flex-col gap-8 sm:gap-10 md:gap-12"
+          variants={staggerContainerVariants(!!reduce)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={LANDING_VIEWPORT}
+        >
           {STEPS.map((step, i) => {
             const reverse = i % 2 === 1;
             return (
               <React.Fragment key={step.label}>
-                <article
+                <motion.article
+                  variants={staggerItemVariants(!!reduce)}
                   className={`relative flex flex-col gap-6 overflow-hidden rounded-3xl border border-white/90 bg-white/80 p-6 shadow-md shadow-green-950/[0.04] backdrop-blur-[2px] sm:p-8 md:flex-row md:items-center md:gap-8 md:p-10 ${
                     reverse ? "md:flex-row-reverse" : ""
                   } ${
@@ -181,7 +203,7 @@ export const HowItWorks = () => {
                       {step.desc}
                     </p>
                   </div>
-                </article>
+                </motion.article>
 
                 {i < STEPS.length - 1 && (
                   <div className="flex justify-center py-1 md:hidden" aria-hidden>
@@ -191,7 +213,7 @@ export const HowItWorks = () => {
               </React.Fragment>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -1,29 +1,37 @@
+"use client";
+
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  LANDING_VIEWPORT,
+  landingTransition,
+} from "@/modules/landig-page/lib/landingMotion";
 import { StatCard } from "./StatCard";
 
 interface StatsSectionProps {
-  statsRef: React.RefObject<HTMLDivElement>;
+  statsRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export const StatsSection: React.FC<StatsSectionProps> = ({ statsRef }) => {
+  const reduce = useReducedMotion();
+
   const containerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: reduce ? 1 : 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.3,
+        staggerChildren: reduce ? 0 : 0.09,
+        delayChildren: reduce ? 0 : 0.05,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 40, opacity: 0 },
+    hidden: { y: reduce ? 0 : 12, opacity: reduce ? 1 : 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+      transition: landingTransition(0),
     },
   };
 
@@ -33,14 +41,13 @@ export const StatsSection: React.FC<StatsSectionProps> = ({ statsRef }) => {
       variants={containerVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
+      viewport={LANDING_VIEWPORT}
       className="grid grid-cols-1 md:grid-cols-3 gap-8"
     >
       <motion.div variants={itemVariants}>
         <StatCard
           value="15x"
           description="Higher Conversion Rates"
-          //   icon={<TrendingUp className="w-8 h-8" />}
         />
       </motion.div>
 
@@ -48,7 +55,6 @@ export const StatsSection: React.FC<StatsSectionProps> = ({ statsRef }) => {
         <StatCard
           value="80%"
           description="Less Prospecting Time"
-          //   icon={<BarChart2 className="w-8 h-8" />}
         />
       </motion.div>
 
@@ -56,7 +62,6 @@ export const StatsSection: React.FC<StatsSectionProps> = ({ statsRef }) => {
         <StatCard
           value="78%"
           description="Sales Outperformance"
-          //   icon={<Award className="w-8 h-8" />}
         />
       </motion.div>
     </motion.div>

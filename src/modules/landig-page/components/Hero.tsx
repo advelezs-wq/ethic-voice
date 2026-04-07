@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { landingTransition } from "@/modules/landig-page/lib/landingMotion";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 import { VideoModal } from "./VideoModal";
 
@@ -181,6 +182,7 @@ function HeroDecorBottomFlow({ className }: { className?: string }) {
 
 export const Hero = () => {
   const { openCalendly } = useCalendlyGate();
+  const reduce = useReducedMotion();
 
   return (
     <section className="relative min-h-[min(480px,88svh)] overflow-x-clip bg-[#0a1f14] pt-20">
@@ -196,9 +198,9 @@ export const Hero = () => {
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-8 md:min-h-[min(440px,82svh)] md:flex-row md:items-center md:justify-between md:gap-10 md:py-10 lg:gap-14 lg:px-8 lg:pb-14 lg:pt-12">
         {/* Texto — columna izquierda */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={reduce ? false : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55 }}
+          transition={landingTransition(0)}
           className="flex w-full max-w-lg shrink-0 flex-col items-center justify-center text-center md:max-w-[min(100%,28rem)] md:flex-1 md:items-start md:text-left lg:max-w-xl"
         >
           <h1 className="text-balance text-3xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-4xl md:text-[2.65rem] lg:text-5xl">
@@ -225,9 +227,9 @@ export const Hero = () => {
 
         {/* Video — columna derecha, centrada en la fila */}
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
+          initial={reduce ? false : { opacity: 0, x: 16 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.08 }}
+          transition={landingTransition(0.06)}
           className="flex w-full shrink-0 justify-center md:flex-1 md:justify-end"
         >
           <div className="relative w-full max-w-md lg:max-w-lg">

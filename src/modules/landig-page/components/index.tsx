@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { Header } from "./layout/Header";
 import {
   MobileNavProvider,
@@ -26,34 +25,6 @@ function LandingContent() {
   const cookie = useCookieConsentOptional();
   const allowFunctional =
     cookie?.hydrated && !!cookie.consent?.functional && !cookie.needsInteraction;
-
-  useEffect(() => {
-    if (!isClient) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("animate-reveal");
-          }
-        });
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -100px 0px" }
-    );
-
-    const timeoutId = setTimeout(() => {
-      document.querySelectorAll("section").forEach((section) => {
-        observer.observe(section);
-      });
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-      document.querySelectorAll("section").forEach((section) => {
-        observer.unobserve(section);
-      });
-    };
-  }, [isClient]);
 
   return (
     <>

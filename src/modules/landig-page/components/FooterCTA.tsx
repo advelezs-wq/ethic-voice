@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
+import { SectionReveal } from "@/modules/landig-page/components/motion/SectionReveal";
 
 const NAV_LINKS = [
   { label: "Servicios", href: "/servicios" },
@@ -27,7 +28,7 @@ export const FooterCTA = () => {
 
       {/* CTA Content */}
       <div className="relative px-4 pb-8 pt-10 sm:px-6 sm:pt-12 md:px-8 md:pt-14">
-        <div className="mx-auto max-w-3xl text-center">
+        <SectionReveal className="mx-auto max-w-3xl text-center" y={14}>
           <h2 className="mb-2 text-2xl font-extrabold leading-tight text-green-300 sm:mb-3 sm:text-3xl md:text-4xl">
             Agenda tu demo personalizada
           </h2>
@@ -42,10 +43,10 @@ export const FooterCTA = () => {
             Agendar ahora
             <i className="icon-[lucide--arrow-right] w-4 h-4" />
           </button>
-        </div>
+        </SectionReveal>
 
         {/* Navigation links */}
-        <div className="mt-8 border-t border-white/10 pt-6 sm:mt-12">
+        <SectionReveal className="mt-8 border-t border-white/10 pt-6 sm:mt-12" delay={0.08} y={10}>
           <nav className="mb-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-6">
             {NAV_LINKS.map((l) => (
               <Link
@@ -60,7 +61,7 @@ export const FooterCTA = () => {
           <p className="text-center text-xs text-white/30">
             Copyright © {new Date().getFullYear()} EthicVoice
           </p>
-        </div>
+        </SectionReveal>
       </div>
     </footer>
   );

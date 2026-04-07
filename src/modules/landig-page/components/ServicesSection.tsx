@@ -2,6 +2,13 @@
 
 import React from "react";
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  LANDING_VIEWPORT,
+  staggerContainerVariants,
+  staggerItemVariants,
+} from "@/modules/landig-page/lib/landingMotion";
+import { SectionReveal } from "@/modules/landig-page/components/motion/SectionReveal";
 
 const SERVICES = [
   {
@@ -76,13 +83,7 @@ function ServicesSectionBg() {
   );
 }
 
-function ServiceCard({
-  s,
-  mdPlacement,
-}: {
-  s: (typeof SERVICES)[number];
-  mdPlacement: string;
-}) {
+function ServiceCard({ s }: { s: (typeof SERVICES)[number] }) {
   const featured = s.featured;
 
   const inner = (
@@ -151,7 +152,7 @@ function ServiceCard({
   return (
     <Link
       href={s.href}
-      className={`group relative block overflow-hidden rounded-3xl border transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0a1f14] ${mdPlacement} ${
+      className={`group relative block h-full overflow-hidden rounded-3xl border transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0a1f14] ${
         featured
           ? "border-lime-400/20 bg-[#0a1f14] shadow-xl shadow-[#0a1f14]/25 ring-1 ring-white/10 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-[#0a1f14]/35"
           : "border-gray-200/90 bg-white/90 shadow-md shadow-gray-200/40 ring-1 ring-black/[0.03] backdrop-blur-sm hover:-translate-y-0.5 hover:border-[#0a1f14]/15 hover:shadow-lg"
@@ -163,12 +164,14 @@ function ServiceCard({
 }
 
 export const ServicesSection = () => {
+  const reduce = useReducedMotion();
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-white via-[#fafcfa] to-white px-4 py-12 sm:px-6 sm:py-14 md:py-16 lg:px-8">
       <ServicesSectionBg />
 
       <div className="relative z-10 mx-auto w-full max-w-6xl">
-        <div className="mb-8 text-center sm:mb-10 md:mb-12">
+        <SectionReveal className="mb-8 text-center sm:mb-10 md:mb-12">
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#0a1f14]/80">
             Servicios
           </p>
@@ -179,9 +182,15 @@ export const ServicesSection = () => {
             Tres pilares para blindar cultura, datos y puntos de contacto con tu
             organización.
           </p>
-        </div>
+        </SectionReveal>
 
-        <div className="grid auto-rows-fr grid-cols-1 gap-4 md:grid-cols-2 md:grid-rows-2 md:gap-5 lg:gap-6">
+        <motion.div
+          className="grid auto-rows-fr grid-cols-1 gap-4 md:grid-cols-2 md:grid-rows-2 md:gap-5 lg:gap-6"
+          variants={staggerContainerVariants(!!reduce)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={LANDING_VIEWPORT}
+        >
           {SERVICES.map((s) => {
             const mdPlacement = s.featured
               ? "md:col-start-2 md:row-start-1 md:row-span-2"
@@ -189,10 +198,16 @@ export const ServicesSection = () => {
                 ? "md:col-start-1 md:row-start-1"
                 : "md:col-start-1 md:row-start-2";
             return (
-              <ServiceCard key={s.title} s={s} mdPlacement={mdPlacement} />
+              <motion.div
+                key={s.title}
+                variants={staggerItemVariants(!!reduce)}
+                className={`min-h-0 ${mdPlacement}`}
+              >
+                <ServiceCard s={s} />
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

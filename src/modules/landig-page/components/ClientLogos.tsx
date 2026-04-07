@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
+import { SectionReveal } from "@/modules/landig-page/components/motion/SectionReveal";
 
 /** Marcas reales del sitio (misma fuente que la landing anterior) */
 const BRANDS = [
@@ -52,59 +53,63 @@ export const ClientLogos = () => {
   return (
     <section className="bg-white px-4 py-8 sm:px-6 sm:py-10 md:py-12 lg:px-8">
       <div className="mx-auto w-full max-w-4xl">
-        <h2 className="mb-4 text-center text-lg font-bold text-gray-900 sm:mb-6 sm:text-xl md:text-2xl">
-          Confían en nosotros
-        </h2>
+        <SectionReveal className="mb-4 sm:mb-6">
+          <h2 className="text-center text-lg font-bold text-gray-900 sm:text-xl md:text-2xl">
+            Confían en nosotros
+          </h2>
+        </SectionReveal>
 
-        <div
-          className="flex min-w-0 items-center gap-2 sm:gap-3"
-          onMouseEnter={() => {
-            hoverPausedRef.current = true;
-          }}
-          onMouseLeave={() => {
-            hoverPausedRef.current = false;
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => scroll("left")}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 text-gray-500 hover:text-gray-700 transition-colors"
-            aria-label="Anterior"
-          >
-            <i className="icon-[lucide--chevron-left] w-4 h-4" />
-          </button>
-
+        <SectionReveal delay={0.07} y={10}>
           <div
-            ref={scrollRef}
-            className="flex-1 min-w-0 overflow-x-auto flex items-center gap-8 md:gap-10 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex min-w-0 items-center gap-2 sm:gap-3"
+            onMouseEnter={() => {
+              hoverPausedRef.current = true;
+            }}
+            onMouseLeave={() => {
+              hoverPausedRef.current = false;
+            }}
           >
-            {BRANDS.map((brand) => (
-              <div
-                key={brand.name}
-                className="flex-shrink-0 snap-start flex items-center justify-center h-12 w-[7.5rem] sm:h-14 sm:w-36 md:w-40 opacity-45 hover:opacity-75 transition-opacity grayscale"
-                title={brand.name}
-              >
-                <Image
-                  src={brand.src}
-                  alt={brand.name}
-                  width={160}
-                  height={48}
-                  className="max-h-10 sm:max-h-12 w-auto max-w-full object-contain object-center"
-                  sizes="(max-width: 768px) 120px, 160px"
-                />
-              </div>
-            ))}
-          </div>
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 text-gray-500 hover:text-gray-700 transition-colors"
+              aria-label="Anterior"
+            >
+              <i className="icon-[lucide--chevron-left] w-4 h-4" />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => scroll("right")}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 text-gray-500 hover:text-gray-700 transition-colors"
-            aria-label="Siguiente"
-          >
-            <i className="icon-[lucide--chevron-right] w-4 h-4" />
-          </button>
-        </div>
+            <div
+              ref={scrollRef}
+              className="flex-1 min-w-0 overflow-x-auto flex items-center gap-8 md:gap-10 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {BRANDS.map((brand) => (
+                <div
+                  key={brand.name}
+                  className="flex-shrink-0 snap-start flex items-center justify-center h-12 w-[7.5rem] sm:h-14 sm:w-36 md:w-40 opacity-45 hover:opacity-75 transition-opacity grayscale"
+                  title={brand.name}
+                >
+                  <Image
+                    src={brand.src}
+                    alt={brand.name}
+                    width={160}
+                    height={48}
+                    className="max-h-10 sm:max-h-12 w-auto max-w-full object-contain object-center"
+                    sizes="(max-width: 768px) 120px, 160px"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-gray-200 hover:border-gray-400 text-gray-500 hover:text-gray-700 transition-colors"
+              aria-label="Siguiente"
+            >
+              <i className="icon-[lucide--chevron-right] w-4 h-4" />
+            </button>
+          </div>
+        </SectionReveal>
       </div>
     </section>
   );

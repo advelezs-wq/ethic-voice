@@ -1,7 +1,14 @@
+"use client";
+
 import { Image, User } from "@heroui/react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  LANDING_VIEWPORT,
+  landingTransition,
+} from "@/modules/landig-page/lib/landingMotion";
 
 export const PlatformDemo = () => {
+  const reduce = useReducedMotion();
   return (
     <div className="relative max-w-5xl mx-auto mb-20">
       {/* Gradient background */}
@@ -304,9 +311,10 @@ export const PlatformDemo = () => {
 
       {/* Floating UI Element */}
       <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 1.2, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        initial={reduce ? false : { y: 12, opacity: 0 }}
+        whileInView={{ y: 0, opacity: 1 }}
+        viewport={LANDING_VIEWPORT}
+        transition={landingTransition(reduce ? 0 : 0.12)}
         className="absolute -left-8 top-1/3 z-10"
       >
         <div className="animate-float bg-white/70 backdrop-blur-md p-3 rounded-xl shadow-xl border border-white/20 flex items-center">

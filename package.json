@@ -10,7 +10,7 @@
     "dev:turbo": "next dev --turbopack",
     "dev:demo": "NEXT_PUBLIC_DEMO_MODE=true next dev --webpack",
     "dev:real": "NEXT_PUBLIC_DEMO_MODE=false next dev --webpack",
-    "db:generate": "CHECKPOINT_DISABLE=1 PRISMA_HIDE_UPDATE_MESSAGE=1 PRISMA_GENERATE_SKIP_AUTOINSTALL=1 bunx --bun prisma generate --no-hints",
+    "db:generate": "CHECKPOINT_DISABLE=1 PRISMA_HIDE_UPDATE_MESSAGE=1 PRISMA_GENERATE_SKIP_AUTOINSTALL=1 prisma generate --no-hints",
     "build": "bun run db:generate && next build",
     "start": "next start",
     "lint": "next lint",

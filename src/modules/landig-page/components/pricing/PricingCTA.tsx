@@ -1,29 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 
 export const PricingCTA = () => {
+  const { openCalendly } = useCalendlyGate();
   const badges = [
     "ISO 27001",
     "GDPR Compliant",
     "SOC 2 Type II",
     "5000+ empresas confían en nosotros",
   ];
-
-  // Your Calendly URL with parameters
-  const calendlyUrl =
-    "https://calendly.com/ethicvoice-info/30min?hide_event_type_details=1&hide_gdpr_banner=1";
-
-  const openCalendlyPopup = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-
-    if (window.Calendly) {
-      window.Calendly.initPopupWidget({
-        url: calendlyUrl,
-      });
-    }
-  };
 
   return (
     <section className="py-20 px-6 bg-gray-50">
@@ -42,9 +29,9 @@ export const PricingCTA = () => {
             Contáctanos con más detalles sobre tus requisitos y te responderemos
             rápidamente
           </p>
-          <Link
-            href=""
-            onClick={openCalendlyPopup}
+          <button
+            type="button"
+            onClick={openCalendly}
             className="bg-green-600 mb-8 text-center flex justify-center text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-800 group transition-colors items-center cursor-pointer"
           >
             Hablar con ventas
@@ -53,7 +40,7 @@ export const PricingCTA = () => {
               role="img"
               aria-hidden="true"
             />
-          </Link>
+          </button>
         </motion.div>
 
         <motion.div

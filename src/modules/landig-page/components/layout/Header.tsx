@@ -1,14 +1,5 @@
 "use client";
 
-// Extend the Window interface to include the Calendly property
-declare global {
-  interface Window {
-    Calendly?: {
-      initPopupWidget: (options: { url: string }) => void;
-    };
-  }
-}
-
 import {
   cn,
   Image,
@@ -24,6 +15,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { serviceGroups } from "@/modules/landig-page/services/services.data";
 import { CalendlyCta } from "@/modules/landig-page/components/CalendlyCta";
 import { useMobileNavDrawer } from "@/modules/landig-page/components/mobile-nav-context";
+import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 
 export const Header = () => {
   const {
@@ -31,26 +23,14 @@ export const Header = () => {
     setIsOpen: setMobileMenuOpen,
     close: closeMobileMenu,
   } = useMobileNavDrawer();
+  const { openCalendly } = useCalendlyGate();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [openMobileSection, setOpenMobileSection] = useState<string | null>(
     null
   );
 
-  // Your Calendly URL with parameters
-  const calendlyUrl =
-    "https://calendly.com/ethicvoice-info/30min?hide_event_type_details=1&hide_gdpr_banner=1";
-
   const openCalendlyPopup = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-
-    if (window.Calendly) {
-      window.Calendly.initPopupWidget({
-        url: calendlyUrl,
-      });
-    } else if (typeof window !== "undefined") {
-      window.open(calendlyUrl, "_blank");
-    }
-
+    openCalendly(e);
     closeMobileMenu();
   };
 

@@ -3,7 +3,14 @@
  * Utilidades para rastrear eventos con Facebook Pixel
  */
 
+import { readConsentFromStorage } from '@/lib/cookie-consent/storage';
+import { effectiveMarketingAllowed } from '@/lib/cookie-consent/types';
 import type { FacebookStandardEvent, FacebookEventParams } from '@/types/facebook-pixel';
+
+function marketingPixelAllowed(): boolean {
+  const c = readConsentFromStorage();
+  return !!c && effectiveMarketingAllowed(c);
+}
 
 /**
  * Rastrea un evento estándar de Facebook Pixel
@@ -22,6 +29,7 @@ export const trackFacebookEvent = (
   eventName: FacebookStandardEvent,
   params?: FacebookEventParams
 ): void => {
+  if (!marketingPixelAllowed()) return;
   if (typeof window !== 'undefined' && window.fbq) {
     try {
       if (params) {
@@ -54,6 +62,7 @@ export const trackFacebookCustomEvent = (
   eventName: string,
   params?: Record<string, any>
 ): void => {
+  if (!marketingPixelAllowed()) return;
   if (typeof window !== 'undefined' && window.fbq) {
     try {
       if (params) {

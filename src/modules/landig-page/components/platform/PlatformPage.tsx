@@ -4,19 +4,7 @@ import Link from "next/link";
 import NextImage from "next/image";
 import { motion } from "framer-motion";
 import { Button, Card, CardBody, Image } from "@heroui/react";
-import Script from "next/script";
-
-const calendlyUrl =
-  "https://calendly.com/ethicvoice-info/30min?hide_event_type_details=1&hide_gdpr_banner=1";
-
-function openCalendlyPopup(e: { preventDefault: () => void }) {
-  e.preventDefault();
-  if (typeof window !== "undefined" && (window as any).Calendly) {
-    (window as any).Calendly.initPopupWidget({ url: calendlyUrl });
-  } else if (typeof window !== "undefined") {
-    window.open(calendlyUrl, "_blank");
-  }
-}
+import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 
 function scrollToFeatures(e: { preventDefault: () => void }) {
   e.preventDefault();
@@ -27,20 +15,10 @@ function scrollToFeatures(e: { preventDefault: () => void }) {
 }
 
 export const PlatformPage = () => {
+  const { openCalendly } = useCalendlyGate();
+
   return (
     <>
-      <Script
-        src="https://assets.calendly.com/assets/external/widget.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          if (typeof document !== "undefined") {
-            const link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = "https://assets.calendly.com/assets/external/widget.css";
-            document.head.appendChild(link);
-          }
-        }}
-      />
       <section className="relative overflow-hidden bg-[#0a1f14] px-6 pb-16 pt-8 md:pt-12">
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_40%,rgba(22,101,52,0.35)_0%,transparent_55%)]"
@@ -254,7 +232,7 @@ export const PlatformPage = () => {
             tu organización.
           </p>
           <button
-            onClick={openCalendlyPopup}
+            onClick={openCalendly}
             className="group inline-flex items-center rounded-full bg-lime-400 px-6 py-3 text-sm font-bold text-gray-950 shadow-[0_0_24px_rgba(190,242,100,0.35)] transition hover:bg-lime-300"
           >
             Solicitar demo

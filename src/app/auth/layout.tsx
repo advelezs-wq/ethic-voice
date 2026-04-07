@@ -13,6 +13,7 @@ const AuthLayout = ({ children }: { children: ReactNode }) => {
     <MarketingPageShell
       showFooter={false}
       showWhatsApp={false}
+      showStickyCta={false}
       mainClassName="relative flex min-h-[100dvh] flex-col overflow-x-hidden !bg-gradient-to-b from-[#f5f3ee] via-white to-[#ecf2ea] !pt-16"
     >
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>

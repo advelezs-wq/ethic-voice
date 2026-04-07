@@ -63,7 +63,7 @@ export const TestimonialsSection = () => {
           {/* Play button */}
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
             <div className="w-16 h-16 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-lg transition-all group-hover:scale-110">
-              <i className="icon-[lucide--play] w-7 h-7 text-green-800 ml-1" />
+              <i className="icon-[lucide--play] w-7 h-7 text-[#0a1f14] ml-1" />
             </div>
             <div className="text-center px-6">
               <p className="text-white font-semibold">{TESTIMONIALS[activeIdx].name}</p>
@@ -88,7 +88,7 @@ export const TestimonialsSection = () => {
               key={t.name}
               onClick={() => setActiveIdx(i)}
               className={`rounded-xl overflow-hidden border-2 transition-all text-left ${
-                activeIdx === i ? "border-green-700 shadow-md" : "border-transparent opacity-70 hover:opacity-100"
+                activeIdx === i ? "border-lime-400 shadow-md" : "border-transparent opacity-70 hover:opacity-100"
               }`}
             >
               <div className={`relative aspect-video ${t.bg}`}>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
+import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 import { motion } from "framer-motion";
 import { Image } from "@heroui/react";
 
@@ -823,6 +824,7 @@ const ComplianceStats = ({
 export const PlatformPreviewSection = () => {
   const statsRef = useRef<HTMLDivElement>(null);
   const demoRef = useRef<HTMLDivElement>(null);
+  const { openCalendly } = useCalendlyGate();
 
   // Animation variants
   const containerVariants = {
@@ -843,19 +845,6 @@ export const PlatformPreviewSection = () => {
       opacity: 1,
       transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
     },
-  };
-
-  // Calendly URL with parameters
-  const calendlyUrl =
-    "https://calendly.com/ethicvoice-info/30min?hide_event_type_details=1&hide_gdpr_banner=1";
-
-  const openCalendlyPopup = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    if (window.Calendly) {
-      window.Calendly.initPopupWidget({
-        url: calendlyUrl,
-      });
-    }
   };
 
   return (
@@ -900,7 +889,8 @@ export const PlatformPreviewSection = () => {
             className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-16"
           >
             <button
-              onClick={openCalendlyPopup}
+              type="button"
+              onClick={openCalendly}
               className="bg-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-800 group transition-colors flex items-center cursor-pointer"
             >
               Solicitar demo

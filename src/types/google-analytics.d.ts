@@ -97,6 +97,8 @@ export interface GA4Config {
  */
 export interface GA4ConsentConfig {
   ad_storage?: 'granted' | 'denied';
+  ad_user_data?: 'granted' | 'denied';
+  ad_personalization?: 'granted' | 'denied';
   analytics_storage?: 'granted' | 'denied';
   functionality_storage?: 'granted' | 'denied';
   personalization_storage?: 'granted' | 'denied';

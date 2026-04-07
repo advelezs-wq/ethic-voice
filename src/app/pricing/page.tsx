@@ -7,7 +7,6 @@ import { PricingFAQ } from "@/modules/landig-page/components/pricing/PricingFAQ"
 import { PricingHero } from "@/modules/landig-page/components/pricing/PricingHero";
 import PricingPlans from "@/modules/landig-page/components/pricing/PricingPlans";
 import { BillingCycle } from "@/types/subscription.types";
-import Script from "next/script";
 import React from "react";
 import { MarketingPageShell } from "@/modules/landig-page/components/MarketingPageShell";
 
@@ -24,14 +23,6 @@ const Pricing = () => {
 
   return (
     <MarketingPageShell>
-      <link
-        href="https://assets.calendly.com/assets/external/widget.css"
-        rel="stylesheet"
-      />
-      <Script
-        src="https://assets.calendly.com/assets/external/widget.js"
-        strategy="afterInteractive"
-      />
       <PricingHero
         billingCycle={billingCycle}
         onBillingCycleChange={handleBillingCycleChange}

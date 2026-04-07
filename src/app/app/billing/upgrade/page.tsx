@@ -22,9 +22,11 @@ import {
 } from "@/types/subscription.types";
 import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
 import { PlanWidget } from "@/modules/app/components/subscription/PlanWidget";
+import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 // Removed CheckIcon import - using iconify icons instead
 
 export default function UpgradePage() {
+  const { openCalendly } = useCalendlyGate();
   const { planInfo } = usePlanPermissions();
   const searchParams = useSearchParams();
   const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null);
@@ -54,7 +56,7 @@ export default function UpgradePage() {
 
   const handleUpgrade = async (plan: PlanConfig) => {
     if (plan.isEnterprise) {
-      window.open("https://calendly.com/ethicvoice-info/30min", "_blank");
+      openCalendly();
       return;
     }
 

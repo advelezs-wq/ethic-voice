@@ -8,16 +8,8 @@ import {
   services,
   ServiceItem,
 } from "@/modules/landig-page/services/services.data";
-import Script from "next/script";
 import Image from "next/image";
-
-declare global {
-  interface Window {
-    Calendly?: {
-      initPopupWidget: (options: { url: string }) => void;
-    };
-  }
-}
+import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 
 export interface ServicesPageProps {
   initialCategory?: string;
@@ -54,6 +46,7 @@ function ServicesListingBg() {
 export const ServicesPage: React.FC<ServicesPageProps> = ({
   initialCategory,
 }) => {
+  const { openCalendly } = useCalendlyGate();
   const router = useRouter();
   const DEV_GROUP_SLUG = "desarrollo-software";
   const MAIN_DEV_ID = "desarrollo-tecnologico-medida";
@@ -152,19 +145,6 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
 
   return (
     <>
-      <Script
-        src="https://assets.calendly.com/assets/external/widget.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          if (typeof document !== "undefined") {
-            const link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href =
-              "https://assets.calendly.com/assets/external/widget.css";
-            document.head.appendChild(link);
-          }
-        }}
-      />
       {banner}
 
       <section className="relative overflow-hidden bg-gradient-to-b from-[#f5f3ee] via-[#faf9f6] to-[#f5f3ee] px-4 py-10 sm:px-6 md:py-14">
@@ -280,19 +260,7 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({
           </p>
           <button
             type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              if (typeof window !== "undefined" && window.Calendly) {
-                window.Calendly.initPopupWidget({
-                  url: "https://calendly.com/ethicvoice-info/30min?hide_event_type_details=1&hide_gdpr_banner=1",
-                });
-              } else if (typeof window !== "undefined") {
-                window.open(
-                  "https://calendly.com/ethicvoice-info/30min?hide_event_type_details=1&hide_gdpr_banner=1",
-                  "_blank"
-                );
-              }
-            }}
+            onClick={openCalendly}
             className="group mt-8 inline-flex items-center rounded-full bg-lime-400 px-7 py-3.5 text-sm font-bold text-gray-950 shadow-[0_0_28px_rgba(190,242,100,0.4)] transition hover:bg-lime-300"
           >
             Solicitar demo

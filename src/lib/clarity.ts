@@ -3,7 +3,12 @@
  * Utilidades para rastrear eventos y sesiones con Microsoft Clarity
  */
 
+import { readConsentFromStorage } from '@/lib/cookie-consent/storage';
 import type { ClarityCustomEvent, ClarityIdentifyOptions, ClarityTags } from '@/types/clarity';
+
+function clarityAnalyticsAllowed(): boolean {
+  return !!readConsentFromStorage()?.analytics;
+}
 
 /**
  * Verifica si Microsoft Clarity está disponible
@@ -27,6 +32,7 @@ export const isClarityAvailable = (): boolean => {
  * });
  */
 export const identifyClarityUser = (options: ClarityIdentifyOptions): void => {
+  if (!clarityAnalyticsAllowed()) return;
   if (isClarityAvailable() && window.clarity) {
     try {
       window.clarity.identify(
@@ -63,6 +69,7 @@ export const identifyClarityUser = (options: ClarityIdentifyOptions): void => {
  * setClarityTag('features', ['reports', 'analytics', 'ai']);
  */
 export const setClarityTag = (key: string, value: string | string[]): void => {
+  if (!clarityAnalyticsAllowed()) return;
   if (isClarityAvailable() && window.clarity) {
     try {
       window.clarity.set(key, value);
@@ -111,6 +118,7 @@ export const setClarityTags = (tags: ClarityTags): void => {
  * trackClarityEvent('checkout_initiated');
  */
 export const trackClarityEvent = (eventName: ClarityCustomEvent): void => {
+  if (!clarityAnalyticsAllowed()) return;
   if (isClarityAvailable() && window.clarity) {
     try {
       window.clarity.event(eventName);
@@ -166,6 +174,7 @@ export const updateClarityConsent = (consent: 'granted' | 'denied'): void => {
  * }
  */
 export const getClaritySessionId = (): string | undefined => {
+  if (!clarityAnalyticsAllowed()) return undefined;
   if (isClarityAvailable() && window.clarity && window.clarity.getSessionId) {
     try {
       return window.clarity.getSessionId();

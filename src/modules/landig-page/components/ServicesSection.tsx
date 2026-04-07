@@ -44,7 +44,7 @@ function ServicesSectionBg() {
         xmlns="http://www.w3.org/2000/svg"
       >
         <g
-          stroke="#14532d"
+          stroke="#0a1f14"
           strokeWidth="1"
           strokeLinecap="round"
           opacity="0.25"
@@ -62,7 +62,7 @@ function ServicesSectionBg() {
         xmlns="http://www.w3.org/2000/svg"
       >
         <g
-          stroke="#4ade80"
+          stroke="#a3e635"
           strokeWidth="1"
           strokeLinecap="round"
           className="opacity-40"
@@ -115,9 +115,9 @@ function ServiceCard({
                 {s.desc}
               </p>
             </div>
-            <div className="mt-8 flex items-center gap-2 text-sm font-semibold text-lime-300">
+            <div className="mt-8 flex items-center gap-2 text-sm font-semibold text-lime-400">
               <span>Explorar servicio</span>
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-lime-400 text-green-950 transition-transform duration-200 group-hover:translate-x-0.5">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-lime-400 text-[#0a1f14] transition-transform duration-200 group-hover:translate-x-0.5">
                 <i className="icon-[lucide--arrow-right] h-4 w-4" />
               </span>
             </div>
@@ -125,10 +125,10 @@ function ServiceCard({
         </>
       ) : (
         <div className="relative flex h-full flex-col p-5 sm:p-6">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-800 shadow-inner shadow-black/10 sm:h-12 sm:w-12">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0a1f14] shadow-inner shadow-black/10 sm:h-12 sm:w-12">
             <i className={`${s.icon} h-5 w-5 text-white sm:h-6 sm:w-6`} />
           </div>
-          <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.18em] text-green-700 sm:text-[11px]">
+          <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.18em] text-[#0a1f14]/70 sm:text-[11px]">
             {s.tag}
           </p>
           <h3 className="mt-2 text-lg font-bold text-gray-900 sm:text-xl">
@@ -138,8 +138,8 @@ function ServiceCard({
             {s.desc}
           </p>
           <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
-            <span className="text-xs font-semibold text-green-800">Ver más</span>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-800 text-white transition-colors group-hover:bg-green-700">
+            <span className="text-xs font-semibold text-[#0a1f14]">Ver más</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0a1f14] text-white transition-colors group-hover:bg-[#0a1f14]/80">
               <i className="icon-[lucide--arrow-right] h-4 w-4" />
             </span>
           </div>
@@ -151,10 +151,10 @@ function ServiceCard({
   return (
     <Link
       href={s.href}
-      className={`group relative block overflow-hidden rounded-3xl border transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 ${mdPlacement} ${
+      className={`group relative block overflow-hidden rounded-3xl border transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0a1f14] ${mdPlacement} ${
         featured
-          ? "border-lime-400/20 bg-gradient-to-br from-[#0a1f14] via-[#0d2419] to-green-950 shadow-xl shadow-green-950/25 ring-1 ring-white/10 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-green-950/35"
-          : "border-gray-200/90 bg-white/90 shadow-md shadow-gray-200/40 ring-1 ring-black/[0.03] backdrop-blur-sm hover:-translate-y-0.5 hover:border-green-800/15 hover:shadow-lg"
+          ? "border-lime-400/20 bg-[#0a1f14] shadow-xl shadow-[#0a1f14]/25 ring-1 ring-white/10 hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-[#0a1f14]/35"
+          : "border-gray-200/90 bg-white/90 shadow-md shadow-gray-200/40 ring-1 ring-black/[0.03] backdrop-blur-sm hover:-translate-y-0.5 hover:border-[#0a1f14]/15 hover:shadow-lg"
       }`}
     >
       {inner}
@@ -169,7 +169,7 @@ export const ServicesSection = () => {
 
       <div className="relative z-10 mx-auto w-full max-w-6xl">
         <div className="mb-8 text-center sm:mb-10 md:mb-12">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-green-800/80">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#0a1f14]/80">
             Servicios
           </p>
           <h2 className="text-balance text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">

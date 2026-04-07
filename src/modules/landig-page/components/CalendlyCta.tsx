@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 
 type CalendlyCtaProps = {
   className?: string;
@@ -8,27 +9,20 @@ type CalendlyCtaProps = {
 };
 
 export const CalendlyCta: React.FC<CalendlyCtaProps> = ({ className, children }) => {
-  const calendlyUrl =
-    "https://calendly.com/ethicvoice-info/30min?hide_event_type_details=1&hide_gdpr_banner=1";
-
-  const onClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    try {
-      if (typeof window !== "undefined" && (window as any).Calendly) {
-        (window as any).Calendly.initPopupWidget({ url: calendlyUrl });
-        return;
-      }
-    } catch {}
-    if (typeof window !== "undefined") {
-      window.open(calendlyUrl, "_blank");
-    }
-  };
+  const { openCalendly, calendlyAllowed } = useCalendlyGate();
 
   return (
-    <button type="button" onClick={onClick} className={className}>
+    <button
+      type="button"
+      onClick={openCalendly}
+      className={className}
+      title={
+        calendlyAllowed
+          ? undefined
+          : "Activa las cookies opcionales para usar el agenda de Calendly"
+      }
+    >
       {children}
     </button>
   );
 };
-
-

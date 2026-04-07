@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { FAQSection } from "@/modules/landig-page/components/FAQSection";
 import { CalendlyCta } from "@/modules/landig-page/components/CalendlyCta";
-import Script from "next/script";
 import { MarketingPageShell } from "@/modules/landig-page/components/MarketingPageShell";
 
 export const metadata: Metadata = {
@@ -40,15 +39,6 @@ function PageDecorBeige() {
 export default function PrivacyPage() {
   return (
     <MarketingPageShell>
-      <link
-        href="https://assets.calendly.com/assets/external/widget.css"
-        rel="stylesheet"
-      />
-      <Script
-        src="https://assets.calendly.com/assets/external/widget.js"
-        strategy="afterInteractive"
-      />
-
       {/* Hero — misma línea que home (verde oscuro + lima) */}
       <section className="relative overflow-hidden bg-[#0a1f14] px-4 pb-16 pt-10 md:px-6 md:pb-20 md:pt-14">
         <div

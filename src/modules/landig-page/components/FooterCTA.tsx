@@ -2,13 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useIsClient } from "@/modules/app/hooks/useIsClient";
-
-declare global {
-  interface Window {
-    Calendly?: { initPopupWidget: (options: { url: string }) => void };
-  }
-}
+import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 
 const NAV_LINKS = [
   { label: "Servicios", href: "/servicios" },
@@ -19,18 +13,7 @@ const NAV_LINKS = [
 ];
 
 export const FooterCTA = () => {
-  const isClient = useIsClient();
-  const calendlyUrl =
-    "https://calendly.com/ethicvoice-info/30min?hide_event_type_details=1&hide_gdpr_banner=1";
-
-  const openCalendly = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (isClient && window.Calendly) {
-      window.Calendly.initPopupWidget({ url: calendlyUrl });
-    } else {
-      window.open(calendlyUrl, "_blank");
-    }
-  };
+  const { openCalendly } = useCalendlyGate();
 
   return (
     <footer className="bg-green-900 relative overflow-hidden">
@@ -52,6 +35,7 @@ export const FooterCTA = () => {
             Descubre cómo EthicVoice protege tu empresa.
           </p>
           <button
+            type="button"
             onClick={openCalendly}
             className="inline-flex items-center gap-2 rounded-full bg-green-400 px-6 py-2.5 text-sm font-bold text-green-950 shadow-lg transition-colors hover:bg-green-300 sm:px-8 sm:py-3 sm:text-base"
           >

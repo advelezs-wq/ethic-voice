@@ -69,10 +69,10 @@ export const VideoModal: React.FC<VideoModalProps> = ({
             transition={{ duration: 0.2 }}
           >
             <span
-              className="absolute inset-0 rounded-full bg-green-500/30 animate-ping"
+              className="absolute inset-0 rounded-full bg-lime-400/30 animate-ping"
               aria-hidden
             />
-            <span className="absolute inset-0 z-10 flex items-center justify-center rounded-full bg-gradient-to-br from-green-600 to-green-700 shadow-2xl">
+            <span className="absolute inset-0 z-10 flex items-center justify-center rounded-full bg-[#0a1f14] shadow-2xl">
               <i
                 className="icon-[lucide--play] h-9 w-9 text-white"
                 role="img"
@@ -83,11 +83,11 @@ export const VideoModal: React.FC<VideoModalProps> = ({
         </div>
 
         {/* Capa de tinte al hover: no intercepta puntero para que el play reciba hover/click */}
-        <div className="pointer-events-none absolute inset-0 z-[2] bg-green-600/0 transition-colors duration-300 group-hover:bg-green-600/10" />
+        <div className="pointer-events-none absolute inset-0 z-[2] bg-[#0a1f14]/0 transition-colors duration-300 group-hover:bg-[#0a1f14]/10" />
 
         {/* CTA compacto — contraste alto sobre el póster del vídeo */}
         <div className="absolute bottom-3 left-3 right-3 z-[3] sm:bottom-4 sm:left-4 sm:right-4">
-          <div className="mx-auto max-w-sm rounded-lg border border-lime-400/25 bg-green-950/92 px-3 py-2 shadow-lg shadow-black/30 backdrop-blur-sm sm:max-w-md sm:rounded-xl sm:px-4 sm:py-2.5">
+          <div className="mx-auto max-w-sm rounded-lg border border-lime-400/25 bg-[#0a1f14]/92 px-3 py-2 shadow-lg shadow-black/30 backdrop-blur-sm sm:max-w-md sm:rounded-xl sm:px-4 sm:py-2.5">
             <div className="flex items-center gap-2.5 sm:gap-3">
               <div className="min-w-0 flex-1">
                 <h3 className="text-xs font-bold leading-snug text-white sm:text-sm">

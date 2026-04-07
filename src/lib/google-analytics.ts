@@ -3,12 +3,17 @@
  * Utilidades para rastrear eventos con Google Analytics 4
  */
 
+import { readConsentFromStorage } from '@/lib/cookie-consent/storage';
 import type {
   GA4RecommendedEvent,
   GA4EventParams,
   GA4Config,
   GA4ConsentConfig,
 } from '@/types/google-analytics';
+
+function analyticsConsentGranted(): boolean {
+  return !!readConsentFromStorage()?.analytics;
+}
 
 /**
  * Verifica si Google Analytics está disponible
@@ -42,6 +47,7 @@ export const trackGA4Event = (
   eventName: GA4RecommendedEvent | string,
   params?: GA4EventParams
 ): void => {
+  if (!analyticsConsentGranted()) return;
   if (isGA4Available() && window.gtag) {
     try {
       if (params) {
@@ -81,6 +87,7 @@ export const updateGA4Config = (
   measurementId: string,
   config: GA4Config
 ): void => {
+  if (!analyticsConsentGranted()) return;
   if (isGA4Available() && window.gtag) {
     try {
       window.gtag('config', measurementId, config);
@@ -107,6 +114,7 @@ export const updateGA4Config = (
  * });
  */
 export const setGA4Parameters = (params: Record<string, any>): void => {
+  if (!analyticsConsentGranted()) return;
   if (isGA4Available() && window.gtag) {
     try {
       window.gtag('set', 'user_properties', params);
@@ -228,6 +236,7 @@ export const trackGA4PageView = (
   pagePath: string,
   pageTitle?: string
 ): void => {
+  if (!analyticsConsentGranted()) return;
   if (isGA4Available() && window.gtag) {
     const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
     if (measurementId) {

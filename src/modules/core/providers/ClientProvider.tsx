@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { HeroUIProvider, ToastProvider } from "@heroui/react";
 import { ReactNode } from "react";
 import { UserProvider } from "./UserProvider";
+import { CookieConsentRoot } from "./CookieConsentRoot";
 import { UserType } from "@/types/user";
 import { esMX } from "@clerk/localizations";
 
@@ -33,7 +34,7 @@ export const ClientProvider = ({
         }}
       >
         <UserProvider serverUser={serverUser} serverToken={serverToken}>
-          {children}
+          <CookieConsentRoot>{children}</CookieConsentRoot>
         </UserProvider>
       </ClerkProvider>
     </HeroUIProvider>

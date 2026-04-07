@@ -15,13 +15,17 @@ import { ServicesSection } from "./ServicesSection";
 import { HowItWorks } from "./HowItWorks";
 import { PlatformPreviewShowcaseSection } from "./PlatformPreview";
 import { TrustSecuritySection } from "./TrustSecuritySection";
-import Script from "next/script";
 import { useIsClient } from "@/modules/app/hooks/useIsClient";
 import { FloatingWhatsApp } from "react-floating-whatsapp";
+import { StickyCalendlyToast } from "./StickyCalendlyToast";
+import { useCookieConsentOptional } from "@/modules/core/providers/CookieConsentContext";
 
 function LandingContent() {
   const isClient = useIsClient();
   const { isOpen: mobileNavOpen } = useMobileNavDrawer();
+  const cookie = useCookieConsentOptional();
+  const allowFunctional =
+    cookie?.hydrated && !!cookie.consent?.functional && !cookie.needsInteraction;
 
   useEffect(() => {
     if (!isClient) return;
@@ -55,7 +59,7 @@ function LandingContent() {
     <>
       <Header />
 
-      {!mobileNavOpen && (
+      {!mobileNavOpen && allowFunctional && (
         <FloatingWhatsApp
           phoneNumber={process.env.NEXT_PUBLIC_WPP_NUMBER || ""}
           accountName="Ethic Voice"
@@ -65,7 +69,9 @@ function LandingContent() {
         />
       )}
 
-      <main className="w-full min-w-0 overflow-x-hidden">
+      {!mobileNavOpen && <StickyCalendlyToast />}
+
+      <main className="w-full min-w-0 overflow-x-hidden pb-28 sm:pb-24">
         {/* 1. Hero — fondo verde oscuro */}
         <Hero />
 
@@ -101,19 +107,6 @@ export const Landing = () => {
   return (
     <MobileNavProvider>
       <div className="relative min-h-screen bg-white">
-        <Script
-          src="https://assets.calendly.com/assets/external/widget.js"
-          strategy="afterInteractive"
-          onLoad={() => {
-            if (typeof document !== "undefined") {
-              const link = document.createElement("link");
-              link.rel = "stylesheet";
-              link.href =
-                "https://assets.calendly.com/assets/external/widget.css";
-              document.head.appendChild(link);
-            }
-          }}
-        />
         <LandingContent />
       </div>
     </MobileNavProvider>

@@ -14,9 +14,11 @@ import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
 // Removed CheckIcon import - using iconify icons instead
 import { motion } from "framer-motion";
 import { useExchangeRate } from "@/modules/core/hooks/useExchangeRate";
+import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 // Duplicate import removed
 
 export default function InPlatformPricingTable() {
+  const { openCalendly } = useCalendlyGate();
   const { currentOrganization: _currentOrganization } = useOrganization();
   const { planInfo } = usePlanPermissions();
   const { rates } = useExchangeRate({ base: "USD", symbols: ["COP"] });
@@ -45,7 +47,7 @@ export default function InPlatformPricingTable() {
 
   const handlePlanSelect = async (plan: PlanConfig) => {
     if (plan.isEnterprise) {
-      window.open("https://calendly.com/ethicvoice-info/30min", "_blank");
+      openCalendly();
       return;
     }
 

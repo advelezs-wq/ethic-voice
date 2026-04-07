@@ -13,12 +13,14 @@ import { useExchangeRate } from "@/modules/core/hooks/useExchangeRate";
 // Removed CheckIcon import - using iconify icons instead
 import { motion } from "framer-motion";
 import CheckoutSidebar from "@/modules/app/components/checkout/CheckoutSidebar";
+import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 
 interface PricingPlansProps {
   billingCycle: BillingCycle;
 }
 
 export default function PricingPlans({ billingCycle }: PricingPlansProps) {
+  const { openCalendly } = useCalendlyGate();
   const { isSignedIn, isLoaded } = useUser();
   const { rates } = useExchangeRate({ base: "USD", symbols: ["COP"] });
   const [isProcessing, setIsProcessing] = useState(false);
@@ -51,7 +53,7 @@ export default function PricingPlans({ billingCycle }: PricingPlansProps) {
 
     // Handle Premium plan (contact us)
     if (planType === "PREMIUM") {
-      window.open("https://calendly.com/ethicvoice-info/30min", "_blank");
+      openCalendly();
       return;
     }
 

@@ -32,7 +32,9 @@ export function ChatMessage({
   const { user } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [showActions, setShowActions] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState(false);
   const messageRef = useRef<HTMLDivElement>(null);
+  const deleteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isOwnMessage = message.authorId === user?.id;
   const canEdit = isOwnMessage && !message.isOptimistic && message.id > 0;
@@ -43,10 +45,16 @@ export function ChatMessage({
     setIsEditing(false);
   };
 
+  /* Two-step delete: first click arms, second click confirms */
   const handleDelete = async () => {
-    if (confirm("¿Estás seguro de que deseas eliminar este mensaje?")) {
-      await onDelete(message.id);
+    if (!pendingDelete) {
+      setPendingDelete(true);
+      deleteTimerRef.current = setTimeout(() => setPendingDelete(false), 3000);
+      return;
     }
+    if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+    setPendingDelete(false);
+    await onDelete(message.id);
   };
 
   const renderContent = (content: string) => {
@@ -130,21 +138,15 @@ export function ChatMessage({
               <span className="text-xs text-gray-400">(editado)</span>
             )}
             {message.isInternal && (
-              <span className="inline-flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full">
-                <svg
-                  className="w-3 h-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
+              <span className="inline-flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200">
+                <i className="icon-[lucide--lock] size-3" />
                 Interno
+              </span>
+            )}
+            {pendingDelete && (
+              <span className="inline-flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200 animate-pulse">
+                <i className="icon-[lucide--trash-2] size-3" />
+                Clic para confirmar eliminación
               </span>
             )}
           </div>

@@ -171,12 +171,29 @@ function TaskFormModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" scrollBehavior="inside">
+    <Modal
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      size="2xl"
+      scrollBehavior="outside"
+      classNames={{
+        base: "max-h-[90vh]",
+        body: "overflow-visible",
+      }}
+    >
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="flex items-center gap-2.5 pb-2">
-              <div className={`p-1.5 rounded-lg ${isEdit ? "bg-blue-100" : parentTask ? "bg-violet-100" : "bg-blue-100"}`}>
+            <ModalHeader className="flex items-start gap-3 pb-0 border-b border-gray-100">
+              <div
+                className={`p-2 rounded-xl mt-0.5 shrink-0 ${
+                  isEdit
+                    ? "bg-blue-100"
+                    : parentTask
+                      ? "bg-violet-100"
+                      : "bg-blue-100"
+                }`}
+              >
                 <i
                   className={`size-4 ${
                     isEdit
@@ -187,35 +204,40 @@ function TaskFormModal({
                   }`}
                 />
               </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-900">
+              <div className="min-w-0">
+                <p className="text-base font-semibold text-gray-900 leading-tight">
                   {isEdit
                     ? "Editar tarea"
                     : parentTask
-                      ? `Subtarea de "${parentTask.title}"`
+                      ? "Nueva subtarea"
                       : "Nueva tarea de investigación"}
                 </p>
-                <p className="text-xs text-gray-400 font-normal">
+                <p className="text-xs text-gray-400 font-normal mt-0.5 leading-snug">
                   {isEdit
                     ? "Modifica los campos que necesites"
                     : parentTask
-                      ? "Crea una subtarea para desglosar esta tarea"
+                      ? `Subtarea de: "${parentTask.title}"`
                       : "Completa la información de la tarea"}
                 </p>
               </div>
             </ModalHeader>
 
-            <ModalBody className="gap-4">
+            <ModalBody className="gap-4 pt-4 overflow-visible">
               {/* Title */}
               <Input
                 label="Título de la tarea"
                 placeholder="¿Qué hay que hacer?"
                 value={title}
-                onValueChange={(v) => { setTitle(v); if (v.trim().length >= 3) setTitleError(""); }}
+                onValueChange={(v) => {
+                  setTitle(v);
+                  if (v.trim().length >= 3) setTitleError("");
+                }}
                 isInvalid={!!titleError}
                 errorMessage={titleError}
                 isRequired
-                startContent={<i className="icon-[lucide--clipboard-list] size-4 text-gray-400 shrink-0" />}
+                startContent={
+                  <i className="icon-[lucide--clipboard-list] size-4 text-gray-400 shrink-0" />
+                }
               />
 
               {/* Description */}
@@ -224,69 +246,86 @@ function TaskFormModal({
                 placeholder="Describe el objetivo, qué se debe investigar, revisar o ejecutar…"
                 value={description}
                 onValueChange={setDescription}
-                minRows={3}
-                maxRows={6}
+                minRows={2}
+                maxRows={5}
               />
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Priority */}
+              {/* Priority + Date row */}
+              <div className="grid grid-cols-2 gap-3">
                 <Select
                   label="Prioridad"
                   selectedKeys={[priority]}
-                  onSelectionChange={(k) => setPriority(Array.from(k)[0] as TaskPriority)}
+                  onSelectionChange={(k) =>
+                    setPriority(Array.from(k)[0] as TaskPriority)
+                  }
                   startContent={
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${PRIORITY_CFG[priority]?.dot}`} />
+                    <span
+                      className={`w-2 h-2 rounded-full shrink-0 ${PRIORITY_CFG[priority]?.dot}`}
+                    />
                   }
                 >
                   {Object.entries(PRIORITY_CFG).map(([key, cfg]) => (
-                    <SelectItem key={key} startContent={<i className={`${cfg.icon} size-3.5`} />}>
+                    <SelectItem
+                      key={key}
+                      startContent={
+                        <i className={`${cfg.icon} size-3.5`} />
+                      }
+                    >
                       {cfg.label}
                     </SelectItem>
                   ))}
                 </Select>
 
-                {/* Due date */}
                 <Input
                   label="Fecha límite"
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  startContent={<i className="icon-[lucide--calendar] size-4 text-gray-400 shrink-0" />}
+                  startContent={
+                    <i className="icon-[lucide--calendar] size-4 text-gray-400 shrink-0" />
+                  }
                 />
-
-                {/* Status — only on edit */}
-                {isEdit && (
-                  <Select
-                    label="Estado"
-                    selectedKeys={[status]}
-                    onSelectionChange={(k) => setStatus(Array.from(k)[0] as TaskStatus)}
-                    startContent={
-                      <i className={`${STATUS_CFG[status]?.icon} size-3.5 ${STATUS_CFG[status]?.text} shrink-0`} />
-                    }
-                  >
-                    {Object.entries(STATUS_CFG).map(([key, cfg]) => (
-                      <SelectItem key={key} startContent={<i className={`${cfg.icon} size-3.5 ${cfg.text}`} />}>
-                        {cfg.label}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                )}
-
-                {/* Assignee — MemberPicker */}
-                <div className={isEdit ? "" : "sm:col-span-2"}>
-                  <MemberPicker
-                    label="Responsable"
-                    value={assignedTo}
-                    onChange={setAssignedTo}
-                    members={members}
-                    isLoading={membersLoading}
-                    placeholder="Sin asignar"
-                  />
-                </div>
               </div>
+
+              {/* Status — only on edit */}
+              {isEdit && (
+                <Select
+                  label="Estado"
+                  selectedKeys={[status]}
+                  onSelectionChange={(k) =>
+                    setStatus(Array.from(k)[0] as TaskStatus)
+                  }
+                  startContent={
+                    <i
+                      className={`${STATUS_CFG[status]?.icon} size-3.5 ${STATUS_CFG[status]?.text} shrink-0`}
+                    />
+                  }
+                >
+                  {Object.entries(STATUS_CFG).map(([key, cfg]) => (
+                    <SelectItem
+                      key={key}
+                      startContent={
+                        <i className={`${cfg.icon} size-3.5 ${cfg.text}`} />
+                      }
+                    >
+                      {cfg.label}
+                    </SelectItem>
+                  ))}
+                </Select>
+              )}
+
+              {/* Assignee — MemberPicker (always full width, uses portal) */}
+              <MemberPicker
+                label="Responsable"
+                value={assignedTo}
+                onChange={setAssignedTo}
+                members={members}
+                isLoading={membersLoading}
+                placeholder="Sin asignar"
+              />
             </ModalBody>
 
-            <ModalFooter>
+            <ModalFooter className="border-t border-gray-100 pt-3">
               <Button variant="light" onPress={onClose} isDisabled={isSaving}>
                 Cancelar
               </Button>
@@ -294,7 +333,15 @@ function TaskFormModal({
                 color="primary"
                 onPress={handleSave}
                 isLoading={isSaving}
-                startContent={!isSaving && <i className={`${isEdit ? "icon-[lucide--save]" : "icon-[lucide--plus]"} size-4`} />}
+                startContent={
+                  !isSaving && (
+                    <i
+                      className={`${
+                        isEdit ? "icon-[lucide--save]" : "icon-[lucide--plus]"
+                      } size-4`}
+                    />
+                  )
+                }
               >
                 {isEdit ? "Guardar cambios" : "Crear tarea"}
               </Button>

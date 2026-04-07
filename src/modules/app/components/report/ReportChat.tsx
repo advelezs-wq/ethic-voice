@@ -213,9 +213,8 @@ export function ReportChat({
                     onEdit={editMessage}
                     onDelete={deleteMessage}
                     onReact={toggleReaction}
-                    onReply={(id) => {
-                      // Handle reply functionality if needed
-                      console.log("Reply to message:", id);
+                    onReply={() => {
+                      /* reply functionality placeholder */
                     }}
                   />
                 );
@@ -225,21 +224,11 @@ export function ReportChat({
             {!isScrolledToBottom && (
               <button
                 onClick={scrollToBottom}
-                className="absolute bottom-20 right-4 bg-white border shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors"
+                className="absolute bottom-20 right-4 bg-white border border-gray-200 shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors"
+                aria-label="Ir al mensaje más reciente"
+                title="Ir al mensaje más reciente"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                  />
-                </svg>
+                <i className="icon-[lucide--chevrons-down] size-4 text-gray-600" />
               </button>
             )}
           </>

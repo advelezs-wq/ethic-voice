@@ -431,66 +431,77 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                     </a>
                   )}
 
-                  {/* Extra details */}
+                  {/* Extra details — only show keys not already in description */}
                   {activity.details &&
                     typeof activity.details === "object" &&
                     Object.keys(activity.details).length > 0 &&
                     !activity.details.taskId && (
                       <div className="mt-3 pt-3 border-t border-gray-200 grid grid-cols-2 gap-x-4 gap-y-1">
                         {Object.entries(activity.details).map(([key, value]) => {
-                          if (
-                            activity.action === ACTIVITY_TYPES.CUSTOM_EVENT &&
-                            (key === "title" ||
-                              key === "description" ||
-                              key === "taskId")
-                          )
-                            return null;
-                          if (value === undefined || value === null || value === "")
-                            return null;
+                          // Keys already shown in title/description or purely internal — skip
+                          const SKIP_KEYS = new Set([
+                            "title", "description", "taskId", "taskTitle",
+                            "parentTaskId", "preview", "isInternal",
+                            // STATUS_CHANGED & PRIORITY_CHANGED are in getDescription()
+                            "oldStatus", "newStatus", "oldPriority", "newPriority",
+                            // ASSIGNED is in getDescription()
+                            "assigneeName", "assigneeId",
+                            // type:"custom" is noise
+                          ]);
+                          if (SKIP_KEYS.has(key)) return null;
+                          if (key === "type" && String(value) === "custom") return null;
+                          if (value === undefined || value === null || value === "") return null;
 
-                          let label = key
-                            .replace(/([A-Z])/g, " $1")
-                            .trim()
-                            .toLowerCase();
-                          let display: string = String(value);
+                          // Spanish label map
+                          const LABEL_MAP: Record<string, string> = {
+                            type: "Tipo",
+                            irregularityType: "Tipo de irregularidad",
+                            priority: "Prioridad",
+                            channel: "Canal",
+                            channelType: "Canal",
+                            source: "Fuente",
+                            isAnonymous: "Anónimo",
+                            createdBy: "Creado por",
+                            createdByName: "Creado por",
+                            updatedFields: "Campos actualizados",
+                            changed: "Campos actualizados",
+                            severity: "Severidad",
+                            reason: "Motivo",
+                            confidence: "Confianza",
+                          };
 
+                          const label =
+                            LABEL_MAP[key] ||
+                            key
+                              .replace(/([A-Z])/g, " $1")
+                              .trim()
+                              .toLowerCase();
+
+                          let display: string;
                           switch (key) {
                             case "type":
                             case "irregularityType":
-                              label = "Tipo";
                               display = getReportTypeLabel(String(value));
                               break;
                             case "priority":
-                              label = "Prioridad";
+                            case "severity":
                               display = getPriorityLabel(String(value));
                               break;
                             case "channel":
                             case "channelType":
                             case "source":
-                              label = "Canal";
                               display = getSourceLabel(String(value));
                               break;
                             case "isAnonymous":
-                              label = "Anónimo";
                               display =
-                                String(value).toLowerCase() === "true"
-                                  ? "Sí"
-                                  : "No";
-                              break;
-                            case "createdBy":
-                            case "createdByName":
-                              label = "Creado por";
-                              display = String(value);
+                                String(value).toLowerCase() === "true" ? "Sí" : "No";
                               break;
                             case "updatedFields":
                             case "changed":
-                              label = "Campos actualizados";
                               display = Array.isArray(value)
                                 ? (value as any[])
                                     .map((v) =>
-                                      String(v)
-                                        .replace(/[_-]+/g, " ")
-                                        .toLowerCase()
+                                      String(v).replace(/[_-]+/g, " ").toLowerCase()
                                     )
                                     .join(", ")
                                 : String(value);
@@ -498,7 +509,7 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                             default:
                               display = String(value)
                                 .replace(/[_-]+/g, " ")
-                                .toLowerCase();
+                                .replace(/^\w/, (c) => c.toUpperCase());
                           }
 
                           return (

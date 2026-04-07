@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Button } from "@heroui/react";
 
 interface ChatErrorProps {
   error: string;
@@ -10,29 +11,24 @@ interface ChatErrorProps {
 export function ChatError({ error, onRetry }: ChatErrorProps) {
   return (
     <div className="flex flex-col items-center justify-center h-full p-8 text-center">
-      <div className="w-16 h-16 mb-4 text-red-500">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.5}
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
+      <div className="p-4 bg-red-50 rounded-2xl mb-4">
+        <i className="icon-[lucide--message-circle-x] size-10 text-red-400" />
       </div>
-      <h3 className="text-lg font-medium text-gray-900 mb-1">
+      <h3 className="text-base font-semibold text-gray-900 mb-1">
         Error al cargar los mensajes
       </h3>
-      <p className="text-sm text-gray-500 mb-4 max-w-sm">
+      <p className="text-sm text-gray-500 mb-5 max-w-sm">
         {error || "Ocurrió un error inesperado. Por favor, intenta nuevamente."}
       </p>
       {onRetry && (
-        <button
-          onClick={onRetry}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        <Button
+          color="primary"
+          size="sm"
+          onPress={onRetry}
+          startContent={<i className="icon-[lucide--refresh-cw] size-4" />}
         >
           Reintentar
-        </button>
+        </Button>
       )}
     </div>
   );

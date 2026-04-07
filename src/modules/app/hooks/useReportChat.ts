@@ -67,7 +67,7 @@ export function useReportChat({
       setMessages(loadedMessages);
       setHasMore(moreAvailable);
     } catch (err) {
-      setError("Failed to load messages");
+      setError("No se pudieron cargar los mensajes. Intenta de nuevo.");
       console.error("Error loading messages:", err);
     } finally {
       setIsLoading(false);

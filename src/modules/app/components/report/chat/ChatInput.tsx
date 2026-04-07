@@ -179,28 +179,15 @@ export function ChatInput({
   if (isReportClosed) {
     return (
       <div className="border-t bg-gray-50 p-4">
-        <div className="flex items-center justify-center py-6 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
-          <div className="text-center">
-            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-3 bg-gray-200 rounded-full">
-              <svg
-                className="w-6 h-6 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
-            </div>
-            <h3 className="text-sm font-medium text-gray-900 mb-1">
-              Chat en Modo Solo Lectura
-            </h3>
-            <p className="text-sm text-gray-500">
-              Este caso ha sido cerrado. Ya no se pueden enviar nuevos mensajes, pero puedes revisar el historial de conversaciones.
+        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3.5">
+          <i className="icon-[lucide--lock] size-5 text-amber-500 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-amber-800">
+              Chat en modo solo lectura
+            </p>
+            <p className="text-xs text-amber-600 mt-0.5">
+              Caso cerrado — no se pueden enviar nuevos mensajes, pero puedes
+              revisar el historial de conversaciones.
             </p>
           </div>
         </div>
@@ -211,75 +198,44 @@ export function ChatInput({
   return (
     <form onSubmit={handleSubmit} className="border-t bg-gray-50 p-4">
       {replyToId && (
-        <div className="flex items-center justify-between mb-2 px-3 py-2 bg-gray-100 rounded-lg text-sm">
-          <span className="text-gray-600">Respondiendo a un mensaje</span>
+        <div className="flex items-center justify-between mb-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-xl text-sm">
+          <span className="flex items-center gap-1.5 text-blue-700">
+            <i className="icon-[lucide--reply] size-3.5" />
+            Respondiendo a un mensaje
+          </span>
           <button
             type="button"
             onClick={() => setReplyToId(null)}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-blue-400 hover:text-blue-600"
             disabled={isInputDisabled}
+            aria-label="Cancelar respuesta"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <i className="icon-[lucide--x] size-4" />
           </button>
         </div>
       )}
 
       {attachments.length > 0 && (
-        <div className="mb-2 p-2 bg-white rounded-lg border">
+        <div className="mb-2 p-2 bg-white rounded-xl border border-gray-200">
           <div className="flex flex-wrap gap-2">
             {attachments.map((file, index) => (
               <div
                 key={`${file.name}-${index}`}
-                className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full text-sm"
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 rounded-full text-sm"
               >
-                <svg
-                  className="w-4 h-4 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                  />
-                </svg>
-                <span className="max-w-[150px] truncate">{file.name}</span>
-                <span className="text-xs text-gray-500">
-                  ({formatFileSize(file.size)})
+                <i className="icon-[lucide--paperclip] size-3.5 text-gray-500 shrink-0" />
+                <span className="max-w-[150px] truncate text-gray-700">{file.name}</span>
+                <span className="text-xs text-gray-400">
+                  {formatFileSize(file.size)}
                 </span>
                 <button
                   type="button"
                   onClick={() => removeAttachment(index)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-red-500 transition-colors ml-0.5"
                   disabled={isInputDisabled || isUploading}
+                  aria-label="Eliminar archivo"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <i className="icon-[lucide--x] size-3.5" />
                 </button>
               </div>
             ))}
@@ -287,14 +243,14 @@ export function ChatInput({
           {isUploading && (
             <div className="mt-2 text-xs text-gray-500 flex items-center gap-2">
               <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-              Subiendo archivos...
+              Subiendo archivos…
             </div>
           )}
         </div>
       )}
 
       <div className="flex items-center gap-2 mb-3">
-        <label className="flex items-center gap-2 text-sm cursor-pointer">
+        <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
           <input
             type="checkbox"
             checked={isInternal}
@@ -305,66 +261,40 @@ export function ChatInput({
           <span className={cn("text-gray-700", isInputDisabled && "opacity-50")}>
             Mensaje interno
           </span>
-          <svg
-            className={cn("w-4 h-4 text-gray-400", isInputDisabled && "opacity-50")}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-            />
-          </svg>
+          <i
+            className={cn(
+              "icon-[lucide--lock] size-3.5 text-amber-500",
+              isInputDisabled && "opacity-50"
+            )}
+          />
         </label>
+        {isInternal && (
+          <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+            Solo visible para el equipo
+          </span>
+        )}
       </div>
 
       <div className="flex items-end gap-2">
-        <div className="flex gap-1">
+        <div className="flex gap-0.5">
           <button
             type="button"
             onClick={() => !isInputDisabled && fileInputRef.current?.click()}
             disabled={isInputDisabled || isUploading || isSending}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             title={isInputDisabled ? "Chat deshabilitado" : "Adjuntar archivo"}
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-              />
-            </svg>
+            <i className="icon-[lucide--paperclip] size-5" />
           </button>
 
           <button
             type="button"
             onClick={() => !isInputDisabled && setShowEmojiPicker(!showEmojiPicker)}
             disabled={isInputDisabled}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             title={isInputDisabled ? "Chat deshabilitado" : "Emojis"}
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+            <i className="icon-[lucide--smile] size-5" />
           </button>
         </div>
 
@@ -425,42 +355,12 @@ export function ChatInput({
               : "bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-300",
             "disabled:cursor-not-allowed"
           )}
-          title={isInputDisabled ? "Chat deshabilitado - caso cerrado" : "Enviar mensaje"}
+          title={isInputDisabled ? "Chat deshabilitado — caso cerrado" : "Enviar mensaje"}
         >
           {isSending || isUploading ? (
-            <svg
-              className="w-5 h-5 animate-spin"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-              />
-            </svg>
+            <i className="icon-[lucide--send] size-5" />
           )}
         </button>
       </div>

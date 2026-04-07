@@ -15,6 +15,18 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+async function safePusherTrigger(
+  channel: string,
+  event: string,
+  data: object
+): Promise<void> {
+  try {
+    await pusherServer.trigger(channel, event, data);
+  } catch (err) {
+    console.error("[pusher] trigger failed:", channel, event, err);
+  }
+}
+
 export interface ChatMessage {
   id: number;
   content: string;
@@ -55,11 +67,14 @@ export async function getReportMessages(
   }
 ): Promise<{ messages: ChatMessage[]; hasMore: boolean }> {
   const { userId } = await auth();
-  const orgId = await (await import("@/modules/core/utils/org-resolver")).resolveOrgId();
 
-  if (!userId || !orgId) {
+  if (!userId) {
     throw new Error("No autorizado");
   }
+
+  const { orgId } = await (
+    await import("@/modules/core/utils/org-resolver")
+  ).assertUserCanAccessReport(reportId);
 
   const {
     includeInternal = true,
@@ -202,23 +217,17 @@ export async function sendMessage(
   }
 ): Promise<ChatMessage> {
   const { userId } = await auth();
-  const orgId = await (await import("@/modules/core/utils/org-resolver")).resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId || !user) {
+  if (!userId || !user) {
     throw new Error("No autorizado");
   }
 
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-  });
+  const submission = await (
+    await import("@/modules/core/utils/org-resolver")
+  ).assertUserCanAccessReport(reportId);
 
-  if (!report) {
-    throw new Error("Report not found");
-  }
-
-  // Prevent sending messages to archived reports
-  if (report.status === "ARCHIVED") {
+  if (submission.status === "ARCHIVED") {
     throw new Error("Cannot send messages to archived reports");
   }
 
@@ -250,16 +259,6 @@ export async function sendMessage(
         },
         data: { commentId: newMessage.id },
       });
-
-      // Fetch the updated message with attachments
-      return await tx.reportComment.findUnique({
-        where: { id: newMessage.id },
-        include: {
-          attachments: true,
-          reactions: true,
-          readBy: true,
-        },
-      });
     }
 
     await tx.reportActivity.create({
@@ -270,13 +269,24 @@ export async function sendMessage(
           commentId: newMessage.id,
           isInternal: options?.isInternal || false,
           hasAttachments:
-            options?.attachmentIds && options.attachmentIds.length > 0,
+            !!(options?.attachmentIds && options.attachmentIds.length > 0),
           isReply: !!options?.parentId,
         },
         userId,
         userName: user.fullName || "Unknown User",
       },
     });
+
+    if (options?.attachmentIds && options.attachmentIds.length > 0) {
+      return await tx.reportComment.findUnique({
+        where: { id: newMessage.id },
+        include: {
+          attachments: true,
+          reactions: true,
+          readBy: true,
+        },
+      });
+    }
 
     return newMessage;
   });
@@ -307,7 +317,7 @@ export async function sendMessage(
     readBy: [],
   };
 
-  await pusherServer.trigger(`report-${reportId}`, "new-message", {
+  await safePusherTrigger(`report-${reportId}`, "new-message", {
     message: fullMessage,
   });
 
@@ -356,9 +366,8 @@ export async function editMessage(
   content: string
 ): Promise<ChatMessage> {
   const { userId } = await auth();
-  const orgId = await (await import("@/modules/core/utils/org-resolver")).resolveOrgId();
 
-  if (!userId || !orgId) {
+  if (!userId) {
     throw new Error("Unauthorized");
   }
 
@@ -366,13 +375,17 @@ export async function editMessage(
     where: {
       id: messageId,
       authorId: userId,
-      submission: { orgId },
     },
+    select: { submissionId: true },
   });
 
   if (!message) {
     throw new Error("Message not found or unauthorized");
   }
+
+  await (
+    await import("@/modules/core/utils/org-resolver")
+  ).assertUserCanAccessReport(message.submissionId);
 
   const updatedMessage = await prisma.reportComment.update({
     where: { id: messageId },
@@ -388,9 +401,8 @@ export async function editMessage(
     },
   });
 
-  // Send real-time update
-  await pusherServer.trigger(
-    `report-${message.submissionId}`,
+  await safePusherTrigger(
+    `report-${updatedMessage.submissionId}`,
     "message-updated",
     {
       messageId,
@@ -435,9 +447,8 @@ export async function editMessage(
 
 export async function deleteMessage(messageId: number): Promise<void> {
   const { userId } = await auth();
-  const orgId = await (await import("@/modules/core/utils/org-resolver")).resolveOrgId();
 
-  if (!userId || !orgId) {
+  if (!userId) {
     throw new Error("Unauthorized");
   }
 
@@ -445,24 +456,27 @@ export async function deleteMessage(messageId: number): Promise<void> {
     where: {
       id: messageId,
       authorId: userId,
-      submission: { orgId },
     },
+    select: { submissionId: true },
   });
 
   if (!message) {
     throw new Error("Message not found or unauthorized");
   }
 
+  await (
+    await import("@/modules/core/utils/org-resolver")
+  ).assertUserCanAccessReport(message.submissionId);
+
+  const submissionId = message.submissionId;
+
   await prisma.reportComment.delete({
     where: { id: messageId },
   });
 
-  // Send real-time update
-  await pusherServer.trigger(
-    `report-${message.submissionId}`,
-    "message-deleted",
-    { messageId }
-  );
+  await safePusherTrigger(`report-${submissionId}`, "message-deleted", {
+    messageId,
+  });
 
   revalidatePath(`/app/reports/${message.submissionId}`);
 }
@@ -472,23 +486,24 @@ export async function toggleReaction(
   emoji: string
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await (await import("@/modules/core/utils/org-resolver")).resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId || !user) {
+  if (!userId || !user) {
     throw new Error("Unauthorized");
   }
 
-  const message = await prisma.reportComment.findFirst({
-    where: {
-      id: messageId,
-      submission: { orgId },
-    },
+  const message = await prisma.reportComment.findUnique({
+    where: { id: messageId },
+    select: { submissionId: true },
   });
 
   if (!message) {
     throw new Error("Message not found");
   }
+
+  await (
+    await import("@/modules/core/utils/org-resolver")
+  ).assertUserCanAccessReport(message.submissionId);
 
   const existingReaction = await prisma.commentReaction.findUnique({
     where: {
@@ -515,8 +530,7 @@ export async function toggleReaction(
     });
   }
 
-  // Send real-time update
-  await pusherServer.trigger(
+  await safePusherTrigger(
     `report-${message.submissionId}`,
     "reaction-toggled",
     { messageId, emoji, userId }
@@ -527,22 +541,28 @@ export async function toggleReaction(
 
 export async function markAsRead(messageIds: number[]): Promise<void> {
   const { userId } = await auth();
-  const orgId = await (await import("@/modules/core/utils/org-resolver")).resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId || !user) {
+  if (!userId || !user) {
     throw new Error("Unauthorized");
   }
 
   const messages = await prisma.reportComment.findMany({
     where: {
       id: { in: messageIds },
-      submission: { orgId },
     },
+    select: { id: true, submissionId: true },
   });
 
   if (messages.length === 0) {
     return;
+  }
+
+  const submissionIds = [...new Set(messages.map((m) => m.submissionId))];
+  for (const sid of submissionIds) {
+    await (
+      await import("@/modules/core/utils/org-resolver")
+    ).assertUserCanAccessReport(sid);
   }
 
   const readReceipts = messages.map((message) => ({
@@ -556,10 +576,9 @@ export async function markAsRead(messageIds: number[]): Promise<void> {
     skipDuplicates: true,
   });
 
-  // Send real-time update for each report
   const reportIds = [...new Set(messages.map((m) => m.submissionId))];
-  for (const reportId of reportIds) {
-    await pusherServer.trigger(`report-${reportId}`, "messages-read", {
+  for (const rid of reportIds) {
+    await safePusherTrigger(`report-${rid}`, "messages-read", {
       messageIds,
       userId,
     });

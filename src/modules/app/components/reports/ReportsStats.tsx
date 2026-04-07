@@ -45,9 +45,9 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
 
   const statsData = [
     {
-      title: "Total Reportes",
+      title: "Informes totales",
       value: stats.totalReports.toString(),
-      subtitle: `${stats.totalReportsChange} vs periodo anterior`,
+      subtitle: `${stats.totalReportsChange} frente al periodo anterior`,
       icon: (
         <i
           className="icon-[lucide--file-text] size-5"
@@ -193,13 +193,13 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
                 </div>
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-600 mb-1 truncate">
+                <p className="text-sm font-medium text-gray-600 mb-1 whitespace-normal break-words text-pretty">
                   {stat.title}
                 </p>
-                <p className="text-2xl font-bold text-gray-900 truncate">
+                <p className="text-2xl font-bold text-gray-900 tabular-nums">
                   {stat.value}
                 </p>
-                <p className="text-xs text-gray-500 mt-1 truncate">
+                <p className="text-xs text-gray-500 mt-1 whitespace-normal break-words text-pretty">
                   {stat.subtitle}
                 </p>
                 {stat.showProgress && (

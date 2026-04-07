@@ -1,7 +1,5 @@
 import React from "react";
-import { Header } from "@/modules/landig-page/components/layout/Header";
-import { Footer } from "@/modules/landig-page/components/layout/Footer";
-import { BackgroundCurves } from "@/modules/landig-page/components/layout/BackgroundCurves";
+import { MarketingPageShell } from "@/modules/landig-page/components/MarketingPageShell";
 
 export const metadata = {
   title: "Términos y Condiciones | EthicVoice",
@@ -11,14 +9,9 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-white bg-curves relative">
-      <div className="absolute inset-0 -z-[1]">
-        <BackgroundCurves />
-      </div>
-      <Header />
-      <main className="pt-24 pb-16">
-        <section className="container max-w-7xl md:mx-auto">
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 md:p-10">
+    <MarketingPageShell mainClassName="pb-16">
+      <section className="container max-w-7xl px-4 md:mx-auto">
+        <div className="rounded-2xl border border-[#0a1f14]/10 bg-[#f5f3ee] p-6 shadow-sm md:p-10">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Términos y Condiciones
             </h1>
@@ -313,9 +306,7 @@ export default function TermsPage() {
             </section>
           </div>
         </section>
-      </main>
-      <Footer />
-    </div>
+    </MarketingPageShell>
   );
 }
 

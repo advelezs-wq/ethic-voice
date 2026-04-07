@@ -1,3 +1,4 @@
+import { MarketingPageShell } from "@/modules/landig-page/components/MarketingPageShell";
 import { ServicesPage } from "@/modules/landig-page/components/services/ServicesPage";
 
 export default async function Page(props: {
@@ -5,7 +6,9 @@ export default async function Page(props: {
 }) {
   const params = await props.searchParams;
   const category = params?.category;
-  return <ServicesPage initialCategory={category} />;
+  return (
+    <MarketingPageShell>
+      <ServicesPage initialCategory={category} />
+    </MarketingPageShell>
+  );
 }
-
-

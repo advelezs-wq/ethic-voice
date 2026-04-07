@@ -1,6 +1,4 @@
 import { getReportByTrackingCode } from "@/actions/tracking.actions";
-import { Footer } from "@/modules/landig-page/components/layout/Footer";
-import { Header } from "@/modules/landig-page/components/layout/Header";
 import { TrackingPageContent } from "@/modules/track/components/TrackingPageContent";
 
 interface TrackReportPageProps {
@@ -15,15 +13,11 @@ export default async function TrackReportPage({
   const report = await getReportByTrackingCode((await params).code);
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <main className=" bg-gradient-to-br from-white via-gray-50 pt-20 to-blue-50/30">
-        <TrackingPageContent
-          initialCode={(await params).code}
-          initialReport={report}
-        />
-      </main>
-      <Footer />
+    <div className="min-h-[calc(100dvh-5rem)] bg-gradient-to-br from-[#f5f3ee] via-white to-emerald-50/20">
+      <TrackingPageContent
+        initialCode={(await params).code}
+        initialReport={report}
+      />
     </div>
   );
 }

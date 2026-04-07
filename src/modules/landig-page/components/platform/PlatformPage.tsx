@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import NextImage from "next/image";
 import { motion } from "framer-motion";
 import { Button, Card, CardBody, Image } from "@heroui/react";
-import { Header } from "@/modules/landig-page/components/layout/Header";
-import { Footer } from "@/modules/landig-page/components/layout/Footer";
 import Script from "next/script";
 
 const calendlyUrl =
@@ -29,8 +28,7 @@ function scrollToFeatures(e: { preventDefault: () => void }) {
 
 export const PlatformPage = () => {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Calendly Widget Script */}
+    <>
       <Script
         src="https://assets.calendly.com/assets/external/widget.js"
         strategy="afterInteractive"
@@ -43,21 +41,27 @@ export const PlatformPage = () => {
           }
         }}
       />
-      <Header />
-      {/* Hero */}
-      <section className="relative pb-20 pt-36 px-6 bg-gradient-to-br from-white via-gray-50 to-green-50/30 overflow-hidden">
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <section className="relative overflow-hidden bg-[#0a1f14] px-6 pb-16 pt-8 md:pt-12">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_40%,rgba(22,101,52,0.35)_0%,transparent_55%)]"
+          aria-hidden
+        />
+        <div className="relative z-10 container mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               className="space-y-6"
             >
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-                Plataforma EthicVoice
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-400/90">
+                Producto
+              </p>
+              <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-white md:text-5xl">
+                Plataforma{" "}
+                <span className="text-lime-400">EthicVoice</span>
               </h1>
-              <p className="text-lg text-gray-600 max-w-2xl">
+              <p className="max-w-2xl text-lg text-white/80">
                 Reportes confiables, gestión de casos, analíticas avanzadas e IA
                 para transformar el cumplimiento en una ventaja competitiva.
               </p>
@@ -67,14 +71,18 @@ export const PlatformPage = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
+              className="relative flex justify-center lg:justify-end"
             >
-              {/* Platform preview image */}
-              <div className="relative w-full h-80 rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-                <Image
+              {/* Borde/sombra pegados al bitmap: sin caja fija h-80 ni object-cover */}
+              <div className="inline-block max-w-full overflow-hidden rounded-2xl border border-white/15 shadow-[0_0_40px_rgba(0,0,0,0.35)]">
+                <NextImage
                   src="/platform/preview-1.jpg"
                   alt="Vista previa de la plataforma EthicVoice"
-                  className="w-full h-full object-cover"
+                  width={2340}
+                  height={1368}
+                  className="block h-auto w-full max-w-full align-top"
+                  sizes="(min-width: 1024px) min(50vw, 640px), 100vw"
+                  priority
                 />
               </div>
             </motion.div>
@@ -118,7 +126,7 @@ export const PlatformPage = () => {
       </section>
 
       {/* Highlight Sections */}
-      <section id="features" className="py-16 px-6 bg-gray-50">
+      <section id="features" className="bg-[#f5f3ee] px-6 py-16">
         <div className="container mx-auto max-w-7xl space-y-16">
           <div className="text-center mb-4">
             <h2 className="text-3xl font-bold text-gray-900">
@@ -247,7 +255,7 @@ export const PlatformPage = () => {
           </p>
           <button
             onClick={openCalendlyPopup}
-            className="bg-green-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-800 group transition-colors inline-flex items-center"
+            className="group inline-flex items-center rounded-full bg-lime-400 px-6 py-3 text-sm font-bold text-gray-950 shadow-[0_0_24px_rgba(190,242,100,0.35)] transition hover:bg-lime-300"
           >
             Solicitar demo
             <i
@@ -258,8 +266,7 @@ export const PlatformPage = () => {
           </button>
         </div>
       </section>
-      <Footer />
-    </div>
+    </>
   );
 };
 

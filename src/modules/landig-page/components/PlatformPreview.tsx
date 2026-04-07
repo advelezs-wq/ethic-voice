@@ -1,27 +1,72 @@
+"use client";
+
 import React, { useRef } from "react";
 import { motion } from "framer-motion";
 import { Image } from "@heroui/react";
 
-// Updated Compliance Platform Demo Component to match current design
-const CompliancePlatformDemo = () => {
+type PreviewSidebarItem = {
+  name: string;
+  shortName?: string;
+  icon: string;
+};
+
+/** Navegación del mock (compartida: barra móvil + sidebar desktop) */
+const PREVIEW_SIDEBAR_ITEMS: PreviewSidebarItem[] = [
+  {
+    name: "Denuncias",
+    icon: "M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z",
+  },
+  {
+    name: "Organización",
+    icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
+  },
+  {
+    name: "Correo",
+    icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+  },
+  {
+    name: "Formularios",
+    icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+  },
+  {
+    name: "Equipo",
+    icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z",
+  },
+  {
+    name: "Analíticas e Informes",
+    shortName: "Analíticas",
+    icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
+  },
+  {
+    name: "Configuración del Sistema",
+    shortName: "Configuración",
+    icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z",
+  },
+];
+
+const PREVIEW_PROFILE_ICON =
+  "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z";
+
+/** Mock del panel (ventana navegador + islas flotantes). Reutilizable en la landing. */
+export const CompliancePlatformDemo = () => {
   return (
-    <div className="relative mx-auto max-w-6xl px-3 sm:px-4 md:px-6">
-      {/* Browser Window */}
+    <div className="relative mx-auto w-full max-w-6xl px-1 sm:px-3 md:px-5 min-w-0">
+      {/* Browser Window — escala contenida en viewport */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
-        className="relative rounded-xl shadow-2xl overflow-hidden bg-white"
+        className="relative max-w-full rounded-lg sm:rounded-xl shadow-xl sm:shadow-2xl overflow-hidden bg-white isolate"
       >
         {/* Browser Header */}
-        <div className="bg-gray-100 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between border-b border-gray-200">
+        <div className="bg-gray-100 px-2 sm:px-3 py-1.5 sm:py-2 flex items-center justify-between border-b border-gray-200 gap-2 min-w-0">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="flex gap-1.5">
-              <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <div className="flex gap-1 shrink-0">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500" />
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500" />
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500" />
             </div>
-            <div className="hidden sm:flex ml-4 items-center gap-2 bg-white rounded-md px-3 py-1 text-sm text-gray-600">
+            <div className="hidden sm:flex ml-2 sm:ml-3 min-w-0 items-center gap-1.5 bg-white rounded px-2 py-0.5 text-xs text-gray-600">
               <svg
                 className="w-4 h-4 text-gray-400"
                 fill="none"
@@ -56,27 +101,27 @@ const CompliancePlatformDemo = () => {
           </div>
         </div>
 
-        {/* Dashboard Content */}
-        <div className="flex flex-col md:flex-row h-[520px] md:h-[560px] lg:h-[640px]">
-          {/* Sidebar */}
-          <div className="w-14 md:w-16 lg:w-64 bg-white border-r border-gray-200 p-2 lg:p-4 relative flex flex-col">
-            <div className="flex items-center justify-center lg:justify-start gap-3 mb-6 lg:mb-8">
+        {/* Dashboard: móvil = barra horizontal; desde 480px sidebar + contenido */}
+        <div className="flex flex-col min-[480px]:flex-row overflow-hidden min-h-[280px] min-[480px]:min-h-[300px] h-[min(400px,84svh)] min-[480px]:h-[min(400px,78svh)] sm:h-[min(430px,74svh)] md:h-[min(460px,70svh)] lg:h-[min(500px,65svh)] xl:h-[min(520px,62svh)] max-h-[min(600px,90svh)]">
+          {/* Móvil: una sola franja horizontal (logo + scroll + perfil/salir) — evita columna vacía */}
+          <div
+            className="flex min-[480px]:hidden items-stretch gap-1.5 border-b border-gray-200 bg-white px-2 py-1.5 shrink-0"
+            aria-label="Navegación rápida del panel (vista previa)"
+          >
+            <div className="flex shrink-0 items-center py-0.5">
               <Image
-                className="w-8 h-8 object-contain lg:hidden"
-                src="/brand/logo-nobg.png"
-                alt="EthicVoice"
-              />
-              <Image
-                className="hidden lg:block w-44 object-cover"
+                className="h-7 w-7 object-contain"
                 src="/brand/logo-nobg.png"
                 alt="EthicVoice"
               />
             </div>
-
-            <nav className="space-y-1">
-              <div className="bg-green-50 text-green-700 px-0 lg:px-3 py-3 rounded-lg flex items-center justify-center lg:justify-start gap-0 lg:gap-3">
+            <div className="flex min-h-[2.25rem] min-w-0 flex-1 flex-row items-center gap-0.5 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-green-50 text-green-700"
+                title="Dashboard"
+              >
                 <svg
-                  className="w-6 h-6"
+                  className="h-4 w-4 shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -94,49 +139,15 @@ const CompliancePlatformDemo = () => {
                     d="M8 5a2 2 0 012-2h2a2 2 0 012 2v6l-3 3-3-3V5z"
                   />
                 </svg>
-                <span className="font-medium hidden lg:inline">Dashboard</span>
               </div>
-
-              {[
-                {
-                  name: "Denuncias",
-                  icon: "M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z",
-                },
-                {
-                  name: "Organización",
-                  icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
-                },
-                {
-                  name: "Correo",
-                  icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-                },
-                {
-                  name: "Formularios",
-                  icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-                },
-                {
-                  name: "Equipo",
-                  icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z",
-                },
-                {
-                  name: "Analíticas e Informes",
-                  icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
-                },
-                {
-                  name: "Configuración del Sistema",
-                  icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z",
-                },
-                {
-                  name: "Perfil",
-                  icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
-                },
-              ].map((item, idx) => (
+              {PREVIEW_SIDEBAR_ITEMS.map((item, idx) => (
                 <div
                   key={idx}
-                  className="px-0 lg:px-3 py-3 text-gray-600 hover:bg-gray-50 rounded-lg flex items-center justify-center lg:justify-start gap-0 lg:gap-3 cursor-pointer"
+                  title={item.name}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-500"
                 >
                   <svg
-                    className="w-6 h-6"
+                    className="h-4 w-4 shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -148,20 +159,36 @@ const CompliancePlatformDemo = () => {
                       d={item.icon}
                     />
                   </svg>
-                  <span className="text-sm hidden lg:inline">{item.name}</span>
                 </div>
               ))}
-            </nav>
-
-            {/* User Profile */}
-            <div className="absolute bottom-4 left-2 right-2 lg:left-4 lg:right-4">
+            </div>
+            <div className="flex shrink-0 flex-row items-center gap-2 border-l border-gray-100 pl-2">
+              <div
+                title="Perfil"
+                className="flex h-9 w-9 items-center justify-center rounded-md text-gray-600"
+              >
+                <svg
+                  className="h-4 w-4 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d={PREVIEW_PROFILE_ICON}
+                  />
+                </svg>
+              </div>
               <button
-                className="w-full mt-2 text-gray-600 hover:text-gray-800 flex items-center justify-center lg:justify-start gap-0 lg:gap-2 px-0 lg:px-3 py-2 text-xs lg:text-sm"
+                type="button"
+                className="flex h-9 w-9 items-center justify-center rounded-md text-gray-600"
                 aria-label="Cerrar sesión"
                 title="Cerrar sesión"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="h-4 w-4 shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -173,31 +200,142 @@ const CompliancePlatformDemo = () => {
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                   />
                 </svg>
-                <span className="hidden lg:inline">Cerrar Sesión</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop / tablet: sidebar vertical */}
+          <div className="hidden min-[480px]:flex w-full min-[480px]:w-14 md:w-16 lg:w-52 xl:w-56 shrink-0 flex-col min-h-0 min-w-0 bg-white border-b min-[480px]:border-b-0 min-[480px]:border-r border-gray-200 p-1.5 sm:p-2 lg:p-3 min-[480px]:h-full min-[480px]:self-stretch">
+            <div className="flex min-[480px]:items-center lg:justify-start justify-center gap-2 mb-2 sm:mb-3 lg:mb-4 shrink-0">
+              <Image
+                className="hidden min-[480px]:block lg:hidden h-8 w-8 object-contain"
+                src="/brand/logo-nobg.png"
+                alt="EthicVoice"
+              />
+              <Image
+                className="hidden lg:block w-32 xl:w-36 object-cover max-w-full"
+                src="/brand/logo-nobg.png"
+                alt="EthicVoice"
+              />
+            </div>
+
+            <nav
+              className="min-h-0 flex-1 space-y-0.5 sm:space-y-1 overflow-y-auto overscroll-contain pr-0.5 [scrollbar-width:thin]"
+              aria-label="Navegación del panel (vista previa)"
+            >
+              <div className="flex items-center justify-center gap-0 rounded-md bg-green-50 px-0 py-2 text-green-700 min-[480px]:py-2.5 lg:justify-start lg:gap-2 lg:px-2">
+                <svg
+                  className="h-5 w-5 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 5a2 2 0 012-2h2a2 2 0 012 2v6l-3 3-3-3V5z"
+                  />
+                </svg>
+                <span className="hidden font-medium lg:inline">Dashboard</span>
+              </div>
+
+              {PREVIEW_SIDEBAR_ITEMS.map((item, idx) => (
+                <div
+                  key={idx}
+                  title={item.name}
+                  className="flex min-w-0 cursor-default items-center justify-center gap-0 rounded-md px-0 py-1.5 text-gray-600 min-[480px]:py-2 hover:bg-gray-50 lg:justify-start lg:gap-2 lg:px-2"
+                >
+                  <svg
+                    className="h-5 w-5 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d={item.icon}
+                    />
+                  </svg>
+                  <span className="hidden text-left text-[11px] leading-snug line-clamp-2 break-words lg:inline lg:text-xs">
+                    {item.shortName ?? item.name}
+                  </span>
+                </div>
+              ))}
+            </nav>
+
+            <div className="mt-auto shrink-0 space-y-1.5 border-t border-gray-100 bg-white pt-2 pb-1">
+              <div
+                title="Perfil"
+                className="flex min-w-0 cursor-default items-center justify-center gap-0 rounded-md px-0 py-1.5 text-gray-600 hover:bg-gray-50 min-[480px]:py-2 lg:justify-start lg:gap-2 lg:px-2"
+              >
+                <svg
+                  className="h-5 w-5 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d={PREVIEW_PROFILE_ICON}
+                  />
+                </svg>
+                <span className="hidden truncate text-[11px] lg:inline lg:text-xs">Perfil</span>
+              </div>
+              <button
+                type="button"
+                className="flex w-full min-w-0 items-center justify-center gap-1 rounded-md px-0 py-1.5 text-[10px] text-gray-600 hover:bg-gray-50 min-[480px]:py-2 lg:justify-start lg:gap-1.5 lg:px-2 lg:text-xs"
+                aria-label="Cerrar sesión"
+                title="Cerrar sesión"
+              >
+                <svg
+                  className="h-4 w-4 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+                <span className="hidden truncate lg:inline">Cerrar sesión</span>
               </button>
             </div>
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 p-3 sm:p-5 md:p-6 lg:p-8 bg-gray-50 overflow-y-auto">
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+          <div className="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-2 max-[479px]:px-3 sm:p-3 md:p-4 lg:p-5">
+            <div className="mb-3 sm:mb-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 mb-3">
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-xl font-bold text-gray-900 mb-0.5 leading-tight">
                     Panel de Control
                   </h1>
-                  <p className="text-gray-600 text-sm sm:text-base">
+                  <p className="text-gray-600 text-xs sm:text-sm leading-snug">
                     Gestión de denuncias y reportes de tu organización
                   </p>
                 </div>
-                <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 shrink-0">
                   <button
-                    className="p-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50"
+                    className="p-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-50"
                     aria-label="Refrescar"
                     title="Refrescar"
                   >
                     <svg
-                      className="w-5 h-5 text-gray-600"
+                      className="w-4 h-4 text-gray-600"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -210,9 +348,9 @@ const CompliancePlatformDemo = () => {
                       />
                     </svg>
                   </button>
-                  <button className="p-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 flex items-center gap-2">
+                  <button className="p-1.5 rounded-md border border-gray-300 bg-white hover:bg-gray-50 flex items-center gap-1.5">
                     <svg
-                      className="w-5 h-5 text-gray-600"
+                      className="w-4 h-4 text-gray-600 shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -224,11 +362,11 @@ const CompliancePlatformDemo = () => {
                         d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"
                       />
                     </svg>
-                    <span className="text-sm hidden sm:inline">Filtrar</span>
+                    <span className="text-xs hidden sm:inline">Filtrar</span>
                   </button>
-                  <button className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2">
+                  <button className="px-2 sm:px-3 py-1.5 bg-green-600 text-white text-xs rounded-md hover:bg-green-700 flex items-center gap-1.5">
                     <svg
-                      className="w-4 h-4"
+                      className="w-3.5 h-3.5 shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -240,25 +378,23 @@ const CompliancePlatformDemo = () => {
                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                       />
                     </svg>
-                    <span className="text-sm hidden sm:inline">
-                      Exportar PDF
-                    </span>
+                    <span className="hidden sm:inline">Exportar PDF</span>
                   </button>
                 </div>
               </div>
             </div>
 
             {/* Metrics Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-              <div className="bg-blue-600 rounded-xl p-4 md:p-6 text-white relative overflow-hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-blue-100 text-sm">Nuevos reportes</p>
-                    <p className="text-2xl md:text-3xl font-bold">0</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <div className="bg-blue-600 rounded-lg p-3 sm:p-4 text-white relative overflow-hidden">
+                <div className="flex items-center justify-between gap-2 mb-0">
+                  <div className="min-w-0">
+                    <p className="text-blue-100 text-[11px] sm:text-xs leading-tight">Nuevos reportes</p>
+                    <p className="text-xl sm:text-2xl font-bold tabular-nums">0</p>
                   </div>
-                  <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-500 rounded-md flex items-center justify-center shrink-0">
                     <svg
-                      className="w-6 h-6"
+                      className="w-5 h-5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -274,15 +410,15 @@ const CompliancePlatformDemo = () => {
                 </div>
               </div>
 
-              <div className="bg-orange-500 rounded-xl p-4 md:p-6 text-white relative overflow-hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-orange-100 text-sm">En progreso</p>
-                    <p className="text-2xl md:text-3xl font-bold">0</p>
+              <div className="bg-orange-500 rounded-lg p-3 sm:p-4 text-white relative overflow-hidden">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-orange-100 text-[11px] sm:text-xs leading-tight">En progreso</p>
+                    <p className="text-xl sm:text-2xl font-bold tabular-nums">0</p>
                   </div>
-                  <div className="w-12 h-12 bg-orange-400 rounded-lg flex items-center justify-center">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-orange-400 rounded-md flex items-center justify-center shrink-0">
                     <svg
-                      className="w-6 h-6"
+                      className="w-5 h-5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -298,15 +434,15 @@ const CompliancePlatformDemo = () => {
                 </div>
               </div>
 
-              <div className="bg-green-600 rounded-xl p-4 md:p-6 text-white relative overflow-hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-green-100 text-sm">Cerrados</p>
-                    <p className="text-2xl md:text-3xl font-bold">0</p>
+              <div className="bg-green-600 rounded-lg p-3 sm:p-4 text-white relative overflow-hidden sm:col-span-2 lg:col-span-1">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-green-100 text-[11px] sm:text-xs leading-tight">Cerrados</p>
+                    <p className="text-xl sm:text-2xl font-bold tabular-nums">0</p>
                   </div>
-                  <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 bg-green-500 rounded-md flex items-center justify-center shrink-0">
                     <svg
-                      className="w-6 h-6"
+                      className="w-5 h-5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -324,20 +460,20 @@ const CompliancePlatformDemo = () => {
             </div>
 
             {/* Charts and Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
               {/* Weekly Trend Chart */}
-              <div className="md:col-span-2 bg-white rounded-xl p-4 md:p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-semibold text-gray-900">
+              <div className="md:col-span-2 bg-white rounded-lg p-3 sm:p-4 border border-gray-200 min-w-0">
+                <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                     Tendencia Semanal
                   </h3>
                   <button
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-600 shrink-0 p-0.5"
                     aria-label="Opciones del gráfico"
                     title="Opciones del gráfico"
                   >
                     <svg
-                      className="w-5 h-5"
+                      className="w-4 h-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -351,44 +487,44 @@ const CompliancePlatformDemo = () => {
                     </svg>
                   </button>
                 </div>
-                <div className="h-40 md:h-48 bg-gray-50 rounded-lg flex items-end justify-center">
-                  <div className="flex items-end gap-3 md:gap-4 mb-4">
+                <div className="h-28 sm:h-32 md:h-36 bg-gray-50 rounded-md flex items-end justify-center overflow-hidden px-1">
+                  <div className="flex items-end justify-center gap-1 sm:gap-1.5 md:gap-2 mb-2 w-full max-w-full overflow-x-auto pb-1">
                     {["lun", "mar", "mié", "jue", "vie", "sáb", "dom"].map(
                       (day, idx) => (
-                        <div key={idx} className="text-center">
+                        <div key={idx} className="text-center shrink-0 min-w-[1.35rem] sm:min-w-[1.5rem]">
                           <div
-                            className={`w-6 md:w-8 bg-blue-500 rounded-t mb-2 ${idx === 6 ? "h-16" : "h-2"}`}
-                          ></div>
-                          <span className="text-xs text-gray-500">{day}</span>
+                            className={`mx-auto w-4 sm:w-5 md:w-6 bg-blue-500 rounded-t mb-1 ${idx === 6 ? "h-10 sm:h-12 md:h-14" : "h-1.5 sm:h-2"}`}
+                          />
+                          <span className="text-[10px] sm:text-xs text-gray-500 leading-none">{day}</span>
                         </div>
                       )
                     )}
                   </div>
                 </div>
-                <div className="text-center mt-4">
-                  <span className="text-sm font-medium text-gray-900">mar</span>
-                  <span className="text-sm text-gray-500 ml-2">0 reportes</span>
+                <div className="text-center mt-2 sm:mt-3">
+                  <span className="text-xs sm:text-sm font-medium text-gray-900">mar</span>
+                  <span className="text-xs sm:text-sm text-gray-500 ml-1 sm:ml-2">0 reportes</span>
                 </div>
               </div>
 
               {/* Monthly Statistics */}
-              <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-semibold text-gray-900">
+              <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200 min-w-0">
+                <div className="mb-3">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
                     Estadísticas Mensuales
                   </h3>
                 </div>
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-2">
+                <div className="mb-2 sm:mb-3">
+                  <p className="text-xs text-gray-600 mb-1">
                     Total de Reportes
                   </p>
-                  <p className="text-xl md:text-2xl font-bold text-gray-900 mb-1">
+                  <p className="text-lg sm:text-xl font-bold text-gray-900 tabular-nums">
                     0
                   </p>
-                  <p className="text-xs text-gray-500">Últimos 6 meses</p>
+                  <p className="text-[10px] sm:text-xs text-gray-500">Últimos 6 meses</p>
                 </div>
-                <div className="h-32 bg-gray-50 rounded-lg flex items-end justify-center">
-                  <div className="flex items-end gap-1.5 md:gap-2 mb-4">
+                <div className="h-24 sm:h-28 bg-gray-50 rounded-md flex items-end justify-center overflow-hidden">
+                  <div className="flex items-end gap-1 sm:gap-1.5 mb-2 px-0.5">
                     {["feb", "mar", "abr", "may", "jun", "jul"].map(
                       (month, idx) => (
                         <div key={idx} className="text-center">
@@ -403,23 +539,23 @@ const CompliancePlatformDemo = () => {
             </div>
 
             {/* Recent Reports and Severity Indicator */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mt-6">
-              <div className="md:col-span-2 bg-white rounded-xl p-4 md:p-6 border border-gray-200">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3 mt-3 sm:mt-4">
+              <div className="md:col-span-2 bg-white rounded-lg p-3 sm:p-4 border border-gray-200 min-w-0">
+                <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
                       Reportes Recientes
                     </h3>
-                    <span className="text-sm text-gray-500">0 total</span>
+                    <span className="text-xs text-gray-500">0 total</span>
                   </div>
-                  <button className="text-sm text-green-600 hover:text-green-700">
+                  <button className="text-xs text-green-600 hover:text-green-700 shrink-0">
                     Ver todos
                   </button>
                 </div>
-                <div className="flex flex-col items-center justify-center h-28 md:h-32">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <div className="flex flex-col items-center justify-center h-20 sm:h-24 md:h-28">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gray-100 rounded-full flex items-center justify-center mb-2">
                     <svg
-                      className="w-8 h-8 text-gray-400"
+                      className="w-6 h-6 sm:w-7 sm:h-7 text-gray-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -432,57 +568,55 @@ const CompliancePlatformDemo = () => {
                       />
                     </svg>
                   </div>
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-gray-500 text-xs sm:text-sm text-center px-2">
                     No hay reportes recientes
                   </p>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-200">
-                <h3 className="font-semibold text-gray-900 mb-6">
+              <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200 min-w-0">
+                <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-3 sm:mb-4">
                   Indicador de Severidad
                 </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      <span className="text-sm text-gray-700">Alta</span>
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-red-500 rounded-full shrink-0" />
+                      <span className="text-xs sm:text-sm text-gray-700 truncate">Alta</span>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-gray-900">0</div>
-                      <div className="text-xs text-gray-500">0.0%</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                      <span className="text-sm text-gray-700">Media</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-gray-900">0</div>
-                      <div className="text-xs text-gray-500">0.0%</div>
+                    <div className="text-right shrink-0">
+                      <div className="text-sm sm:text-base font-bold text-gray-900 tabular-nums">0</div>
+                      <div className="text-[10px] text-gray-500">0.0%</div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-gray-700">Baja</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-yellow-500 rounded-full shrink-0" />
+                      <span className="text-xs sm:text-sm text-gray-700 truncate">Media</span>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-gray-900">0</div>
-                      <div className="text-xs text-gray-500">0.0%</div>
+                    <div className="text-right shrink-0">
+                      <div className="text-sm sm:text-base font-bold text-gray-900 tabular-nums">0</div>
+                      <div className="text-[10px] text-gray-500">0.0%</div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                      <span className="text-sm text-gray-700">
-                        Sin clasificar
-                      </span>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-green-500 rounded-full shrink-0" />
+                      <span className="text-xs sm:text-sm text-gray-700 truncate">Baja</span>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-gray-900">0</div>
-                      <div className="text-xs text-gray-500">0.0%</div>
+                    <div className="text-right shrink-0">
+                      <div className="text-sm sm:text-base font-bold text-gray-900 tabular-nums">0</div>
+                      <div className="text-[10px] text-gray-500">0.0%</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-gray-400 rounded-full shrink-0" />
+                      <span className="text-xs sm:text-sm text-gray-700 truncate">Sin clasificar</span>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="text-sm sm:text-base font-bold text-gray-900 tabular-nums">0</div>
+                      <div className="text-[10px] text-gray-500">0.0%</div>
                     </div>
                   </div>
                 </div>
@@ -492,19 +626,19 @@ const CompliancePlatformDemo = () => {
         </div>
       </motion.div>
 
-      {/* Floating badges - keeping the existing ones */}
+      {/* Islas flotantes: solo lg+ para no cortarse en tablet; tamaño compacto */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.8, duration: 0.6 }}
-        className="hidden md:flex absolute md:-left-8 lg:-left-20 bottom-20 bg-white rounded-lg shadow-lg p-4 items-center gap-3 animate-floating"
+        className="hidden lg:flex absolute z-[2] max-w-[11rem] xl:max-w-[14rem] left-1 xl:-left-6 2xl:-left-14 bottom-24 xl:bottom-28 bg-white rounded-lg shadow-lg p-2.5 xl:p-3 items-center gap-2 animate-floating pointer-events-none"
         style={{
           animation: "floating 3s ease-in-out infinite",
         }}
       >
-        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+        <div className="w-9 h-9 xl:w-10 xl:h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
           <svg
-            className="w-6 h-6 text-green-600"
+            className="w-5 h-5 text-green-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -517,11 +651,11 @@ const CompliancePlatformDemo = () => {
             />
           </svg>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-gray-900">
+        <div className="min-w-0">
+          <p className="text-[11px] xl:text-xs font-semibold text-gray-900 leading-snug">
             Ratio de verificación líder en la industria
           </p>
-          <p className="text-xs text-gray-500">98% de casos resueltos</p>
+          <p className="text-[10px] xl:text-xs text-gray-500">98% de casos resueltos</p>
         </div>
       </motion.div>
 
@@ -529,18 +663,18 @@ const CompliancePlatformDemo = () => {
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 1, duration: 0.6 }}
-        className="hidden md:block absolute md:-right-8 md:top-10 lg:-right-24 top-20 bg-white rounded-lg shadow-lg p-4 animate-floating"
+        className="hidden lg:block absolute z-[2] right-1 xl:-right-6 2xl:-right-14 top-16 xl:top-20 bg-white rounded-lg shadow-lg p-2.5 xl:p-3 animate-floating max-w-[10rem]"
         style={{
           animation: "floating 3s ease-in-out infinite 1.5s",
         }}
       >
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-2xl font-bold text-gray-900">0</span>
-          <span className="text-sm text-gray-600">Total reportes</span>
+        <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+          <span className="text-lg xl:text-xl font-bold text-gray-900 tabular-nums">0</span>
+          <span className="text-[11px] xl:text-xs text-gray-600 leading-tight">Total reportes</span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-xs text-green-600">0.0%</span>
-          <span className="text-xs text-gray-500">este mes</span>
+          <span className="text-[10px] xl:text-xs text-green-600">0.0%</span>
+          <span className="text-[10px] xl:text-xs text-gray-500">este mes</span>
         </div>
       </motion.div>
 
@@ -794,6 +928,92 @@ export const PlatformPreviewSection = () => {
           {/* Compliance Stats Section */}
           <ComplianceStats statsRef={statsRef} />
         </motion.div>
+      </div>
+    </section>
+  );
+};
+
+/**
+ * Bloque para la landing actual: título breve + preview de plataforma con islas flotantes
+ * (sustituye la sección de testimonios en video).
+ */
+function PlatformPreviewWaveBackground() {
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      aria-hidden
+    >
+      <svg
+        className="absolute left-1/2 top-[38%] h-[min(90%,520px)] w-[min(190%,1100px)] -translate-x-1/2 -translate-y-1/2 sm:top-[40%] sm:h-[min(95%,580px)]"
+        viewBox="0 0 1000 520"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        <g
+          strokeWidth="1.15"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+        >
+          {/* Teal / aguamarina */}
+          <path
+            className="opacity-[0.28]"
+            stroke="#5a9d9a"
+            d="M-40 165 C120 95 280 210 440 145 S760 80 1040 155"
+          />
+          <path
+            className="opacity-[0.22]"
+            stroke="#4a8f8c"
+            d="M-20 255 C180 320 360 140 540 230 S820 300 1020 195"
+          />
+          <path
+            className="opacity-[0.2]"
+            stroke="#6bb0ac"
+            d="M0 340 C220 260 400 400 620 310 S900 360 1000 280"
+          />
+          {/* Oliva / verde suave */}
+          <path
+            className="opacity-[0.26]"
+            stroke="#9aad6e"
+            d="M-60 200 C140 280 320 120 500 200 S780 130 1060 220"
+          />
+          <path
+            className="opacity-[0.2]"
+            stroke="#b8c67a"
+            d="M-30 295 C200 180 420 360 640 250 S880 200 1030 320"
+          />
+          <path
+            className="opacity-[0.18]"
+            stroke="#8a9f5c"
+            d="M20 125 C260 200 480 60 700 140 S920 95 980 175"
+          />
+          <path
+            className="opacity-[0.16]"
+            stroke="#5a9d9a"
+            d="M40 405 C280 330 520 480 760 390 S940 440 990 360"
+          />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+export const PlatformPreviewShowcaseSection = () => {
+  return (
+    <section className="relative overflow-x-hidden bg-[#fafaf8] px-3 py-10 sm:px-6 sm:py-12 md:py-14 lg:px-8">
+      <PlatformPreviewWaveBackground />
+      <div className="relative z-10 mx-auto mb-6 max-w-3xl px-1 text-center sm:mb-8 sm:px-2 md:mb-10">
+        <h2 className="mb-2 text-xl font-bold text-gray-900 sm:mb-3 sm:text-2xl md:text-3xl">
+          La plataforma en acción
+        </h2>
+        <p className="text-sm leading-relaxed text-gray-600 sm:text-base">
+          Vista previa del panel: gestión de denuncias, métricas y flujo de trabajo en un solo
+          entorno.
+        </p>
+      </div>
+      <div className="relative z-10">
+        <CompliancePlatformDemo />
       </div>
     </section>
   );

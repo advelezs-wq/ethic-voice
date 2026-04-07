@@ -1,17 +1,20 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Modal, ModalContent, ModalBody } from "@heroui/react";
+import { Modal, ModalContent, ModalBody, cn } from "@heroui/react";
 import { motion } from "framer-motion";
 
 interface VideoModalProps {
   videoSrc: string;
   posterSrc?: string;
+  /** Clases extra para el contenedor de vista previa (p. ej. sombra del hero) */
+  className?: string;
 }
 
 export const VideoModal: React.FC<VideoModalProps> = ({
   videoSrc,
   posterSrc,
+  className,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -39,7 +42,10 @@ export const VideoModal: React.FC<VideoModalProps> = ({
     <>
       {/* Video Preview with Play Button */}
       <motion.div
-        className="relative w-full h-96 rounded-2xl overflow-hidden shadow-2xl cursor-pointer group"
+        className={cn(
+          "relative w-full h-96 rounded-2xl overflow-hidden shadow-2xl cursor-pointer group",
+          className
+        )}
         onClick={handleOpen}
         whileHover={{ scale: 1.02 }}
         transition={{ duration: 0.3 }}
@@ -54,47 +60,45 @@ export const VideoModal: React.FC<VideoModalProps> = ({
           <source src={videoSrc} type="video/mp4" />
         </video>
 
-        {/* Overlay with Play Button */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-center justify-center">
-          {/* Play Button */}
+        {/* Overlay + play: flex center en el overlay; anillo ping mismo tamaño que el botón */}
+        <div className="absolute inset-0 z-[1] flex items-center justify-center bg-gradient-to-t from-black/60 via-black/20 to-transparent">
           <motion.div
-            className="relative"
+            className="relative h-20 w-20 shrink-0"
             initial={{ scale: 1 }}
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.2 }}
           >
-            {/* Pulsing ring */}
-            <div className="absolute inset-0 rounded-full bg-green-500/30 animate-ping" />
-
-            {/* Button background */}
-            <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-green-600 to-green-700 flex items-center justify-center shadow-2xl">
-              {/* Play Icon */}
+            <span
+              className="absolute inset-0 rounded-full bg-green-500/30 animate-ping"
+              aria-hidden
+            />
+            <span className="absolute inset-0 z-10 flex items-center justify-center rounded-full bg-gradient-to-br from-green-600 to-green-700 shadow-2xl">
               <i
-                className="icon-[mdi--play] text-white size-10 ml-1"
+                className="icon-[lucide--play] h-9 w-9 text-white"
                 role="img"
                 aria-hidden="true"
               />
-            </div>
+            </span>
           </motion.div>
         </div>
 
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-green-600/0 group-hover:bg-green-600/10 transition-colors duration-300" />
+        {/* Capa de tinte al hover: no intercepta puntero para que el play reciba hover/click */}
+        <div className="pointer-events-none absolute inset-0 z-[2] bg-green-600/0 transition-colors duration-300 group-hover:bg-green-600/10" />
 
-        {/* "Ver Demo" Text */}
-        <div className="absolute bottom-6 left-6 right-6">
-          <div className="bg-white/95 backdrop-blur-sm rounded-xl px-6 py-4 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+        {/* CTA compacto — contraste alto sobre el póster del vídeo */}
+        <div className="absolute bottom-3 left-3 right-3 z-[3] sm:bottom-4 sm:left-4 sm:right-4">
+          <div className="mx-auto max-w-sm rounded-lg border border-lime-400/25 bg-green-950/92 px-3 py-2 shadow-lg shadow-black/30 backdrop-blur-sm sm:max-w-md sm:rounded-xl sm:px-4 sm:py-2.5">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-xs font-bold leading-snug text-white sm:text-sm">
                   Ver demostración de la plataforma
                 </h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="mt-0.5 text-[11px] font-medium leading-snug text-lime-100/95 sm:text-xs">
                   Conoce cómo funciona EthicVoice
                 </p>
               </div>
               <i
-                className="icon-[mdi--play-circle] text-green-600 size-8"
+                className="icon-[mdi--play-circle] shrink-0 text-lime-400 size-6 drop-shadow-[0_0_6px_rgba(190,242,100,0.45)] sm:size-7"
                 role="img"
                 aria-hidden="true"
               />

@@ -1,124 +1,104 @@
 export const AboutValues = () => {
   const values = [
     {
-      icon: (
-        <i
-          className="icon-[lucide--shield] text-green-700 size-8"
-          role="img"
-          aria-hidden="true"
-        />
-      ),
+      icon: "icon-[lucide--shield]",
       title: "Confidencialidad",
       description:
         "Protegemos la identidad y la información de nuestros usuarios con los más altos estándares de seguridad.",
     },
     {
-      icon: (
-        <i
-          className="icon-[lucide--heart] text-green-700 size-8"
-          role="img"
-          aria-hidden="true"
-        />
-      ),
+      icon: "icon-[lucide--heart]",
       title: "Integridad",
       description:
         "Actuamos con transparencia y honestidad en todas nuestras interacciones y decisiones comerciales.",
     },
     {
-      icon: (
-        <i
-          className="icon-[lucide--lightbulb] text-green-700 size-8"
-          role="img"
-          aria-hidden="true"
-        />
-      ),
+      icon: "icon-[lucide--lightbulb]",
       title: "Innovación",
       description:
         "Desarrollamos continuamente nuevas soluciones para hacer que el cumplimiento sea más eficiente y accesible.",
     },
     {
-      icon: (
-        <i
-          className="icon-[lucide--users] text-green-700 size-8"
-          role="img"
-          aria-hidden="true"
-        />
-      ),
+      icon: "icon-[lucide--users]",
       title: "Inclusión",
       description:
         "Creamos un entorno donde todas las voces son escuchadas y valoradas, sin importar su origen o posición.",
     },
     {
-      icon: (
-        <i
-          className="icon-[lucide--target] text-green-700 size-8"
-          role="img"
-          aria-hidden="true"
-        />
-      ),
+      icon: "icon-[lucide--target]",
       title: "Excelencia",
       description:
         "Nos esforzamos por superar las expectativas en cada aspecto de nuestro servicio y producto.",
     },
     {
-      icon: (
-        <i
-          className="icon-[lucide--globe] text-green-700 size-8"
-          role="img"
-          aria-hidden="true"
-        />
-      ),
-      title: "Impacto Global",
+      icon: "icon-[lucide--globe]",
+      title: "Impacto global",
       description:
         "Trabajamos para crear un impacto positivo en organizaciones y comunidades alrededor del mundo.",
     },
   ];
 
   return (
-    <section className="py-20 px-6">
-      <div className="container mx-auto max-w-7xl">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-            Nuestros Valores
+    <section
+      id="valores"
+      className="relative overflow-hidden bg-gradient-to-b from-[#f5f3ee] via-[#faf9f6] to-[#f5f3ee] px-4 py-16 md:px-6 md:py-20"
+    >
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_45%_at_50%_100%,rgba(20,83,45,0.05)_0%,transparent_45%)]"
+        aria-hidden
+      />
+      <div className="relative z-10 container mx-auto max-w-7xl">
+        <div className="mb-12 text-center md:mb-14">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0a1f14]/65">
+            Principios
+          </p>
+          <h2 className="mt-3 text-balance text-3xl font-bold tracking-tight text-[#0a1f14] md:text-4xl">
+            Nuestros <span className="text-lime-600">valores</span>
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Estos valores fundamentales guían nuestras decisiones diarias y
-            definen la forma en que interactuamos con nuestros clientes, socios
-            y comunidad.
+          <p className="mx-auto mt-4 max-w-3xl text-lg text-gray-600">
+            Guían nuestras decisiones diarias y definen cómo interactuamos con
+            clientes, socios y comunidad.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {values.map((value, index) => {
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300 group"
-              >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-xl mb-6 group-hover:bg-green-200 transition-colors">
-                  {value.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  {value.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {value.description}
-                </p>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-7">
+          {values.map((value) => (
+            <div
+              key={value.title}
+              className="group rounded-3xl border border-[#0a1f14]/10 bg-white/95 p-7 shadow-md shadow-gray-200/50 ring-1 ring-black/[0.04] transition duration-300 hover:-translate-y-0.5 hover:border-lime-400/25 hover:shadow-lg"
+            >
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-lime-400/15 ring-1 ring-lime-400/30 transition group-hover:bg-lime-400/20">
+                <i
+                  className={`${value.icon} size-7 text-lime-600`}
+                  aria-hidden
+                />
               </div>
-            );
-          })}
+              <h3 className="text-xl font-bold text-[#0a1f14]">{value.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-gray-600 md:text-[0.9375rem]">
+                {value.description}
+              </p>
+            </div>
+          ))}
         </div>
 
-        {/* Mission Statement */}
-        <div className="mt-20 bg-gradient-to-r from-green-800 to-green-700 rounded-2xl p-12 text-white text-center">
-          <h3 className="text-2xl md:text-3xl font-bold mb-6">
-            Nuestra Misión
-          </h3>
-          <p className="text-xl text-green-100 leading-relaxed max-w-4xl mx-auto">
-            Empoderar a las organizaciones para crear culturas de integridad y
-            transparencia mediante tecnología innovadora que hace que reportar
-            irregularidades sea seguro, accesible y efectivo para todos.
-          </p>
+        <div className="relative mt-16 overflow-hidden rounded-3xl border border-lime-400/20 bg-[#0a1f14] px-6 py-12 text-center shadow-[0_0_48px_rgba(10,31,20,0.35)] md:mt-20 md:px-12 md:py-14">
+          <div
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_120%,rgba(163,230,53,0.12)_0%,transparent_55%)]"
+            aria-hidden
+          />
+          <div className="relative z-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-400/90">
+              Propósito
+            </p>
+            <h3 className="mt-3 text-2xl font-bold text-white md:text-3xl">
+              Nuestra misión
+            </h3>
+            <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-white/80 md:text-xl">
+              Empoderar a las organizaciones para crear culturas de integridad y
+              transparencia mediante tecnología innovadora que hace que reportar
+              irregularidades sea seguro, accesible y efectivo para todos.
+            </p>
+          </div>
         </div>
       </div>
     </section>

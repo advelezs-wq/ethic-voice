@@ -13,27 +13,31 @@ export const PricingHero = ({
   onBillingCycleChange,
 }: PricingHeroProps) => {
   return (
-    <section className="py-16 px-6 bg-white">
-      <div className="container mx-auto max-w-4xl text-center">
+    <section className="relative overflow-hidden bg-[#0a1f14] px-6 py-16 md:py-20">
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_40%,rgba(22,101,52,0.35)_0%,transparent_55%)]"
+        aria-hidden
+      />
+      <div className="relative z-10 container mx-auto max-w-4xl text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="space-y-8"
         >
-          {/* Main Title */}
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-            ¡Elige tu plan ideal!
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-400/90">
+            Planes
+          </p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl">
+            Elige tu plan <span className="text-lime-400">ideal</span>
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="mx-auto max-w-2xl text-lg leading-relaxed text-white/80">
             Selecciona entre los mejores planes, asegurando una combinación
-            perfecta. ¿Necesitas más o menos? ¡Personaliza tu suscripción para
-            un ajuste perfecto!
+            perfecta. ¿Necesitas más o menos? Personaliza tu suscripción para un
+            ajuste perfecto.
           </p>
 
-          {/* Billing Toggle - Hero UI Tabs with Green Color */}
           <div className="flex justify-center">
             <Tabs
               selectedKey={billingCycle}
@@ -45,11 +49,11 @@ export const PricingHero = ({
               size="lg"
               className="w-auto"
               classNames={{
-                tabList: "bg-gray-100 rounded-full p-1",
-                cursor: "bg-green-600 rounded-full shadow-lg",
-                tab: "px-8 py-3 text-sm font-medium rounded-full transition-all duration-300",
+                tabList: "rounded-full bg-white/10 p-1",
+                cursor: "rounded-full bg-lime-400 shadow-lg",
+                tab: "rounded-full px-8 py-3 text-sm font-medium transition-all duration-300",
                 tabContent:
-                  "group-data-[selected=true]:text-white text-gray-600",
+                  "group-data-[selected=true]:text-gray-950 text-white/70",
               }}
             >
               <Tab key={BillingCycle.MONTHLY} title="Mensual" />

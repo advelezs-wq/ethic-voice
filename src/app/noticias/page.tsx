@@ -1,9 +1,7 @@
 "use client";
 
-import { Header } from "@/modules/landig-page/components/layout/Header";
-import { Footer } from "@/modules/landig-page/components/layout/Footer";
 import Image from "next/image";
-import { BackgroundCurves } from "@/modules/landig-page/components/layout/BackgroundCurves";
+import { MarketingPageShell } from "@/modules/landig-page/components/MarketingPageShell";
 
 const NewsPage = () => {
   const news = [
@@ -31,43 +29,55 @@ const NewsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white bg-curves relative">
-      <div className="absolute inset-0 -z-[1]">
-        <BackgroundCurves />
-      </div>
-      <Header />
-      <main className="pt-20">
-        <section className="py-16 px-6 bg-gray-50">
-          <div className="container mx-auto max-w-6xl">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Noticias</h1>
-            <p className="text-gray-600 max-w-2xl">
-              Actualizaciones, anuncios y cobertura de prensa sobre EthicVoice.
-            </p>
-          </div>
-        </section>
+    <MarketingPageShell>
+      <section className="relative overflow-hidden bg-[#0a1f14] px-6 py-16">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_40%,rgba(22,101,52,0.35)_0%,transparent_55%)]"
+          aria-hidden
+        />
+        <div className="relative z-10 mx-auto max-w-6xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-400/90">
+            Prensa
+          </p>
+          <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-white md:text-5xl">
+            <span className="text-lime-400">Noticias</span>
+          </h1>
+          <p className="mt-4 max-w-2xl text-white/75">
+            Actualizaciones, anuncios y cobertura de prensa sobre EthicVoice.
+          </p>
+        </div>
+      </section>
 
-        <section className="py-12 px-6">
-          <div className="container mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8">
-            {news.map((n, i) => (
-              <article key={i} className="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="relative w-full h-48">
-                  <Image src={n.image} alt={n.title} fill className="object-cover" />
-                </div>
-                <div className="p-6">
-                  <span className="text-xs uppercase tracking-wide text-gray-500">{new Date(n.date).toLocaleDateString()}</span>
-                  <h2 className="mt-2 text-lg font-semibold text-gray-900">{n.title}</h2>
-                  <p className="text-gray-600 text-sm mt-2">{n.excerpt}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+      <section className="bg-[#f5f3ee] px-6 py-12">
+        <div className="container mx-auto grid max-w-6xl grid-cols-1 gap-8 md:grid-cols-3">
+          {news.map((n, i) => (
+            <article
+              key={i}
+              className="overflow-hidden rounded-2xl border border-[#0a1f14]/10 bg-white shadow-sm transition-shadow hover:shadow-md"
+            >
+              <div className="relative h-48 w-full">
+                <Image
+                  src={n.image}
+                  alt={n.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-6">
+                <span className="text-xs uppercase tracking-wide text-gray-500">
+                  {new Date(n.date).toLocaleDateString()}
+                </span>
+                <h2 className="mt-2 text-lg font-semibold text-[#0a1f14]">
+                  {n.title}
+                </h2>
+                <p className="mt-2 text-sm text-gray-600">{n.excerpt}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    </MarketingPageShell>
   );
 };
 
 export default NewsPage;
-
-

@@ -1,33 +1,41 @@
-import { Header } from "@/modules/landig-page/components/layout/Header";
-import { Footer } from "@/modules/landig-page/components/layout/Footer";
+import { MarketingPageShell } from "@/modules/landig-page/components/MarketingPageShell";
 import Link from "next/link";
 
 export default function PartnersPortalPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <main className="pt-24 pb-16">
-        <section className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">Portal de Partners</h1>
-          <p className="mt-4 text-gray-700 max-w-2xl mx-auto">
-            Accede al portal exclusivo para socios de EthicVoice. Si aún no tienes acceso, contáctanos en
-            <a href="mailto:partners@ethicvoice.co" className="underline ml-1">partners@ethicvoice.co</a>.
-          </p>
-          <div className="mt-8 flex justify-center gap-4">
-            <Link href="/auth/sign-in" className="inline-flex items-center px-6 py-3 rounded-full bg-green-700 text-white font-semibold hover:bg-green-800">
-              Iniciar sesión
-              <i className="icon-[mdi--login] ml-2 size-5" />
-            </Link>
-            <a href="mailto:partners@ethicvoice.co" className="inline-flex items-center px-6 py-3 rounded-full border-2 border-green-700 text-green-700 font-semibold hover:bg-green-50">
-              Solicitar acceso
-              <i className="icon-[mdi--email] ml-2 size-5" />
-            </a>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+    <MarketingPageShell mainClassName="pb-16">
+      <section className="container mx-auto px-6 text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0a1f14]/60">
+          Partners
+        </p>
+        <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-[#0a1f14] md:text-5xl">
+          Portal de <span className="text-lime-600">Partners</span>
+        </h1>
+        <p className="mx-auto mt-4 max-w-2xl text-gray-700">
+          Accede al portal exclusivo para socios de EthicVoice. Si aún no tienes
+          acceso, contáctanos en{" "}
+          <a href="mailto:partners@ethicvoice.co" className="underline">
+            partners@ethicvoice.co
+          </a>
+          .
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <Link
+            href="/auth/sign-in"
+            className="inline-flex items-center rounded-full bg-lime-400 px-6 py-3 text-sm font-bold text-gray-950 shadow-[0_0_24px_rgba(190,242,100,0.35)] transition hover:bg-lime-300"
+          >
+            Iniciar sesión
+            <i className="icon-[mdi--login] ml-2 size-5" />
+          </Link>
+          <a
+            href="mailto:partners@ethicvoice.co"
+            className="inline-flex items-center rounded-full border-2 border-[#0a1f14]/20 px-6 py-3 font-semibold text-[#0a1f14] transition hover:bg-[#f5f3ee]"
+          >
+            Solicitar acceso
+            <i className="icon-[mdi--email] ml-2 size-5" />
+          </a>
+        </div>
+      </section>
+    </MarketingPageShell>
   );
 }
-
-

@@ -1,103 +1,83 @@
+"use client";
+
 import React from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
+import { useIsClient } from "@/modules/app/hooks/useIsClient";
+
+declare global {
+  interface Window {
+    Calendly?: { initPopupWidget: (options: { url: string }) => void };
+  }
+}
+
+const NAV_LINKS = [
+  { label: "Servicios", href: "/servicios" },
+  { label: "Empresa", href: "/empresa" },
+  { label: "Soporte", href: "/soporte" },
+  { label: "Política de Privacidad", href: "/privacidad" },
+  { label: "Términos", href: "/terminos" },
+];
 
 export const FooterCTA = () => {
-  // Your Calendly URL with parameters
+  const isClient = useIsClient();
   const calendlyUrl =
     "https://calendly.com/ethicvoice-info/30min?hide_event_type_details=1&hide_gdpr_banner=1";
 
-  const openCalendlyPopup = (e: { preventDefault: () => void }) => {
+  const openCalendly = (e: React.MouseEvent) => {
     e.preventDefault();
-
-    if (window.Calendly) {
-      window.Calendly.initPopupWidget({
-        url: calendlyUrl,
-      });
+    if (isClient && window.Calendly) {
+      window.Calendly.initPopupWidget({ url: calendlyUrl });
+    } else {
+      window.open(calendlyUrl, "_blank");
     }
   };
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-br from-green-800 via-green-700 to-green-800 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <svg
-          width="100%"
-          height="100%"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          <path d="M0,0 Q50,20 100,0 L100,100 L0,100 Z" fill="url(#gradient)" />
-          <defs>
-            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.1)" />
-              <stop offset="100%" stopColor="rgba(255,255,255,0.05)" />
-            </linearGradient>
-          </defs>
+    <footer className="bg-green-900 relative overflow-hidden">
+      {/* Decorative lines */}
+      <div className="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
+        <svg viewBox="0 0 800 300" fill="none" className="absolute bottom-0 w-full">
+          <path d="M-100 200 Q200 100 400 200 T900 200" stroke="white" strokeWidth="1" fill="none" />
+          <path d="M-100 240 Q200 140 400 240 T900 240" stroke="white" strokeWidth="1" fill="none" />
         </svg>
       </div>
 
-      <div className="container mx-auto max-w-4xl relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center"
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-            ¿Listo para transformar tu cultura de cumplimiento?
+      {/* CTA Content */}
+      <div className="relative px-4 pb-8 pt-10 sm:px-6 sm:pt-12 md:px-8 md:pt-14">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="mb-2 text-2xl font-extrabold leading-tight text-green-300 sm:mb-3 sm:text-3xl md:text-4xl">
+            Agenda tu demo personalizada
           </h2>
-          <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Únete a más de 5,000 organizaciones que han transformado su gestión
-            de cumplimiento con nuestra plataforma. Comenzar es más fácil de lo
-            que piensas.
+          <p className="mb-6 text-sm text-white/75 sm:mb-8 sm:text-base">
+            Descubre cómo EthicVoice protege tu empresa.
           </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <Link
-              href=""
-              onClick={openCalendlyPopup}
-              className="bg-white text-green-800 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center group text-lg"
-            >
-              <i
-                className="icon-[mynaui--calendar] size-5 mr-2"
-                role="img"
-                aria-hidden="true"
-              />
-              Solicitar demo
-              <i
-                className="icon-[mdi--arrow-right] ml-2 size-5 transition-transform group-hover:-rotate-45"
-                role="img"
-                aria-hidden="true"
-              />
-            </Link>
-
-            {/* Botón 'Ver cómo funciona' removido por solicitud */}
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-6 text-green-100"
+          <button
+            onClick={openCalendly}
+            className="inline-flex items-center gap-2 rounded-full bg-green-400 px-6 py-2.5 text-sm font-bold text-green-950 shadow-lg transition-colors hover:bg-green-300 sm:px-8 sm:py-3 sm:text-base"
           >
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full mr-2"></div>
-              <span className="text-sm">Demo en vivo de 30 minutos</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full mr-2"></div>
-              <span className="text-sm">Sin compromiso</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full mr-2"></div>
-              <span className="text-sm">Configuración gratuita</span>
-            </div>
-          </motion.div>
-        </motion.div>
+            Agendar ahora
+            <i className="icon-[lucide--arrow-right] w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Navigation links */}
+        <div className="mt-8 border-t border-white/10 pt-6 sm:mt-12">
+          <nav className="mb-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-6">
+            {NAV_LINKS.map((l) => (
+              <Link
+                key={l.label}
+                href={l.href}
+                className="text-xs text-white/50 hover:text-white/80 transition-colors"
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+          <p className="text-center text-xs text-white/30">
+            Copyright © {new Date().getFullYear()} EthicVoice
+          </p>
+        </div>
       </div>
-    </section>
+    </footer>
   );
 };

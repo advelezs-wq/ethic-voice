@@ -1,24 +1,29 @@
 "use client";
 
 import { useEffect } from "react";
-import { Footer } from "./layout/Footer";
 import { Header } from "./layout/Header";
+import {
+  MobileNavProvider,
+  useMobileNavDrawer,
+} from "./mobile-nav-context";
 import { ClientLogos } from "./ClientLogos";
-import { ReportChannelsSection } from "./ReportChannelsSection";
-import { PlatformPreviewSection } from "./PlatformPreview";
 import { FAQSection } from "./FAQSection";
 import { FooterCTA } from "./FooterCTA";
 import { Hero } from "./Hero";
+import { WhyEthicVoice } from "./WhyEthicVoice";
+import { ServicesSection } from "./ServicesSection";
+import { HowItWorks } from "./HowItWorks";
+import { PlatformPreviewShowcaseSection } from "./PlatformPreview";
+import { TrustSecuritySection } from "./TrustSecuritySection";
 import Script from "next/script";
 import { useIsClient } from "@/modules/app/hooks/useIsClient";
 import { FloatingWhatsApp } from "react-floating-whatsapp";
-import { BackgroundCurves } from "./layout/BackgroundCurves";
 
-export const Landing = () => {
+function LandingContent() {
   const isClient = useIsClient();
+  const { isOpen: mobileNavOpen } = useMobileNavDrawer();
 
   useEffect(() => {
-    // Only run DOM manipulation after client-side hydration is complete
     if (!isClient) return;
 
     const observer = new IntersectionObserver(
@@ -32,7 +37,6 @@ export const Landing = () => {
       { threshold: 0.15, rootMargin: "0px 0px -100px 0px" }
     );
 
-    // Use a small timeout to ensure DOM is fully ready
     const timeoutId = setTimeout(() => {
       document.querySelectorAll("section").forEach((section) => {
         observer.observe(section);
@@ -48,42 +52,70 @@ export const Landing = () => {
   }, [isClient]);
 
   return (
-    <div className="min-h-screen bg-white bg-curves relative">
-      <div className="absolute inset-0 -z-[1]">
-        <BackgroundCurves />
-      </div>
-      {/* Calendly Widget Script - Load after interactive */}
-      <Script
-        src="https://assets.calendly.com/assets/external/widget.js"
-        strategy="afterInteractive"
-        onLoad={() => {
-          // Add Calendly CSS only after script loads
-          if (typeof document !== "undefined") {
-            const link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href =
-              "https://assets.calendly.com/assets/external/widget.css";
-            document.head.appendChild(link);
-          }
-        }}
-      />
+    <>
       <Header />
-      <FloatingWhatsApp
-        phoneNumber={process.env.NEXT_PUBLIC_WPP_NUMBER || ""}
-        accountName="Ethic Voice"
-        avatar="/brand/wpp_logo.png"
-        chatMessage="Hola! 🤝 
-Cómo puedo ayudarte?"
-      />
-      <main className="pt-20">
+
+      {!mobileNavOpen && (
+        <FloatingWhatsApp
+          phoneNumber={process.env.NEXT_PUBLIC_WPP_NUMBER || ""}
+          accountName="Ethic Voice"
+          avatar="/brand/wpp_logo.png"
+          chatMessage={`Hola! 🤝 
+¿Cómo puedo ayudarte?`}
+        />
+      )}
+
+      <main className="w-full min-w-0 overflow-x-hidden">
+        {/* 1. Hero — fondo verde oscuro */}
         <Hero />
+
+        {/* 2. Logos de clientes */}
         <ClientLogos />
-        <ReportChannelsSection />
-        <PlatformPreviewSection />
+
+        {/* 3. ¿Por qué EthicVoice? — pain points */}
+        <WhyEthicVoice />
+
+        {/* 4. Nuestros servicios éticos */}
+        <ServicesSection />
+
+        {/* 5. Cómo funciona — 3 pasos */}
+        <HowItWorks />
+
+        {/* 6. Preview de plataforma (mock + islas flotantes) */}
+        <PlatformPreviewShowcaseSection />
+
+        {/* 7. Seguridad y confianza (sin certificaciones que no poseemos) */}
+        <TrustSecuritySection />
+
+        {/* 8. FAQ */}
         <FAQSection />
+
+        {/* 9. CTA final + footer integrado */}
         <FooterCTA />
       </main>
-      <Footer />
-    </div>
+    </>
+  );
+}
+
+export const Landing = () => {
+  return (
+    <MobileNavProvider>
+      <div className="relative min-h-screen bg-white">
+        <Script
+          src="https://assets.calendly.com/assets/external/widget.js"
+          strategy="afterInteractive"
+          onLoad={() => {
+            if (typeof document !== "undefined") {
+              const link = document.createElement("link");
+              link.rel = "stylesheet";
+              link.href =
+                "https://assets.calendly.com/assets/external/widget.css";
+              document.head.appendChild(link);
+            }
+          }}
+        />
+        <LandingContent />
+      </div>
+    </MobileNavProvider>
   );
 };

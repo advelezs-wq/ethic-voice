@@ -441,11 +441,14 @@ model ReportActivity {
 model ReportUpdate {
   id          Int      @id @default(autoincrement())
   title       String
-  description String
+  description String   @default("")
   status      String   @default("pending") // pending, in_progress, completed, blocked
   priority    String   @default("medium") // low, medium, high
   dueDate     DateTime?
   assignedTo  String?
+  completedAt DateTime?
+  completionNotes String? // Notes/conclusions added when task is completed
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

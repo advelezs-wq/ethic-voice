@@ -12,6 +12,8 @@ import {
   getReportTypeLabel,
   getSourceLabel,
 } from "../../utils/dashboard.utils";
+import { useSafeToast } from "../../hooks/useSafeToast";
+import { Button, Input, Textarea } from "@heroui/react";
 
 interface ReportTimelineProps {
   reportId: number;
@@ -23,6 +25,7 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
   report,
 }) => {
   const { activities, isLoading, refetch } = useReportActivities(reportId);
+  const { showSuccess, showError } = useSafeToast();
   const [showAddForm, setShowAddForm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [newActivity, setNewActivity] = useState({
@@ -229,35 +232,25 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
   const handleSaveActivity = async () => {
     if (isSaving) return;
     if (!newActivity.title || !newActivity.description) {
-      alert("Por favor completa el título y la descripción");
+      showError("Completa el título y la descripción");
       return;
     }
-
     if (isReportClosed) {
-      alert("No se pueden agregar eventos a un caso cerrado");
+      showError("No se pueden agregar eventos a un caso cerrado");
       return;
     }
-
     try {
       setIsSaving(true);
       await createCustomReportActivity(reportId, {
         title: newActivity.title,
         description: newActivity.description,
       });
-
-      // Reset form and close
-      setNewActivity({
-        title: "",
-        description: "",
-        type: "update",
-      });
+      setNewActivity({ title: "", description: "", type: "update" });
       setShowAddForm(false);
-
-      // Refresh activities
+      showSuccess("Evento registrado en la cronología");
       refetch();
-    } catch (error) {
-      console.error("Error creating activity:", error);
-      alert("Error al crear el evento");
+    } catch {
+      showError("Error al crear el evento");
     } finally {
       setIsSaving(false);
     }
@@ -265,139 +258,124 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="text-gray-500">Cargando cronología...</div>
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="flex gap-4 animate-pulse">
+            <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 bg-gray-200 rounded w-1/3" />
+              <div className="h-3 bg-gray-100 rounded w-2/3" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div>
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">
-            Cronología del Caso
+          <h2 className="text-base font-semibold text-gray-900">
+            Cronología del caso
           </h2>
           {isReportClosed && (
-            <p className="text-sm text-gray-500 mt-1">
-              Este caso está cerrado - los eventos están en modo solo lectura
+            <p className="text-xs text-gray-500 mt-0.5">
+              Caso cerrado — solo lectura
             </p>
           )}
         </div>
         {!isReportClosed && (
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            disabled={isSaving}
-            className="flex items-center space-x-2 bg-blue-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          <Button
+            size="sm"
+            color="primary"
+            variant="flat"
+            onPress={() => setShowAddForm(!showAddForm)}
+            isDisabled={isSaving}
+            startContent={<i className="icon-[lucide--plus] size-3.5" />}
           >
-            <i
-              className="icon-[lucide--plus] size-4"
-              role="img"
-              aria-hidden="true"
-            />
-            <span>Agregar Evento</span>
-          </button>
+            Agregar evento
+          </Button>
         )}
       </div>
 
-      {/* Closed Report Notice */}
+      {/* Closed notice */}
       {isReportClosed && (
-        <div className="mb-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <svg
-                className="h-5 w-5 text-amber-400"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-amber-700">
-                Este caso ha sido cerrado. La cronología existente se muestra en
-                modo solo lectura y no se pueden agregar nuevos eventos.
-              </p>
-            </div>
-          </div>
+        <div className="mb-5 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3.5">
+          <i className="icon-[lucide--lock] size-4 text-amber-500 mt-0.5 shrink-0" />
+          <p className="text-sm text-amber-700">
+            Este caso está cerrado. La cronología es de solo lectura.
+          </p>
         </div>
       )}
 
       {/* Add Activity Form */}
       {showAddForm && !isReportClosed && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
-            Agregar Nuevo Evento
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl space-y-3">
+          <h3 className="text-sm font-semibold text-blue-900">
+            Nuevo evento de investigación
           </h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Título
-              </label>
-              <input
-                type="text"
-                value={newActivity.title}
-                onChange={(e) =>
-                  setNewActivity({ ...newActivity, title: e.target.value })
-                }
-                disabled={isSaving}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent disabled:opacity-50"
-                placeholder="Título del evento"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Descripción
-              </label>
-              <textarea
-                value={newActivity.description}
-                onChange={(e) =>
-                  setNewActivity({
-                    ...newActivity,
-                    description: e.target.value,
-                  })
-                }
-                rows={3}
-                disabled={isSaving}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent disabled:opacity-50"
-                placeholder="Descripción del evento"
-              />
-            </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={handleSaveActivity}
-                disabled={isSaving}
-                className="bg-blue-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSaving ? "Guardando..." : "Guardar"}
-              </button>
-              <button
-                onClick={() => setShowAddForm(false)}
-                disabled={isSaving}
-                className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-400 transition-colors disabled:opacity-50"
-              >
-                Cancelar
-              </button>
-            </div>
+          <Input
+            label="Título del evento"
+            size="sm"
+            value={newActivity.title}
+            onChange={(e) =>
+              setNewActivity({ ...newActivity, title: e.target.value })
+            }
+            isDisabled={isSaving}
+            placeholder="Ej: Entrevista con testigo, revisión de documentos…"
+          />
+          <Textarea
+            label="Descripción"
+            size="sm"
+            value={newActivity.description}
+            onChange={(e) =>
+              setNewActivity({ ...newActivity, description: e.target.value })
+            }
+            isDisabled={isSaving}
+            placeholder="Detalla qué ocurrió, qué se encontró, qué acción se tomó…"
+            minRows={3}
+          />
+          <div className="flex gap-2 justify-end">
+            <Button
+              size="sm"
+              variant="light"
+              onPress={() => setShowAddForm(false)}
+              isDisabled={isSaving}
+            >
+              Cancelar
+            </Button>
+            <Button
+              size="sm"
+              color="primary"
+              onPress={handleSaveActivity}
+              isLoading={isSaving}
+              startContent={
+                !isSaving && <i className="icon-[lucide--save] size-3.5" />
+              }
+            >
+              Guardar evento
+            </Button>
           </div>
         </div>
       )}
 
       <div className="relative">
-        {/* Timeline line */}
-        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+        {/* Vertical line */}
+        {activities.length > 0 && (
+          <div className="absolute left-5 top-5 bottom-5 w-px bg-gray-200" />
+        )}
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           {activities.length === 0 ? (
-            <div className="text-center text-gray-500 py-8">
-              <p>No hay actividades registradas aún.</p>
-              {isReportClosed && (
-                <p className="text-sm mt-1">
-                  Este caso no tiene eventos registrados.
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <i className="icon-[lucide--clock] size-10 text-gray-300 mb-3" />
+              <p className="text-sm font-medium text-gray-500">
+                Sin actividades registradas
+              </p>
+              {!isReportClosed && (
+                <p className="text-xs text-gray-400 mt-1">
+                  Agrega eventos para documentar el progreso de la investigación.
                 </p>
               )}
             </div>
@@ -405,147 +383,135 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
             activities.map((activity) => (
               <div
                 key={activity.id}
-                className="relative flex items-start space-x-4"
+                className="relative flex items-start gap-4"
               >
-                {/* Timeline dot */}
+                {/* Icon dot */}
                 <div
-                  className={`relative z-10 w-12 h-12 rounded-full ${getColor(
+                  className={`relative z-10 w-10 h-10 rounded-full shrink-0 ${getColor(
                     activity.action as keyof typeof ACTIVITY_TYPES
-                  )} flex items-center justify-center`}
+                  )} flex items-center justify-center shadow-sm ring-2 ring-white`}
                 >
                   {getIcon(activity.action as keyof typeof ACTIVITY_TYPES)}
                 </div>
 
-                {/* Event content */}
-                <div className="flex-1 min-w-0">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-lg font-medium text-gray-900">
-                        {getTitle(activity.action, activity.details)}
-                      </h3>
-                      <div className="text-right">
-                        <span className="text-sm text-gray-500">
-                          {formatDate(activity.createdAt)}
-                        </span>
-                        <p className="text-xs text-gray-400 mt-1">
-                          {getTimeAgo(activity.createdAt)}
-                        </p>
-                      </div>
+                {/* Card */}
+                <div className="flex-1 min-w-0 bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      {getTitle(activity.action, activity.details)}
+                    </h3>
+                    <div className="text-right shrink-0">
+                      <span className="text-xs text-gray-400">
+                        {getTimeAgo(activity.createdAt)}
+                      </span>
                     </div>
-                    <p className="text-gray-700 mb-2">
-                      {getDescription(activity.action, activity.details)}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Por: {activity.userName}
-                    </p>
-
-                    {/* Additional details */}
-                    {activity.details &&
-                      typeof activity.details === "object" &&
-                      Object.keys(activity.details).length > 0 && (
-                        <div className="mt-3 p-3 bg-white rounded border">
-                          <p className="text-xs font-medium text-gray-600 mb-2">
-                            Detalles adicionales:
-                          </p>
-                          <div className="text-xs text-gray-500">
-                            {activity.details.taskId && (
-                              <div className="mb-2">
-                                <a
-                                  href={`?tab=tasks&task=${activity.details.taskId}`}
-                                  className="text-blue-700 underline"
-                                >
-                                  Abrir{" "}
-                                  {activity.details.parentTaskId
-                                    ? "subtarea"
-                                    : "tarea"}{" "}
-                                  #{activity.details.taskId}
-                                </a>
-                              </div>
-                            )}
-                            {Object.entries(activity.details).map(
-                              ([key, value]) => {
-                                if (
-                                  activity.action ===
-                                    ACTIVITY_TYPES.CUSTOM_EVENT &&
-                                  (key === "title" ||
-                                    key === "description" ||
-                                    key === "taskId")
-                                ) {
-                                  return null;
-                                }
-                                if (
-                                  value === undefined ||
-                                  value === null ||
-                                  value === ""
-                                )
-                                  return null;
-                                // Localize known keys/values
-                                let label = key
-                                  .replace(/([A-Z])/g, " $1")
-                                  .trim()
-                                  .toLowerCase();
-                                let display: string = String(value);
-                                switch (key) {
-                                  case "type":
-                                  case "irregularityType":
-                                    label = "Tipo";
-                                    display = getReportTypeLabel(String(value));
-                                    break;
-                                  case "priority":
-                                    label = "Prioridad";
-                                    display = getPriorityLabel(String(value));
-                                    break;
-                                  case "channel":
-                                  case "channelType":
-                                  case "source":
-                                    label = "Canal";
-                                    display = getSourceLabel(String(value));
-                                    break;
-                                  case "isAnonymous":
-                                    label = "Anónimo";
-                                    display =
-                                      String(value).toLowerCase() === "true"
-                                        ? "Sí"
-                                        : "No";
-                                    break;
-                                  case "createdBy":
-                                  case "createdByName":
-                                    label = "Creado por";
-                                    display = String(value);
-                                    break;
-                                  case "updatedFields":
-                                  case "changed":
-                                    label = "Campos actualizados";
-                                    display = Array.isArray(value)
-                                      ? (value as any[])
-                                          .map((v) =>
-                                            String(v)
-                                              .replace(/[_-]+/g, " ")
-                                              .toLowerCase()
-                                          )
-                                          .join(", ")
-                                      : String(value);
-                                    break;
-                                  default:
-                                    // Humanize generic slugs
-                                    display = String(value)
-                                      .replace(/[_-]+/g, " ")
-                                      .toLowerCase();
-                                }
-                                return (
-                                  <div key={key} className="mb-1">
-                                    <span className="font-medium capitalize">
-                                      {label}:
-                                    </span>{" "}
-                                    {display}
-                                  </div>
-                                );
-                              }
-                            )}
-                          </div>
-                        </div>
-                      )}
                   </div>
+
+                  <p className="text-sm text-gray-700 mb-2">
+                    {getDescription(activity.action, activity.details)}
+                  </p>
+
+                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <i className="icon-[lucide--user] size-3" />
+                      {activity.userName}
+                    </span>
+                    <span>{formatDate(activity.createdAt)}</span>
+                  </div>
+
+                  {/* Task link */}
+                  {activity.details?.taskId && (
+                    <a
+                      href={`?tab=tasks&task=${activity.details.taskId}`}
+                      className="mt-2 inline-flex items-center gap-1 text-xs text-blue-700 hover:underline"
+                    >
+                      <i className="icon-[lucide--external-link] size-3" />
+                      Ver {activity.details.parentTaskId ? "subtarea" : "tarea"}{" "}
+                      #{activity.details.taskId}
+                    </a>
+                  )}
+
+                  {/* Extra details */}
+                  {activity.details &&
+                    typeof activity.details === "object" &&
+                    Object.keys(activity.details).length > 0 &&
+                    !activity.details.taskId && (
+                      <div className="mt-3 pt-3 border-t border-gray-200 grid grid-cols-2 gap-x-4 gap-y-1">
+                        {Object.entries(activity.details).map(([key, value]) => {
+                          if (
+                            activity.action === ACTIVITY_TYPES.CUSTOM_EVENT &&
+                            (key === "title" ||
+                              key === "description" ||
+                              key === "taskId")
+                          )
+                            return null;
+                          if (value === undefined || value === null || value === "")
+                            return null;
+
+                          let label = key
+                            .replace(/([A-Z])/g, " $1")
+                            .trim()
+                            .toLowerCase();
+                          let display: string = String(value);
+
+                          switch (key) {
+                            case "type":
+                            case "irregularityType":
+                              label = "Tipo";
+                              display = getReportTypeLabel(String(value));
+                              break;
+                            case "priority":
+                              label = "Prioridad";
+                              display = getPriorityLabel(String(value));
+                              break;
+                            case "channel":
+                            case "channelType":
+                            case "source":
+                              label = "Canal";
+                              display = getSourceLabel(String(value));
+                              break;
+                            case "isAnonymous":
+                              label = "Anónimo";
+                              display =
+                                String(value).toLowerCase() === "true"
+                                  ? "Sí"
+                                  : "No";
+                              break;
+                            case "createdBy":
+                            case "createdByName":
+                              label = "Creado por";
+                              display = String(value);
+                              break;
+                            case "updatedFields":
+                            case "changed":
+                              label = "Campos actualizados";
+                              display = Array.isArray(value)
+                                ? (value as any[])
+                                    .map((v) =>
+                                      String(v)
+                                        .replace(/[_-]+/g, " ")
+                                        .toLowerCase()
+                                    )
+                                    .join(", ")
+                                : String(value);
+                              break;
+                            default:
+                              display = String(value)
+                                .replace(/[_-]+/g, " ")
+                                .toLowerCase();
+                          }
+
+                          return (
+                            <div key={key} className="text-xs">
+                              <span className="font-medium text-gray-500 capitalize">
+                                {label}:
+                              </span>{" "}
+                              <span className="text-gray-700">{display}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                 </div>
               </div>
             ))

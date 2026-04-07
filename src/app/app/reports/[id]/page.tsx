@@ -42,25 +42,24 @@ export default async function ReportDetailsPage({
 
     return (
       <div className="min-h-screen bg-gray-50">
-        <main className="pt-8 sm:pt-12">
-          <div className="container mx-auto max-w-[1440px] px-4 sm:px-6 py-6 sm:py-8">
+        <main className="pt-6 sm:pt-10">
+          <div className="container mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            {/* Back link */}
             <Link
               href="/app/reports"
-              className="mb-6 inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="mb-5 inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200 transition-all"
             >
-              <i
-                className="icon-[bx--left-arrow-alt] size-4 group-hover:-translate-x-1 transition-transform"
-                role="img"
-                aria-hidden="true"
-              />
+              <i className="icon-[lucide--arrow-left] size-4" />
               Todas las denuncias
             </Link>
+
+            {/* Compact header */}
             <ReportHeader report={report} parsedContent={parsedContent} />
 
-            {/* Content Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-6 gap-6 sm:gap-8">
-              {/* Main Content with Tabs */}
-              <div className="lg:col-span-4">
+            {/* Content layout: tabs (wider) + sidebar */}
+            <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6">
+              {/* Main: tabs */}
+              <div className="min-w-0">
                 <ReportTabsContainer
                   report={report}
                   parsedContent={parsedContent}
@@ -69,7 +68,7 @@ export default async function ReportDetailsPage({
               </div>
 
               {/* Sidebar */}
-              <div className="lg:col-span-2">
+              <div className="space-y-4">
                 <ReportSidebar report={report} reportId={reportId} />
               </div>
             </div>

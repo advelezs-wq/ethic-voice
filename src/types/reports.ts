@@ -213,14 +213,19 @@ export interface ReportUpdate {
   id: number;
   title: string;
   description: string;
-  status: string; // Changed from union type to string to match database
-  priority: string; // Changed from union type to string to match database
+  status: string;
+  priority: string;
   dueDate?: string | Date | null;
   assignedTo?: string | null;
   createdAt: string | Date;
   updatedAt?: string | Date;
   submissionId?: number;
   parentId?: number | null;
+  order?: number;
+  createdById?: string;
+  createdByName?: string;
+  completionNotes?: string | null;
+  completedAt?: string | Date | null;
 }
 
 export interface ChatMessage {

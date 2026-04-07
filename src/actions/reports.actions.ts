@@ -650,9 +650,11 @@ export async function updateReportStatus(
   reportId: number,
   status: ReportStatus
 ): Promise<void> {
+  const { userId } = await auth();
   const orgId = await resolveOrgId();
+  const user = await currentUser();
 
-  if (!orgId) {
+  if (!userId || !orgId) {
     throw new Error("Unauthorized - No organization access");
   }
 
@@ -675,18 +677,18 @@ export async function updateReportStatus(
       },
     });
 
-    // Create activity log
     await prisma.reportActivity.create({
       data: {
         submissionId: reportId,
         action: "STATUS_CHANGED",
         details: { oldStatus: report.status, newStatus: status },
-        userId: "system",
-        userName: "Sistema",
+        userId,
+        userName: user?.fullName || "Usuario",
       },
     });
 
     revalidatePath(`/app/reports/${reportId}`);
+    revalidatePath("/app/reports");
   } catch (error) {
     console.error("Error updating report status:", error);
     throw error;
@@ -793,61 +795,52 @@ export async function updateReportProcessedAt(
 
 export async function bulkUpdateReports(
   reportIds: number[],
-  action: "priority" | "status" | "archive", // Remove "assign" as it's no longer valid
+  action: "priority" | "status" | "archive",
   value?: string
 ): Promise<void> {
   const { userId } = await auth();
   const orgId = await resolveOrgId();
+  const user = await currentUser();
 
-  if (!userId) {
+  if (!userId || !orgId) {
     throw new Error("Unauthorized");
   }
 
-  if (!orgId) {
-    throw new Error("Organization not found");
-  }
+  if (!reportIds.length) return;
 
   const updateData: Prisma.FormSubmissionUpdateManyArgs["data"] = {};
 
   switch (action) {
     case "priority":
-      if (value) {
-        updateData.priority = value.toUpperCase() as any;
-      }
+      if (!value) throw new Error("Se requiere un valor de prioridad");
+      updateData.priority = value.toUpperCase() as any;
       break;
     case "status":
-      if (value) {
-        updateData.status = value.toUpperCase() as any;
-      }
+      if (!value) throw new Error("Se requiere un valor de estado");
+      updateData.status = value.toUpperCase() as any;
       break;
     case "archive":
       updateData.status = "ARCHIVED";
       break;
   }
 
+  if (Object.keys(updateData).length === 0) return;
+
   await prisma.formSubmission.updateMany({
-    where: {
-      id: { in: reportIds },
-      orgId,
-    },
+    where: { id: { in: reportIds }, orgId },
     data: updateData,
   });
 
-  // Create activity for each report
+  const userName = user?.fullName || "Usuario";
   const activities = reportIds.map((reportId) => ({
     submissionId: reportId,
     action: `BULK_${action.toUpperCase()}`,
-    details: {
-      value,
-      updatedBy: userId,
-    },
+    details: { value, updatedBy: userId },
     userId,
-    userName: "Current User",
+    userName,
   }));
 
-  await prisma.reportActivity.createMany({
-    data: activities,
-  });
+  await prisma.reportActivity.createMany({ data: activities });
 
   revalidatePath("/app/reports");
 }
@@ -2225,6 +2218,10 @@ export async function createReportTask(
   });
   if (!report) throw new Error("Report not found or access denied");
 
+  if (report.status === "CLOSED" || report.status === "RESOLVED") {
+    throw new Error("No se pueden agregar tareas a un caso cerrado");
+  }
+
   const siblingMax = await prisma.reportUpdate.aggregate({
     where: { submissionId: reportId, parentId: data.parentId ?? null },
     _max: { order: true },
@@ -2278,6 +2275,7 @@ export async function updateReportTask(
     dueDate: string | null;
     assignedTo: string | null;
     parentId: number | null;
+    completionNotes: string | null;
   }>
 ) {
   const { userId } = await auth();
@@ -2289,6 +2287,8 @@ export async function updateReportTask(
     where: { id: taskId, submission: { orgId } },
   });
   if (!existing) throw new Error("Task not found or access denied");
+
+  const isCompleting = data.status === "completed" && existing.status !== "completed";
 
   const updated = await prisma.reportUpdate.update({
     where: { id: taskId },
@@ -2308,17 +2308,28 @@ export async function updateReportTask(
         data.parentId === undefined
           ? undefined
           : (data.parentId as number | null),
+      completionNotes:
+        data.completionNotes === undefined ? undefined : data.completionNotes,
+      completedAt: isCompleting ? new Date() : undefined,
     },
   });
+
+  const activityTitle = isCompleting ? "Tarea completada" : "Tarea actualizada";
+  const activityDesc = isCompleting
+    ? `La tarea "${existing.title}" fue marcada como completada`
+    : `La tarea #${taskId} fue actualizada`;
 
   await prisma.reportActivity.create({
     data: {
       submissionId: existing.submissionId,
       action: "CUSTOM_EVENT",
       details: {
-        title: "Tarea actualizada",
-        description: `La tarea #${taskId} fue actualizada`,
+        title: activityTitle,
+        description: activityDesc,
         taskId,
+        ...(isCompleting && data.completionNotes
+          ? { completionNotes: data.completionNotes }
+          : {}),
       },
       userId,
       userName: user.fullName || "Unknown User",
@@ -2340,20 +2351,24 @@ export async function deleteReportTask(taskId: number) {
   });
   if (!existing) throw new Error("Task not found or access denied");
 
-  await prisma.reportUpdate.delete({ where: { id: taskId } });
+  // Delete children first to avoid FK constraint violations, then parent
+  await prisma.$transaction(async (tx) => {
+    await tx.reportUpdate.deleteMany({ where: { parentId: taskId } });
+    await tx.reportUpdate.delete({ where: { id: taskId } });
 
-  await prisma.reportActivity.create({
-    data: {
-      submissionId: existing.submissionId,
-      action: "CUSTOM_EVENT",
-      details: {
-        title: "Tarea eliminada",
-        description: `Se eliminó la tarea #${taskId}`,
-        taskId,
+    await tx.reportActivity.create({
+      data: {
+        submissionId: existing.submissionId,
+        action: "CUSTOM_EVENT",
+        details: {
+          title: "Tarea eliminada",
+          description: `Se eliminó la tarea #${taskId}`,
+          taskId,
+        },
+        userId,
+        userName: user.fullName || "Unknown User",
       },
-      userId,
-      userName: user.fullName || "Unknown User",
-    },
+    });
   });
 
   revalidatePath(`/app/reports/${existing.submissionId}`);

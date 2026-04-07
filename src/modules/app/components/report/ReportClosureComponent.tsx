@@ -19,6 +19,7 @@ import { es } from "date-fns/locale";
 import { DownloadPDFButton } from "../analytics/DownloadPDFButton";
 import { updateReportStatus } from "@/actions/reports.actions";
 import { getStatusLabel as getDashboardStatusLabel } from "../../utils/dashboard.utils";
+import { useSafeToast } from "../../hooks/useSafeToast";
 
 interface ReportClosureComponentProps {
   report: FormSubmission;
@@ -31,6 +32,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
   reportId,
   onStatusChange,
 }) => {
+  const { showSuccess, showError } = useSafeToast();
   const [closureSummary, setClosureSummary] = useState("");
   const [isClosing, setIsClosing] = useState(false);
   const [isReopening, setIsReopening] = useState(false);
@@ -67,21 +69,12 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
   const handleCloseCase = async () => {
     try {
       setIsClosing(true);
-
-      // Update report status to closed
       await updateReportStatus(reportId, "CLOSED");
-
-      // Add closure summary as internal note if provided
-      if (closureSummary.trim()) {
-        // This would need a specific action for closure summaries
-        // await addClosureSummary(reportId, closureSummary);
-      }
-
+      showSuccess("Caso cerrado exitosamente");
       onStatusChange?.();
       onCloseModalOpenChange();
-    } catch (error) {
-      console.error("Error closing case:", error);
-      alert("Error al cerrar el caso. Por favor, intenta nuevamente.");
+    } catch {
+      showError("Error al cerrar el caso. Por favor, intenta nuevamente.");
     } finally {
       setIsClosing(false);
     }
@@ -90,14 +83,12 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
   const handleReopenCase = async () => {
     try {
       setIsReopening(true);
-
       await updateReportStatus(reportId, "IN_PROGRESS");
-
+      showSuccess("Caso reabierto exitosamente");
       onStatusChange?.();
       onReopenModalOpenChange();
-    } catch (error) {
-      console.error("Error reopening case:", error);
-      alert("Error al reabrir el caso. Por favor, intenta nuevamente.");
+    } catch {
+      showError("Error al reabrir el caso. Por favor, intenta nuevamente.");
     } finally {
       setIsReopening(false);
     }

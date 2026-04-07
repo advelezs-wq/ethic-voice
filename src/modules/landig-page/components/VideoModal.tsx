@@ -9,22 +9,38 @@ interface VideoModalProps {
   posterSrc?: string;
   /** Clases extra para el contenedor de vista previa (p. ej. sombra del hero) */
   className?: string;
+  /** Solo el modal (sin tarjeta). Requiere isOpen + onOpenChange. */
+  embedOnly?: boolean;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const VideoModal: React.FC<VideoModalProps> = ({
   videoSrc,
   posterSrc,
   className,
+  embedOnly = false,
+  isOpen: controlledOpen,
+  onOpenChange,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = embedOnly ? !!controlledOpen : internalOpen;
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const setOpen = (next: boolean) => {
+    if (embedOnly) {
+      onOpenChange?.(next);
+    } else {
+      setInternalOpen(next);
+    }
+  };
+
   const handleOpen = () => {
-    setIsOpen(true);
+    setOpen(true);
   };
 
   const handleClose = () => {
-    setIsOpen(false);
+    setOpen(false);
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
@@ -37,6 +53,56 @@ export const VideoModal: React.FC<VideoModalProps> = ({
       videoRef.current.play();
     }
   }, [isOpen]);
+
+  const modal = (
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      size="5xl"
+      backdrop="blur"
+      classNames={{
+        base: "bg-transparent",
+        backdrop: "bg-black/80",
+      }}
+    >
+      <ModalContent>
+        {(onClose) => (
+          <ModalBody className="p-0">
+            <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden">
+              {/* Close Button */}
+              <button
+                onClick={onClose}
+                className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors flex items-center justify-center group"
+                aria-label="Cerrar video"
+              >
+                <i
+                  className="icon-[mdi--close] text-white size-6 group-hover:rotate-90 transition-transform"
+                  role="img"
+                  aria-hidden="true"
+                />
+              </button>
+
+              {/* Video Player */}
+              <video
+                ref={videoRef}
+                className="w-full h-full"
+                controls
+                controlsList="nodownload"
+                playsInline
+              >
+                <source src={videoSrc} type="video/mp4" />
+                Tu navegador no soporta la reproducción de video.
+              </video>
+            </div>
+          </ModalBody>
+        )}
+      </ModalContent>
+    </Modal>
+  );
+
+  if (embedOnly) {
+    return modal;
+  }
 
   return (
     <>
@@ -107,50 +173,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
         </div>
       </motion.div>
 
-      {/* Video Modal */}
-      <Modal
-        isOpen={isOpen}
-        onClose={handleClose}
-        size="5xl"
-        backdrop="blur"
-        classNames={{
-          base: "bg-transparent",
-          backdrop: "bg-black/80",
-        }}
-      >
-        <ModalContent>
-          {(onClose) => (
-            <ModalBody className="p-0">
-              <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden">
-                {/* Close Button */}
-                <button
-                  onClick={onClose}
-                  className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors flex items-center justify-center group"
-                  aria-label="Cerrar video"
-                >
-                  <i
-                    className="icon-[mdi--close] text-white size-6 group-hover:rotate-90 transition-transform"
-                    role="img"
-                    aria-hidden="true"
-                  />
-                </button>
-
-                {/* Video Player */}
-                <video
-                  ref={videoRef}
-                  className="w-full h-full"
-                  controls
-                  controlsList="nodownload"
-                  playsInline
-                >
-                  <source src={videoSrc} type="video/mp4" />
-                  Tu navegador no soporta la reproducción de video.
-                </video>
-              </div>
-            </ModalBody>
-          )}
-        </ModalContent>
-      </Modal>
+      {modal}
     </>
   );
 };

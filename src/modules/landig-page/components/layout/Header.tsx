@@ -100,12 +100,20 @@ export const Header = () => {
     },
   ] as const;
 
+  const ddTriggerClass =
+    "font-medium h-auto min-h-9 shrink-0 px-2 py-1.5 text-xs 2xl:px-3 2xl:py-3 2xl:text-sm group transition-colors whitespace-nowrap text-gray-700 hover:text-green-700 data-[hover=true]:bg-gray-50/80";
+
+  const planLinkClass =
+    "font-medium transition-colors shrink-0 px-2 py-1.5 rounded-lg text-xs 2xl:px-3 2xl:py-3 2xl:text-sm whitespace-nowrap text-gray-700 hover:text-green-700 hover:bg-gray-50/80";
+
+  const signInClass =
+    "font-medium transition-colors text-xs 2xl:text-sm whitespace-nowrap px-1 text-green-700 hover:text-green-800";
+
   return (
     <>
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 overflow-x-hidden border-b border-gray-100 bg-white py-3 shadow-sm sm:py-4 md:px-6",
-        /* Con menú móvil abierto el header queda bajo el backdrop: el cierre vive en el drawer */
         isMobileMenuOpen ? "z-40" : "z-50"
       )}
     >
@@ -135,7 +143,7 @@ export const Header = () => {
               <DropdownTrigger>
                 <Button
                   variant="light"
-                  className="font-medium h-auto min-h-9 shrink-0 px-2 py-1.5 text-xs 2xl:px-3 2xl:py-3 2xl:text-sm group transition-colors whitespace-nowrap text-gray-700 hover:text-green-700 data-[hover=true]:bg-gray-50/80"
+                  className={ddTriggerClass}
                   endContent={
                     <i className="icon-[lucide--chevron-down] w-3 h-3 2xl:w-4 2xl:h-4 transition-transform duration-200 group-hover:-rotate-90 shrink-0" />
                   }
@@ -268,7 +276,7 @@ export const Header = () => {
               <DropdownTrigger>
                 <Button
                   variant="light"
-                  className="font-medium h-auto min-h-9 shrink-0 px-2 py-1.5 text-xs 2xl:px-3 2xl:py-3 2xl:text-sm group transition-colors whitespace-nowrap text-gray-700 hover:text-green-700 data-[hover=true]:bg-gray-50/80"
+                  className={ddTriggerClass}
                   endContent={
                     <i className="icon-[lucide--chevron-down] w-3 h-3 2xl:w-4 2xl:h-4 transition-transform duration-200 group-hover:-rotate-90 shrink-0" />
                   }
@@ -320,7 +328,7 @@ export const Header = () => {
               <DropdownTrigger>
                 <Button
                   variant="light"
-                  className="font-medium h-auto min-h-9 shrink-0 px-2 py-1.5 text-xs 2xl:px-3 2xl:py-3 2xl:text-sm group transition-colors whitespace-nowrap text-gray-700 hover:text-green-700 data-[hover=true]:bg-gray-50/80"
+                  className={ddTriggerClass}
                   endContent={
                     <i className="icon-[lucide--chevron-down] w-3 h-3 2xl:w-4 2xl:h-4 transition-transform duration-200 group-hover:-rotate-90 shrink-0" />
                   }
@@ -373,7 +381,7 @@ export const Header = () => {
               <DropdownTrigger>
                 <Button
                   variant="light"
-                  className="font-medium h-auto min-h-9 shrink-0 px-2 py-1.5 text-xs 2xl:px-3 2xl:py-3 2xl:text-sm group transition-colors whitespace-nowrap text-gray-700 hover:text-green-700 data-[hover=true]:bg-gray-50/80"
+                  className={ddTriggerClass}
                   endContent={
                     <i className="icon-[lucide--chevron-down] w-3 h-3 2xl:w-4 2xl:h-4 transition-transform duration-200 group-hover:-rotate-90 shrink-0" />
                   }
@@ -483,7 +491,7 @@ export const Header = () => {
           {/* Pricing Link */}
           <Link
             href="/pricing"
-            className="font-medium transition-colors shrink-0 px-2 py-1.5 rounded-lg text-xs 2xl:px-3 2xl:py-3 2xl:text-sm whitespace-nowrap text-gray-700 hover:text-green-700 hover:bg-gray-50/80"
+            className={planLinkClass}
           >
             Planes
           </Link>
@@ -493,7 +501,7 @@ export const Header = () => {
         <div className="hidden shrink-0 xl:flex items-center gap-2 2xl:gap-4">
           <Link
             href="/auth/sign-in"
-            className="font-medium transition-colors text-xs 2xl:text-sm whitespace-nowrap px-1 text-green-700 hover:text-green-800"
+            className={signInClass}
           >
             Iniciar sesión
           </Link>

@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import { ClientProvider } from "@/modules/core/providers/ClientProvider";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import "./globals.css";
 import { JsonLd } from "@/modules/core/components/JsonLd";
 import Script from "next/script";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 const OPEN_GRAPH_IMAGE_URL = `${BASE_URL}/brand/ethicvoice.jpeg`;
@@ -113,7 +121,10 @@ export default async function RootLayout({
         />
         {/* Píxeles GA / Clarity / Meta: solo tras consentimiento (ConsentGatedScripts) */}
       </head>
-      <body className={` antialiased`} suppressHydrationWarning={true}>
+      <body
+        className={`${inter.variable} font-sans antialiased`}
+        suppressHydrationWarning={true}
+      >
         <ClientProvider serverUser={serverUser} serverToken={serverToken}>
           {children}
         </ClientProvider>

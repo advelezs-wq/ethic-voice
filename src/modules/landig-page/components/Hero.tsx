@@ -1,15 +1,15 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { landingTransition } from "@/modules/landig-page/lib/landingMotion";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 import { VideoModal } from "./VideoModal";
+import { AnimatedHeading } from "@/modules/landig-page/components/motion/AnimatedHeading";
+import { FadeIn } from "@/modules/landig-page/components/motion/FadeIn";
 
-/** Ciclo cerrado (inicio = fin) para bucle infinito sin saltos — sensación de oleaje */
 const topWaveTimes = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1] as const;
 
-/** Curvas de flujo esquina superior izquierda — oleaje sutil infinito */
 function HeroDecorTopLeft({ className }: { className?: string }) {
   const reduceMotion = useReducedMotion();
 
@@ -101,7 +101,6 @@ function HeroDecorTopLeft({ className }: { className?: string }) {
 
 const bottomWaveTimes = [0, 0.14, 0.28, 0.42, 0.57, 0.71, 0.85, 1] as const;
 
-/** Curvas inferiores — oleaje horizontal suave e infinito */
 function HeroDecorBottomFlow({ className }: { className?: string }) {
   const reduceMotion = useReducedMotion();
 
@@ -180,12 +179,13 @@ function HeroDecorBottomFlow({ className }: { className?: string }) {
   );
 }
 
+const HEADING = "Transformamos la ética\nen acción.";
+
 export const Hero = () => {
   const { openCalendly } = useCalendlyGate();
-  const reduce = useReducedMotion();
 
   return (
-    <section className="relative min-h-[min(480px,88svh)] overflow-x-clip bg-[#0a1f14] pt-20">
+    <section className="relative flex min-h-svh flex-col overflow-x-clip bg-[#0a1f14] pt-20 text-white">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_40%,rgba(22,101,52,0.35)_0%,transparent_55%)]"
         aria-hidden
@@ -195,51 +195,47 @@ export const Hero = () => {
 
       <HeroDecorBottomFlow className="pointer-events-none absolute bottom-0 left-0 right-0 z-[1] h-16 w-full opacity-80 sm:h-20 md:h-24" />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-8 md:min-h-[min(440px,82svh)] md:flex-row md:items-center md:justify-between md:gap-10 md:py-10 lg:gap-14 lg:px-8 lg:pb-14 lg:pt-12">
-        {/* Texto — columna izquierda */}
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={landingTransition(0)}
-          className="flex w-full max-w-lg shrink-0 flex-col items-center justify-center text-center md:max-w-[min(100%,28rem)] md:flex-1 md:items-start md:text-left lg:max-w-xl"
-        >
-          <h1 className="text-balance text-3xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-4xl md:text-[2.65rem] lg:text-5xl">
-            Transformamos la{" "}
-            <span className="text-lime-400">Ética</span> en{" "}
-            <span className="text-lime-400">Acción</span>
-          </h1>
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-start gap-8 px-4 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-8 md:justify-center md:gap-10 md:py-10 lg:flex-row lg:items-center lg:justify-between lg:gap-14 lg:px-8 lg:pb-14 lg:pt-12">
+        <div className="mx-auto flex w-full max-w-lg shrink-0 flex-col items-center justify-center text-center md:max-w-[min(100%,32rem)] lg:mx-0 lg:max-w-xl lg:flex-1 lg:items-start lg:text-left">
+          <AnimatedHeading text={HEADING} />
 
-          <p className="mt-4 max-w-md text-pretty text-sm leading-relaxed text-white/80 sm:mt-5 sm:text-base md:max-w-md">
-            Cumplimiento proactivo, sin fricción: tu equipo al centro, con
-            datos claros y decisiones más rápidas.
-          </p>
+          <FadeIn delayMs={800} durationMs={1000}>
+            <p className="mx-auto mt-4 max-w-md text-pretty text-sm leading-relaxed text-white/80 sm:mt-5 sm:text-base lg:mx-0">
+              Cumplimiento proactivo, sin fricción: tu equipo al centro, con
+              datos claros y decisiones más rápidas.
+            </p>
+          </FadeIn>
 
-          <div className="mt-6 flex w-full justify-center sm:mt-8 md:justify-start">
-            <button
-              type="button"
-              onClick={openCalendly}
-              className="inline-flex items-center gap-2 rounded-full bg-lime-400 px-6 py-3 text-sm font-bold text-gray-950 shadow-[0_0_24px_rgba(190,242,100,0.35)] transition hover:bg-lime-300 sm:px-7 sm:text-base"
-            >
-              Agendar prueba gratis
-            </button>
+          <FadeIn delayMs={1200} durationMs={1000}>
+            <div className="mt-6 flex w-full flex-wrap justify-center gap-4 sm:mt-8 lg:justify-start">
+              <button
+                type="button"
+                onClick={openCalendly}
+                className="inline-flex items-center gap-2 rounded-full bg-lime-400 px-6 py-3 text-sm font-bold text-gray-950 shadow-[0_0_24px_rgba(190,242,100,0.35)] transition hover:bg-lime-300 sm:px-7 sm:text-base"
+              >
+                Agendar prueba gratis
+              </button>
+              <Link
+                href="/platform"
+                className="inline-flex items-center justify-center rounded-full border border-white/25 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:border-lime-400/50 hover:bg-white/10 sm:px-7 sm:text-base"
+              >
+                Explorar plataforma
+              </Link>
+            </div>
+          </FadeIn>
+        </div>
+
+        <FadeIn delayMs={1400} durationMs={1000} className="w-full lg:flex-1">
+          <div className="flex w-full shrink-0 justify-center lg:justify-end">
+            <div className="relative w-full max-w-md lg:max-w-lg">
+              <VideoModal
+                videoSrc="/demo-video.mp4"
+                posterSrc="/platform/ethicvoice-hero.jpeg"
+                className="h-64 shadow-2xl shadow-green-950/50 sm:h-72 md:h-80 lg:h-96"
+              />
+            </div>
           </div>
-        </motion.div>
-
-        {/* Video — columna derecha, centrada en la fila */}
-        <motion.div
-          initial={reduce ? false : { opacity: 0, x: 16 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={landingTransition(0.06)}
-          className="flex w-full shrink-0 justify-center md:flex-1 md:justify-end"
-        >
-          <div className="relative w-full max-w-md lg:max-w-lg">
-            <VideoModal
-              videoSrc="/demo-video.mp4"
-              posterSrc="/platform/ethicvoice-hero.jpeg"
-              className="h-64 shadow-2xl shadow-green-950/50 sm:h-72 md:h-80 lg:h-96"
-            />
-          </div>
-        </motion.div>
+        </FadeIn>
       </div>
     </section>
   );

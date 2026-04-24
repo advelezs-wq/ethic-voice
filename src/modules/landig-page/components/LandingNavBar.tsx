@@ -118,7 +118,7 @@ export function LandingNav() {
                   placement: "header",
                 })
               }
-              className="hidden rounded-full border border-[#051a24] bg-white px-4 py-2 text-sm font-semibold text-[#051a24] shadow-sm transition-colors hover:bg-[#051a24]/[0.04] md:inline-flex"
+              className="hidden rounded-full border-2 border-lime-600 bg-white px-4 py-2 text-sm font-semibold text-[#052b24] shadow-sm transition-colors hover:bg-lime-50 md:inline-flex"
             >
               Denunciar
             </Link>
@@ -131,7 +131,7 @@ export function LandingNav() {
                 });
                 openCalendly(e);
               }}
-              className="hidden rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800 md:inline-flex"
+              className="hidden rounded-full bg-lime-400 px-5 py-2.5 text-sm font-semibold text-[#052b24] shadow-[0_1px_2px_0_rgba(5,26,36,0.1),0_4px_4px_0_rgba(5,26,36,0.09),inset_0_1px_0_0_rgba(255,255,255,0.35)] transition-colors hover:bg-lime-500 md:inline-flex"
             >
               Empezar gratis
             </button>
@@ -152,9 +152,21 @@ export function LandingNav() {
       </header>
 
       {open && (
-        <div className="fixed inset-0 z-[60] flex flex-col bg-white p-6 md:hidden">
-          <div className="mb-8 flex items-center justify-between">
-            <span className="text-lg font-semibold text-black">EthicVoice</span>
+        <div className="fixed inset-0 z-[110] flex flex-col bg-white px-4 pb-8 pt-3 sm:px-6 md:hidden">
+          <div className="mx-auto mb-6 flex w-full max-w-7xl items-center justify-between border-b border-slate-200/80 pb-3">
+            <Link
+              href="/"
+              className="inline-flex items-center"
+              onClick={() => setOpen(false)}
+            >
+              <Image
+                src="/brand/logo-nobg.png"
+                alt="EthicVoice"
+                width={170}
+                height={40}
+                className="h-9 w-auto object-contain"
+              />
+            </Link>
             <button
               type="button"
               onClick={() => setOpen(false)}
@@ -163,7 +175,7 @@ export function LandingNav() {
               <i className="icon-[lucide--x] h-6 w-6 text-black" aria-hidden />
             </button>
           </div>
-          <div className="flex flex-1 flex-col justify-center gap-5 text-center">
+          <nav className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-1 overflow-y-auto">
             {sectionNavItems.map((item) => (
               <button
                 key={item.href}
@@ -172,50 +184,59 @@ export function LandingNav() {
                   scrollToId(item.href);
                   setOpen(false);
                 }}
-                className="text-xl font-semibold text-gray-800"
+                className="w-full rounded-lg py-3 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-slate-50 hover:text-black"
               >
                 {item.label}
               </button>
             ))}
-            <div className="mx-auto h-px w-full max-w-xs bg-slate-200" />
+            <div className="my-3 h-px w-full bg-slate-200" />
             {[...productLinks, ...companyLinks].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="text-lg font-medium text-gray-700"
+                className="block rounded-lg py-3 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#051a24]"
               >
                 {item.label}
               </Link>
             ))}
-            <Link
-              href="/submit"
-              onClick={() => {
-                trackGA4Event("landing_cta_click", {
-                  cta_name: "mobile_menu_report",
-                  placement: "mobile_menu",
-                });
-                setOpen(false);
-              }}
-              className="mx-auto mt-2 w-full max-w-xs rounded-full border-2 border-[#051a24] bg-white px-8 py-3 text-center text-sm font-semibold text-[#051a24]"
-            >
-              Denunciar
-            </Link>
-            <button
-              type="button"
-              onClick={(e) => {
-                trackGA4Event("landing_cta_click", {
-                  cta_name: "mobile_menu_demo",
-                  placement: "mobile_menu",
-                });
-                openCalendly(e);
-                setOpen(false);
-              }}
-              className="mx-auto mt-4 rounded-full bg-black px-8 py-3 text-sm font-medium text-white"
-            >
-              Empezar gratis
-            </button>
-          </div>
+            <div className="mt-6 flex flex-col gap-3 border-t border-slate-200/80 pt-6">
+              <Link
+                href="/auth/sign-in"
+                onClick={() => setOpen(false)}
+                className="w-full rounded-lg py-2.5 text-center text-sm text-gray-700 transition-colors hover:text-black"
+              >
+                Iniciar sesión
+              </Link>
+              <Link
+                href="/submit"
+                onClick={() => {
+                  trackGA4Event("landing_cta_click", {
+                    cta_name: "mobile_menu_report",
+                    placement: "mobile_menu",
+                  });
+                  setOpen(false);
+                }}
+                className="w-full rounded-full border-2 border-lime-600 bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#052b24] shadow-sm transition-colors hover:bg-lime-50"
+              >
+                Denunciar
+              </Link>
+              <button
+                type="button"
+                onClick={(e) => {
+                  trackGA4Event("landing_cta_click", {
+                    cta_name: "mobile_menu_demo",
+                    placement: "mobile_menu",
+                  });
+                  openCalendly(e);
+                  setOpen(false);
+                }}
+                className="w-full rounded-full bg-lime-400 px-5 py-2.5 text-sm font-semibold text-[#052b24] shadow-[0_1px_2px_0_rgba(5,26,36,0.1),0_4px_4px_0_rgba(5,26,36,0.09),0_8px_12px_0_rgba(163,230,53,0.25),inset_0_1px_0_0_rgba(255,255,255,0.35)] transition-colors hover:bg-lime-500"
+              >
+                Empezar gratis
+              </button>
+            </div>
+          </nav>
         </div>
       )}
     </>

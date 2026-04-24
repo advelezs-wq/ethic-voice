@@ -19,7 +19,7 @@ export const FooterCTA = () => {
     <footer className="border-t border-slate-200 bg-white">
       <FooterDemoCtaBand ctaName="footer_demo" placement="marketing_footer" />
 
-      <div className="border-t border-slate-200 bg-white py-10">
+      <div className="border-t border-slate-200 bg-white pt-10 pb-[max(11.5rem,calc(9.5rem+env(safe-area-inset-bottom,0px)))] sm:pb-36 md:pb-32 lg:pb-28">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-5 md:px-8">
           <Link
             href="/"

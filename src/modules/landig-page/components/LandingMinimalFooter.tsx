@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const LINKS = [
@@ -14,11 +15,17 @@ export function LandingMinimalFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-slate-200 bg-white py-10">
+    <footer className="border-t border-slate-200 bg-white pt-10 pb-[max(11.5rem,calc(9.5rem+env(safe-area-inset-bottom,0px)))] sm:pb-36 md:pb-32 lg:pb-28">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 px-5 text-sm text-slate-500 md:flex-row md:px-8">
-        <span className="text-sm font-black tracking-[0.18em] text-[#0d212c]">
-          ETHICVOICE
-        </span>
+        <Link href="/" className="inline-flex shrink-0 items-center">
+          <Image
+            src="/brand/logo-nobg.png"
+            alt="EthicVoice"
+            width={170}
+            height={40}
+            className="h-9 w-auto object-contain"
+          />
+        </Link>
         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           {LINKS.map((l) => (
             <Link

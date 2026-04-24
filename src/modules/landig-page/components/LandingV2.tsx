@@ -226,7 +226,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-white px-4 pb-14 pt-8 sm:px-6 sm:pb-16 sm:pt-10 md:pt-14">
+    <section className="relative overflow-hidden bg-white px-4 pb-14 pt-4 sm:px-6 sm:pb-16 sm:pt-6 md:pt-8">
       <video
         ref={bgVideoRef}
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30"
@@ -455,7 +455,7 @@ export function LandingV2() {
       )}
       <StickyCalendlyToast />
 
-      <main className="pb-28 pt-20 sm:pt-24">
+      <main className="pb-28 pt-16 sm:pt-[4.5rem]">
         <HeroSection variant={variant} />
         <LogoProofSection />
 

@@ -33,7 +33,7 @@ export function LandingSiteChrome({ children }: Props) {
         />
       )}
       <StickyCalendlyToast />
-      <main className="w-full min-w-0 overflow-x-hidden pb-28 pt-20 sm:pt-24">
+      <main className="w-full min-w-0 overflow-x-hidden pb-28 pt-16 sm:pt-[4.5rem]">
         {children}
       </main>
       <LandingMinimalFooter />

@@ -83,10 +83,10 @@ export const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/noticias"
+                  href="/blog"
                   className="text-black hover:text-green-700 transition-colors"
                 >
-                  Noticias
+                  Blog
                 </Link>
               </li>
               <li>

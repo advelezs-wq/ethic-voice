@@ -1,39 +1,24 @@
+"use client";
+
 import { motion } from "framer-motion";
+import { MarketingSectionV2 } from "@/modules/landig-page/components/MarketingSectionV2";
 
 export const HowItWorks = () => {
   const steps = [
     {
-      icon: (
-        <i
-          className="icon-[lucide--message-square] text-green-700 size-10"
-          role="img"
-          aria-hidden="true"
-        />
-      ),
+      icon: "icon-[lucide--message-square]",
       title: "Cuéntanos sobre ti",
       description:
         "Te contactaremos en 24 horas para entender completamente tus necesidades",
     },
     {
-      icon: (
-        <i
-          className="icon-[lucide--monitor] text-green-700 size-10"
-          role="img"
-          aria-hidden="true"
-        />
-      ),
+      icon: "icon-[lucide--monitor]",
       title: "Solución personalizada",
       description:
         "Programaremos una llamada corta y te mostraremos las opciones adaptadas a tu organización",
     },
     {
-      icon: (
-        <i
-          className="icon-[lucide--rocket] text-green-700 size-10"
-          role="img"
-          aria-hidden="true"
-        />
-      ),
+      icon: "icon-[lucide--rocket]",
       title: "Implementación rápida",
       description:
         "Te apoyamos de manera oportuna con todo lo necesario para comenzar",
@@ -41,41 +26,32 @@ export const HowItWorks = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-gray-50">
-      <div className="container mx-auto max-w-6xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            ¿Cómo funciona?
-          </h2>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {steps.map((step, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="text-center"
-            >
-              <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                {step.icon}
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                {step.title}
-              </h3>
-              <p className="text-gray-600">{step.description}</p>
-            </motion.div>
-          ))}
-        </div>
+    <MarketingSectionV2
+      surface
+      eyebrow="Proceso"
+      title="¿Cómo funciona?"
+      subtitle="Tres pasos claros desde el primer contacto hasta operar con EthicVoice."
+    >
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
+        {steps.map((step, index) => (
+          <motion.div
+            key={step.title}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: index * 0.08 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-[0_8px_24px_rgba(0,0,0,0.05)]"
+          >
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-lime-100">
+              <i className={`${step.icon} h-8 w-8 text-lime-800`} aria-hidden />
+            </div>
+            <h3 className="text-lg font-bold text-[#0d212c]">{step.title}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-[#273c46]">
+              {step.description}
+            </p>
+          </motion.div>
+        ))}
       </div>
-    </section>
+    </MarketingSectionV2>
   );
 };

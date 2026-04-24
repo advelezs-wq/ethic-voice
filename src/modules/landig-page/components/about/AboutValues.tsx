@@ -1,3 +1,5 @@
+import { MarketingSectionV2 } from "@/modules/landig-page/components/MarketingSectionV2";
+
 export const AboutValues = () => {
   const values = [
     {
@@ -39,68 +41,48 @@ export const AboutValues = () => {
   ];
 
   return (
-    <section
+    <MarketingSectionV2
       id="valores"
-      className="relative overflow-hidden bg-gradient-to-b from-[#f5f3ee] via-[#faf9f6] to-[#f5f3ee] px-4 py-16 md:px-6 md:py-20"
+      eyebrow="Principios"
+      title="Nuestros valores"
+      subtitle="Guían nuestras decisiones diarias y definen cómo interactuamos con clientes, socios y comunidad."
     >
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_45%_at_50%_100%,rgba(20,83,45,0.05)_0%,transparent_45%)]"
-        aria-hidden
-      />
-      <div className="relative z-10 container mx-auto max-w-7xl">
-        <div className="mb-12 text-center md:mb-14">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#0a1f14]/65">
-            Principios
-          </p>
-          <h2 className="mt-3 text-balance text-3xl font-bold tracking-tight text-[#0a1f14] md:text-4xl">
-            Nuestros <span className="text-lime-600">valores</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-3xl text-lg text-gray-600">
-            Guían nuestras decisiones diarias y definen cómo interactuamos con
-            clientes, socios y comunidad.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-7">
-          {values.map((value) => (
-            <div
-              key={value.title}
-              className="group rounded-3xl border border-[#0a1f14]/10 bg-white/95 p-7 shadow-md shadow-gray-200/50 ring-1 ring-black/[0.04] transition duration-300 hover:-translate-y-0.5 hover:border-lime-400/25 hover:shadow-lg"
-            >
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-lime-400/15 ring-1 ring-lime-400/30 transition group-hover:bg-lime-400/20">
-                <i
-                  className={`${value.icon} size-7 text-lime-600`}
-                  aria-hidden
-                />
-              </div>
-              <h3 className="text-xl font-bold text-[#0a1f14]">{value.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-gray-600 md:text-[0.9375rem]">
-                {value.description}
-              </p>
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {values.map((value) => (
+          <article
+            key={value.title}
+            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_8px_24px_rgba(0,0,0,0.05)] transition duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_16px_40px_-20px_rgba(15,23,42,0.12)] md:p-7"
+          >
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-lime-100">
+              <i className={`${value.icon} h-6 w-6 text-lime-800`} aria-hidden />
             </div>
-          ))}
-        </div>
+            <h3 className="text-lg font-bold text-[#0d212c]">{value.title}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-[#273c46] md:text-[0.9375rem]">
+              {value.description}
+            </p>
+          </article>
+        ))}
+      </div>
 
-        <div className="relative mt-16 overflow-hidden rounded-3xl border border-lime-400/20 bg-[#0a1f14] px-6 py-12 text-center shadow-[0_0_48px_rgba(10,31,20,0.35)] md:mt-20 md:px-12 md:py-14">
-          <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_120%,rgba(163,230,53,0.12)_0%,transparent_55%)]"
-            aria-hidden
-          />
-          <div className="relative z-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-400/90">
-              Propósito
-            </p>
-            <h3 className="mt-3 text-2xl font-bold text-white md:text-3xl">
-              Nuestra misión
-            </h3>
-            <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-white/80 md:text-xl">
-              Empoderar a las organizaciones para crear culturas de integridad y
-              transparencia mediante tecnología innovadora que hace que reportar
-              irregularidades sea seguro, accesible y efectivo para todos.
-            </p>
-          </div>
+      <div className="relative mt-12 overflow-hidden rounded-[28px] border border-emerald-400/35 bg-gradient-to-br from-[#051a24] via-[#0d212c] to-[#052b24] px-6 py-12 text-center shadow-[0_24px_60px_-28px_rgba(5,43,36,0.5)] md:mt-14 md:px-12 md:py-14">
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"
+          aria-hidden
+        />
+        <div className="relative z-10">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+            Propósito
+          </p>
+          <h3 className="mt-3 text-2xl font-bold text-white md:text-3xl">
+            Nuestra misión
+          </h3>
+          <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-white/85 md:text-lg">
+            Empoderar a las organizaciones para crear culturas de integridad y
+            transparencia mediante tecnología innovadora que hace que reportar
+            irregularidades sea seguro, accesible y efectivo para todos.
+          </p>
         </div>
       </div>
-    </section>
+    </MarketingSectionV2>
   );
 };

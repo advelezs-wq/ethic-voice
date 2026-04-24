@@ -80,7 +80,7 @@ export const Header = () => {
       id: "recursos",
       label: "Recursos",
       icon: "icon-[lucide--library]",
-      links: [{ href: "/eventos", label: "Eventos" }],
+      links: [{ href: "/blog", label: "Blog" }],
     },
     {
       id: "nosotros",
@@ -89,7 +89,7 @@ export const Header = () => {
       links: [
         { href: "/about", label: "Acerca de Nosotros" },
         { href: "/careers", label: "Únete a EthicVoice" },
-        { href: "/noticias", label: "Noticias de la Empresa" },
+        { href: "/blog", label: "Blog y noticias" },
       ],
     },
     {
@@ -467,13 +467,13 @@ export const Header = () => {
 
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-3">
-                            Noticias de la Empresa
+                            Blog
                           </h4>
                           <p className="text-sm text-gray-600 mb-3">
-                            Noticias y cobertura de prensa sobre EthicVoice.
+                            Artículos y novedades sobre línea ética y cumplimiento.
                           </p>
                           <Link
-                            href="/noticias"
+                            href="/blog"
                             className="inline-flex items-center text-sm text-green-600 hover:text-green-700 font-medium"
                           >
                             Conocer más
@@ -559,7 +559,7 @@ export const Header = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="xl:hidden fixed inset-0 z-[10050] bg-gray-900/50"
+              className="xl:hidden fixed inset-0 z-[10050] bg-[#051a24]/40 backdrop-blur-[2px]"
               onClick={closeMobileMenu}
             />
 
@@ -577,57 +577,58 @@ export const Header = () => {
                 stiffness: 380,
                 mass: 0.82,
               }}
-              className="xl:hidden fixed inset-y-0 right-0 z-[10051] flex h-dvh max-h-dvh w-full max-w-[min(100vw,20.5rem)] flex-col border-l border-gray-200/90 bg-white shadow-[-12px_0_40px_rgba(10,31,20,0.18)] sm:max-w-[24rem] md:max-w-[26.5rem]"
+              className="xl:hidden fixed inset-y-0 right-0 z-[10051] flex h-dvh max-h-dvh w-full max-w-[min(100vw,20.5rem)] flex-col border-l border-slate-200/90 bg-white shadow-[-16px_0_48px_rgba(15,23,42,0.12)] sm:max-w-[24rem] md:max-w-[26.5rem]"
             >
+              <div className="pointer-events-none absolute left-0 top-0 h-24 w-full bg-gradient-to-b from-lime-400/8 to-transparent" aria-hidden />
+
               <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-                <div className="flex shrink-0 items-center justify-between border-b border-gray-100 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-green-800/60">
-                    Menú
-                  </p>
+                <div className="relative flex shrink-0 items-center justify-between border-b border-slate-100 px-4 pb-3 pt-[max(0.85rem,env(safe-area-inset-top))]">
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-lime-700">
+                      Navegación
+                    </p>
+                    <p className="mt-0.5 text-sm font-semibold text-[#0d212c]">
+                      EthicVoice
+                    </p>
+                  </div>
                   <button
                     type="button"
                     onClick={closeMobileMenu}
-                    className="flex h-10 w-10 items-center justify-center rounded-full text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200/80 bg-white text-[#273c46] shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-[#0d212c]"
                     aria-label="Cerrar menú"
                   >
-                    <i
-                      className="icon-[lucide--x] h-5 w-5"
-                      aria-hidden
-                    />
+                    <i className="icon-[lucide--x] h-5 w-5" aria-hidden />
                   </button>
                 </div>
 
-                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-2">
-                  <div className="overflow-hidden rounded-xl border border-gray-100 bg-gray-50/50">
-                    {mobileNavSections.map((section, idx) => {
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3">
+                  <div className="space-y-2">
+                    {mobileNavSections.map((section) => {
                       const open = openMobileSection === section.id;
                       return (
                         <div
                           key={section.id}
-                          className={cn(
-                            "border-gray-100/90 bg-white",
-                            idx > 0 && "border-t"
-                          )}
+                          className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
                         >
                           <button
                             type="button"
-                            className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left transition-colors hover:bg-gray-50/90 active:bg-gray-50 sm:gap-3 sm:px-3.5 sm:py-3"
+                            className="flex w-full items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-slate-50/90 active:bg-slate-50 sm:px-3.5 sm:py-3.5"
                             onClick={() => toggleMobileSection(section.id)}
                             aria-expanded={open}
                           >
-                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-800 text-white sm:h-9 sm:w-9 sm:rounded-xl">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-lime-100 ring-1 ring-lime-200/60">
                               <i
-                                className={`${section.icon} h-3.5 w-3.5 sm:h-4 sm:w-4`}
+                                className={`${section.icon} h-[18px] w-[18px] text-lime-800 sm:h-5 sm:w-5`}
                                 aria-hidden
                               />
                             </span>
-                            <span className="min-w-0 flex-1 text-sm font-semibold text-gray-900 sm:text-[0.9375rem]">
+                            <span className="min-w-0 flex-1 text-[0.9375rem] font-semibold text-[#0d212c]">
                               {section.label}
                             </span>
                             <i
                               className={cn(
-                                "icon-[lucide--chevron-down] h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200",
-                                open && "rotate-180 text-green-700"
+                                "icon-[lucide--chevron-down] h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200",
+                                open && "rotate-180 text-lime-700"
                               )}
                               aria-hidden
                             />
@@ -644,16 +645,20 @@ export const Header = () => {
                                   duration: 0.2,
                                   ease: [0.4, 0, 0.2, 1],
                                 }}
-                                className="overflow-hidden border-t border-gray-100"
+                                className="overflow-hidden border-t border-slate-100 bg-[#f7faf9]/70"
                               >
                                 <ul className="space-y-0.5 px-2 py-2 sm:px-3 sm:py-2.5">
                                   {section.links.map((link) => (
                                     <li key={`${section.id}-${link.href}`}>
                                       <Link
                                         href={link.href}
-                                        className="block rounded-lg py-2 pl-8 pr-2 text-sm text-gray-600 transition-colors hover:bg-green-50/80 hover:text-green-900 sm:pl-9"
+                                        className="flex items-center gap-2 rounded-xl py-2.5 pl-3 pr-2 text-sm text-[#273c46] transition-colors hover:bg-white hover:text-[#0d212c] hover:shadow-sm"
                                         onClick={closeMobileMenu}
                                       >
+                                        <span
+                                          className="h-1 w-1 shrink-0 rounded-full bg-lime-500 opacity-70"
+                                          aria-hidden
+                                        />
                                         {link.label}
                                       </Link>
                                     </li>
@@ -668,11 +673,11 @@ export const Header = () => {
                   </div>
                 </div>
 
-                <div className="mt-auto shrink-0 border-t border-gray-100 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_24px_rgba(0,0,0,0.06)] sm:py-4">
-                  <div className="flex flex-col gap-2 sm:gap-2.5">
+                <div className="relative mt-auto shrink-0 border-t border-slate-100 bg-white/95 px-4 py-3 pb-[max(0.85rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:py-4">
+                  <div className="flex flex-col gap-2.5">
                     <Link
                       href="/auth/sign-in"
-                      className="rounded-lg py-2.5 text-center text-sm font-semibold text-green-800 transition-colors hover:bg-gray-50"
+                      className="rounded-full border border-slate-200 bg-white py-3 text-center text-sm font-semibold text-[#0d212c] transition-colors hover:border-slate-300 hover:bg-slate-50"
                       onClick={closeMobileMenu}
                     >
                       Iniciar sesión
@@ -680,7 +685,7 @@ export const Header = () => {
                     <button
                       type="button"
                       onClick={openCalendlyPopup}
-                      className="rounded-full bg-lime-400 py-3 text-sm font-bold text-gray-950 shadow-sm transition hover:bg-lime-300 active:scale-[0.99] sm:py-3.5"
+                      className="rounded-full bg-lime-400 py-3.5 text-sm font-bold text-[#052b24] shadow-[0_4px_20px_rgba(163,230,53,0.35)] transition hover:bg-lime-500 active:scale-[0.99]"
                     >
                       Solicitar demo
                     </button>

@@ -7,7 +7,12 @@ import {
   landingTransition,
 } from "@/modules/landig-page/lib/landingMotion";
 
-export const FAQSection = () => {
+type FAQSectionProps = {
+  /** Si es false, no renderiza el encabezado ni el contenedor de página (útil dentro de MarketingSectionV2). */
+  showHeader?: boolean;
+};
+
+export const FAQSection = ({ showHeader = true }: FAQSectionProps) => {
   const faqs = [
     {
       question: "¿Qué es un sistema de denuncias éticas?",
@@ -41,6 +46,40 @@ export const FAQSection = () => {
     },
   ];
 
+  const accordion = (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={landingTransition(showHeader ? 0.08 : 0)}
+      viewport={LANDING_VIEWPORT}
+    >
+      <Accordion
+        defaultExpandedKeys={["0"]}
+        className="gap-2 p-0 sm:gap-4"
+        itemClasses={{
+          title: "font-semibold text-base text-[#0d212c] sm:text-lg",
+          trigger: "h-auto py-3 sm:py-4",
+          content:
+            "px-1 pb-4 pt-0 text-sm leading-relaxed text-[#273c46] sm:px-2 sm:text-base sm:pb-5",
+        }}
+      >
+        {faqs.map((faq, index) => (
+          <AccordionItem
+            key={index.toString()}
+            aria-label={faq.question}
+            title={faq.question}
+          >
+            <p>{faq.answer}</p>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </motion.div>
+  );
+
+  if (!showHeader) {
+    return <div className="mx-auto w-full max-w-3xl">{accordion}</div>;
+  }
+
   return (
     <section className="bg-white px-4 py-12 sm:px-6 sm:py-16 md:py-20 lg:px-8">
       <div className="container mx-auto w-full max-w-4xl">
@@ -51,41 +90,15 @@ export const FAQSection = () => {
           viewport={LANDING_VIEWPORT}
           className="mb-8 text-center sm:mb-12 md:mb-14"
         >
-          <h2 className="mb-3 text-2xl font-bold text-gray-900 sm:mb-4 sm:text-3xl md:text-4xl">
+          <h2 className="mb-3 text-2xl font-bold text-[#0d212c] sm:mb-4 sm:text-3xl md:text-4xl">
             Preguntas frecuentes
           </h2>
-          <p className="mx-auto max-w-2xl text-sm leading-relaxed text-gray-600 sm:text-base md:text-lg">
+          <p className="mx-auto max-w-2xl text-sm leading-relaxed text-[#273c46] sm:text-base md:text-lg">
             Encuentra respuestas a las preguntas más comunes sobre nuestra
             plataforma de cumplimiento.
           </p>
         </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={landingTransition(0.08)}
-          viewport={LANDING_VIEWPORT}
-        >
-          <Accordion
-            defaultExpandedKeys={["0"]}
-            className="gap-2 p-0 sm:gap-4"
-            itemClasses={{
-              title: "font-semibold text-base text-gray-900 sm:text-lg",
-              trigger: "h-auto py-3 sm:py-4",
-              content: "px-1 pb-4 pt-0 text-sm leading-relaxed text-gray-600 sm:px-2 sm:text-base sm:pb-5",
-            }}
-          >
-            {faqs.map((faq, index) => (
-              <AccordionItem
-                key={index.toString()}
-                aria-label={faq.question}
-                title={faq.question}
-              >
-                <p>{faq.answer}</p>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </motion.div>
+        {accordion}
       </div>
     </section>
   );

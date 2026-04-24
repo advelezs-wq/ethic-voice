@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Accordion, AccordionItem } from "@heroui/react";
+import { MarketingSectionV2 } from "@/modules/landig-page/components/MarketingSectionV2";
 
 export const PricingFAQ = () => {
   const faqs = [
@@ -34,50 +34,32 @@ export const PricingFAQ = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-white">
-      <div className="container mx-auto max-w-4xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Preguntas frecuentes sobre precios
-          </h2>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          <Accordion
-            defaultExpandedKeys={["0"]}
-            className="gap-4"
-            itemClasses={{
-              title: "font-semibold text-lg text-gray-900",
-              trigger: " h-auto",
-              content: "p-4",
-            }}
+    <MarketingSectionV2 id="faq-precios" eyebrow="FAQ" title="Preguntas frecuentes sobre precios" guides={[]}>
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45 }}
+        viewport={{ once: true }}
+        className="mx-auto max-w-3xl space-y-3"
+      >
+        {faqs.map((faq, index) => (
+          <details
+            key={index}
+            className="group rounded-2xl border border-slate-200 bg-white shadow-[0_4px_14px_rgba(0,0,0,0.04)]"
           >
-            {faqs.map((faq, index) => (
-              <AccordionItem
-                key={index}
-                title={
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {faq.question}
-                  </h3>
-                }
-              >
-                <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </motion.div>
-      </div>
-    </section>
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-left text-sm font-semibold text-[#0d212c]">
+              {faq.question}
+              <i
+                className="icon-[lucide--chevron-right] h-4 w-4 shrink-0 text-slate-500 transition-transform group-open:rotate-90"
+                aria-hidden
+              />
+            </summary>
+            <p className="border-t border-slate-200 px-5 pb-4 pt-3 text-sm leading-relaxed text-[#273c46]">
+              {faq.answer}
+            </p>
+          </details>
+        ))}
+      </motion.div>
+    </MarketingSectionV2>
   );
 };

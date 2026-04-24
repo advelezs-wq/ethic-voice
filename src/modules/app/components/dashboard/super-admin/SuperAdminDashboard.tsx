@@ -95,7 +95,7 @@ export function SuperAdminDashboard() {
             Gestión global de todas las organizaciones del sistema
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-end gap-3">
           <DownloadPDFButton
             reportType="super_admin"
             data={{ organizations, systemStats }}
@@ -106,6 +106,14 @@ export function SuperAdminDashboard() {
           />
           <Button
             as={Link}
+            href="/app/superadmin/blog"
+            variant="flat"
+            startContent={<i className="icon-[lucide--newspaper] size-4" />}
+          >
+            Blog público
+          </Button>
+          <Button
+            as={Link}
             href="/app/organizations"
             color="primary"
             startContent={<i className="icon-[tabler--building-plus] size-4" />}
@@ -113,6 +121,78 @@ export function SuperAdminDashboard() {
             Gestionar Organizaciones
           </Button>
         </div>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="border border-default-200 shadow-sm">
+          <CardBody className="flex flex-row items-center justify-between gap-3 py-4">
+            <div>
+              <p className="text-sm font-semibold text-default-700">Blog</p>
+              <p className="text-xs text-default-500">
+                Crear, editar y publicar artículos en /blog
+              </p>
+            </div>
+            <Button
+              as={Link}
+              href="/app/superadmin/blog"
+              size="sm"
+              color="primary"
+              variant="flat"
+            >
+              Administrar
+            </Button>
+          </CardBody>
+        </Card>
+        <Card className="border border-default-200 shadow-sm">
+          <CardBody className="flex flex-row items-center justify-between gap-3 py-4">
+            <div>
+              <p className="text-sm font-semibold text-default-700">Clientes</p>
+              <p className="text-xs text-default-500">Alta manual y tabla de clientes</p>
+            </div>
+            <Button
+              as={Link}
+              href="/app/superadmin/clients"
+              size="sm"
+              variant="flat"
+            >
+              Abrir
+            </Button>
+          </CardBody>
+        </Card>
+        <Card className="border border-default-200 shadow-sm">
+          <CardBody className="flex flex-row items-center justify-between gap-3 py-4">
+            <div>
+              <p className="text-sm font-semibold text-default-700">Herramientas</p>
+              <p className="text-xs text-default-500">Digests, colas y tareas</p>
+            </div>
+            <Button
+              as={Link}
+              href="/app/superadmin/tools"
+              size="sm"
+              variant="flat"
+            >
+              Abrir
+            </Button>
+          </CardBody>
+        </Card>
+        <Card className="border border-default-200 shadow-sm">
+          <CardBody className="flex flex-row items-center justify-between gap-3 py-4">
+            <div>
+              <p className="text-sm font-semibold text-default-700">Ver sitio</p>
+              <p className="text-xs text-default-500">Blog y marketing públicos</p>
+            </div>
+            <Button
+              as={Link}
+              href="/blog"
+              size="sm"
+              variant="flat"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              /blog
+            </Button>
+          </CardBody>
+        </Card>
       </div>
 
       {/* System Stats */}

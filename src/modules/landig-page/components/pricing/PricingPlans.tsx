@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { Button } from "@heroui/react";
 import {
   PLAN_CONFIGS,
   PlanType,
@@ -10,10 +9,10 @@ import {
   formatPriceForUI,
 } from "@/types/subscription.types";
 import { useExchangeRate } from "@/modules/core/hooks/useExchangeRate";
-// Removed CheckIcon import - using iconify icons instead
 import { motion } from "framer-motion";
 import CheckoutSidebar from "@/modules/app/components/checkout/CheckoutSidebar";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
+import { MarketingSectionV2 } from "@/modules/landig-page/components/MarketingSectionV2";
 
 interface PricingPlansProps {
   billingCycle: BillingCycle;
@@ -251,13 +250,32 @@ Gracias,
   }, [isSignedIn, isLoaded, isProcessing, billingCycle]);
 
   const displayPlans = [PlanType.STARTER, PlanType.GROW, PlanType.GROW_PRO];
-  const customPlan = PlanType.PREMIUM;
+  const premiumConfig = PLAN_CONFIGS[PlanType.PREMIUM];
+
+  const enterpriseFeatures = [
+    { iconClass: "icon-[lucide--users]", title: "Usuarios Ilimitados", desc: "Sin restricciones de equipo" },
+    { iconClass: "icon-[lucide--mail]", title: "Todos los Canales", desc: "Web, Email, Chatbot, Teléfono" },
+    { iconClass: "icon-[lucide--brain]", title: "IA Avanzada Completa", desc: "Procesamiento y análisis automatizado" },
+    { iconClass: "icon-[lucide--chart-column]", title: "Analíticas Premium", desc: "Reportes detallados y métricas" },
+    { iconClass: "icon-[lucide--shield-check]", title: "Seguridad Empresarial", desc: "Cumplimiento y encriptación" },
+    { iconClass: "icon-[lucide--headphones]", title: "Soporte Prioritario", desc: "Atención personalizada 24/7" },
+    { iconClass: "icon-[lucide--palette]", title: "Personalización Total", desc: "Branding y diseño exclusivo" },
+    { iconClass: "icon-[lucide--graduation-cap]", title: "Capacitación Completa", desc: "Training para investigadores" },
+    { iconClass: "icon-[lucide--scale]", title: "Consultoría Legal", desc: "Asesoría especializada incluida" },
+    { iconClass: "icon-[lucide--cog]", title: "Integración API", desc: "Conecta con tus sistemas existentes" },
+    { iconClass: "icon-[lucide--clock]", title: "SLA Garantizado", desc: "Tiempos de respuesta asegurados" },
+    { iconClass: "icon-[lucide--globe]", title: "Soporte Multiidioma", desc: "Disponible en varios idiomas" },
+  ];
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto max-w-7xl px-6">
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto">
+    <>
+      <MarketingSectionV2
+        id="planes-precio"
+        eyebrow="Comparar"
+        title="Elige la capacidad que necesitas"
+        subtitle="Precios en USD según ciclo de facturación. Valor en COP orientativo según tipo de cambio del día."
+      >
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 md:gap-8">
           {displayPlans.map((planType) => {
             const config = PLAN_CONFIGS[planType];
             const price = getPrice(planType);
@@ -271,84 +289,82 @@ Gracias,
             return (
               <motion.div
                 key={planType}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration: 0.6,
-                  delay: displayPlans.indexOf(planType) * 0.1,
+                  duration: 0.5,
+                  delay: displayPlans.indexOf(planType) * 0.08,
                 }}
-                className={`relative bg-white rounded-xl p-6 sm:p-7 md:p-8 min-h-[560px] md:min-h-[600px] transition-all duration-300 ${
+                className={`relative flex min-h-[520px] flex-col rounded-xl border bg-white p-6 transition-all duration-300 sm:min-h-[560px] sm:p-7 md:p-8 ${
                   isPopular
-                    ? "border-2 border-green-500 shadow-2xl"
-                    : "border border-gray-200 shadow-lg hover:shadow-xl"
+                    ? "border-2 border-lime-500 shadow-2xl shadow-lime-900/10"
+                    : "border border-slate-200 shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:border-slate-300 hover:shadow-lg"
                 }`}
               >
-                {/* Recommended Chip */}
                 {isPopular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-green-600 text-white text-xs px-3 py-1 rounded-full font-semibold shadow-md">
+                    <span className="rounded-full bg-lime-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-md">
                       Recomendado
                     </span>
                   </div>
                 )}
-                {/* Title */}
-                <div className="mb-6">
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+
+                <div className="mb-5">
+                  <h3 className="mb-2 text-2xl font-semibold text-[#0d212c]">
                     {config.displayName}
                   </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-sm leading-relaxed text-[#273c46]">
                     {config.description}
                   </p>
                 </div>
 
-                {/* Price */}
-                <div className="mb-6 md:mb-8">
-                  <div className="flex items-baseline flex-wrap">
+                <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50/80 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
+                    Precio
+                  </p>
+                  <div className="mt-1 flex flex-wrap items-baseline gap-x-1">
                     <span
-                      className={`font-extrabold text-gray-900 ${
+                      className={`font-extrabold text-[#0d212c] ${
                         priceDisplay.size === "large"
-                          ? "text-4xl md:text-5xl"
+                          ? "text-3xl md:text-4xl"
                           : priceDisplay.size === "medium"
-                            ? "text-3xl md:text-4xl"
-                            : "text-2xl md:text-3xl"
+                            ? "text-2xl md:text-3xl"
+                            : "text-xl md:text-2xl"
                       }`}
                     >
                       {priceDisplay.formatted}
                     </span>
-                    <span className="text-sm text-gray-600 ml-1 flex-shrink-0">
+                    <span className="text-sm font-medium text-[#273c46]">
                       /{billingCycle === BillingCycle.YEARLY ? "año" : "mes"}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <p className="mt-1 text-xs text-slate-500">
                     {rates?.COP
                       ? `≈ ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(Math.round(monthlyUsd * rates.COP))} COP/mes`
-                      : ""}
-                  </div>
+                      : "\u00a0"}
+                  </p>
                 </div>
 
-                {/* CTA Button */}
-                <div className="mb-6 md:mb-8">
-                  <Button
-                    onClick={() => handlePlanSelect(planType)}
-                    disabled={isProcessing && selectedPlan === planType}
-                    className={`w-full py-3 px-6 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      isPopular
-                        ? "bg-green-600 text-white hover:bg-green-700 shadow-lg"
-                        : "border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                    }`}
-                  >
-                    {isProcessing && selectedPlan === planType
-                      ? "Procesando..."
-                      : "Iniciar Sesión y Continuar"}
-                  </Button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handlePlanSelect(planType)}
+                  disabled={isProcessing && selectedPlan === planType}
+                  className={`mb-6 w-full rounded-lg py-3 px-6 text-sm font-semibold transition-all duration-200 disabled:opacity-60 ${
+                    isPopular
+                      ? "bg-lime-600 text-white shadow-lg hover:bg-lime-700"
+                      : "border-2 border-lime-600 text-lime-800 hover:bg-lime-600 hover:text-white"
+                  }`}
+                >
+                  {isProcessing && selectedPlan === planType
+                    ? "Procesando..."
+                    : "Iniciar sesión y continuar"}
+                </button>
 
-                {/* Features */}
-                <div className="space-y-3 md:space-y-4">
+                <div className="flex flex-1 flex-col space-y-3">
                   {config.features.highlights.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <i className="icon-[lucide--check] w-5 h-5 text-green-600 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{feature}</span>
+                    <div key={index} className="flex items-start gap-3">
+                      <i className="icon-[lucide--circle-check] mt-0.5 h-5 w-5 shrink-0 text-lime-600" />
+                      <span className="text-sm text-[#273c46]">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -357,139 +373,63 @@ Gracias,
           })}
         </div>
 
-        {/* Custom Plan Section */}
-        <div className="mt-16 max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-center mb-8"
-          >
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+        <div className="mx-auto mt-14 max-w-5xl">
+          <div className="mb-8 text-center">
+            <h3 className="text-balance text-2xl font-extrabold tracking-tight text-[#0d212c] md:text-3xl">
               ¿Necesitas algo más específico?
             </h3>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Si estos planes no se ajustan a tus necesidades, creemos una
-              solución personalizada para tu organización. Desde startups hasta
-              grandes corporaciones.
+            <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-[#273c46]">
+              Si estos planes no se ajustan a tus necesidades, creemos una solución
+              personalizada para tu organización. Desde startups hasta grandes
+              corporaciones.
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="relative bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 rounded-2xl p-8 lg:p-12 shadow-2xl border-2 border-purple-400 overflow-hidden"
+          <motion.article
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="relative overflow-hidden rounded-2xl border border-emerald-400/35 bg-gradient-to-br from-[#051a24] via-[#0d212c] to-[#052b24] p-6 shadow-2xl lg:p-10"
           >
-            {/* Background Pattern */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
-
-            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
-              {/* Left Column - Content */}
-              <div>
-                <div className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-white/20 backdrop-blur-sm rounded-full mb-4 sm:mb-6">
-                  <span className="text-white font-semibold text-sm">
-                    Plan Personalizado
-                  </span>
-                </div>
-
-                <h4 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">
-                  Solución Empresarial Completa
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"
+              aria-hidden
+            />
+            <div className="relative grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
+              <div className="lg:col-span-5">
+                <span className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-emerald-200">
+                  Plan personalizado
+                </span>
+                <h4 className="mt-4 text-2xl font-bold text-white md:text-3xl">
+                  {premiumConfig.displayName}
                 </h4>
-
-                <p className="text-purple-100 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8">
-                  Una plataforma de línea ética completamente adaptada a las
-                  necesidades específicas de tu organización. Incluye todo lo
-                  necesario para gestionar denuncias y mantener un ambiente
-                  laboral ético.
+                <p className="mt-3 text-base leading-relaxed text-white/80">
+                  {premiumConfig.description}
                 </p>
-
-                <Button
-                  as="a"
+                <a
                   href={generateCustomPlanEmail()}
-                  className="bg-white text-purple-700 hover:bg-purple-50 px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-bold transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto"
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-lime-400 px-6 py-3.5 text-sm font-bold text-[#052b24] shadow-lg transition-colors hover:bg-lime-500 sm:w-auto"
                 >
-                  <i className="icon-[lucide--calendar] w-5 h-5 mr-2" />
-                  Agendar Consulta Gratuita
-                </Button>
+                  <i className="icon-[lucide--calendar] h-5 w-5" aria-hidden />
+                  Agendar consulta gratuita
+                </a>
               </div>
-
-              {/* Right Column - Features Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                {/* All Premium Features */}
-                {[
-                  {
-                    iconClass: "icon-[lucide--users]",
-                    title: "Usuarios Ilimitados",
-                    desc: "Sin restricciones de equipo",
-                  },
-                  {
-                    iconClass: "icon-[lucide--mail]",
-                    title: "Todos los Canales",
-                    desc: "Web, Email, Chatbot, Teléfono",
-                  },
-                  {
-                    iconClass: "icon-[lucide--brain]",
-                    title: "IA Avanzada Completa",
-                    desc: "Procesamiento y análisis automatizado",
-                  },
-                  {
-                    iconClass: "icon-[lucide--chart-bar]",
-                    title: "Analíticas Premium",
-                    desc: "Reportes detallados y métricas",
-                  },
-                  {
-                    iconClass: "icon-[lucide--shield-check]",
-                    title: "Seguridad Empresarial",
-                    desc: "Cumplimiento y encriptación",
-                  },
-                  {
-                    iconClass: "icon-[lucide--headphones]",
-                    title: "Soporte Prioritario",
-                    desc: "Atención personalizada 24/7",
-                  },
-                  {
-                    iconClass: "icon-[lucide--palette]",
-                    title: "Personalización Total",
-                    desc: "Branding y diseño exclusivo",
-                  },
-                  {
-                    iconClass: "icon-[lucide--graduation-cap]",
-                    title: "Capacitación Completa",
-                    desc: "Training para investigadores",
-                  },
-                  {
-                    iconClass: "icon-[lucide--scale]",
-                    title: "Consultoría Legal",
-                    desc: "Asesoría especializada incluida",
-                  },
-                  {
-                    iconClass: "icon-[lucide--cog]",
-                    title: "Integración API",
-                    desc: "Conecta con tus sistemas existentes",
-                  },
-                  {
-                    iconClass: "icon-[lucide--clock]",
-                    title: "SLA Garantizado",
-                    desc: "Tiempos de respuesta asegurados",
-                  },
-                  {
-                    iconClass: "icon-[lucide--globe]",
-                    title: "Soporte Multiidioma",
-                    desc: "Disponible en varios idiomas",
-                  },
-                ].map((feature, index) => (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:col-span-7">
+                {enterpriseFeatures.map((feature, index) => (
                   <div
                     key={index}
-                    className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/20"
+                    className="rounded-lg border border-white/20 bg-white/10 p-3 backdrop-blur-sm sm:p-4"
                   >
                     <div className="flex items-start gap-3">
-                      <i className={`${feature.iconClass} w-5 h-5 text-white flex-shrink-0 mt-1`} />
+                      <i
+                        className={`${feature.iconClass} mt-0.5 h-5 w-5 shrink-0 text-emerald-300`}
+                      />
                       <div>
-                        <h5 className="text-white font-semibold text-xs sm:text-sm mb-1">
+                        <h5 className="text-sm font-semibold text-white">
                           {feature.title}
                         </h5>
-                        <p className="text-purple-100 text-[11px] sm:text-xs">
+                        <p className="mt-0.5 text-xs leading-snug text-white/75">
                           {feature.desc}
                         </p>
                       </div>
@@ -498,11 +438,10 @@ Gracias,
                 ))}
               </div>
             </div>
-          </motion.div>
+          </motion.article>
         </div>
-      </div>
+      </MarketingSectionV2>
 
-      {/* Checkout Sidebar */}
       {checkoutSidebarOpen && subscription && (
         <CheckoutSidebar
           isOpen={checkoutSidebarOpen}
@@ -510,6 +449,6 @@ Gracias,
           subscription={subscription}
         />
       )}
-    </section>
+    </>
   );
 }

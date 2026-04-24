@@ -1,251 +1,248 @@
 "use client";
 
 import Link from "next/link";
-import NextImage from "next/image";
-import { motion } from "framer-motion";
-import { Button, Card, CardBody, Image } from "@heroui/react";
+import Image from "next/image";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
+import { MarketingSectionV2 } from "@/modules/landig-page/components/MarketingSectionV2";
 
-function scrollToFeatures(e: { preventDefault: () => void }) {
-  e.preventDefault();
-  if (typeof document !== "undefined") {
-    const el = document.getElementById("features");
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-}
+const pillars = [
+  {
+    icon: "icon-[lucide--megaphone]",
+    title: "Recepción multicanal segura",
+    desc: "Web, email, chatbot y teléfono en una sola vista, con captura estructurada y trazable.",
+  },
+  {
+    icon: "icon-[lucide--clipboard-list]",
+    title: "Investigaciones con control",
+    desc: "SLA, responsables, evidencias y comunicaciones en cada caso para operar con rigor.",
+  },
+  {
+    icon: "icon-[lucide--sparkles]",
+    title: "Analítica e IA aplicada",
+    desc: "Priorización, resúmenes y señales de riesgo para acelerar decisiones de compliance.",
+  },
+];
+
+const modules = [
+  {
+    title: "Analitica avanzada e IA",
+    desc: "Extrae entidades clave, clasifica severidad y sugiere prioridades para reducir tiempos de respuesta.",
+    bullets: [
+      "Deteccion de patrones y terminos sensibles",
+      "Resumen ejecutivo por caso",
+      "Priorizacion por impacto y urgencia",
+    ],
+    image: "/platform/ai-analysis.jpeg",
+    imageAlt: "Panel de analitica e IA de EthicVoice",
+  },
+  {
+    title: "Seguridad y privacidad por diseno",
+    desc: "Anonimato configurable, cifrado y control de acceso granular para contextos regulados.",
+    bullets: [
+      "Flujos anonimos y confidenciales",
+      "Control por roles y trazabilidad completa",
+      "Registro de auditoria y gobierno del dato",
+    ],
+    image: "/platform/advanced-security.jpeg",
+    imageAlt: "Controles de seguridad de la plataforma",
+  },
+  {
+    title: "Operacion global multidioma",
+    desc: "Experiencia localizada para denunciantes e investigadores en operaciones distribuidas.",
+    bullets: [
+      "Interfaz y formularios localizados",
+      "Comunicacion bidireccional traducida",
+      "Soporte para equipos multisede",
+    ],
+    image: "/platform/multidioma-platform.jpeg",
+    imageAlt: "Vista multidioma de EthicVoice",
+  },
+  {
+    title: "Backoffice colaborativo",
+    desc: "Tableros por estado, asignaciones y seguimiento compartido entre compliance, legal y RRHH.",
+    bullets: [
+      "Flujos por etapa y propietario",
+      "Notas internas y evidencias centralizadas",
+      "Visibilidad para comites y liderazgo",
+    ],
+    image: "/platform/workspace-organizational.jpeg",
+    imageAlt: "Backoffice colaborativo para gestion de casos",
+  },
+];
 
 export const PlatformPage = () => {
   const { openCalendly } = useCalendlyGate();
 
   return (
     <>
-      <section className="relative overflow-hidden bg-[#0a1f14] px-6 pb-16 pt-8 md:pt-12">
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_40%,rgba(22,101,52,0.35)_0%,transparent_55%)]"
-          aria-hidden
-        />
-        <div className="relative z-10 container mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="space-y-6"
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-400/90">
-                Producto
-              </p>
-              <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-white md:text-5xl">
-                Plataforma{" "}
-                <span className="text-lime-400">EthicVoice</span>
+      <section className="relative overflow-hidden border-t border-slate-200 bg-white px-5 pb-14 pt-10 md:px-8 md:pb-20 md:pt-14">
+        <div className="pointer-events-none absolute inset-0 hidden md:block" aria-hidden>
+          {[25, 50, 75].map((left) => (
+            <div
+              key={left}
+              className="absolute bottom-0 top-0 w-px bg-black/[0.07]"
+              style={{ left: `${left}%`, transform: "translateX(-50%)" }}
+            />
+          ))}
+        </div>
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(94,210,156,0.16),transparent_45%)]" aria-hidden />
+        <div className="relative mx-auto max-w-7xl">
+          <div className="grid items-end gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-700">Producto</p>
+              <h1 className="mt-3 text-4xl font-semibold leading-[1.03] tracking-tight text-[#051a24] md:text-6xl">
+                Plataforma <span className="text-lime-700">EthicVoice</span>
               </h1>
-              <p className="max-w-2xl text-lg text-white/80">
-                Reportes confiables, gestión de casos, analíticas avanzadas e IA
-                para transformar el cumplimiento en una ventaja competitiva.
+              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[#273c46]">
+                Reportes confiables, gestion de casos, analiticas avanzadas e IA para transformar cumplimiento en una
+                operacion medible y trazable.
               </p>
-              {/* Action buttons removed per request */}
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative flex justify-center lg:justify-end"
-            >
-              {/* Borde/sombra pegados al bitmap: sin caja fija h-80 ni object-cover */}
-              <div className="inline-block max-w-full overflow-hidden rounded-2xl border border-white/15 shadow-[0_0_40px_rgba(0,0,0,0.35)]">
-                <NextImage
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={(e) => openCalendly(e)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-lime-400 px-7 py-3 text-sm font-semibold text-[#052b24] transition-colors hover:bg-lime-500"
+                >
+                  Agendar demo de plataforma
+                  <i className="icon-[lucide--arrow-right] h-4 w-4" aria-hidden />
+                </button>
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-[#051a24] shadow-[0_0_0_0.5px_rgba(0,0,0,0.08),0_4px_24px_rgba(0,0,0,0.06)] transition-opacity hover:opacity-80"
+                >
+                  Ver planes
+                </Link>
+              </div>
+            </div>
+
+            <div className="lg:col-span-6">
+              <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl shadow-emerald-900/15">
+                <Image
                   src="/platform/preview-1.jpg"
-                  alt="Vista previa de la plataforma EthicVoice"
+                  alt="Vista general de la plataforma EthicVoice"
                   width={2340}
                   height={1368}
-                  className="block h-auto w-full max-w-full align-top"
-                  sizes="(min-width: 1024px) min(50vw, 640px), 100vw"
+                  className="h-auto w-full object-cover"
                   priority
                 />
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Features Overview */}
-      <section id="overview" className="py-16 px-6">
-        <div className="container mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card shadow="sm" className="border border-gray-200">
-              <CardBody>
-                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mb-3">
-                  <i className="icon-[lucide--megaphone] size-5 text-green-700" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Denuncias y canales</h3>
-                <p className="text-gray-600 mt-1">Web, email, chatbot y teléfono, seguros y accesibles.</p>
-              </CardBody>
-            </Card>
-            <Card shadow="sm" className="border border-gray-200">
-              <CardBody>
-                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mb-3">
-                  <i className="icon-[lucide--clipboard-list] size-5 text-green-700" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Gestión de casos</h3>
-                <p className="text-gray-600 mt-1">Flujos claros, SLA, y colaboración para resolver con rigor.</p>
-              </CardBody>
-            </Card>
-            <Card shadow="sm" className="border border-gray-200">
-              <CardBody>
-                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center mb-3">
-                  <i className="icon-[lucide--sparkles] size-5 text-green-700" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Analíticas e IA</h3>
-                <p className="text-gray-600 mt-1">Insights accionables y procesamiento inteligente de denuncias.</p>
-              </CardBody>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Highlight Sections */}
-      <section id="features" className="bg-[#f5f3ee] px-6 py-16">
-        <div className="container mx-auto max-w-7xl space-y-16">
-          <div className="text-center mb-4">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Características importantes de la plataforma
-            </h2>
-          </div>
-
-          {/* Build alternating feature blocks */}
-          {[
-            {
-              title: "Analíticas avanzadas e IA",
-              desc:
-                "Procesa los reportes con IA: extrae entidades clave (personas, lugares, fechas), resalta términos sensibles y detecta señales de riesgo para acelerar la investigación.",
-              bullets: [
-                "Detección automática de entidades y palabras sensibles",
-                "Priorización por severidad y nivel de confianza",
-                "Resúmenes ejecutivos listos para el equipo",
-                "Tendencias por tema, ubicación y frecuencia",
-              ],
-              mock: "Mock de dashboard de analíticas / IA",
-            },
-            {
-              title: "Seguridad avanzada",
-              desc:
-                "Reporte cifrado de extremo a extremo, anonimato real y confidencialidad por diseño. Controles de acceso y auditoría para proteger cada dato.",
-              bullets: [
-                "Cifrado E2E desde el navegador hasta el almacenamiento",
-                "Reportes anónimos sin metadatos sensibles",
-                "Permisos y acceso granulares por rol y sensibilidad",
-                "Auditoría y retención segura de la información",
-              ],
-              mock: "Mock de configuraciones y logs",
-            },
-            {
-              title: "Plataforma multidioma",
-              desc:
-                "El idioma ya no es una barrera: interfaz, formularios y comunicaciones en múltiples idiomas con traducciones automáticas precisas.",
-              bullets: [
-                "Formularios, UI y notificaciones localizados",
-                "Traducción automática bidireccional de reportes y mensajes",
-                "Detección automática del idioma del usuario",
-                "Soporte para más de 100 idiomas y escritura RTL",
-              ],
-              mock: "Mock de plataforma multidioma",
-            },
-            {
-              title: "Espacios de trabajo organizados",
-              desc:
-                "Diseñado para equipos: vistas por rol, distribución de tareas, asignaciones y seguimiento colaborativo de casos entre áreas.",
-              bullets: [
-                "Colas y tableros por estado y prioridad",
-                "Asignaciones, notas internas y recordatorios",
-                "Integraciones con correo y herramientas internas",
-              ],
-              mock: "Mock de bandejas y tableros",
-            },
-          ].map((f, idx) => (
-            <div
-              key={f.title}
-              className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center"
+      <MarketingSectionV2
+        id="overview"
+        eyebrow="Capacidades clave"
+        title="La operacion que necesita un equipo de cumplimiento moderno"
+        subtitle="Diseñada para integrar recepcion, investigacion y decision en un mismo flujo."
+      >
+        <div className="grid gap-4 md:grid-cols-3">
+          {pillars.map((item) => (
+            <article
+              key={item.title}
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_8px_24px_rgba(0,0,0,0.05)]"
             >
-              {/* Text block */}
-              <div className={idx % 2 === 0 ? "lg:order-1" : "lg:order-2"}>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{f.title}</h3>
-                <p className="text-gray-600">{f.desc}</p>
-                <ul className="list-disc list-inside text-gray-700 mt-3 space-y-1">
-                  {f.bullets.map((b) => (
-                    <li key={b}>{b}</li>
+              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-lime-100 text-lime-700">
+                <i className={`${item.icon} h-5 w-5`} aria-hidden />
+              </div>
+              <h3 className="text-lg font-semibold text-[#0d212c]">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#273c46]">{item.desc}</p>
+            </article>
+          ))}
+        </div>
+      </MarketingSectionV2>
+
+      <MarketingSectionV2
+        id="features"
+        surface
+        eyebrow="Modulos de plataforma"
+        title="Todo el flujo de denuncias y cumplimiento en un solo lugar"
+        subtitle="Una experiencia clara para denunciantes, investigadores y equipos de liderazgo."
+      >
+        <div className="space-y-7">
+          {modules.map((module, idx) => (
+            <article
+              key={module.title}
+              className="grid items-center gap-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_16px_40px_-24px_rgba(15,23,42,0.35)] md:p-6 lg:grid-cols-12"
+            >
+              <div className={`lg:col-span-6 ${idx % 2 === 0 ? "lg:order-1" : "lg:order-2"}`}>
+                <h3 className="text-2xl font-extrabold tracking-tight text-[#0d212c]">{module.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-[#273c46] md:text-base">{module.desc}</p>
+                <ul className="mt-4 space-y-2.5">
+                  {module.bullets.map((bullet) => (
+                    <li key={bullet} className="flex items-start gap-2 text-sm text-[#273c46]">
+                      <i className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 text-lime-600" aria-hidden />
+                      {bullet}
+                    </li>
                   ))}
                 </ul>
               </div>
-              {/* Image/mock block */}
-              <div
-                className={
-                  (f.title === "Analíticas avanzadas e IA" || f.title === "Espacios de trabajo organizados" || f.title === "Seguridad avanzada" || f.title === "Plataforma multidioma"
-                    ? "aspect-square "
-                    : "h-64 ") +
-                  "flex items-center justify-center overflow-hidden " +
-                  (idx % 2 === 0 ? "lg:order-2" : "lg:order-1")
-                }
-              >
-                {f.title === "Analíticas avanzadas e IA" ? (
-                  <Image
-                    src="/platform/ai-analysis.jpeg"
-                    alt="Análisis avanzado con IA"
-                    className="w-full h-full object-cover"
-                  />
-                ) : f.title === "Seguridad avanzada" ? (
-                  <div className="w-full h-full bg-white">
-                    <Image
-                      src="/platform/advanced-security.jpeg"
-                      alt="Seguridad avanzada y confidencialidad"
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                ) : f.title === "Plataforma multidioma" ? (
-                  <Image
-                    src="/platform/multidioma-platform.jpeg"
-                    alt="Plataforma multidioma"
-                    className="w-full h-full object-cover"
-                  />
-                ) : f.title === "Espacios de trabajo organizados" ? (
-                  <Image
-                    src="/platform/workspace-organizational.jpeg"
-                    alt="Espacios de trabajo organizados"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-gray-500">{f.mock}</span>
-                )}
+              <div className={`overflow-hidden rounded-2xl border border-slate-200 bg-white lg:col-span-6 ${idx % 2 === 0 ? "lg:order-2" : "lg:order-1"}`}>
+                <Image
+                  src={module.image}
+                  alt={module.imageAlt}
+                  width={1400}
+                  height={980}
+                  className="h-[250px] w-full object-cover md:h-[320px]"
+                />
               </div>
-            </div>
+            </article>
           ))}
         </div>
-      </section>
+      </MarketingSectionV2>
 
-      {/* Call to Action */}
-      <section className="py-16 px-6">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h3 className="text-3xl font-bold text-gray-900 mb-4">
-            Transforma el cumplimiento en una ventaja competitiva
-          </h3>
-          <p className="text-gray-600 mb-6">
-            Agenda una demo para conocer cómo la plataforma EthicVoice se adapta a
-            tu organización.
+      <MarketingSectionV2
+        id="security"
+        eyebrow="Gobierno y confianza"
+        title="Seguridad, trazabilidad y control para contextos regulados"
+        subtitle="Arquitectura pensada para compliance, legal y auditoria."
+      >
+        <section className="rounded-[28px] border border-emerald-700/30 bg-gradient-to-br from-[#06251f] via-[#07352b] to-[#052b24] p-6 text-white shadow-[0_28px_80px_-36px_rgba(6,37,31,0.85)] md:p-9">
+          <div className="grid gap-5 md:grid-cols-2">
+            {[
+              "Bitacora integral de eventos y acciones por caso",
+              "Permisos granulares por rol, area y sensibilidad",
+              "Tiempos de respuesta y SLA con seguimiento continuo",
+              "Evidencias y comunicacion centralizadas por expediente",
+            ].map((item) => (
+              <div key={item} className="rounded-2xl border border-white/15 bg-white/5 p-4">
+                <div className="flex items-start gap-2">
+                  <i className="icon-[lucide--shield-check] mt-0.5 h-5 w-5 shrink-0 text-emerald-300" aria-hidden />
+                  <p className="text-sm leading-relaxed text-white/90">{item}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </MarketingSectionV2>
+
+      <MarketingSectionV2 className="!py-20" guides={[{ percent: 15, accent: true }, { percent: 85, accent: true }]}>
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-3xl font-extrabold tracking-tight text-[#0d212c] md:text-5xl">
+            Lleva tu canal de denuncias a estandar enterprise
+          </h2>
+          <p className="mt-4 text-sm leading-relaxed text-[#273c46] md:text-lg">
+            Agenda una demo y diseña un flujo de cumplimiento alineado con tu estructura, riesgos y objetivos.
           </p>
-          <button
-            onClick={openCalendly}
-            className="group inline-flex items-center rounded-full bg-lime-400 px-6 py-3 text-sm font-bold text-gray-950 shadow-[0_0_24px_rgba(190,242,100,0.35)] transition hover:bg-lime-300"
-          >
-            Solicitar demo
-            <i
-              className="icon-[mdi--arrow-right] ml-2 size-5 transition-transform group-hover:-rotate-45"
-              role="img"
-              aria-hidden="true"
-            />
-          </button>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={(e) => openCalendly(e)}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-lime-400 px-8 py-4 text-sm font-bold text-[#070b0a] transition-colors hover:bg-lime-500"
+            >
+              Solicitar demo personalizada
+              <i className="icon-[lucide--arrow-right] h-4 w-4" aria-hidden />
+            </button>
+            <Link
+              href="/services"
+              className="inline-flex items-center justify-center rounded-full border border-slate-300 bg-white px-8 py-4 text-sm font-semibold text-[#0d212c] transition-colors hover:border-lime-500 hover:text-lime-700"
+            >
+              Explorar servicios complementarios
+            </Link>
+          </div>
         </div>
-      </section>
+      </MarketingSectionV2>
     </>
   );
 };
-
-

@@ -2,66 +2,67 @@
 
 import React from "react";
 import Link from "next/link";
-import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
-import { SectionReveal } from "@/modules/landig-page/components/motion/SectionReveal";
+import Image from "next/image";
+import { FooterDemoCtaBand } from "@/modules/landig-page/components/FooterDemoCtaBand";
 
 const NAV_LINKS = [
-  { label: "Servicios", href: "/servicios" },
-  { label: "Empresa", href: "/empresa" },
-  { label: "Soporte", href: "/soporte" },
+  { label: "Servicios", href: "/services" },
+  { label: "Blog", href: "/blog" },
+  { label: "Empresa", href: "/about" },
+  { label: "Soporte", href: "mailto:soporte@ethicvoice.com" },
   { label: "Política de Privacidad", href: "/privacidad" },
-  { label: "Términos", href: "/terminos" },
-];
+  { label: "Términos", href: "/terms" },
+] as const;
 
 export const FooterCTA = () => {
-  const { openCalendly } = useCalendlyGate();
-
   return (
-    <footer className="bg-green-900 relative overflow-hidden">
-      {/* Decorative lines */}
-      <div className="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-10">
-        <svg viewBox="0 0 800 300" fill="none" className="absolute bottom-0 w-full">
-          <path d="M-100 200 Q200 100 400 200 T900 200" stroke="white" strokeWidth="1" fill="none" />
-          <path d="M-100 240 Q200 140 400 240 T900 240" stroke="white" strokeWidth="1" fill="none" />
-        </svg>
-      </div>
+    <footer className="border-t border-slate-200 bg-white">
+      <FooterDemoCtaBand ctaName="footer_demo" placement="marketing_footer" />
 
-      {/* CTA Content */}
-      <div className="relative px-4 pb-8 pt-10 sm:px-6 sm:pt-12 md:px-8 md:pt-14">
-        <SectionReveal className="mx-auto max-w-3xl text-center" y={14}>
-          <h2 className="mb-2 text-2xl font-extrabold leading-tight text-green-300 sm:mb-3 sm:text-3xl md:text-4xl">
-            Agenda tu demo personalizada
-          </h2>
-          <p className="mb-6 text-sm text-white/75 sm:mb-8 sm:text-base">
-            Descubre cómo EthicVoice protege tu empresa.
-          </p>
-          <button
-            type="button"
-            onClick={openCalendly}
-            className="inline-flex items-center gap-2 rounded-full bg-green-400 px-6 py-2.5 text-sm font-bold text-green-950 shadow-lg transition-colors hover:bg-green-300 sm:px-8 sm:py-3 sm:text-base"
+      <div className="border-t border-slate-200 bg-white py-10">
+        <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-5 md:px-8">
+          <Link
+            href="/"
+            className="inline-flex shrink-0 opacity-90 transition-opacity hover:opacity-100"
           >
-            Agendar ahora
-            <i className="icon-[lucide--arrow-right] w-4 h-4" />
-          </button>
-        </SectionReveal>
+            <Image
+              src="/brand/logo-nobg.png"
+              alt="EthicVoice"
+              width={160}
+              height={38}
+              className="h-8 w-auto object-contain"
+            />
+          </Link>
 
-        {/* Navigation links */}
-        <SectionReveal className="mt-8 border-t border-white/10 pt-6 sm:mt-12" delay={0.08} y={10}>
-          <nav className="mb-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-x-6">
-            {NAV_LINKS.map((l) => (
-              <Link
-                key={l.label}
-                href={l.href}
-                className="text-xs text-white/50 hover:text-white/80 transition-colors"
-              >
-                {l.label}
-              </Link>
-            ))}
+          <nav
+            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-slate-600"
+            aria-label="Pie de página"
+          >
+            {NAV_LINKS.map((l) =>
+              l.href.startsWith("mailto:") ? (
+                <a
+                  key={l.label}
+                  href={l.href}
+                  className="transition-colors hover:text-lime-700"
+                >
+                  {l.label}
+                </a>
+              ) : (
+                <Link
+                  key={l.label}
+                  href={l.href}
+                  className="transition-colors hover:text-lime-700"
+                >
+                  {l.label}
+                </Link>
+              )
+            )}
           </nav>
-          <p className="text-center text-xs text-white/30">
+
+          <p className="text-center text-xs text-slate-500">
             Copyright © {new Date().getFullYear()} EthicVoice
           </p>
-        </SectionReveal>
+        </div>
       </div>
     </footer>
   );

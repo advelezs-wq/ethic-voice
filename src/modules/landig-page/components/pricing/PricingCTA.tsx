@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
+import { MarketingSectionV2 } from "@/modules/landig-page/components/MarketingSectionV2";
 
 export const PricingCTA = () => {
   const { openCalendly } = useCalendlyGate();
@@ -13,53 +14,47 @@ export const PricingCTA = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-gray-50">
-      <div className="container mx-auto max-w-4xl">
+    <MarketingSectionV2
+      className="!pb-24"
+      guides={[{ percent: 50, accent: true }]}
+      eyebrow="Ventas"
+      title="¿No estás listo para solicitar una cotización?"
+      subtitle="Contáctanos con más detalles sobre tus requisitos y te responderemos rápidamente."
+    >
+      <div className="mx-auto max-w-3xl text-center">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.45 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
         >
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            ¿No estás listo para solicitar una cotización?
-          </h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Contáctanos con más detalles sobre tus requisitos y te responderemos
-            rápidamente
-          </p>
           <button
             type="button"
-            onClick={openCalendly}
-            className="bg-green-600 mb-8 text-center flex justify-center text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-800 group transition-colors items-center cursor-pointer"
+            onClick={(e) => openCalendly(e)}
+            className="group mt-2 inline-flex items-center justify-center gap-2 rounded-full bg-lime-400 px-8 py-3.5 text-sm font-bold text-[#052b24] shadow-[0_4px_20px_rgba(163,230,53,0.35)] transition-colors hover:bg-lime-500"
           >
             Hablar con ventas
-            <i
-              className="icon-[mdi--arrow-right] ml-2 size-5 transition-transform group-hover:-rotate-45"
-              role="img"
-              aria-hidden="true"
-            />
+            <i className="icon-[lucide--arrow-right] h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
           </button>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.45, delay: 0.08 }}
           viewport={{ once: true }}
-          className="flex flex-wrap justify-center gap-6"
+          className="mt-10 flex flex-wrap justify-center gap-3"
         >
           {badges.map((badge, index) => (
-            <div
+            <span
               key={index}
-              className="bg-white px-4 py-2 rounded-full border border-gray-200"
+              className="inline-flex rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-medium text-[#273c46] shadow-sm"
             >
-              <span className="text-gray-700 font-medium text-sm">{badge}</span>
-            </div>
+              {badge}
+            </span>
           ))}
         </motion.div>
       </div>
-    </section>
+    </MarketingSectionV2>
   );
 };

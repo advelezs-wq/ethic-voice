@@ -5,6 +5,21 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
+    ],
+  },
+  async redirects() {
+    return [
+      { source: "/eventos", destination: "/blog", permanent: true },
+      { source: "/noticias", destination: "/blog", permanent: true },
+    ];
+  },
   typescript: {
     ignoreBuildErrors: false,
   },

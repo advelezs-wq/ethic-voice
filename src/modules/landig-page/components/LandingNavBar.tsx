@@ -103,12 +103,24 @@ export function LandingNav() {
             </div>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/auth/sign-in"
               className="hidden text-sm text-gray-700 hover:text-black md:inline"
             >
               Iniciar sesión
+            </Link>
+            <Link
+              href="/submit"
+              onClick={() =>
+                trackGA4Event("landing_cta_click", {
+                  cta_name: "header_report",
+                  placement: "header",
+                })
+              }
+              className="hidden rounded-full border border-[#051a24] bg-white px-4 py-2 text-sm font-semibold text-[#051a24] shadow-sm transition-colors hover:bg-[#051a24]/[0.04] md:inline-flex"
+            >
+              Denunciar
             </Link>
             <button
               type="button"
@@ -176,6 +188,19 @@ export function LandingNav() {
                 {item.label}
               </Link>
             ))}
+            <Link
+              href="/submit"
+              onClick={() => {
+                trackGA4Event("landing_cta_click", {
+                  cta_name: "mobile_menu_report",
+                  placement: "mobile_menu",
+                });
+                setOpen(false);
+              }}
+              className="mx-auto mt-2 w-full max-w-xs rounded-full border-2 border-[#051a24] bg-white px-8 py-3 text-center text-sm font-semibold text-[#051a24]"
+            >
+              Denunciar
+            </Link>
             <button
               type="button"
               onClick={(e) => {

@@ -293,7 +293,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[#273c46] md:mt-6 md:text-xl">
               {heroSub}
             </p>
-            <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row">
+            <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
               <button
                 type="button"
                 onClick={(e) => {
@@ -312,6 +312,18 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
               >
                 Descubrir producto
               </button>
+              <Link
+                href="/submit"
+                onClick={() =>
+                  trackGA4Event("landing_cta_click", {
+                    cta_name: "hero_report",
+                    placement: "hero",
+                  })
+                }
+                className="inline-flex w-full items-center justify-center rounded-full border-2 border-[#051a24] bg-white px-7 py-3 text-sm font-semibold text-[#051a24] transition-colors hover:bg-[#051a24]/[0.04] sm:w-auto"
+              >
+                Denunciar
+              </Link>
             </div>
           </div>
 

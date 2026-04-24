@@ -823,3 +823,25 @@ model BlogPost {
 
   @@index([status, publishedAt])
 }
+
+/// Capturas de leads desde landings de campaña (p. ej. guía PDF).
+model EbookLead {
+  id           String   @id @default(uuid())
+  fullName     String
+  phone        String
+  email        String
+  company      String
+  role         String
+  campaign     String   @default("guia_canal_denuncias")
+  sourcePath   String?
+  utmSource    String?
+  utmMedium    String?
+  utmCampaign  String?
+  utmContent   String?
+  utmTerm      String?
+  userAgent    String?  @db.Text
+  createdAt    DateTime @default(now())
+
+  @@index([email])
+  @@index([campaign, createdAt])
+}

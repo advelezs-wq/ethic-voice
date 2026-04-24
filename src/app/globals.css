@@ -194,7 +194,7 @@ body {
   right: max(0.75rem, env(safe-area-inset-right, 0px)) !important;
 }
 
-/* Móvil: tamaño del botón = default del componente; solo el icono SVG más pequeño */
+/* Móvil: botón = default del paquete; icono SVG un poco mayor para llenar el círculo */
 @media (max-width: 639px) {
   .ev-floating-whatsapp .floating-whatsapp-button {
     bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px)) !important;
@@ -202,8 +202,8 @@ body {
   }
 
   .ev-floating-whatsapp .floating-whatsapp-button svg {
-    width: 28px !important;
-    height: 28px !important;
+    width: 46px !important;
+    height: 46px !important;
   }
 }
 

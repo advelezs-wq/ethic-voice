@@ -11,6 +11,7 @@ import { VideoModal } from "@/modules/landig-page/components/VideoModal";
 import { useCookieConsentOptional } from "@/modules/core/providers/CookieConsentContext";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 import { trackGA4Event } from "@/lib/google-analytics";
+import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
 import {
   useLandingVariant,
   useLandingViewEvent,
@@ -126,14 +127,7 @@ const comparisonColumns = [
   },
 ];
 
-const pricingRanges = [
-  { employees: "1 - 49", price: "€69 + IVA / mes" },
-  { employees: "50 - 149", price: "€79 + IVA / mes" },
-  { employees: "150 - 199", price: "€89 + IVA / mes" },
-  { employees: "200 - 499", price: "€129 + IVA / mes" },
-  { employees: "500 - 999", price: "€199 + IVA / mes" },
-  { employees: "1.000+", price: "Plan personalizado" },
-];
+const planOrder = [PlanType.STARTER, PlanType.GROW, PlanType.GROW_PRO, PlanType.PREMIUM] as const;
 
 const testimonials = [
   {
@@ -354,7 +348,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-white px-6 pb-20 pt-12 md:pt-16">
+    <section className="relative overflow-hidden bg-white px-4 pb-14 pt-8 sm:px-6 sm:pb-16 sm:pt-10 md:pt-14">
       <video
         ref={bgVideoRef}
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30"
@@ -413,30 +407,30 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
+        <div className="grid gap-6 md:gap-8 lg:grid-cols-12 lg:items-end lg:gap-10">
           <div className="animate-fade-in-up lg:col-span-7" style={{ animationDelay: "0.2s", opacity: 0 }}>
-            <h1 className="text-4xl font-semibold leading-[1.06] tracking-tight text-[#051a24] md:text-6xl lg:text-7xl">
+            <h1 className="text-[3.15rem] font-semibold leading-[1.02] tracking-tight text-[#051a24] sm:text-6xl md:text-7xl">
               {heroTitle}
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#273c46] md:text-xl">
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[#273c46] md:mt-6 md:text-xl">
               {heroSub}
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row">
               <button
                 type="button"
                 onClick={(e) => {
                   trackGA4Event("landing_cta_click", { cta_name: "hero_demo", placement: "hero" });
                   openCalendly(e);
                 }}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#051a24] px-7 py-3 text-sm font-semibold text-white shadow-[0_1px_2px_0_rgba(5,26,36,0.1),0_4px_4px_0_rgba(5,26,36,0.09),0_9px_6px_0_rgba(5,26,36,0.05),inset_0_2px_8px_0_rgba(255,255,255,0.35)] transition-colors hover:bg-[#0d212c]"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-lime-400 px-7 py-3 text-sm font-semibold text-[#052b24] shadow-[0_1px_2px_0_rgba(5,26,36,0.1),0_4px_4px_0_rgba(5,26,36,0.09),0_9px_6px_0_rgba(5,26,36,0.05),inset_0_2px_8px_0_rgba(255,255,255,0.45)] transition-colors hover:bg-lime-500 sm:w-auto"
               >
-                Book a demo
+                Agendar demo
                 <i className="icon-[lucide--arrow-right] h-4 w-4" aria-hidden />
               </button>
               <button
                 type="button"
                 onClick={() => scrollToId("#como-funciona")}
-                className="rounded-full bg-white px-7 py-3 text-sm font-semibold text-[#051a24] shadow-[0_0_0_0.5px_rgba(0,0,0,0.05),0_4px_30px_rgba(0,0,0,0.08)] transition-opacity hover:opacity-80"
+                className="w-full rounded-full bg-white px-7 py-3 text-sm font-semibold text-[#051a24] shadow-[0_0_0_0.5px_rgba(0,0,0,0.05),0_4px_30px_rgba(0,0,0,0.08)] transition-opacity hover:opacity-80 sm:w-auto"
               >
                 Descubrir producto
               </button>
@@ -447,7 +441,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
             <p className="max-w-xl text-base leading-relaxed text-[#273c46] md:text-lg">
               Ponemos a los equipos de cumplimiento al centro con una solución que impulsa cultura de integridad, simplifica flujos y reduce riesgo organizacional.
             </p>
-            <div className="mt-6 flex flex-wrap items-center gap-4">
+            <div className="mt-5 flex flex-wrap items-center gap-3 md:mt-6 md:gap-4">
               <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5">
                 <span className="text-xs font-semibold text-[#051a24]">G2</span>
                 <div className="flex gap-1 text-lime-600">
@@ -466,22 +460,22 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
           </div>
         </div>
 
-        <div className="animate-fade-in-up mt-10 grid gap-4 lg:grid-cols-12" style={{ animationDelay: "0.5s", opacity: 0 }}>
-          <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl shadow-green-900/15 lg:col-span-7">
+        <div className="animate-fade-in-up mt-8 grid gap-4 md:mt-10 lg:grid-cols-12" style={{ animationDelay: "0.5s", opacity: 0 }}>
+          <article className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl shadow-green-900/15 lg:col-span-8">
             <VideoModal
               videoSrc="/demo-video.mp4"
               posterSrc="/platform/ethicvoice-hero-frame.jpg"
-              className="h-[320px] w-full rounded-none md:h-[520px]"
+              className="h-[250px] w-full rounded-none sm:h-[320px] md:h-[460px] lg:h-[520px]"
             />
           </article>
 
-          <article className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-300/25 lg:col-span-5">
+          <article className="relative hidden overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-300/25 md:block lg:col-span-4">
             <Image
               src="/platform/impulsed-by-ai.jpeg"
               alt="Asistente Andi impulsado por IA en EthicVoice"
               width={960}
               height={1280}
-              className="h-[320px] w-full object-cover md:h-[520px]"
+              className="h-[460px] w-full object-cover lg:h-[520px]"
               priority
             />
             <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#051a24]/65 via-[#051a24]/25 to-transparent p-4">
@@ -496,25 +490,33 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
 }
 
 function LogoProofSection() {
+  const hasOddAmount = legacyHeroBrands.length % 2 !== 0;
+
   return (
-    <section className="border-t border-slate-200 bg-white py-9">
+    <section className="border-t border-slate-200 bg-white py-8 sm:py-9">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <p className="mb-5 text-center text-xs uppercase tracking-[0.22em] text-slate-500">Equipos que ya confían en EthicVoice</p>
-        <div className="grid grid-cols-2 gap-3 text-center md:grid-cols-5">
-          {legacyHeroBrands.map((brand) => (
+        <p className="mb-4 text-center text-[11px] uppercase tracking-[0.22em] text-slate-500 sm:mb-5 sm:text-xs">
+          Equipos que ya confían en EthicVoice
+        </p>
+        <div className="grid grid-cols-2 gap-2.5 text-center sm:gap-3 md:grid-cols-5">
+          {legacyHeroBrands.map((brand, index) => (
             <div
               key={brand.name}
-              className="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
+              className={`rounded-xl border border-slate-200 bg-white px-3 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.04)] sm:px-4 ${
+                hasOddAmount && index === legacyHeroBrands.length - 1
+                  ? "col-span-2 mx-auto w-full max-w-[280px] md:col-span-1 md:max-w-none"
+                  : ""
+              }`}
               title={brand.name}
             >
-              <div className="flex h-9 w-full items-center justify-center opacity-75 grayscale transition-opacity hover:opacity-95">
+              <div className="flex h-8 w-full items-center justify-center opacity-75 grayscale transition-opacity hover:opacity-95 sm:h-9">
                 <Image
                   src={brand.src}
                   alt={brand.name}
                   width={130}
                   height={36}
-                  className="max-h-9 w-auto max-w-full object-contain"
-                  sizes="130px"
+                  className="max-h-8 w-auto max-w-full object-contain sm:max-h-9"
+                  sizes="(max-width: 767px) 120px, 130px"
                 />
               </div>
             </div>
@@ -789,22 +791,68 @@ export function LandingV2() {
           title="Canal seguro, anónimo y auditable"
           subtitle="Con enfoque de protección de datos, gobernanza y comunicación segura entre las partes."
         >
-          <div className="grid gap-5 lg:grid-cols-12">
-            <article className="rounded-2xl border border-lime-300/35 bg-lime-50 p-6 lg:col-span-5">
-              <i className="icon-[lucide--shield-check] h-8 w-8 text-lime-600" aria-hidden />
-              <h3 className="mt-4 text-xl font-bold text-[#0d212c]">Privacidad, anonimato y control</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[#273c46]">
-                Estructura alineada con buenas prácticas de confidencialidad, permisos por rol y trazabilidad de acciones.
-              </p>
-            </article>
-            <article className="rounded-2xl border border-slate-200 bg-white p-6 lg:col-span-7">
-              <ul className="space-y-3 text-sm text-[#273c46]">
-                <li className="flex gap-2"><i className="icon-[lucide--circle-check] h-4 w-4 text-lime-600" aria-hidden />Comunicación bidireccional segura tras el reporte.</li>
-                <li className="flex gap-2"><i className="icon-[lucide--circle-check] h-4 w-4 text-lime-600" aria-hidden />Accesos segmentados para equipo investigador y comité.</li>
-                <li className="flex gap-2"><i className="icon-[lucide--circle-check] h-4 w-4 text-lime-600" aria-hidden />Registro histórico de actividades del caso.</li>
-                <li className="flex gap-2"><i className="icon-[lucide--circle-check] h-4 w-4 text-lime-600" aria-hidden />Capacidad de reportes para auditoría y seguimiento.</li>
-              </ul>
-            </article>
+          <section className="relative overflow-hidden rounded-[32px] border border-emerald-700/30 bg-gradient-to-br from-[#051b16] via-[#07352b] to-[#051f1a] p-6 shadow-[0_30px_80px_-30px_rgba(6,37,31,0.8)] md:p-10">
+            <div
+              className="pointer-events-none absolute inset-0 opacity-35"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 18% 15%, rgba(94,210,156,0.24), transparent 42%), radial-gradient(circle at 85% 0%, rgba(45,212,191,0.2), transparent 35%)",
+              }}
+            />
+            <div
+              className="pointer-events-none absolute inset-0 opacity-20"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(125deg, transparent 0 24px, rgba(255,255,255,0.05) 24px 25px)",
+              }}
+            />
+
+            <div className="relative z-10 grid gap-4 lg:grid-cols-12">
+              <article className="rounded-2xl border border-emerald-300/25 bg-emerald-300/[0.12] p-6 lg:col-span-5">
+                <i className="icon-[lucide--shield-check] h-8 w-8 text-emerald-300" aria-hidden />
+                <h3 className="mt-4 text-2xl font-bold text-white">Privacidad, anonimato y control</h3>
+                <p className="mt-3 text-sm leading-relaxed text-white/80">
+                  Estructura alineada con buenas prácticas de confidencialidad, permisos por rol y trazabilidad de acciones.
+                </p>
+                <div className="mt-5 inline-flex items-center rounded-full border border-white/20 bg-black/20 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-200">
+                  Seguridad orientada a compliance
+                </div>
+              </article>
+
+              <article className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-sm lg:col-span-7">
+                <ul className="grid gap-3 text-sm text-white/90 sm:grid-cols-2">
+                  <li className="flex gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-3">
+                    <i className="icon-[lucide--circle-check] h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
+                    <span>Comunicación bidireccional segura tras el reporte.</span>
+                  </li>
+                  <li className="flex gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-3">
+                    <i className="icon-[lucide--circle-check] h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
+                    <span>Accesos segmentados para equipo investigador y comité.</span>
+                  </li>
+                  <li className="flex gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-3">
+                    <i className="icon-[lucide--circle-check] h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
+                    <span>Registro histórico de actividades del caso.</span>
+                  </li>
+                  <li className="flex gap-2 rounded-xl border border-white/10 bg-black/20 px-3 py-3">
+                    <i className="icon-[lucide--circle-check] h-4 w-4 shrink-0 text-emerald-300" aria-hidden />
+                    <span>Capacidad de reportes para auditoría y seguimiento.</span>
+                  </li>
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            {[
+              { label: "Modelo de acceso", value: "Por roles" },
+              { label: "Visibilidad", value: "Trazable" },
+              { label: "Comunicación", value: "Segura y continua" },
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-left shadow-[0_4px_14px_rgba(0,0,0,0.05)]">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{item.label}</p>
+                <p className="mt-1 text-base font-bold text-[#0d212c]">{item.value}</p>
+              </div>
+            ))}
           </div>
         </MarketingSectionV2>
 
@@ -814,24 +862,91 @@ export function LandingV2() {
           subtitle="La diferencia principal: pasar de recepción básica de denuncias a gestión profesional de casos."
           surface
         >
-          <div className="grid gap-5 lg:grid-cols-3">
-            {comparisonColumns.map((column) => (
-              <article
-                key={column.title}
-                className={`rounded-2xl border p-6 ${
-                  column.highlight ? "border-lime-300/45 bg-lime-50" : "border-slate-200 bg-white"
-                }`}
-              >
-                <h3 className="text-lg font-bold text-[#0d212c]">{column.title}</h3>
-                <ul className="mt-4 space-y-2.5">
-                  {column.points.map((p) => (
+          <section className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(0,0,0,0.06)] md:p-8">
+            <div
+              className="pointer-events-none absolute inset-0 opacity-50"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 50% -20%, rgba(132,204,22,0.18), transparent 45%)",
+              }}
+            />
+
+            <div className="relative z-10 mb-5 grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:grid-cols-3">
+              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Sin sistema</p>
+                <p className="mt-1 text-sm font-bold text-[#0d212c]">Más riesgo operativo</p>
+              </div>
+              <div className="rounded-xl border border-lime-300 bg-lime-50 px-4 py-3 text-center">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-lime-700">Con EthicVoice</p>
+                <p className="mt-1 text-sm font-bold text-[#0d212c]">Más control y trazabilidad</p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Resultado</p>
+                <p className="mt-1 text-sm font-bold text-[#0d212c]">Mejores decisiones</p>
+              </div>
+            </div>
+
+            <div className="relative z-10 grid gap-4 lg:grid-cols-12">
+              <article className="rounded-2xl border border-slate-200 bg-white p-5 lg:col-span-4">
+                <div className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
+                  <i className="icon-[lucide--triangle-alert] h-3.5 w-3.5" aria-hidden />
+                  Riesgos comunes
+                </div>
+                <h3 className="mt-3 text-lg font-bold text-[#0d212c]">{comparisonColumns[0].title}</h3>
+                <ul className="mt-3 space-y-2.5">
+                  {comparisonColumns[0].points.map((p) => (
                     <li key={p} className="flex items-start gap-2 text-sm text-[#273c46]">
-                      <i className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 text-lime-600" aria-hidden />
+                      <i className="icon-[lucide--x-circle] mt-0.5 h-4 w-4 shrink-0 text-red-500" aria-hidden />
                       {p}
                     </li>
                   ))}
                 </ul>
               </article>
+
+              <article className="rounded-2xl border border-lime-300/60 bg-gradient-to-br from-lime-50 via-white to-emerald-50 p-5 shadow-[0_10px_24px_rgba(132,204,22,0.2)] lg:col-span-4">
+                <div className="inline-flex items-center gap-2 rounded-full border border-lime-300 bg-lime-100 px-3 py-1 text-xs font-semibold text-lime-800">
+                  <i className="icon-[lucide--badge-check] h-3.5 w-3.5" aria-hidden />
+                  Ventaja EthicVoice
+                </div>
+                <h3 className="mt-3 text-lg font-bold text-[#0d212c]">{comparisonColumns[1].title}</h3>
+                <ul className="mt-3 space-y-2.5">
+                  {comparisonColumns[1].points.map((p) => (
+                    <li key={p} className="flex items-start gap-2 text-sm text-[#273c46]">
+                      <i className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 text-lime-700" aria-hidden />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </article>
+
+              <article className="rounded-2xl border border-slate-200 bg-white p-5 lg:col-span-4">
+                <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
+                  <i className="icon-[lucide--alert-circle] h-3.5 w-3.5" aria-hidden />
+                  Limitaciones típicas
+                </div>
+                <h3 className="mt-3 text-lg font-bold text-[#0d212c]">{comparisonColumns[2].title}</h3>
+                <ul className="mt-3 space-y-2.5">
+                  {comparisonColumns[2].points.map((p) => (
+                    <li key={p} className="flex items-start gap-2 text-sm text-[#273c46]">
+                      <i className="icon-[lucide--x-circle] mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            </div>
+          </section>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              "Mayor confianza para reportar",
+              "Mejor tiempo de respuesta",
+              "Más evidencia para auditoría",
+              "Menos operación manual",
+            ].map((benefit) => (
+              <div key={benefit} className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-medium text-[#0d212c] shadow-[0_4px_14px_rgba(0,0,0,0.05)]">
+                {benefit}
+              </div>
             ))}
           </div>
         </MarketingSectionV2>
@@ -842,44 +957,219 @@ export function LandingV2() {
           subtitle="Evidencia operativa: más orden, más trazabilidad y mejor capacidad de respuesta."
           guides={[22, { percent: 50, accent: true }, 78]}
         >
-          <div className="grid gap-5 lg:grid-cols-3">
-            {testimonials.map((item) => (
-              <article key={item.quote} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_4px_16px_rgba(0,0,0,0.05)]">
-                <i className="icon-[lucide--star] h-5 w-5 text-lime-300" aria-hidden />
-                <p className="mt-4 text-sm leading-relaxed text-[#273c46]">"{item.quote}"</p>
-                <p className="mt-5 text-sm font-semibold text-[#0d212c]">{item.author}</p>
-                <p className="text-xs text-slate-500">{item.company}</p>
+          <section className="grid gap-5 lg:grid-cols-12">
+            <article className="relative overflow-hidden rounded-[28px] border border-lime-300/45 bg-gradient-to-br from-lime-50 via-white to-emerald-50 p-7 shadow-[0_18px_38px_rgba(132,204,22,0.16)] lg:col-span-6">
+              <div
+                className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-lime-200/40 blur-3xl"
+                aria-hidden
+              />
+              <div className="relative z-10">
+                <div className="mb-4 flex items-center gap-2 text-lime-700">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <i key={i} className="icon-[lucide--star] h-4 w-4 fill-current" aria-hidden />
+                  ))}
+                  <span className="text-xs font-semibold uppercase tracking-[0.12em]">Testimonio destacado</span>
+                </div>
+                <p className="text-[22px] leading-tight text-[#0d212c] md:text-[28px]">
+                  "{testimonials[0].quote}"
+                </p>
+                <div className="mt-7 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0d212c] text-xs font-bold text-white">
+                    GC
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#0d212c]">{testimonials[0].author}</p>
+                    <p className="text-xs text-slate-500">{testimonials[0].company}</p>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:col-span-6">
+              {testimonials.slice(1).map((item, idx) => (
+                <article
+                  key={item.quote}
+                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_4px_16px_rgba(0,0,0,0.05)]"
+                >
+                  <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                    <i className="icon-[lucide--badge-check] h-3.5 w-3.5 text-lime-600" aria-hidden />
+                    Caso validado
+                  </div>
+                  <p className="text-sm leading-relaxed text-[#273c46]">"{item.quote}"</p>
+                  <div className="mt-5 flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-[#0d212c]">
+                      {idx === 0 ? "DA" : "RE"}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-[#0d212c]">{item.author}</p>
+                      <p className="text-xs text-slate-500">{item.company}</p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+              <article className="rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:col-span-2">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {[
+                    { label: "Implementación", value: "Rápida" },
+                    { label: "Percepción del comité", value: "Más control" },
+                    { label: "Resultado común", value: "Mejor trazabilidad" },
+                  ].map((item) => (
+                    <div key={item.label} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-center">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{item.label}</p>
+                      <p className="mt-1 text-sm font-bold text-[#0d212c]">{item.value}</p>
+                    </div>
+                  ))}
+                </div>
               </article>
-            ))}
+            </div>
+          </section>
+
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+            <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600">
+              <i className="icon-[lucide--messages-square] h-3.5 w-3.5 text-lime-600" aria-hidden />
+              Equipos de cumplimiento
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600">
+              <i className="icon-[lucide--shield-check] h-3.5 w-3.5 text-lime-600" aria-hidden />
+              Contextos regulados
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600">
+              <i className="icon-[lucide--chart-column] h-3.5 w-3.5 text-lime-600" aria-hidden />
+              Mejora operativa medible
+            </span>
           </div>
         </MarketingSectionV2>
 
-        <MarketingSectionV2 id="planes" eyebrow="Planes y escalabilidad" title="Referencia de precios por tamaño de equipo">
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_24px_rgba(0,0,0,0.05)]">
-            <div className="grid grid-cols-2 border-b border-slate-200 bg-slate-50 px-5 py-3 text-xs font-bold uppercase tracking-wide text-slate-600">
-              <span>Colaboradores</span>
-              <span>Precio mensual</span>
-            </div>
-            {pricingRanges.map((row) => (
-              <div key={row.employees} className="grid grid-cols-2 border-b border-slate-100 px-5 py-3 text-sm last:border-b-0">
-                <span className="font-semibold text-[#0d212c]">{row.employees}</span>
-                <span className="text-[#273c46]">{row.price}</span>
-              </div>
-            ))}
+        <MarketingSectionV2
+          id="planes"
+          eyebrow="Planes y escalabilidad"
+          title="Planes EthicVoice para cada etapa de madurez"
+          subtitle="Los mismos planes de nuestra página de precios, presentados aquí para comparación rápida."
+        >
+          <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 md:gap-8">
+            {planOrder
+              .filter((p) => p !== PlanType.PREMIUM)
+              .map((planType) => {
+                const plan = PLAN_CONFIGS[planType];
+                const isPopular = !!plan.isPopular;
+                const employees =
+                  plan.features.maxEmployees === -1
+                    ? "Colaboradores ilimitados"
+                    : `Hasta ${plan.features.maxEmployees} colaboradores`;
+
+                return (
+                  <article
+                    key={planType}
+                    className={`relative min-h-[560px] rounded-xl bg-white p-6 shadow-lg transition-all duration-300 sm:p-7 md:p-8 ${
+                      isPopular ? "border-2 border-green-500 shadow-2xl" : "border border-gray-200 hover:shadow-xl"
+                    }`}
+                  >
+                    {isPopular && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                        <span className="rounded-full bg-green-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-md">
+                          Recomendado
+                        </span>
+                      </div>
+                    )}
+
+                    <h3 className="text-2xl font-semibold text-gray-900">{plan.displayName}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-gray-600">{plan.description}</p>
+
+                    <div className="mt-6 rounded-xl border border-gray-200 bg-slate-50 p-4 md:mt-8">
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Precio</p>
+                      <p className="mt-1 text-3xl font-extrabold text-gray-900 md:text-4xl">
+                        ${plan.price.monthly}
+                        <span className="ml-1 text-sm font-medium text-gray-600">USD / mes</span>
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {plan.price.yearly ? `$${plan.price.yearly} USD / año` : "Plan anual disponible"}
+                      </p>
+                      <p className="mt-2 text-xs font-medium text-slate-600">{employees}</p>
+                    </div>
+
+                    <ul className="mt-6 space-y-3">
+                      {plan.features.highlights.slice(0, 6).map((item) => (
+                        <li key={`${planType}-${item}`} className="flex items-start gap-2 text-sm text-[#273c46]">
+                          <i className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 text-lime-600" aria-hidden />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        trackGA4Event("landing_cta_click", {
+                          cta_name: `pricing_${planType.toLowerCase()}`,
+                          placement: "pricing",
+                        });
+                        openCalendly(e);
+                      }}
+                      className={`mt-6 w-full rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 ${
+                        isPopular
+                          ? "bg-green-600 text-white shadow-lg hover:bg-green-700"
+                          : "border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                      }`}
+                    >
+                      Iniciar Sesion y Continuar
+                    </button>
+                  </article>
+                );
+              })}
           </div>
+
+          {(() => {
+            const enterprise = PLAN_CONFIGS[PlanType.PREMIUM];
+            return (
+              <div className="mx-auto mt-10 max-w-6xl">
+                <article className="relative overflow-hidden rounded-2xl border border-emerald-400/35 bg-gradient-to-br from-[#051a24] via-[#0d212c] to-[#052b24] p-8 shadow-2xl lg:p-10">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+                  <div className="relative grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
+                    <div className="lg:col-span-5">
+                      <span className="inline-flex items-center rounded-full bg-white/15 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-emerald-200">
+                        Plan personalizado
+                      </span>
+                      <h4 className="mt-4 text-3xl font-bold text-white">{enterprise.displayName}</h4>
+                      <p className="mt-3 leading-relaxed text-white/80">{enterprise.description}</p>
+                      <div className="mt-6 rounded-xl border border-white/20 bg-white/10 px-4 py-3">
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-200">Precio</p>
+                        <p className="mt-1 text-xl font-bold text-white">Bajo consulta</p>
+                        <p className="mt-1 text-xs text-white/75">Implementacion segun alcance y complejidad</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          trackGA4Event("landing_cta_click", {
+                            cta_name: "pricing_enterprise_consult",
+                            placement: "pricing",
+                          });
+                          openCalendly(e);
+                        }}
+                        className="mt-6 w-full rounded-lg bg-white px-8 py-3 text-base font-bold text-[#052b24] shadow-lg transition-all duration-200 hover:bg-emerald-50 sm:w-auto"
+                      >
+                        Hablar con consultor
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:col-span-7">
+                      {enterprise.features.highlights.slice(0, 8).map((feature) => (
+                        <div key={feature} className="rounded-lg border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
+                          <div className="flex items-start gap-3">
+                            <i className="icon-[lucide--circle-check] mt-0.5 h-5 w-5 shrink-0 text-emerald-300" />
+                            <p className="text-sm leading-snug text-white/90">{feature}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </article>
+              </div>
+            );
+          })()}
+
           <div className="mt-5 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={(e) => {
-                trackGA4Event("landing_cta_click", { cta_name: "pricing_contact", placement: "pricing" });
-                openCalendly(e);
-              }}
-              className="rounded-full bg-[#0d212c] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#051a24]"
-            >
-              Solicitar propuesta
-            </button>
             <span className="inline-flex items-center rounded-full border border-lime-200 bg-lime-50 px-4 py-2 text-xs font-medium text-lime-800">
-              * Valores de referencia, facturación anual.
+              * Precios en USD. La configuración final depende del alcance de implementación.
             </span>
           </div>
         </MarketingSectionV2>

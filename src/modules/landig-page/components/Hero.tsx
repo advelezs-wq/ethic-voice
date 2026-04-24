@@ -230,7 +230,7 @@ export const Hero = () => {
             <div className="relative w-full max-w-md lg:max-w-lg">
               <VideoModal
                 videoSrc="/demo-video.mp4"
-                posterSrc="/platform/ethicvoice-hero.jpeg"
+                posterSrc="/platform/ethicvoice-hero-frame.jpg"
                 className="h-64 shadow-2xl shadow-green-950/50 sm:h-72 md:h-80 lg:h-96"
               />
             </div>

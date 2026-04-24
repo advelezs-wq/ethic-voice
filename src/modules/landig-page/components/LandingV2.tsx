@@ -19,12 +19,23 @@ import {
   type LandingVariant,
 } from "@/modules/landig-page/lib/landingConversion";
 
-const navItems = [
+const sectionNavItems = [
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#solucion", label: "Solución" },
   { href: "#seguridad", label: "Seguridad" },
   { href: "#planes", label: "Planes" },
   { href: "#faq", label: "Preguntas" },
+];
+
+const productLinks = [
+  { href: "/platform", label: "Plataforma" },
+  { href: "/services", label: "Servicios" },
+  { href: "/pricing", label: "Precios" },
+];
+
+const companyLinks = [
+  { href: "/about", label: "Empresa" },
+  { href: "/privacidad", label: "Privacidad" },
 ];
 
 const HERO_BG_HLS_SRC =
@@ -185,7 +196,11 @@ function scrollToId(idOrHash: string) {
   const id = idOrHash.replace("#", "");
   const el = document.getElementById(id);
   if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  const header = document.querySelector("header");
+  const headerHeight = header ? header.getBoundingClientRect().height : 0;
+  const extraOffset = 14;
+  const targetTop = el.getBoundingClientRect().top + window.scrollY - headerHeight - extraOffset;
+  window.scrollTo({ top: Math.max(targetTop, 0), behavior: "smooth" });
 }
 
 function LandingNav() {
@@ -202,7 +217,10 @@ function LandingNav() {
 
   return (
     <>
-      <header className="animate-fade-in-up px-6 py-4" style={{ animationDelay: "0.1s", opacity: 0 }}>
+      <header
+        className="animate-fade-in-up fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-md sm:px-6 sm:py-4"
+        style={{ animationDelay: "0.1s", opacity: 0 }}
+      >
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <Link href="/" className="inline-flex items-center">
             <Image
@@ -215,8 +233,8 @@ function LandingNav() {
             />
           </Link>
 
-          <nav className="hidden items-center gap-8 md:flex">
-            {navItems.map((item) => (
+          <nav className="hidden items-center gap-5 lg:flex">
+            {sectionNavItems.slice(0, 4).map((item) => (
               <button
                 key={item.href}
                 type="button"
@@ -224,11 +242,45 @@ function LandingNav() {
                 className="inline-flex items-center gap-1 text-sm text-gray-700 transition-colors hover:text-black"
               >
                 {item.label}
-                {(item.label === "Cómo funciona" || item.label === "Solución") && (
-                  <i className="icon-[lucide--chevron-down] h-4 w-4" aria-hidden />
-                )}
               </button>
             ))}
+
+            <div className="group relative">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 text-sm text-gray-700 transition-colors hover:text-black"
+              >
+                Más
+                <i className="icon-[lucide--chevron-down] h-4 w-4" aria-hidden />
+              </button>
+              <div className="invisible absolute left-1/2 top-full z-50 mt-2 w-52 -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-2 opacity-0 shadow-xl transition-all group-hover:visible group-hover:opacity-100">
+                <button
+                  type="button"
+                  onClick={() => scrollToId("#faq")}
+                  className="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#051a24]"
+                >
+                  Preguntas frecuentes
+                </button>
+                {productLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex items-center rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#051a24]"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                {companyLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex items-center rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50 hover:text-[#051a24]"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -269,19 +321,30 @@ function LandingNav() {
               <i className="icon-[lucide--x] h-6 w-6 text-black" aria-hidden />
             </button>
           </div>
-          <div className="flex flex-1 flex-col justify-center gap-7 text-center">
-            {navItems.map((item) => (
-              <button
-                key={item.href}
-                type="button"
-                onClick={() => {
-                  scrollToId(item.href);
-                  setOpen(false);
-                }}
-                className="text-xl font-semibold text-gray-800"
-              >
-                {item.label}
-              </button>
+          <div className="flex flex-1 flex-col justify-center gap-5 text-center">
+            {sectionNavItems.map((item) => (
+                <button
+                  key={item.href}
+                  type="button"
+                  onClick={() => {
+                    scrollToId(item.href);
+                    setOpen(false);
+                  }}
+                  className="text-xl font-semibold text-gray-800"
+                >
+                  {item.label}
+                </button>
+            ))}
+            <div className="mx-auto h-px w-full max-w-xs bg-slate-200" />
+            {[...productLinks, ...companyLinks].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="text-lg font-medium text-gray-700"
+                >
+                  {item.label}
+                </Link>
             ))}
             <button
               type="button"
@@ -564,7 +627,7 @@ export function LandingV2() {
       )}
       <StickyCalendlyToast />
 
-      <main className="pb-28 sm:pb-24">
+      <main className="pb-28 pt-20 sm:pb-24 sm:pt-24">
         <HeroSection variant={variant} />
         <LogoProofSection />
 

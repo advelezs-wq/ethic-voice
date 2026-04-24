@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import React, { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useCookieConsent } from "@/modules/core/providers/CookieConsentContext";
 
 export function CookieConsentBanner() {
+  const pathname = usePathname();
+  const isAppArea = pathname === "/app" || pathname?.startsWith("/app/");
+
   const {
     needsInteraction,
     isPrimaryBannerVisible,
@@ -30,6 +34,10 @@ export function CookieConsentBanner() {
       body.style.overflow = prevBody;
     };
   }, [isPrimaryBannerVisible]);
+
+  if (isAppArea) {
+    return null;
+  }
 
   if (!isPrimaryBannerVisible && consent && !needsInteraction) {
     return (

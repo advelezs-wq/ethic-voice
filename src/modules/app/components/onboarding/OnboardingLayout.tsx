@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@heroui/react";
 import { useClerk } from "@clerk/nextjs";
 import { OnboardingContextType, OnboardingStep } from "./OnboardingClient";
@@ -97,16 +99,18 @@ export function OnboardingLayout({
     <div className="h-screen w-screen grid grid-cols-[18rem_1fr] overflow-hidden">
       {/* Left Sidebar - Fixed full height */}
       <div className="h-screen w-72 bg-white/90 backdrop-blur-sm border-r border-gray-200/50 p-6 flex flex-col">
-        {/* Header without logos and Logout */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div>
-              <p className="text-sm font-semibold text-gray-700">
-                Plataforma Interna
-              </p>
-              <p className="text-xs text-gray-500">Configuración inicial</p>
-            </div>
-          </div>
+          <Link href="/" className="flex min-w-0 flex-col gap-1">
+            <Image
+              src="/brand/logo-nobg.png"
+              alt="EthicVoice"
+              width={150}
+              height={36}
+              className="h-9 w-auto max-w-[11rem] object-contain"
+              priority
+            />
+            <p className="text-xs text-gray-500">Configuración inicial</p>
+          </Link>
 
           <Button
             isIconOnly

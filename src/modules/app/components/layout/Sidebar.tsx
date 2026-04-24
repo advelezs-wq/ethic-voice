@@ -5,6 +5,7 @@ import { Button, User } from "@heroui/react";
 import { useUserStore } from "@/modules/store/user-store";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { SidebarItem } from "./SidebarItem";
 import { useSidebar } from "../../context/SidebarContext";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
@@ -259,16 +260,23 @@ export const Sidebar: React.FC = () => {
           isCollapsed ? "justify-center" : "justify-start p-6"
         }`}
       >
-        <Link href="/app" className="flex items-center gap-3 min-w-0">
-          <div
-            className={`flex flex-col transition-all duration-300 ${
-              isCollapsed ? "hidden" : "w-auto opacity-100"
-            } overflow-hidden`}
-          >
-            <div className="w-44 h-10 flex items-center text-sm font-semibold text-gray-700">
-              Plataforma Interna
-            </div>
-          </div>
+        <Link
+          href="/app"
+          className={`flex items-center min-w-0 ${
+            isCollapsed ? "justify-center w-full" : "justify-start gap-2"
+          }`}
+          aria-label="EthicVoice — inicio"
+        >
+          <Image
+            src="/brand/logo-nobg.png"
+            alt="EthicVoice"
+            width={170}
+            height={40}
+            className={`object-contain ${
+              isCollapsed ? "h-8 w-8" : "h-10 w-auto max-w-[10.5rem]"
+            }`}
+            priority
+          />
         </Link>
       </div>
 

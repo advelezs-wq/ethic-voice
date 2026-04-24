@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -261,16 +262,22 @@ export function OrganizationSettingsWithPlan() {
                         description="Upload your logo and paste the URL here"
                       />
 
-                      {settings.logoUrl && (
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <p className="text-sm text-gray-600 mb-2">
-                            Logo Preview:
+                      {settings.logoUrl ? (
+                        <div className="rounded-lg bg-gray-50 p-4">
+                          <p className="mb-2 text-sm text-gray-600">
+                            Vista previa del logo
                           </p>
-                          <div className="max-h-16 max-w-32 rounded-md bg-gray-200 text-gray-600 text-xs flex items-center justify-center px-3 py-2">
-                            Logo oculto en demo interna
+                          <div className="relative h-16 w-40 overflow-hidden rounded-md border border-gray-200 bg-white">
+                            <Image
+                              src={settings.logoUrl}
+                              alt="Vista previa del logo de la organización"
+                              fill
+                              className="object-contain p-1"
+                              unoptimized
+                            />
                           </div>
                         </div>
-                      )}
+                      ) : null}
 
                       <Button
                         color="primary"

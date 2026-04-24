@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { useOrganization } from "@/modules/app/hooks/useOrganization";
 import {
@@ -40,12 +42,20 @@ export function Header() {
           />
         </Button>
 
-        {/* Neutral label on sm/md, no logos for internal demo */}
-        <div className="lg:hidden pl-10 md:pl-16">
-          <span className="text-sm font-semibold text-gray-700">
-            Plataforma
-          </span>
-        </div>
+        <Link
+          href="/app"
+          className="lg:hidden inline-flex items-center pl-10 md:pl-16"
+          aria-label="EthicVoice — inicio"
+        >
+          <Image
+            src="/brand/logo-nobg.png"
+            alt="EthicVoice"
+            width={160}
+            height={38}
+            className="h-8 w-auto max-w-[9.5rem] object-contain"
+            priority
+          />
+        </Link>
 
         <div className="hidden lg:block">
           <h1 className="text-xl font-semibold text-gray-900">
@@ -63,7 +73,6 @@ export function Header() {
                 : "Gestión de casos asignados"}
           </p>
         </div>
-        <div className="hidden"></div>
       </div>
 
       {/* Actions and Navigation */}

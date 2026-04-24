@@ -29,7 +29,8 @@ export const ClientProvider = ({
         localization={esMX}
         appearance={{
           variables: {
-            colorBackground: "hsl(var(--accent))",
+            // No usar --accent del tema (en dark mode es casi negro y oscurece pie de Clerk).
+            colorBackground: "#ffffff",
           },
         }}
       >

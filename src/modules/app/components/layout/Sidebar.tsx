@@ -204,6 +204,17 @@ export const Sidebar: React.FC = () => {
         {
           icon: (
             <i
+              className="icon-[lucide--file-text] size-5"
+              role="img"
+              aria-hidden="true"
+            />
+          ),
+          text: "Leads ebook",
+          to: "/app/superadmin/leads",
+        },
+        {
+          icon: (
+            <i
               className="icon-[lucide--user-plus] size-5"
               role="img"
               aria-hidden="true"

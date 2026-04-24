@@ -114,6 +114,14 @@ export function SuperAdminDashboard() {
           </Button>
           <Button
             as={Link}
+            href="/app/superadmin/leads"
+            variant="flat"
+            startContent={<i className="icon-[lucide--file-text] size-4" />}
+          >
+            Leads ebook
+          </Button>
+          <Button
+            as={Link}
             href="/app/organizations"
             color="primary"
             startContent={<i className="icon-[tabler--building-plus] size-4" />}
@@ -123,7 +131,7 @@ export function SuperAdminDashboard() {
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <Card className="border border-default-200 shadow-sm">
           <CardBody className="flex flex-row items-center justify-between gap-3 py-4">
             <div>
@@ -140,6 +148,17 @@ export function SuperAdminDashboard() {
               variant="flat"
             >
               Administrar
+            </Button>
+          </CardBody>
+        </Card>
+        <Card className="border border-default-200 shadow-sm">
+          <CardBody className="flex flex-row items-center justify-between gap-3 py-4">
+            <div>
+              <p className="text-sm font-semibold text-default-700">Leads ebook</p>
+              <p className="text-xs text-default-500">Descargas de la guía PDF (landing pública)</p>
+            </div>
+            <Button as={Link} href="/app/superadmin/leads" size="sm" color="primary" variant="flat">
+              Ver leads
             </Button>
           </CardBody>
         </Card>

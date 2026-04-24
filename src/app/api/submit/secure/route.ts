@@ -1,44 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { securityManager, getClientIP } from '@/modules/app/lib/security/rate-limiter';
 import { submitEthicLineReport } from '@/actions/submission.actions';
-
-interface HCaptchaVerifyResponse {
-  success: boolean;
-  challenge_ts?: string;
-  hostname?: string;
-  'error-codes'?: string[];
-}
-
-async function verifyHCaptcha(token: string): Promise<boolean> {
-  if (!process.env.HCAPTCHA_SECRET_KEY) {
-    console.warn('[SECURITY] hCaptcha secret key not configured');
-    return true; // Allow in development if not configured
-  }
-
-  try {
-    const response = await fetch('https://hcaptcha.com/siteverify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        secret: process.env.HCAPTCHA_SECRET_KEY,
-        response: token,
-      }).toString(),
-    });
-
-    const data: HCaptchaVerifyResponse = await response.json();
-    
-          if (!data.success) {
-        return false;
-      }
-
-      return true;
-  } catch (error) {
-    console.error('[SECURITY] Error verifying hCaptcha:', error);
-    return false;
-  }
-}
+import { verifyHcaptchaToken } from '@/lib/security/verify-hcaptcha';
 
 export async function POST(request: NextRequest) {
   try {
@@ -101,7 +64,7 @@ export async function POST(request: NextRequest) {
             );
           }
 
-          const captchaValid = await verifyHCaptcha(captchaToken);
+          const captchaValid = await verifyHcaptchaToken(captchaToken, clientIP);
           if (!captchaValid) {
             securityManager.logAttack(clientIP, 'Captcha Failed', 'Invalid captcha verification');
             

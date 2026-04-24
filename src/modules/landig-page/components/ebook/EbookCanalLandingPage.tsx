@@ -2,9 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useState } from "react";
-import { cn } from "@heroui/react";
+import { useCallback, useRef, useState } from "react";
 import { trackGA4Event } from "@/lib/google-analytics";
+import { cn } from "@heroui/react";
+import { EbookDownloadLeadModal } from "@/modules/landig-page/components/ebook/EbookDownloadLeadModal";
+import {
+  EbookLeadCaptcha,
+  type EbookLeadCaptchaHandle,
+} from "@/modules/landig-page/components/ebook/EbookLeadCaptcha";
+import { resolvePublicEbookPdfUrl } from "@/lib/ebook-public-pdf";
 
 export type EbookUtm = {
   utmSource?: string;
@@ -13,6 +19,10 @@ export type EbookUtm = {
   utmContent?: string;
   utmTerm?: string;
 };
+
+const siteKeyConfigured =
+  typeof process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY === "string" &&
+  process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY.length > 0;
 
 const GOODBYE_ITEMS = [
   "Enterarte del problema cuando ya es demasiado tarde.",
@@ -44,10 +54,6 @@ const PROOF_BLOCKS = [
 /** Países citados en el primer bloque de credibilidad (refuerzo visual). */
 const PROOF_REGION_CHIPS = ["Colombia", "México", "Brasil", "Argentina", "Chile", "Perú"] as const;
 
-function scrollToDownload() {
-  document.getElementById("descargar")?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
 function EbookGoodbyeSection() {
   return (
     <section
@@ -67,13 +73,13 @@ function EbookGoodbyeSection() {
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
         <header className="mx-auto mb-12 max-w-3xl text-center md:mb-14">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-lime-700">Haz espacio</p>
           <div className="relative mt-3 inline-block">
             <h2
               id="ebook-despidete-heading"
-              className="relative text-balance text-3xl font-extrabold uppercase tracking-tight text-[#0d212c] md:text-4xl lg:text-[2.35rem]"
+              className="relative text-balance text-2xl font-extrabold uppercase tracking-tight text-[#0d212c] sm:text-3xl md:text-4xl lg:text-[2.35rem]"
             >
               <span className="relative z-10">&quot;Despídete&quot; de:</span>
             </h2>
@@ -92,7 +98,7 @@ function EbookGoodbyeSection() {
             <article
               key={item}
               className={cn(
-                "group relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 p-5 pr-[4.5rem] shadow-[0_14px_40px_-18px_rgba(15,23,42,0.12)] backdrop-blur-sm transition-[transform,box-shadow] duration-300 sm:pr-6 md:p-6",
+                "group relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 p-4 pr-16 shadow-[0_14px_40px_-18px_rgba(15,23,42,0.12)] backdrop-blur-sm transition-[transform,box-shadow] duration-300 sm:p-5 sm:pr-[4.5rem] md:p-6",
                 "hover:-translate-y-1 hover:shadow-[0_22px_48px_-20px_rgba(15,23,42,0.18)]",
                 index % 2 === 1 && "sm:translate-y-2 lg:translate-y-4",
                 index === 0 && "border-lime-300/40 ring-1 ring-lime-400/15"
@@ -157,7 +163,7 @@ function EbookDiscoverSection() {
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
         <header className="mx-auto mb-12 max-w-3xl text-center md:mb-14">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-lime-400/95">Lo que vas a descubrir</p>
           <h2
@@ -234,7 +240,7 @@ function EbookCredibilitySection() {
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
         <header className="mx-auto mb-10 max-w-3xl text-center md:mb-14">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-lime-700">Credibilidad</p>
           <h2
@@ -310,7 +316,7 @@ function EbookCredibilitySection() {
   );
 }
 
-function EbookMidCtaSection() {
+function EbookMidCtaSection({ onRequestDownload }: { onRequestDownload: () => void }) {
   return (
     <section
       className="relative overflow-hidden border-t border-lime-400/25 bg-gradient-to-b from-[#ecfdf3] via-white to-[#f0fdf9] py-16 md:py-20"
@@ -325,7 +331,7 @@ function EbookMidCtaSection() {
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-5 md:px-8">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 md:px-8">
         <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
           <div className="text-center lg:col-span-7 lg:text-left">
             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-lime-800/90">La pregunta incómoda</p>
@@ -364,11 +370,11 @@ function EbookMidCtaSection() {
               </div>
             </div>
 
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
+            <div className="mt-10 flex w-full max-w-md flex-col items-stretch gap-4 sm:mx-auto sm:max-w-none sm:flex-row sm:items-center sm:justify-center lg:mx-0 lg:max-w-none lg:justify-start">
               <button
                 type="button"
-                onClick={scrollToDownload}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-lime-400 to-lime-500 px-8 py-4 text-sm font-bold uppercase tracking-wide text-[#052b24] shadow-[0_6px_24px_rgba(132,204,22,0.55),0_14px_44px_rgba(163,230,53,0.35)] transition-[transform,box-shadow] hover:scale-[1.02] hover:shadow-[0_8px_28px_rgba(132,204,22,0.65),0_18px_52px_rgba(163,230,53,0.42)] active:scale-[0.99] sm:w-auto"
+                onClick={onRequestDownload}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-lime-400 to-lime-500 px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-[#052b24] shadow-[0_6px_24px_rgba(132,204,22,0.55),0_14px_44px_rgba(163,230,53,0.35)] transition-[transform,box-shadow] hover:scale-[1.02] hover:shadow-[0_8px_28px_rgba(132,204,22,0.65),0_18px_52px_rgba(163,230,53,0.42)] active:scale-[0.99] sm:w-auto sm:px-8 sm:py-4"
               >
                 <i className="icon-[lucide--download] h-5 w-5 shrink-0" aria-hidden />
                 Descargar gratis ahora
@@ -407,16 +413,22 @@ const EBOOK_COVER_PATH = "/ebook/guia-portada.jpg";
 const EBOOK_COVER_W = 1275;
 const EBOOK_COVER_H = 1650;
 
-function EbookHeroVisual() {
+function EbookHeroVisual({ onCoverClick }: { onCoverClick: () => void }) {
   const envSrc = process.env.NEXT_PUBLIC_EBOOK_COVER_IMAGE_URL;
   const src = envSrc || EBOOK_COVER_PATH;
   const isRemote = src.startsWith("http");
 
   return (
     <figure
-      className="relative mx-auto w-full max-w-[min(100%,480px)] px-1 sm:px-0"
+      className="relative mx-auto w-full max-w-[min(100%,280px)] sm:max-w-[min(100%,380px)] lg:max-w-[min(100%,480px)]"
       aria-label="Portada 3D de la guía en PDF — EthicVoice × Valor Estratégico"
     >
+      <button
+        type="button"
+        onClick={onCoverClick}
+        className="relative mx-auto block w-full cursor-pointer border-0 bg-transparent p-0 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-lime-400 focus-visible:ring-offset-2"
+        aria-label="Abrir formulario para descargar la guía PDF"
+      >
       <div className="relative mx-auto [perspective:2000px] [perspective-origin:52%_32%]">
         <div className="group relative mx-auto w-fit [transform-style:preserve-3d] transition-transform duration-700 ease-out will-change-transform [transform:rotateY(-22deg)_rotateX(6deg)] group-hover:[transform:rotateY(-14deg)_rotateX(4deg)]">
           {/* Lomo del libro (cara lateral izquierda) */}
@@ -445,8 +457,8 @@ function EbookHeroVisual() {
               alt="Portada: Guía práctica para implementar un canal de denuncias efectivo"
               width={EBOOK_COVER_W}
               height={EBOOK_COVER_H}
-              className="h-auto w-full max-w-[340px] object-cover object-left-top sm:max-w-[380px] lg:max-w-[410px]"
-              sizes="(max-width: 640px) 90vw, (max-width: 1024px) 42vw, 410px"
+              className="h-auto w-full max-w-[260px] object-cover object-left-top sm:max-w-[320px] md:max-w-[360px] lg:max-w-[410px]"
+              sizes="(max-width: 640px) 75vw, (max-width: 1024px) 40vw, 410px"
               priority
               unoptimized={isRemote}
             />
@@ -455,9 +467,10 @@ function EbookHeroVisual() {
       </div>
       {/* Sombra de contacto con el “suelo” */}
       <div
-        className="pointer-events-none mx-auto mt-2 h-10 w-[min(78%,340px)] rounded-[50%] bg-[#0d212c]/[0.22] blur-2xl sm:mt-3 sm:h-12 sm:max-w-[380px]"
+        className="pointer-events-none mx-auto mt-2 h-10 w-[min(78%,260px)] rounded-[50%] bg-[#0d212c]/[0.22] blur-2xl sm:mt-3 sm:h-12 sm:w-[min(78%,320px)] md:w-[min(78%,360px)] lg:w-[min(78%,410px)]"
         aria-hidden
       />
+      </button>
     </figure>
   );
 }
@@ -467,32 +480,43 @@ type Props = {
 };
 
 export function EbookCanalLandingPage({ utm }: Props) {
+  const leadCaptchaRef = useRef<EbookLeadCaptchaHandle>(null);
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
+  const [leadStatus, setLeadStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [leadErrorMsg, setLeadErrorMsg] = useState("");
+  const [pdfUrl, setPdfUrl] = useState(resolvePublicEbookPdfUrl);
 
-  const pdfUrl =
-    process.env.NEXT_PUBLIC_EBOOK_PDF_URL ?? "/ebook/guia-canal-denuncias.pdf";
+  const openDownloadModal = useCallback(() => {
+    setDownloadModalOpen(true);
+  }, []);
 
-  const onSubmit = useCallback(
+  const onSubmitLead = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      setErrorMsg("");
-      setStatus("loading");
+      setLeadErrorMsg("");
+      if (siteKeyConfigured && !hcaptchaToken) {
+        setLeadErrorMsg("Completa la verificación de seguridad.");
+        setLeadStatus("error");
+        return;
+      }
+      setLeadStatus("loading");
       try {
         const res = await fetch("/api/public/ebook-lead", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            fullName,
-            phone,
-            email,
-            company,
-            role,
+            fullName: fullName.trim(),
+            phone: phone.trim(),
+            email: email.trim().toLowerCase(),
+            company: company.trim(),
+            role: role.trim(),
+            hcaptchaToken: hcaptchaToken ?? undefined,
             campaign: "guia_canal_denuncias",
             sourcePath: typeof window !== "undefined" ? window.location.pathname : undefined,
             utmSource: utm.utmSource,
@@ -502,89 +526,102 @@ export function EbookCanalLandingPage({ utm }: Props) {
             utmTerm: utm.utmTerm,
           }),
         });
-        const data = (await res.json()) as { error?: string };
+        const data = (await res.json()) as { error?: string; pdfUrl?: string };
         if (!res.ok) {
-          setErrorMsg(data.error || "Algo salió mal. Inténtalo de nuevo.");
-          setStatus("error");
+          setLeadErrorMsg(data.error || "Algo salió mal. Inténtalo de nuevo.");
+          setLeadStatus("error");
+          leadCaptchaRef.current?.reset();
           return;
+        }
+        if (typeof data.pdfUrl === "string" && data.pdfUrl.length > 0) {
+          setPdfUrl(data.pdfUrl);
         }
         trackGA4Event("generate_lead", {
           cta_name: "ebook_guia_canal_denuncias",
           placement: "ebook_landing",
         });
-        setStatus("success");
+        setLeadStatus("success");
       } catch {
-        setErrorMsg("Error de red. Revisa tu conexión e inténtalo de nuevo.");
-        setStatus("error");
+        setLeadErrorMsg("Error de red. Revisa tu conexión e inténtalo de nuevo.");
+        setLeadStatus("error");
+        leadCaptchaRef.current?.reset();
       }
     },
-    [company, email, fullName, phone, role, utm]
+    [company, email, fullName, hcaptchaToken, phone, role, utm]
   );
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="border-b border-lime-400/40 bg-[#051a24] px-4 py-3 text-center sm:py-3.5">
-        <p className="text-sm font-semibold text-white sm:text-base">
-          Descarga la{" "}
-          <span className="text-lime-300">Guía Práctica para Implementar un Canal de Denuncias Efectivo</span>
-        </p>
-        <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-lime-200/90">
-          EthicVoice × Valor Estratégico
-        </p>
+    <div className="min-h-screen overflow-x-hidden bg-white">
+      <EbookDownloadLeadModal
+        open={downloadModalOpen}
+        onClose={() => setDownloadModalOpen(false)}
+        pdfUrl={pdfUrl}
+        utm={utm}
+      />
+      <div className="border-b border-lime-400/40 bg-[#051a24] px-4 py-3 text-center sm:px-6 sm:py-3.5">
+        <div className="mx-auto max-w-5xl">
+          <p className="text-sm font-semibold leading-snug text-white sm:text-base">
+            Descarga la{" "}
+            <span className="text-lime-300">Guía Práctica para Implementar un Canal de Denuncias Efectivo</span>
+          </p>
+          <p className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-lime-200/90 sm:text-[11px] sm:tracking-[0.18em]">
+            EthicVoice × Valor Estratégico
+          </p>
+        </div>
       </div>
 
-      <section className="relative overflow-hidden bg-white px-5 pb-16 pt-10 md:px-8 md:pb-20 md:pt-14">
+      <section className="relative overflow-hidden bg-white px-4 pb-14 pt-8 sm:px-6 md:px-8 md:pb-20 md:pt-14">
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_85%_15%,rgba(163,230,53,0.14)_0%,transparent_55%)]"
           aria-hidden
         />
         <div className="relative z-10 mx-auto max-w-7xl">
-          <p className="text-left text-[11px] font-bold uppercase tracking-[0.2em] text-lime-700 lg:mb-1">
+          <p className="text-center text-[11px] font-bold uppercase tracking-[0.2em] text-lime-700 lg:mb-1 lg:text-left">
             Recurso gratuito · PDF
           </p>
 
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-x-14 lg:gap-y-12">
-            <div className="order-1 text-left">
+          <div className="grid items-center gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-x-14 lg:gap-y-12">
+            <div className="order-1 flex flex-col text-center lg:text-left">
               <h1 className="text-balance">
-                <span className="block text-2xl font-extrabold leading-tight tracking-tight text-lime-600 sm:text-3xl lg:text-[2.125rem]">
+                <span className="block text-[clamp(1.25rem,4.2vw+0.35rem,1.875rem)] font-extrabold leading-[1.2] tracking-tight text-lime-600 sm:text-3xl lg:text-[2.125rem]">
                   Tu empresa tiene riesgos que nadie está reportando.
                 </span>
-                <span className="mt-2 block text-2xl font-extrabold leading-tight tracking-tight text-[#0d212c] sm:text-3xl lg:text-[2.125rem]">
+                <span className="mt-2 block text-[clamp(1.25rem,4.2vw+0.35rem,1.875rem)] font-extrabold leading-[1.2] tracking-tight text-[#0d212c] sm:text-3xl lg:text-[2.125rem]">
                   Eso tiene solución.
                 </span>
               </h1>
 
-              <p className="mt-5 max-w-xl text-pretty text-sm font-medium leading-relaxed text-[#273c46] sm:text-base">
+              <p className="mx-auto mt-5 max-w-xl text-pretty text-sm font-medium leading-relaxed text-[#273c46] sm:text-base lg:mx-0">
                 Descarga gratis la Guía Práctica para implementar un canal de denuncias efectivo y aprende cómo detectar
                 fraude, corrupción y conductas indebidas antes de que se conviertan en una crisis.
               </p>
 
-              <div className="mt-8 lg:hidden">
-                <EbookHeroVisual />
+              <div className="mt-7 flex justify-center lg:hidden">
+                <EbookHeroVisual onCoverClick={openDownloadModal} />
               </div>
 
-              <div className="mt-8 lg:mt-10">
+              <div className="mt-8 flex w-full justify-center lg:mt-10 lg:justify-start">
                 <button
                   type="button"
-                  onClick={scrollToDownload}
-                  className="w-full rounded-full border-0 bg-lime-400 px-6 py-4 text-center shadow-[0_4px_16px_rgba(132,204,22,0.55),0_10px_40px_rgba(163,230,53,0.55),0_22px_56px_-10px_rgba(190,242,100,0.4),0_3px_12px_rgba(15,23,42,0.14)] transition-[color,box-shadow] hover:bg-lime-500 hover:shadow-[0_6px_22px_rgba(132,204,22,0.65),0_14px_48px_rgba(163,230,53,0.6),0_28px_64px_-8px_rgba(217,249,157,0.45),0_4px_14px_rgba(15,23,42,0.16)] sm:w-auto sm:px-10 sm:py-3.5 lg:min-w-[280px]"
+                  onClick={openDownloadModal}
+                  className="w-full max-w-md rounded-full border-0 bg-lime-400 px-5 py-3.5 text-center shadow-[0_4px_16px_rgba(132,204,22,0.55),0_10px_40px_rgba(163,230,53,0.55),0_22px_56px_-10px_rgba(190,242,100,0.4),0_3px_12px_rgba(15,23,42,0.14)] transition-[color,box-shadow] hover:bg-lime-500 hover:shadow-[0_6px_22px_rgba(132,204,22,0.65),0_14px_48px_rgba(163,230,53,0.6),0_28px_64px_-8px_rgba(217,249,157,0.45),0_4px_14px_rgba(15,23,42,0.16)] sm:w-auto sm:max-w-none sm:px-10 sm:py-3.5 lg:min-w-[280px]"
                 >
                   <span className="block text-sm font-bold uppercase tracking-wide text-[#052b24]">Descargar gratis</span>
-                  <span className="mt-1 block text-xs font-medium normal-case leading-snug text-[#052b24]/85">
+                  <span className="mt-1 block px-1 text-xs font-medium normal-case leading-snug text-[#052b24]/85 sm:px-0">
                     (Obtén gratis lo que te costaría millones en riesgo y reputación)
                   </span>
                 </button>
               </div>
 
               <ul className="mt-5 list-none">
-                <li className="text-left text-[11px] font-bold uppercase leading-snug tracking-wide text-[#14532d] sm:text-xs">
+                <li className="text-center text-[11px] font-bold uppercase leading-snug tracking-wide text-[#14532d] sm:text-xs lg:text-left">
                   100% privacidad. No jugamos. No hacemos spam.
                 </li>
               </ul>
             </div>
 
             <div className="order-2 hidden lg:block lg:pl-4">
-              <EbookHeroVisual />
+              <EbookHeroVisual onCoverClick={openDownloadModal} />
             </div>
           </div>
         </div>
@@ -598,7 +635,7 @@ export function EbookCanalLandingPage({ utm }: Props) {
 
       <section
         id="descargar"
-        className="relative scroll-mt-6 overflow-hidden border-t border-lime-400/20 bg-gradient-to-b from-[#051a24] via-[#0a1f2c] to-[#041018] py-16 md:py-24"
+        className="relative scroll-mt-6 overflow-x-clip overflow-y-visible border-t border-lime-400/20 bg-gradient-to-b from-[#051a24] via-[#0a1f2c] to-[#041018] py-14 sm:py-16 md:py-24"
         aria-labelledby="ebook-download-heading"
       >
         <div
@@ -614,8 +651,8 @@ export function EbookCanalLandingPage({ utm }: Props) {
           aria-hidden
         />
 
-        <div className="relative z-10 mx-auto max-w-6xl px-5 md:px-8">
-          <div className="grid items-stretch gap-10 lg:grid-cols-12 lg:gap-12 lg:gap-x-14">
+        <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 md:px-8">
+          <div className="grid items-stretch gap-8 sm:gap-10 lg:grid-cols-12 lg:gap-12 lg:gap-x-14">
             <div className="flex flex-col justify-center text-center lg:col-span-5 lg:text-left">
               <span className="mx-auto inline-flex items-center gap-2 rounded-full border border-lime-400/35 bg-lime-400/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300 lg:mx-0">
                 <i className="icon-[lucide--file-down] h-3.5 w-3.5" aria-hidden />
@@ -623,7 +660,7 @@ export function EbookCanalLandingPage({ utm }: Props) {
               </span>
               <h2
                 id="ebook-download-heading"
-                className="mt-5 text-balance text-3xl font-extrabold leading-[1.15] tracking-tight text-white md:text-4xl lg:text-[2.35rem]"
+                className="mt-5 text-balance text-2xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-3xl md:text-4xl lg:text-[2.35rem]"
               >
                 Descarga la guía{" "}
                 <span className="bg-gradient-to-r from-lime-300 to-lime-500 bg-clip-text text-transparent">gratuita</span>{" "}
@@ -654,19 +691,19 @@ export function EbookCanalLandingPage({ utm }: Props) {
               </ul>
             </div>
 
-            <div className="lg:col-span-7">
+            <div className="min-w-0 lg:col-span-7">
               <div className="relative mx-auto max-w-lg lg:max-w-none">
                 <div
-                  className="pointer-events-none absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-lime-400/25 via-lime-500/10 to-transparent opacity-80 blur-2xl md:-inset-4 md:rounded-[2.25rem]"
+                  className="pointer-events-none absolute -inset-2 rounded-[1.75rem] bg-gradient-to-br from-lime-400/25 via-lime-500/10 to-transparent opacity-80 blur-2xl sm:-inset-3 sm:rounded-[2rem] md:-inset-4 md:rounded-[2.25rem]"
                   aria-hidden
                 />
-                <div className="relative overflow-hidden rounded-3xl border-2 border-white/20 bg-white/[0.97] p-6 shadow-[0_32px_80px_-24px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl ring-1 ring-lime-400/30 md:p-8 lg:p-9">
+                <div className="relative overflow-hidden rounded-2xl border-2 border-white/20 bg-white/[0.97] p-5 shadow-[0_32px_80px_-24px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl ring-1 ring-lime-400/30 sm:rounded-3xl sm:p-7 md:p-8 lg:p-9">
                   <div
                     className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-lime-400 via-emerald-400 to-[#0d212c]"
                     aria-hidden
                   />
 
-                  {status === "success" ? (
+                  {leadStatus === "success" ? (
                     <div className="mt-6 rounded-2xl border-2 border-lime-300/80 bg-gradient-to-br from-lime-50 to-white px-5 py-8 text-center shadow-inner shadow-lime-100/50">
                       <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-lime-400 text-[#052b24] shadow-lg shadow-lime-500/30">
                         <i className="icon-[lucide--party-popper] h-7 w-7" aria-hidden />
@@ -694,7 +731,7 @@ export function EbookCanalLandingPage({ utm }: Props) {
                       </Link>
                     </div>
                   ) : (
-                    <form onSubmit={onSubmit} className="mt-6 space-y-4 md:space-y-5">
+                    <form onSubmit={onSubmitLead} className="mt-6 space-y-4 md:space-y-5">
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="sm:col-span-2">
                           <label htmlFor="ev-fullName" className="block text-xs font-bold uppercase tracking-wide text-[#0d212c]">
@@ -708,6 +745,7 @@ export function EbookCanalLandingPage({ utm }: Props) {
                             required
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
+                            maxLength={200}
                             className="mt-2 w-full rounded-xl border-2 border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-[#0d212c] shadow-[inset_0_2px_4px_rgba(15,23,42,0.04)] outline-none transition placeholder:text-slate-400 focus:border-lime-500 focus:shadow-[0_0_0_4px_rgba(163,230,53,0.22)]"
                             placeholder="Tu nombre"
                           />
@@ -724,6 +762,8 @@ export function EbookCanalLandingPage({ utm }: Props) {
                             required
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
+                            maxLength={40}
+                            inputMode="tel"
                             className="mt-2 w-full rounded-xl border-2 border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-[#0d212c] shadow-[inset_0_2px_4px_rgba(15,23,42,0.04)] outline-none transition placeholder:text-slate-400 focus:border-lime-500 focus:shadow-[0_0_0_4px_rgba(163,230,53,0.22)]"
                             placeholder="+57 …"
                           />
@@ -740,6 +780,7 @@ export function EbookCanalLandingPage({ utm }: Props) {
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            maxLength={320}
                             className="mt-2 w-full rounded-xl border-2 border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-[#0d212c] shadow-[inset_0_2px_4px_rgba(15,23,42,0.04)] outline-none transition placeholder:text-slate-400 focus:border-lime-500 focus:shadow-[0_0_0_4px_rgba(163,230,53,0.22)]"
                             placeholder="nombre@empresa.com"
                           />
@@ -756,6 +797,7 @@ export function EbookCanalLandingPage({ utm }: Props) {
                             required
                             value={company}
                             onChange={(e) => setCompany(e.target.value)}
+                            maxLength={200}
                             className="mt-2 w-full rounded-xl border-2 border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-[#0d212c] shadow-[inset_0_2px_4px_rgba(15,23,42,0.04)] outline-none transition placeholder:text-slate-400 focus:border-lime-500 focus:shadow-[0_0_0_4px_rgba(163,230,53,0.22)]"
                             placeholder="Razón social"
                           />
@@ -772,27 +814,30 @@ export function EbookCanalLandingPage({ utm }: Props) {
                             required
                             value={role}
                             onChange={(e) => setRole(e.target.value)}
+                            maxLength={200}
                             className="mt-2 w-full rounded-xl border-2 border-slate-200/90 bg-white px-4 py-3.5 text-sm font-medium text-[#0d212c] shadow-[inset_0_2px_4px_rgba(15,23,42,0.04)] outline-none transition placeholder:text-slate-400 focus:border-lime-500 focus:shadow-[0_0_0_4px_rgba(163,230,53,0.22)]"
                             placeholder="Ej. Director de cumplimiento"
                           />
                         </div>
                       </div>
 
-                      {status === "error" && errorMsg ? (
+                      <EbookLeadCaptcha ref={leadCaptchaRef} theme="light" onToken={setHcaptchaToken} />
+
+                      {leadStatus === "error" && leadErrorMsg ? (
                         <p
                           className="rounded-xl border-2 border-red-300/80 bg-red-50 px-4 py-3 text-sm font-medium text-red-900 shadow-sm"
                           role="alert"
                         >
-                          {errorMsg}
+                          {leadErrorMsg}
                         </p>
                       ) : null}
 
                       <button
                         type="submit"
-                        disabled={status === "loading"}
+                        disabled={leadStatus === "loading"}
                         className="relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-lime-400 via-lime-400 to-lime-500 px-6 py-4 text-sm font-bold uppercase tracking-wide text-[#052b24] shadow-[0_6px_24px_rgba(132,204,22,0.55),0_14px_48px_rgba(163,230,53,0.45),0_3px_12px_rgba(15,23,42,0.15)] transition-[transform,box-shadow] before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-t before:from-transparent before:to-white/25 hover:scale-[1.02] hover:shadow-[0_8px_28px_rgba(132,204,22,0.65),0_18px_52px_rgba(163,230,53,0.5)] active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60"
                       >
-                        {status === "loading" ? (
+                        {leadStatus === "loading" ? (
                           <>
                             <i className="icon-[lucide--loader-circle] h-5 w-5 shrink-0 animate-spin" aria-hidden />
                             Enviando…
@@ -817,9 +862,9 @@ export function EbookCanalLandingPage({ utm }: Props) {
         </div>
       </section>
 
-      <EbookMidCtaSection />
+      <EbookMidCtaSection onRequestDownload={openDownloadModal} />
 
-      <section className="relative overflow-hidden border-t border-lime-400/35 bg-gradient-to-b from-[#051a24] via-[#0d212c] to-[#041018] px-5 py-16 md:px-8 md:py-20">
+      <section className="relative overflow-hidden border-t border-lime-400/35 bg-gradient-to-b from-[#051a24] via-[#0d212c] to-[#041018] px-4 py-14 sm:px-6 md:px-8 md:py-20">
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_-15%,rgba(163,230,53,0.16),transparent_50%),radial-gradient(ellipse_45%_50%_at_100%_80%,rgba(163,230,53,0.08),transparent_55%)]"
           aria-hidden
@@ -833,20 +878,20 @@ export function EbookCanalLandingPage({ utm }: Props) {
           aria-hidden
         />
 
-        <div className="relative z-10 mx-auto max-w-3xl text-center">
+        <div className="relative z-10 mx-auto max-w-3xl px-1 text-center sm:px-0">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-lime-400/95">Cierre</p>
-          <h2 className="mt-4 text-balance text-2xl font-extrabold tracking-tight text-white md:text-3xl">
+          <h2 className="mt-4 text-balance text-xl font-extrabold tracking-tight text-white sm:text-2xl md:text-3xl">
             ¿Llegaste hasta aquí?
           </h2>
-          <p className="mt-3 text-lg font-semibold text-lime-100/95">Entonces ya sabes que necesitas esto.</p>
+          <p className="mt-3 text-base font-semibold text-lime-100/95 sm:text-lg">Entonces ya sabes que necesitas esto.</p>
           <p className="mx-auto mt-6 max-w-2xl text-sm leading-relaxed text-slate-200/90 md:text-base">
             Esta guía reúne los estándares internacionales, el marco regulatorio latinoamericano y las mejores prácticas
             en gestión de canales de denuncia — en un recurso práctico, gratuito y listo para aplicar.
           </p>
           <button
             type="button"
-            onClick={scrollToDownload}
-            className="mt-10 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-lime-400 to-lime-500 px-8 py-4 text-sm font-bold text-[#052b24] shadow-[0_6px_24px_rgba(132,204,22,0.5),0_14px_44px_rgba(163,230,53,0.35)] transition-[transform,box-shadow,filter] hover:scale-[1.02] hover:shadow-[0_8px_28px_rgba(132,204,22,0.55),0_18px_52px_rgba(163,230,53,0.42)] hover:brightness-[1.03] active:scale-[0.99]"
+            onClick={openDownloadModal}
+            className="mx-auto mt-10 flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-gradient-to-r from-lime-400 to-lime-500 px-6 py-3.5 text-sm font-bold text-[#052b24] shadow-[0_6px_24px_rgba(132,204,22,0.5),0_14px_44px_rgba(163,230,53,0.35)] transition-[transform,box-shadow,filter] hover:scale-[1.02] hover:shadow-[0_8px_28px_rgba(132,204,22,0.55),0_18px_52px_rgba(163,230,53,0.42)] hover:brightness-[1.03] active:scale-[0.99] sm:w-auto sm:max-w-none sm:px-8 sm:py-4"
           >
             Descargar la guía gratis
             <i className="icon-[lucide--arrow-up] h-4 w-4" aria-hidden />

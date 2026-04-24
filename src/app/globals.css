@@ -181,3 +181,40 @@ body {
   mask-composite: exclude;
   pointer-events: none;
 }
+
+/**
+ * react-floating-whatsapp: wrapper + botón interno (el botón lleva position:fixed).
+ * Clase en <FloatingWhatsApp className="floating-whatsapp ev-floating-whatsapp" />.
+ */
+.ev-floating-whatsapp {
+  z-index: 92 !important;
+}
+
+.ev-floating-whatsapp .floating-whatsapp-button {
+  right: max(0.75rem, env(safe-area-inset-right, 0px)) !important;
+}
+
+/* Móvil: tamaño del botón = default del componente; solo el icono SVG más pequeño */
+@media (max-width: 639px) {
+  .ev-floating-whatsapp .floating-whatsapp-button {
+    bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px)) !important;
+    right: max(0.125rem, env(safe-area-inset-right, 0px)) !important;
+  }
+
+  .ev-floating-whatsapp .floating-whatsapp-button svg {
+    width: 28px !important;
+    height: 28px !important;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  .ev-floating-whatsapp .floating-whatsapp-button {
+    bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .ev-floating-whatsapp .floating-whatsapp-button {
+    bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}

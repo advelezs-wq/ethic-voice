@@ -46,6 +46,7 @@ function ShellInner({
           avatar="/brand/wpp_logo.png"
           chatMessage={`Hola! 🤝 
 ¿Cómo puedo ayudarte?`}
+          className="floating-whatsapp ev-floating-whatsapp"
         />
       )}
       {showStickyCta !== false && !isOpen && <StickyCalendlyToast />}
@@ -53,7 +54,7 @@ function ShellInner({
         className={cn(
           "w-full min-w-0 overflow-x-hidden pt-20",
           mainClassName,
-          showStickyCta !== false && "!pb-28 sm:!pb-24"
+          showStickyCta !== false && "!pb-28"
         )}
       >
         {children}

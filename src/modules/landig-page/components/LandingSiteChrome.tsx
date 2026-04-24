@@ -29,10 +29,11 @@ export function LandingSiteChrome({ children }: Props) {
           accountName="Ethic Voice"
           avatar="/brand/wpp_logo.png"
           chatMessage={"Hola! ¿Cómo puedo ayudarte con tu canal de denuncias?"}
+          className="floating-whatsapp ev-floating-whatsapp"
         />
       )}
       <StickyCalendlyToast />
-      <main className="w-full min-w-0 overflow-x-hidden pb-28 pt-20 sm:pb-24 sm:pt-24">
+      <main className="w-full min-w-0 overflow-x-hidden pb-28 pt-20 sm:pt-24">
         {children}
       </main>
       <LandingMinimalFooter />

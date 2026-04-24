@@ -33,7 +33,7 @@ export function CookieConsentBanner() {
 
   if (!isPrimaryBannerVisible && consent && !needsInteraction) {
     return (
-      <div className="pointer-events-none fixed bottom-4 left-4 z-[190] sm:bottom-6 sm:left-6">
+      <div className="pointer-events-none fixed bottom-6 left-6 z-[190] hidden sm:block">
         <button
           type="button"
           onClick={openCookieSettings}

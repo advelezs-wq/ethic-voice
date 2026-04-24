@@ -450,11 +450,12 @@ export function LandingV2() {
           accountName="Ethic Voice"
           avatar="/brand/wpp_logo.png"
           chatMessage={"Hola! ¿Cómo puedo ayudarte con tu canal de denuncias?"}
+          className="floating-whatsapp ev-floating-whatsapp"
         />
       )}
       <StickyCalendlyToast />
 
-      <main className="pb-28 pt-20 sm:pb-24 sm:pt-24">
+      <main className="pb-28 pt-20 sm:pt-24">
         <HeroSection variant={variant} />
         <LogoProofSection />
 

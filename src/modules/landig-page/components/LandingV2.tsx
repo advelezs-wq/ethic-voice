@@ -951,7 +951,7 @@ export function LandingV2() {
                 return (
                   <article
                     key={planType}
-                    className={`relative min-h-[560px] rounded-xl bg-white p-6 shadow-lg transition-all duration-300 sm:p-7 md:p-8 ${
+                    className={`relative flex h-full min-h-[560px] flex-col rounded-xl bg-white p-6 shadow-lg transition-all duration-300 sm:p-7 md:p-8 ${
                       isPopular ? "border-2 border-green-500 shadow-2xl" : "border border-gray-200 hover:shadow-xl"
                     }`}
                   >
@@ -987,6 +987,9 @@ export function LandingV2() {
                       ))}
                     </ul>
 
+                    {/* flex-1 alinea el CTA al fondo; min-h asegura hueco mínimo respecto a la lista */}
+                    <div className="min-h-8 flex-1" aria-hidden />
+
                     <button
                       type="button"
                       onClick={(e) => {
@@ -996,7 +999,7 @@ export function LandingV2() {
                         });
                         openCalendly(e);
                       }}
-                      className={`mt-6 w-full rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 ${
+                      className={`w-full shrink-0 rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 ${
                         isPopular
                           ? "bg-green-600 text-white shadow-lg hover:bg-green-700"
                           : "border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"

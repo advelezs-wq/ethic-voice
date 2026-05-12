@@ -33,7 +33,6 @@ export const metadata: Metadata = {
     "cumplimiento normativo",
     "seguridad de datos",
     "IA para cumplimiento",
-    "G2 Líder 2025",
   ],
   robots: {
     index: true,

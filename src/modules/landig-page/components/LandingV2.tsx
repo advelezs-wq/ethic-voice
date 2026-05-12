@@ -332,17 +332,6 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
               Ponemos a los equipos de cumplimiento al centro con una solución que impulsa cultura de integridad, simplifica flujos y reduce riesgo organizacional.
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-3 md:mt-6 md:gap-4">
-              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5">
-                <span className="text-xs font-semibold text-[#051a24]">G2</span>
-                <div className="flex gap-1 text-lime-600">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <i key={i} className="icon-[lucide--star] h-3.5 w-3.5 fill-current" aria-hidden />
-                  ))}
-                </div>
-              </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-[#273c46]">
-                Leader 2025
-              </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-[#273c46]">
                 Fast implementation
               </div>

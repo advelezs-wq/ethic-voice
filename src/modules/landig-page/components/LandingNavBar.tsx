@@ -38,7 +38,7 @@ export function LandingNav() {
   return (
     <>
       <header
-        className="animate-fade-in-up fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-md sm:px-6 sm:py-4"
+        className="animate-fade-in-up fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white/90 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] backdrop-blur-md sm:px-6 sm:pb-4 sm:pt-[calc(1rem+env(safe-area-inset-top,0px))]"
         style={{ animationDelay: "0.1s", opacity: 0 }}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between">

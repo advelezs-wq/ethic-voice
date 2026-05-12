@@ -38,14 +38,14 @@ export function FooterDemoCtaBand({
         aria-hidden
       />
 
-      <div className="relative mx-auto max-w-7xl px-5 py-14 text-center md:px-8 md:py-16">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-700">
+      <div className="relative mx-auto max-w-7xl px-4 py-12 text-center sm:px-6 md:px-8 md:py-16">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-lime-700 sm:text-xs sm:tracking-[0.2em]">
           Siguiente paso
         </p>
-        <h2 className="mt-3 text-balance text-3xl font-extrabold tracking-tight text-[#0d212c] md:text-4xl">
+        <h2 className="mt-3 text-balance text-2xl font-extrabold tracking-tight text-[#0d212c] sm:text-3xl md:text-4xl">
           Agenda tu demo personalizada
         </h2>
-        <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-[#273c46] md:text-base">
+        <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-[#273c46] sm:mt-4 md:text-base">
           Descubre cómo EthicVoice protege tu empresa.
         </p>
         <button
@@ -54,7 +54,7 @@ export function FooterDemoCtaBand({
             trackGA4Event("landing_cta_click", { cta_name: ctaName, placement });
             openCalendly(e);
           }}
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-lime-400 px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-[#052b24] shadow-[0_4px_20px_rgba(163,230,53,0.35)] transition-colors hover:bg-lime-500"
+          className="mt-6 inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-lime-400 px-6 py-3 text-sm font-bold uppercase tracking-wide text-[#052b24] shadow-[0_4px_20px_rgba(163,230,53,0.35)] transition-colors hover:bg-lime-500 sm:mt-8 sm:w-auto sm:max-w-none sm:px-8 sm:py-3.5"
         >
           Solicitar demo
           <i className="icon-[lucide--arrow-right] h-4 w-4" aria-hidden />

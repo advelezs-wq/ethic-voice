@@ -1,7 +1,7 @@
 "use client";
 
-import { LandingV2 } from "./LandingV2";
+import { LandingV3 } from "./LandingV3";
 
 export const Landing = () => {
-  return <LandingV2 />;
+  return <LandingV3 />;
 };

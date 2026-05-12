@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Script from "next/script";
@@ -22,9 +22,17 @@ import {
 } from "@/modules/landig-page/components/LandingNavBar";
 import { FooterDemoCtaBand } from "@/modules/landig-page/components/FooterDemoCtaBand";
 import { LandingMinimalFooter } from "@/modules/landig-page/components/LandingMinimalFooter";
+import { VideoModal } from "@/modules/landig-page/components/VideoModal";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 
-const HERO_BG_HLS_SRC =
-  "https://stream.mux.com/tLkHO1qZoaaQOUeVWo8hEBeGQfySP02EPS02BmnNFyXys.m3u8";
+const HERO_BG_VIDEO_SRC = "/video_1778585500522.mp4";
+/** Qué fracción del alto del hero recorre el scroll para pasar de escala 1 → máxima */
+const HERO_BG_SCROLL_ZOOM_RANGE = 0.48;
+/** Escala máxima = 1 + este valor (zoom-in al bajar; zoom-out al subir, misma curva) */
+const HERO_BG_SCROLL_ZOOM_EXTRA = 0.14;
+
+const DEMO_PRODUCT_VIDEO_SRC = "/demo-video.mp4";
+const DEMO_PRODUCT_VIDEO_POSTER = "/platform/ethicvoice-hero-frame.jpg";
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 
@@ -36,11 +44,80 @@ const BRANDS = [
   { name: "Universal Emerald", src: "/ethic-brands/universal_emerald.png" },
 ] as const;
 
-const STATS = [
-  { value: "24/7", label: "Canal disponible siempre" },
-  { value: "+100", label: "Organizaciones confían" },
-  { value: "4.9", label: "Satisfacción de clientes" },
-] as const;
+type StatTickerSpec =
+  | { kind: "24_7" }
+  | { kind: "plusInt"; max: number }
+  | { kind: "decimal"; max: number; decimals: number };
+
+const STATS_BAND: ReadonlyArray<{ label: string; ticker: StatTickerSpec }> = [
+  { label: "Canal disponible siempre", ticker: { kind: "24_7" } },
+  { label: "Organizaciones confían", ticker: { kind: "plusInt", max: 100 } },
+  { label: "Satisfacción de clientes", ticker: { kind: "decimal", max: 4.9, decimals: 1 } },
+];
+
+function easeOutCubic(t: number) {
+  return 1 - (1 - t) ** 3;
+}
+
+function formatStatTicker(spec: StatTickerSpec, linear01: number) {
+  const p = easeOutCubic(Math.min(1, Math.max(0, linear01)));
+  switch (spec.kind) {
+    case "24_7":
+      return `${Math.round(24 * p)}/${Math.round(7 * p)}`;
+    case "plusInt":
+      return `+${Math.round(spec.max * p)}`;
+    case "decimal":
+      return (spec.max * p).toFixed(spec.decimals);
+    default:
+      return "";
+  }
+}
+
+function StatsTickerValue({
+  spec,
+  active,
+  delayMs,
+  reduceMotion,
+}: {
+  spec: StatTickerSpec;
+  active: boolean;
+  delayMs: number;
+  reduceMotion: boolean;
+}) {
+  const [text, setText] = useState(() => formatStatTicker(spec, reduceMotion ? 1 : 0));
+
+  useEffect(() => {
+    if (reduceMotion) {
+      setText(formatStatTicker(spec, active ? 1 : 0));
+      return;
+    }
+    if (!active) return;
+
+    const durationMs = 1150;
+    const startWall = performance.now() + delayMs;
+    let raf = 0;
+
+    const tick = (now: number) => {
+      if (now < startWall) {
+        setText(formatStatTicker(spec, 0));
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      const linear = Math.min(1, (now - startWall) / durationMs);
+      setText(formatStatTicker(spec, linear));
+      if (linear < 1) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        setText(formatStatTicker(spec, 1));
+      }
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active, delayMs, reduceMotion, spec]);
+
+  return <span className="tabular-nums">{text}</span>;
+}
 
 const FEATURES = [
   {
@@ -184,10 +261,57 @@ const FAQS = [
 
 const PLAN_ORDER = [PlanType.STARTER, PlanType.GROW, PlanType.GROW_PRO] as const;
 
+const LANDING_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const LANDING_STAGGER_CONTAINER: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.065, delayChildren: 0.08 },
+  },
+};
+
+const LANDING_STAGGER_ITEM: Variants = {
+  hidden: { opacity: 0, y: 22 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: LANDING_EASE },
+  },
+};
+
+const LANDING_VIEWPORT = { once: true, amount: 0.14 as const, margin: "-56px 0px -12% 0px" as const };
+
+function useInViewReveal(delay = 0) {
+  const reduced = useReducedMotion();
+  if (reduced === true) {
+    return { initial: false as const };
+  }
+  return {
+    initial: { opacity: 0, y: 40 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: LANDING_VIEWPORT,
+    transition: { duration: 0.62, ease: LANDING_EASE, delay },
+  };
+}
+
+function useHeroReveal() {
+  const reduced = useReducedMotion();
+  if (reduced === true) {
+    return { initial: false as const };
+  }
+  return {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    transition: { duration: 0.72, ease: LANDING_EASE },
+  };
+}
+
 // ─── SECTIONS ─────────────────────────────────────────────────────────────────
 
 function HeroSection({ variant }: { variant: LandingVariant }) {
   const { openCalendly } = useCalendlyGate();
+  const heroSectionRef = useRef<HTMLElement>(null);
+  const bgVideoZoomRef = useRef<HTMLDivElement>(null);
   const bgVideoRef = useRef<HTMLVideoElement>(null);
 
   const headlineLines =
@@ -198,71 +322,105 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
   useEffect(() => {
     const video = bgVideoRef.current;
     if (!video) return;
-    let cancelled = false;
-    let hlsInstance: { destroy: () => void } | null = null;
-
-    if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = HERO_BG_HLS_SRC;
-      void video.play().catch(() => {});
-      return () => {
-        video.pause();
-      };
-    }
-
-    void import("hls.js").then(({ default: Hls }) => {
-      if (cancelled || !bgVideoRef.current || !Hls.isSupported()) return;
-      const hls = new Hls({ enableWorker: false });
-      hlsInstance = hls;
-      hls.loadSource(HERO_BG_HLS_SRC);
-      hls.attachMedia(bgVideoRef.current);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        if (!cancelled) void bgVideoRef.current?.play().catch(() => {});
-      });
-    });
-
+    void video.play().catch(() => {});
     return () => {
-      cancelled = true;
-      hlsInstance?.destroy();
-      if (video) video.pause();
+      video.pause();
     };
   }, []);
 
+  useEffect(() => {
+    const section = heroSectionRef.current;
+    const zoomWrap = bgVideoZoomRef.current;
+    if (!section || !zoomWrap) return;
+
+    let rafId = 0;
+    let scheduled = false;
+
+    const applyZoom = () => {
+      scheduled = false;
+      const rect = section.getBoundingClientRect();
+      const h = Math.max(rect.height, 1);
+      const scrolled = Math.max(0, -rect.top);
+      const t = Math.min(1, scrolled / (h * HERO_BG_SCROLL_ZOOM_RANGE));
+      const scale = 1 + t * HERO_BG_SCROLL_ZOOM_EXTRA;
+      zoomWrap.style.transform = `scale(${scale})`;
+    };
+
+    const onScrollOrResize = () => {
+      if (scheduled) return;
+      scheduled = true;
+      rafId = requestAnimationFrame(applyZoom);
+    };
+
+    applyZoom();
+    window.addEventListener("scroll", onScrollOrResize, { passive: true });
+    window.addEventListener("resize", onScrollOrResize);
+
+    return () => {
+      window.removeEventListener("scroll", onScrollOrResize);
+      window.removeEventListener("resize", onScrollOrResize);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  const heroReveal = useHeroReveal();
+
   return (
-    <section className="relative min-h-min overflow-hidden bg-[#051a24] sm:min-h-screen">
-      {/* Background video */}
-      <video
-        ref={bgVideoRef}
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-        style={{ opacity: 0.6, filter: "brightness(0.65) saturate(0.8)" }}
-        muted
-        loop
-        playsInline
-        preload="none"
+    <section
+      ref={heroSectionRef}
+      className="relative min-h-min overflow-hidden bg-[#061f17] sm:min-h-screen"
+    >
+      {/* Background video — zoom según scroll (solo video; overlays fijos) */}
+      <div
+        ref={bgVideoZoomRef}
+        className="pointer-events-none absolute inset-0 z-0 will-change-transform"
+        style={{
+          transformOrigin: "50% 42%",
+          transform: "scale(1)",
+        }}
+      >
+        <video
+          ref={bgVideoRef}
+          src={HERO_BG_VIDEO_SRC}
+          className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
+          style={{
+            opacity: 0.52,
+            filter: "brightness(0.52) contrast(1.08) saturate(0.72) hue-rotate(12deg)",
+          }}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden
+        />
+      </div>
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] bg-[#061f17]/50 mix-blend-multiply"
         aria-hidden
       />
 
       {/* Left gradient overlay */}
       <div
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute inset-0 z-[2]"
         style={{
           background:
-            "linear-gradient(90deg, rgba(7,11,10,0.92) 0%, rgba(7,11,10,0.55) 50%, rgba(7,11,10,0.10) 100%)",
+            "linear-gradient(90deg, rgba(6,31,23,0.94) 0%, rgba(6,31,23,0.58) 50%, rgba(6,31,23,0.12) 100%)",
         }}
         aria-hidden
       />
 
       {/* Bottom gradient overlay */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-3/4"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-3/4"
         style={{
           background:
-            "linear-gradient(to top, rgba(5,26,36,0.97) 0%, rgba(5,26,36,0.5) 40%, transparent 100%)",
+            "linear-gradient(to top, rgba(6,31,23,0.96) 0%, rgba(6,31,23,0.52) 42%, transparent 100%)",
         }}
         aria-hidden
       />
 
       {/* Vertical grid lines — desktop only */}
-      <div className="pointer-events-none absolute inset-0 hidden md:block" aria-hidden>
+      <div className="pointer-events-none absolute inset-0 z-[2] hidden md:block" aria-hidden>
         {[25, 50, 75].map((left) => (
           <div
             key={left}
@@ -278,7 +436,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
 
       {/* Central glow SVG ellipse */}
       <div
-        className="pointer-events-none absolute left-1/2 top-0 z-[1] w-[min(140%,1100px)] -translate-x-1/2"
+        className="pointer-events-none absolute left-1/2 top-0 z-[3] w-[min(140%,1100px)] -translate-x-1/2"
         aria-hidden
       >
         <svg
@@ -299,7 +457,10 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
       </div>
 
       {/* Content — desktop: bloque centrado en altura; móvil: flujo natural + scroll pegado a badges */}
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl min-h-0 flex-col items-center px-5 pb-16 pt-28 max-sm:pb-[max(4.25rem,env(safe-area-inset-bottom,0px))] sm:min-h-[100dvh] sm:min-h-screen sm:justify-center sm:px-6 sm:pb-24 sm:pt-32 md:pb-20 lg:px-8">
+      <motion.div
+        className="relative z-10 mx-auto flex w-full max-w-5xl min-h-0 flex-col items-center px-5 pb-16 pt-28 max-sm:pb-[max(4.25rem,env(safe-area-inset-bottom,0px))] sm:min-h-[100dvh] sm:min-h-screen sm:justify-center sm:px-6 sm:pb-24 sm:pt-32 md:pb-20 lg:px-8"
+        {...heroReveal}
+      >
         <div className="flex w-full flex-col items-center text-center sm:flex-1 sm:justify-center">
           {/* Eyebrow */}
           <p className="mb-4 max-w-[min(100%,26rem)] text-pretty text-[11px] font-bold uppercase leading-snug tracking-[0.2em] text-lime-400 sm:mb-5 sm:text-xs sm:tracking-[0.22em] md:mb-6 md:text-[0.8125rem]">
@@ -391,64 +552,174 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
           </span>
           <i className="icon-[lucide--chevrons-down] h-4 w-4 animate-bounce text-white sm:h-[1.125rem] sm:w-[1.125rem]" aria-hidden />
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
 
-function StatsBand() {
+function HeroDemoVideoStrip() {
+  const reveal = useInViewReveal();
   return (
-    <section className="relative z-[1] -mt-2 scroll-mt-24 bg-[#061f17] sm:mt-0">
-      <div className="mx-auto max-w-5xl px-5 pt-2 pb-8 sm:px-6 sm:py-14 lg:px-8">
-        <div className="grid grid-cols-1 divide-y divide-white/[0.08] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          {STATS.map((stat) => (
-            <div key={stat.label} className="px-4 py-5 text-center first:pt-0 last:pb-0 sm:px-6 sm:py-6 md:px-8">
-              <div className="text-3xl font-black tabular-nums text-lime-400 sm:text-4xl md:text-5xl">
-                {stat.value}
+    <motion.section
+      className="relative z-[1] scroll-mt-24 border-t border-white/[0.07] bg-[#061f17]"
+      aria-labelledby="hero-demo-video-heading"
+      {...reveal}
+    >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-lime-400/25 to-transparent" aria-hidden />
+      <div className="relative mx-auto max-w-5xl px-5 pb-8 pt-8 sm:px-6 sm:pb-12 sm:pt-10 lg:px-8">
+        <div className="mx-auto mb-5 max-w-2xl text-center sm:mb-6">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-lime-400/95 sm:text-xs sm:tracking-[0.22em]">
+            Recorrido en vídeo
+          </p>
+          <h2
+            id="hero-demo-video-heading"
+            className="text-balance text-lg font-bold leading-snug text-white sm:text-xl md:text-2xl"
+          >
+            Así se ve EthicVoice en el día a día de compliance
+          </h2>
+          <p className="mt-2 text-pretty text-sm leading-relaxed text-white/55 sm:mt-2.5 sm:text-[0.9375rem]">
+            Transparencia ante tu equipo: mismo tono visual que el panel real, sin promesas vacías.
+          </p>
+        </div>
+        <VideoModal
+          videoSrc={DEMO_PRODUCT_VIDEO_SRC}
+          posterSrc={DEMO_PRODUCT_VIDEO_POSTER}
+          className="mx-auto aspect-video h-auto min-h-[11.5rem] w-full max-w-3xl rounded-2xl shadow-[0_28px_90px_rgba(0,0,0,0.42)] ring-1 ring-inset ring-white/[0.09] sm:min-h-[13.5rem] md:max-w-4xl md:min-h-[15.5rem] lg:max-w-5xl lg:min-h-[17rem]"
+        />
+      </div>
+    </motion.section>
+  );
+}
+
+function StatsBand() {
+  const statsRootRef = useRef<HTMLDivElement>(null);
+  const [statsVisible, setStatsVisible] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mq.matches);
+    const onChange = () => setReduceMotion(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    const el = statsRootRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setStatsVisible(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.22, rootMargin: "0px 0px -6% 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const reveal = useInViewReveal();
+
+  return (
+    <motion.section className="relative z-[1] scroll-mt-24 bg-[#061f17] sm:mt-0" {...reveal}>
+      <div
+        ref={statsRootRef}
+        className="mx-auto max-w-5xl px-5 pt-2 pb-8 sm:px-6 sm:py-14 lg:px-8"
+      >
+        <div className="grid grid-cols-1 divide-y divide-white/[0.08] sm:grid-cols-3 sm:items-stretch sm:divide-x sm:divide-y-0">
+          {STATS_BAND.map((stat, index) => (
+            <div
+              key={stat.label}
+              className="flex flex-col items-center justify-center px-4 py-5 text-center max-sm:first:pt-0 max-sm:last:pb-0 sm:min-h-[9.5rem] sm:px-6 sm:py-6 md:min-h-[10.5rem] md:px-8"
+            >
+              <div className="text-3xl font-black tabular-nums leading-none tracking-tight text-lime-400 sm:text-4xl md:text-5xl">
+                <StatsTickerValue
+                  spec={stat.ticker}
+                  active={statsVisible}
+                  delayMs={index * 95}
+                  reduceMotion={reduceMotion}
+                />
               </div>
-              <div className="mx-auto mt-1.5 max-w-[16rem] text-pretty text-[10px] font-medium uppercase tracking-widest text-white/40 sm:max-w-none sm:text-xs">
+              <div className="mx-auto mt-3 max-w-[16rem] text-pretty text-[10px] font-medium uppercase leading-snug tracking-widest text-white/40 sm:mt-3.5 sm:max-w-none sm:text-xs sm:leading-snug">
                 {stat.label}
               </div>
             </div>
           ))}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function LogoProofSection() {
+  const reduced = useReducedMotion();
+  const reveal = useInViewReveal();
   return (
-    <section className="scroll-mt-24 border-b border-slate-100 bg-white py-10 sm:py-14">
+    <motion.section className="scroll-mt-24 border-b border-slate-100 bg-white py-10 sm:py-14" {...reveal}>
       <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
         <p className="mb-6 text-center text-[10px] font-bold uppercase tracking-widest text-slate-400 sm:mb-8">
           Equipos que ya confían en EthicVoice
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-8 sm:gap-x-12 sm:gap-y-10 md:gap-x-16">
-          {BRANDS.map((brand) => (
-            <div
-              key={brand.name}
-              className="opacity-45 grayscale transition-all duration-300 hover:opacity-70 hover:grayscale-0"
-            >
-              <Image
-                src={brand.src}
-                alt={brand.name}
-                width={120}
-                height={36}
-                className="h-6 w-auto max-w-[100px] object-contain sm:h-8 sm:max-w-[120px]"
-                sizes="120px"
-              />
-            </div>
-          ))}
-        </div>
+        {reduced === true ? (
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-8 sm:gap-x-12 sm:gap-y-10 md:gap-x-16">
+            {BRANDS.map((brand) => (
+              <div
+                key={brand.name}
+                className="opacity-45 grayscale transition-all duration-300 hover:opacity-70 hover:grayscale-0"
+              >
+                <Image
+                  src={brand.src}
+                  alt={brand.name}
+                  width={120}
+                  height={36}
+                  className="h-6 w-auto max-w-[100px] object-contain sm:h-8 sm:max-w-[120px]"
+                  sizes="120px"
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            className="flex flex-wrap items-center justify-center gap-x-6 gap-y-8 sm:gap-x-12 sm:gap-y-10 md:gap-x-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={LANDING_VIEWPORT}
+            variants={LANDING_STAGGER_CONTAINER}
+          >
+            {BRANDS.map((brand) => (
+              <motion.div
+                key={brand.name}
+                variants={LANDING_STAGGER_ITEM}
+                className="opacity-45 grayscale transition-all duration-300 hover:opacity-70 hover:grayscale-0"
+              >
+                <Image
+                  src={brand.src}
+                  alt={brand.name}
+                  width={120}
+                  height={36}
+                  className="h-6 w-auto max-w-[100px] object-contain sm:h-8 sm:max-w-[120px]"
+                  sizes="120px"
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function FeaturesSection() {
+  const reduced = useReducedMotion();
+  const reveal = useInViewReveal();
   return (
-    <section className="scroll-mt-24 bg-slate-50 py-16 sm:py-20 md:py-24" id="solucion">
+    <motion.section
+      className="scroll-mt-24 bg-slate-50 py-16 sm:py-20 md:py-24"
+      id="solucion"
+      {...reveal}
+    >
       <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="mb-10 grid gap-6 sm:mb-12 md:mb-14 lg:grid-cols-2 lg:items-end lg:gap-10">
@@ -484,57 +755,124 @@ function FeaturesSection() {
         </div>
 
         {/* 6 feature cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((feat) => {
-            const isLime = feat.color === "lime";
-            return (
-              <article
-                key={feat.title}
-                className="group rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-lime-200 hover:shadow-xl sm:p-6"
-              >
-                <div
-                  className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
-                    isLime ? "bg-lime-50" : "bg-emerald-50"
-                  }`}
+        {reduced === true ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((feat) => {
+              const isLime = feat.color === "lime";
+              return (
+                <article
+                  key={feat.title}
+                  className="group rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-lime-200 hover:shadow-xl sm:p-6"
                 >
-                  <i
-                    className={`${feat.icon} h-5 w-5 ${isLime ? "text-lime-700" : "text-emerald-700"}`}
-                    aria-hidden
-                  />
-                </div>
-                <h3 className="mb-2 text-base font-bold text-[#0d212c]">{feat.title}</h3>
-                <p className="text-sm leading-relaxed text-slate-500">{feat.desc}</p>
-              </article>
-            );
-          })}
-        </div>
+                  <div
+                    className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
+                      isLime ? "bg-lime-50" : "bg-emerald-50"
+                    }`}
+                  >
+                    <i
+                      className={`${feat.icon} h-5 w-5 ${isLime ? "text-lime-700" : "text-emerald-700"}`}
+                      aria-hidden
+                    />
+                  </div>
+                  <h3 className="mb-2 text-base font-bold text-[#0d212c]">{feat.title}</h3>
+                  <p className="text-sm leading-relaxed text-slate-500">{feat.desc}</p>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <motion.div
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            initial="hidden"
+            whileInView="visible"
+            viewport={LANDING_VIEWPORT}
+            variants={LANDING_STAGGER_CONTAINER}
+          >
+            {FEATURES.map((feat) => {
+              const isLime = feat.color === "lime";
+              return (
+                <motion.article
+                  key={feat.title}
+                  variants={LANDING_STAGGER_ITEM}
+                  className="group rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-lime-200 hover:shadow-xl sm:p-6"
+                >
+                  <div
+                    className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
+                      isLime ? "bg-lime-50" : "bg-emerald-50"
+                    }`}
+                  >
+                    <i
+                      className={`${feat.icon} h-5 w-5 ${isLime ? "text-lime-700" : "text-emerald-700"}`}
+                      aria-hidden
+                    />
+                  </div>
+                  <h3 className="mb-2 text-base font-bold text-[#0d212c]">{feat.title}</h3>
+                  <p className="text-sm leading-relaxed text-slate-500">{feat.desc}</p>
+                </motion.article>
+              );
+            })}
+          </motion.div>
+        )}
 
         {/* KPI strip — stack on very narrow screens */}
-        <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {[
-            { label: "Canal activo", value: "24/7" },
-            { label: "Modelo de operación", value: "Multicanal" },
-            { label: "Enfoque", value: "Cumplimiento + Cultura" },
-          ].map((kpi) => (
-            <div
-              key={kpi.label}
-              className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-center"
-            >
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                {kpi.label}
-              </p>
-              <p className="mt-1 text-sm font-extrabold text-[#0d212c] sm:text-base">{kpi.value}</p>
-            </div>
-          ))}
-        </div>
+        {reduced === true ? (
+          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {[
+              { label: "Canal activo", value: "24/7" },
+              { label: "Modelo de operación", value: "Multicanal" },
+              { label: "Enfoque", value: "Cumplimiento + Cultura" },
+            ].map((kpi) => (
+              <div
+                key={kpi.label}
+                className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-center"
+              >
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  {kpi.label}
+                </p>
+                <p className="mt-1 text-sm font-extrabold text-[#0d212c] sm:text-base">{kpi.value}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3"
+            initial="hidden"
+            whileInView="visible"
+            viewport={LANDING_VIEWPORT}
+            variants={LANDING_STAGGER_CONTAINER}
+          >
+            {[
+              { label: "Canal activo", value: "24/7" },
+              { label: "Modelo de operación", value: "Multicanal" },
+              { label: "Enfoque", value: "Cumplimiento + Cultura" },
+            ].map((kpi) => (
+              <motion.div
+                key={kpi.label}
+                variants={LANDING_STAGGER_ITEM}
+                className="rounded-2xl border border-slate-200 bg-white px-4 py-4 text-center"
+              >
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                  {kpi.label}
+                </p>
+                <p className="mt-1 text-sm font-extrabold text-[#0d212c] sm:text-base">{kpi.value}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function HowItWorksSection() {
+  const reduced = useReducedMotion();
+  const reveal = useInViewReveal();
   return (
-    <section className="scroll-mt-24 bg-white py-16 sm:py-20 md:py-24" id="como-funciona">
+    <motion.section
+      className="scroll-mt-24 bg-white py-16 sm:py-20 md:py-24"
+      id="como-funciona"
+      {...reveal}
+    >
       <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="mb-10 text-center sm:mb-12 md:mb-14">
@@ -552,54 +890,98 @@ function HowItWorksSection() {
         </div>
 
         {/* Steps grid */}
-        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
-          {STEPS.map((step, idx) => (
-            <article
-              key={step.title}
-              className="group relative flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-lime-200 hover:shadow-xl sm:p-6"
-            >
-              {/* Connector dot — desktop only, except last */}
-              {idx < STEPS.length - 1 && (
-                <div
-                  className="absolute right-0 top-10 hidden h-px w-5 translate-x-full bg-gradient-to-r from-lime-300/70 to-transparent lg:block"
-                  aria-hidden
-                />
-              )}
-
-              {/* Big faded number */}
-              <div
-                className="absolute right-4 top-3 select-none text-5xl font-black text-slate-100 transition-colors group-hover:text-lime-100"
-                aria-hidden
+        {reduced === true ? (
+          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+            {STEPS.map((step, idx) => (
+              <article
+                key={step.title}
+                className="group relative flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-lime-200 hover:shadow-xl sm:p-6"
               >
-                {step.num}
-              </div>
-
-              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#051a24]">
-                <i className={`${step.icon} h-5 w-5 text-lime-400`} aria-hidden />
-              </div>
-
-              <h3 className="mb-2 text-sm font-bold leading-snug text-[#0d212c] sm:text-base">
-                {step.title}
-              </h3>
-              <p className="flex-1 text-xs leading-relaxed text-slate-500">{step.desc}</p>
-
-              <div className="mt-4 rounded-xl bg-lime-50 px-3 py-2">
-                <p className="text-[11px] font-semibold text-lime-800">
-                  <i className="icon-[lucide--circle-check] mr-1 inline h-3.5 w-3.5 text-lime-600" aria-hidden />
-                  {step.outcome}
-                </p>
-              </div>
-            </article>
-          ))}
-        </div>
+                {idx < STEPS.length - 1 && (
+                  <div
+                    className="absolute right-0 top-10 hidden h-px w-5 translate-x-full bg-gradient-to-r from-lime-300/70 to-transparent lg:block"
+                    aria-hidden
+                  />
+                )}
+                <div
+                  className="absolute right-4 top-3 select-none text-5xl font-black text-slate-100 transition-colors group-hover:text-lime-100"
+                  aria-hidden
+                >
+                  {step.num}
+                </div>
+                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#051a24]">
+                  <i className={`${step.icon} h-5 w-5 text-lime-400`} aria-hidden />
+                </div>
+                <h3 className="mb-2 text-sm font-bold leading-snug text-[#0d212c] sm:text-base">
+                  {step.title}
+                </h3>
+                <p className="flex-1 text-xs leading-relaxed text-slate-500">{step.desc}</p>
+                <div className="mt-4 rounded-xl bg-lime-50 px-3 py-2">
+                  <p className="text-[11px] font-semibold text-lime-800">
+                    <i className="icon-[lucide--circle-check] mr-1 inline h-3.5 w-3.5 text-lime-600" aria-hidden />
+                    {step.outcome}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4"
+            initial="hidden"
+            whileInView="visible"
+            viewport={LANDING_VIEWPORT}
+            variants={LANDING_STAGGER_CONTAINER}
+          >
+            {STEPS.map((step, idx) => (
+              <motion.article
+                key={step.title}
+                variants={LANDING_STAGGER_ITEM}
+                className="group relative flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-lime-200 hover:shadow-xl sm:p-6"
+              >
+                {idx < STEPS.length - 1 && (
+                  <div
+                    className="absolute right-0 top-10 hidden h-px w-5 translate-x-full bg-gradient-to-r from-lime-300/70 to-transparent lg:block"
+                    aria-hidden
+                  />
+                )}
+                <div
+                  className="absolute right-4 top-3 select-none text-5xl font-black text-slate-100 transition-colors group-hover:text-lime-100"
+                  aria-hidden
+                >
+                  {step.num}
+                </div>
+                <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#051a24]">
+                  <i className={`${step.icon} h-5 w-5 text-lime-400`} aria-hidden />
+                </div>
+                <h3 className="mb-2 text-sm font-bold leading-snug text-[#0d212c] sm:text-base">
+                  {step.title}
+                </h3>
+                <p className="flex-1 text-xs leading-relaxed text-slate-500">{step.desc}</p>
+                <div className="mt-4 rounded-xl bg-lime-50 px-3 py-2">
+                  <p className="text-[11px] font-semibold text-lime-800">
+                    <i className="icon-[lucide--circle-check] mr-1 inline h-3.5 w-3.5 text-lime-600" aria-hidden />
+                    {step.outcome}
+                  </p>
+                </div>
+              </motion.article>
+            ))}
+          </motion.div>
+        )}
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function SecuritySection() {
+  const reduced = useReducedMotion();
+  const reveal = useInViewReveal();
   return (
-    <section className="scroll-mt-24 relative overflow-hidden bg-[#051a24] py-16 sm:py-20 md:py-24" id="seguridad">
+    <motion.section
+      className="scroll-mt-24 relative overflow-hidden bg-[#0a1e14] py-16 sm:py-20 md:py-24"
+      id="seguridad"
+      {...reveal}
+    >
       {/* Subtle dot grid */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.05]"
@@ -642,49 +1024,102 @@ function SecuritySection() {
             </div>
 
             {/* Metrics */}
-            <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-3">
-              {[
-                { label: "Acceso", value: "Por roles" },
-                { label: "Visibilidad", value: "Trazable" },
-                { label: "Canal", value: "Bidireccional" },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-3.5 text-center sm:px-4"
-                >
-                  <p className="text-pretty text-[10px] font-bold uppercase tracking-widest text-white/35">
-                    {item.label}
-                  </p>
-                  <p className="mt-1 text-sm font-bold text-white sm:text-base">{item.value}</p>
-                </div>
-              ))}
-            </div>
+            {reduced === true ? (
+              <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-3">
+                {[
+                  { label: "Acceso", value: "Por roles" },
+                  { label: "Visibilidad", value: "Trazable" },
+                  { label: "Canal", value: "Bidireccional" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-3.5 text-center sm:px-4"
+                  >
+                    <p className="text-pretty text-[10px] font-bold uppercase tracking-widest text-white/35">
+                      {item.label}
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-white sm:text-base">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <motion.div
+                className="mt-6 grid grid-cols-1 gap-3 sm:mt-8 sm:grid-cols-3"
+                initial="hidden"
+                whileInView="visible"
+                viewport={LANDING_VIEWPORT}
+                variants={LANDING_STAGGER_CONTAINER}
+              >
+                {[
+                  { label: "Acceso", value: "Por roles" },
+                  { label: "Visibilidad", value: "Trazable" },
+                  { label: "Canal", value: "Bidireccional" },
+                ].map((item) => (
+                  <motion.div
+                    key={item.label}
+                    variants={LANDING_STAGGER_ITEM}
+                    className="rounded-xl border border-white/[0.08] bg-white/[0.04] px-3 py-3.5 text-center sm:px-4"
+                  >
+                    <p className="text-pretty text-[10px] font-bold uppercase tracking-widest text-white/35">
+                      {item.label}
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-white sm:text-base">{item.value}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            )}
           </div>
 
           {/* Right cards grid */}
-          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
-            {SECURITY_FEATURES.map((feat) => (
-              <article
-                key={feat.title}
-                className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:bg-white/[0.07] sm:p-5"
-              >
-                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-lime-400/[0.12]">
-                  <i className={`${feat.icon} h-5 w-5 text-lime-400`} aria-hidden />
-                </div>
-                <h3 className="mb-1.5 text-sm font-bold text-white">{feat.title}</h3>
-                <p className="text-xs leading-relaxed text-white/50">{feat.desc}</p>
-              </article>
-            ))}
-          </div>
+          {reduced === true ? (
+            <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
+              {SECURITY_FEATURES.map((feat) => (
+                <article
+                  key={feat.title}
+                  className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:bg-white/[0.07] sm:p-5"
+                >
+                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-lime-400/[0.12]">
+                    <i className={`${feat.icon} h-5 w-5 text-lime-400`} aria-hidden />
+                  </div>
+                  <h3 className="mb-1.5 text-sm font-bold text-white">{feat.title}</h3>
+                  <p className="text-xs leading-relaxed text-white/50">{feat.desc}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <motion.div
+              className="grid gap-3 sm:grid-cols-2 sm:gap-4"
+              initial="hidden"
+              whileInView="visible"
+              viewport={LANDING_VIEWPORT}
+              variants={LANDING_STAGGER_CONTAINER}
+            >
+              {SECURITY_FEATURES.map((feat) => (
+                <motion.article
+                  key={feat.title}
+                  variants={LANDING_STAGGER_ITEM}
+                  className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:bg-white/[0.07] sm:p-5"
+                >
+                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-lime-400/[0.12]">
+                    <i className={`${feat.icon} h-5 w-5 text-lime-400`} aria-hidden />
+                  </div>
+                  <h3 className="mb-1.5 text-sm font-bold text-white">{feat.title}</h3>
+                  <p className="text-xs leading-relaxed text-white/50">{feat.desc}</p>
+                </motion.article>
+              ))}
+            </motion.div>
+          )}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function TestimonialsSection() {
+  const reduced = useReducedMotion();
+  const reveal = useInViewReveal();
   return (
-    <section className="scroll-mt-24 bg-[#0a1e14] py-16 sm:py-20 md:py-24">
+    <motion.section className="scroll-mt-24 bg-[#0a1e14] py-16 sm:py-20 md:py-24" {...reveal}>
       <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
         <div className="mb-8 text-center sm:mb-12">
           <p className="mb-3 text-xs font-bold uppercase tracking-widest text-lime-400">
@@ -696,91 +1131,177 @@ function TestimonialsSection() {
         </div>
 
         <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
-          {/* Featured testimonial */}
-          <article className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#051a24] to-[#0d2d1e] p-6 ring-1 ring-lime-400/20 sm:p-8 md:p-10 lg:col-span-7">
-            <div
-              className="pointer-events-none absolute right-0 top-0 h-48 w-48 opacity-15 blur-3xl"
-              style={{ background: "rgba(163,230,53,0.6)" }}
-              aria-hidden
-            />
-            <div className="relative z-10">
-              <div className="mb-6 flex gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <i key={i} className="icon-[lucide--star] h-5 w-5 fill-current text-lime-400" aria-hidden />
-                ))}
-              </div>
-              <blockquote className="text-pretty text-lg font-semibold leading-snug text-white sm:text-xl md:text-2xl lg:text-3xl">
-                "{TESTIMONIALS[0].quote}"
-              </blockquote>
-              <div className="mt-8 flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-lime-400 text-sm font-black text-[#051a24]">
-                  {TESTIMONIALS[0].initials}
-                </div>
-                <div>
-                  <p className="font-bold text-white">{TESTIMONIALS[0].author}</p>
-                  <p className="text-sm text-white/45">{TESTIMONIALS[0].company}</p>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          {/* Smaller testimonials */}
-          <div className="flex flex-col gap-4 lg:col-span-5">
-            {TESTIMONIALS.slice(1).map((t) => (
-              <article
-                key={t.quote}
-                className="flex-1 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-6 backdrop-blur-sm"
-              >
-                <div className="mb-3 flex gap-0.5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <i key={i} className="icon-[lucide--star] h-3.5 w-3.5 fill-current text-lime-400" aria-hidden />
-                  ))}
-                </div>
-                <blockquote className="text-sm leading-relaxed text-white/75">
-                  "{t.quote}"
-                </blockquote>
-                <div className="mt-5 flex items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-xs font-bold text-white/60">
-                    {t.initials}
+          {reduced === true ? (
+            <>
+              <article className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#051a24] to-[#0d2d1e] p-6 ring-1 ring-lime-400/20 sm:p-8 md:p-10 lg:col-span-7">
+                <div
+                  className="pointer-events-none absolute right-0 top-0 h-48 w-48 opacity-15 blur-3xl"
+                  style={{ background: "rgba(163,230,53,0.6)" }}
+                  aria-hidden
+                />
+                <div className="relative z-10">
+                  <div className="mb-6 flex gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <i key={i} className="icon-[lucide--star] h-5 w-5 fill-current text-lime-400" aria-hidden />
+                    ))}
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">{t.author}</p>
-                    <p className="text-xs text-white/35">{t.company}</p>
+                  <blockquote className="text-pretty text-lg font-semibold leading-snug text-white sm:text-xl md:text-2xl lg:text-3xl">
+                    "{TESTIMONIALS[0].quote}"
+                  </blockquote>
+                  <div className="mt-8 flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-lime-400 text-sm font-black text-[#051a24]">
+                      {TESTIMONIALS[0].initials}
+                    </div>
+                    <div>
+                      <p className="font-bold text-white">{TESTIMONIALS[0].author}</p>
+                      <p className="text-sm text-white/45">{TESTIMONIALS[0].company}</p>
+                    </div>
                   </div>
                 </div>
               </article>
-            ))}
-
-            {/* Summary card */}
-            <div className="rounded-2xl border border-lime-400/20 bg-lime-400/[0.06] px-4 py-4 sm:px-5">
-              <div className="grid grid-cols-1 gap-4 text-center min-[380px]:grid-cols-3 min-[380px]:gap-2 sm:gap-3">
-                {[
-                  { label: "Implementación", value: "Rápida" },
-                  { label: "Control", value: "+Visibilidad" },
-                  { label: "Resultado", value: "Trazable" },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/35">
-                      {item.label}
-                    </p>
-                    <p className="mt-0.5 text-sm font-extrabold text-lime-300">{item.value}</p>
-                  </div>
+              <div className="flex flex-col gap-4 lg:col-span-5">
+                {TESTIMONIALS.slice(1).map((t) => (
+                  <article
+                    key={t.quote}
+                    className="flex-1 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-6 backdrop-blur-sm"
+                  >
+                    <div className="mb-3 flex gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <i key={i} className="icon-[lucide--star] h-3.5 w-3.5 fill-current text-lime-400" aria-hidden />
+                      ))}
+                    </div>
+                    <blockquote className="text-sm leading-relaxed text-white/75">
+                      "{t.quote}"
+                    </blockquote>
+                    <div className="mt-5 flex items-center gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-xs font-bold text-white/60">
+                        {t.initials}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-white">{t.author}</p>
+                        <p className="text-xs text-white/35">{t.company}</p>
+                      </div>
+                    </div>
+                  </article>
                 ))}
+                <div className="rounded-2xl border border-lime-400/20 bg-lime-400/[0.06] px-4 py-4 sm:px-5">
+                  <div className="grid grid-cols-1 gap-4 text-center min-[380px]:grid-cols-3 min-[380px]:gap-2 sm:gap-3">
+                    {[
+                      { label: "Implementación", value: "Rápida" },
+                      { label: "Control", value: "+Visibilidad" },
+                      { label: "Resultado", value: "Trazable" },
+                    ].map((item) => (
+                      <div key={item.label}>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/35">
+                          {item.label}
+                        </p>
+                        <p className="mt-0.5 text-sm font-extrabold text-lime-300">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          ) : (
+            <>
+              <motion.article
+                className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#051a24] to-[#0d2d1e] p-6 ring-1 ring-lime-400/20 sm:p-8 md:p-10 lg:col-span-7"
+                initial={{ opacity: 0, y: 32 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={LANDING_VIEWPORT}
+                transition={{ duration: 0.58, ease: LANDING_EASE }}
+              >
+                <div
+                  className="pointer-events-none absolute right-0 top-0 h-48 w-48 opacity-15 blur-3xl"
+                  style={{ background: "rgba(163,230,53,0.6)" }}
+                  aria-hidden
+                />
+                <div className="relative z-10">
+                  <div className="mb-6 flex gap-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <i key={i} className="icon-[lucide--star] h-5 w-5 fill-current text-lime-400" aria-hidden />
+                    ))}
+                  </div>
+                  <blockquote className="text-pretty text-lg font-semibold leading-snug text-white sm:text-xl md:text-2xl lg:text-3xl">
+                    "{TESTIMONIALS[0].quote}"
+                  </blockquote>
+                  <div className="mt-8 flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-lime-400 text-sm font-black text-[#051a24]">
+                      {TESTIMONIALS[0].initials}
+                    </div>
+                    <div>
+                      <p className="font-bold text-white">{TESTIMONIALS[0].author}</p>
+                      <p className="text-sm text-white/45">{TESTIMONIALS[0].company}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.article>
+
+              <motion.div
+                className="flex flex-col gap-4 lg:col-span-5"
+                initial="hidden"
+                whileInView="visible"
+                viewport={LANDING_VIEWPORT}
+                variants={LANDING_STAGGER_CONTAINER}
+              >
+                {TESTIMONIALS.slice(1).map((t) => (
+                  <motion.article
+                    key={t.quote}
+                    variants={LANDING_STAGGER_ITEM}
+                    className="flex-1 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-6 backdrop-blur-sm"
+                  >
+                    <div className="mb-3 flex gap-0.5">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <i key={i} className="icon-[lucide--star] h-3.5 w-3.5 fill-current text-lime-400" aria-hidden />
+                      ))}
+                    </div>
+                    <blockquote className="text-sm leading-relaxed text-white/75">
+                      "{t.quote}"
+                    </blockquote>
+                    <div className="mt-5 flex items-center gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-xs font-bold text-white/60">
+                        {t.initials}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-white">{t.author}</p>
+                        <p className="text-xs text-white/35">{t.company}</p>
+                      </div>
+                    </div>
+                  </motion.article>
+                ))}
+                <motion.div variants={LANDING_STAGGER_ITEM} className="rounded-2xl border border-lime-400/20 bg-lime-400/[0.06] px-4 py-4 sm:px-5">
+                  <div className="grid grid-cols-1 gap-4 text-center min-[380px]:grid-cols-3 min-[380px]:gap-2 sm:gap-3">
+                    {[
+                      { label: "Implementación", value: "Rápida" },
+                      { label: "Control", value: "+Visibilidad" },
+                      { label: "Resultado", value: "Trazable" },
+                    ].map((item) => (
+                      <div key={item.label}>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/35">
+                          {item.label}
+                        </p>
+                        <p className="mt-0.5 text-sm font-extrabold text-lime-300">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </motion.div>
+            </>
+          )}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function PricingSection() {
   const { openCalendly } = useCalendlyGate();
   const enterprise = PLAN_CONFIGS[PlanType.PREMIUM];
+  const reduced = useReducedMotion();
+  const reveal = useInViewReveal();
 
   return (
-    <section className="scroll-mt-24 bg-white py-16 sm:py-20 md:py-24" id="planes">
+    <motion.section className="scroll-mt-24 bg-white py-16 sm:py-20 md:py-24" id="planes" {...reveal}>
       <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
         <div className="mb-10 text-center sm:mb-12 md:mb-14">
           <p className="mb-3 text-xs font-bold uppercase tracking-widest text-lime-700">
@@ -797,170 +1318,348 @@ function PricingSection() {
         </div>
 
         {/* Plans */}
-        <div className="grid gap-6 sm:grid-cols-3 sm:gap-5">
-          {PLAN_ORDER.map((planType) => {
-            const plan = PLAN_CONFIGS[planType];
-            const isPopular = !!plan.isPopular;
-            const employees =
-              plan.features.maxEmployees === -1
-                ? "Colaboradores ilimitados"
-                : `Hasta ${plan.features.maxEmployees} colaboradores`;
+        {reduced === true ? (
+          <div className="grid gap-6 sm:grid-cols-3 sm:gap-5">
+            {PLAN_ORDER.map((planType) => {
+              const plan = PLAN_CONFIGS[planType];
+              const isPopular = !!plan.isPopular;
+              const employees =
+                plan.features.maxEmployees === -1
+                  ? "Colaboradores ilimitados"
+                  : `Hasta ${plan.features.maxEmployees} colaboradores`;
 
-            return (
-              <article
-                key={planType}
-                className={`relative flex min-h-0 flex-col rounded-2xl p-5 transition-all duration-300 sm:p-7 ${
-                  isPopular
-                    ? "bg-[#051a24] shadow-[0_24px_60px_rgba(5,26,36,0.35)] ring-2 ring-lime-400"
-                    : "border border-slate-200 bg-white hover:border-lime-200 hover:shadow-xl"
-                }`}
-              >
-                {isPopular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#051a24]">
-                      Más popular
-                    </span>
-                  </div>
-                )}
-
-                <h3
-                  className={`text-xl font-extrabold ${isPopular ? "text-white" : "text-[#0d212c]"}`}
-                >
-                  {plan.displayName}
-                </h3>
-                <p
-                  className={`mt-2 text-sm leading-relaxed ${isPopular ? "text-white/55" : "text-slate-500"}`}
-                >
-                  {plan.description}
-                </p>
-
-                <div
-                  className={`mt-6 rounded-xl p-4 ${
+              return (
+                <article
+                  key={planType}
+                  className={`relative flex min-h-0 flex-col rounded-2xl p-5 transition-all duration-300 sm:p-7 ${
                     isPopular
-                      ? "bg-white/[0.08] ring-1 ring-white/10"
-                      : "border border-slate-200 bg-slate-50"
+                      ? "bg-[#0a1e14] shadow-[0_24px_60px_rgba(10,30,20,0.38)] ring-2 ring-lime-400"
+                      : "border border-slate-200 bg-white hover:border-lime-200 hover:shadow-xl"
                   }`}
                 >
-                  <div className="flex items-baseline gap-1">
-                    <span
-                      className={`text-4xl font-black ${isPopular ? "text-white" : "text-[#0d212c]"}`}
-                    >
-                      ${plan.price.monthly}
-                    </span>
-                    <span
-                      className={`text-sm font-medium ${isPopular ? "text-white/50" : "text-slate-400"}`}
-                    >
-                      USD / mes
-                    </span>
-                  </div>
-                  <p
-                    className={`mt-1 text-xs ${isPopular ? "text-white/40" : "text-slate-400"}`}
+                  {isPopular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#0a1e14]">
+                        Más popular
+                      </span>
+                    </div>
+                  )}
+
+                  <h3
+                    className={`text-xl font-extrabold ${isPopular ? "text-white" : "text-[#0d212c]"}`}
                   >
-                    {employees}
+                    {plan.displayName}
+                  </h3>
+                  <p
+                    className={`mt-2 text-sm leading-relaxed ${isPopular ? "text-white/55" : "text-slate-500"}`}
+                  >
+                    {plan.description}
                   </p>
-                </div>
 
-                <ul className="mt-6 flex-1 space-y-3">
-                  {plan.features.highlights.slice(0, 5).map((item) => (
-                    <li
-                      key={`${planType}-${item}`}
-                      className={`flex items-start gap-2 text-sm ${
-                        isPopular ? "text-white/75" : "text-slate-600"
-                      }`}
+                  <div
+                    className={`mt-6 rounded-xl p-4 ${
+                      isPopular
+                        ? "bg-white/[0.08] ring-1 ring-white/10"
+                        : "border border-slate-200 bg-slate-50"
+                    }`}
+                  >
+                    <div className="flex items-baseline gap-1">
+                      <span
+                        className={`text-4xl font-black ${isPopular ? "text-white" : "text-[#0d212c]"}`}
+                      >
+                        ${plan.price.monthly}
+                      </span>
+                      <span
+                        className={`text-sm font-medium ${isPopular ? "text-white/50" : "text-slate-400"}`}
+                      >
+                        USD / mes
+                      </span>
+                    </div>
+                    <p
+                      className={`mt-1 text-xs ${isPopular ? "text-white/40" : "text-slate-400"}`}
                     >
-                      <i
-                        className={`icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 ${
-                          isPopular ? "text-lime-400" : "text-lime-600"
-                        }`}
-                        aria-hidden
-                      />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                      {employees}
+                    </p>
+                  </div>
 
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    trackGA4Event("landing_cta_click", {
-                      cta_name: `pricing_${planType.toLowerCase()}`,
-                      placement: "pricing",
-                    });
-                    openCalendly(e);
-                  }}
-                  className={`mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ${
+                  <ul className="mt-6 flex-1 space-y-3">
+                    {plan.features.highlights.slice(0, 5).map((item) => (
+                      <li
+                        key={`${planType}-${item}`}
+                        className={`flex items-start gap-2 text-sm ${
+                          isPopular ? "text-white/75" : "text-slate-600"
+                        }`}
+                      >
+                        <i
+                          className={`icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 ${
+                            isPopular ? "text-lime-400" : "text-lime-600"
+                          }`}
+                          aria-hidden
+                        />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      trackGA4Event("landing_cta_click", {
+                        cta_name: `pricing_${planType.toLowerCase()}`,
+                        placement: "pricing",
+                      });
+                      openCalendly(e);
+                    }}
+                    className={`mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ${
+                      isPopular
+                        ? "bg-lime-400 text-[#0a1e14] hover:bg-lime-300"
+                        : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
+                    }`}
+                  >
+                    Comenzar ahora
+                  </button>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <motion.div
+            className="grid gap-6 sm:grid-cols-3 sm:gap-5"
+            initial="hidden"
+            whileInView="visible"
+            viewport={LANDING_VIEWPORT}
+            variants={LANDING_STAGGER_CONTAINER}
+          >
+            {PLAN_ORDER.map((planType) => {
+              const plan = PLAN_CONFIGS[planType];
+              const isPopular = !!plan.isPopular;
+              const employees =
+                plan.features.maxEmployees === -1
+                  ? "Colaboradores ilimitados"
+                  : `Hasta ${plan.features.maxEmployees} colaboradores`;
+
+              return (
+                <motion.article
+                  key={planType}
+                  variants={LANDING_STAGGER_ITEM}
+                  className={`relative flex min-h-0 flex-col rounded-2xl p-5 transition-all duration-300 sm:p-7 ${
                     isPopular
-                      ? "bg-lime-400 text-[#051a24] hover:bg-lime-300"
-                      : "border-2 border-[#051a24] text-[#051a24] hover:bg-[#051a24] hover:text-white"
+                      ? "bg-[#0a1e14] shadow-[0_24px_60px_rgba(10,30,20,0.38)] ring-2 ring-lime-400"
+                      : "border border-slate-200 bg-white hover:border-lime-200 hover:shadow-xl"
                   }`}
                 >
-                  Comenzar ahora
-                </button>
-              </article>
-            );
-          })}
-        </div>
+                  {isPopular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#0a1e14]">
+                        Más popular
+                      </span>
+                    </div>
+                  )}
+
+                  <h3
+                    className={`text-xl font-extrabold ${isPopular ? "text-white" : "text-[#0d212c]"}`}
+                  >
+                    {plan.displayName}
+                  </h3>
+                  <p
+                    className={`mt-2 text-sm leading-relaxed ${isPopular ? "text-white/55" : "text-slate-500"}`}
+                  >
+                    {plan.description}
+                  </p>
+
+                  <div
+                    className={`mt-6 rounded-xl p-4 ${
+                      isPopular
+                        ? "bg-white/[0.08] ring-1 ring-white/10"
+                        : "border border-slate-200 bg-slate-50"
+                    }`}
+                  >
+                    <div className="flex items-baseline gap-1">
+                      <span
+                        className={`text-4xl font-black ${isPopular ? "text-white" : "text-[#0d212c]"}`}
+                      >
+                        ${plan.price.monthly}
+                      </span>
+                      <span
+                        className={`text-sm font-medium ${isPopular ? "text-white/50" : "text-slate-400"}`}
+                      >
+                        USD / mes
+                      </span>
+                    </div>
+                    <p
+                      className={`mt-1 text-xs ${isPopular ? "text-white/40" : "text-slate-400"}`}
+                    >
+                      {employees}
+                    </p>
+                  </div>
+
+                  <ul className="mt-6 flex-1 space-y-3">
+                    {plan.features.highlights.slice(0, 5).map((item) => (
+                      <li
+                        key={`${planType}-${item}`}
+                        className={`flex items-start gap-2 text-sm ${
+                          isPopular ? "text-white/75" : "text-slate-600"
+                        }`}
+                      >
+                        <i
+                          className={`icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 ${
+                            isPopular ? "text-lime-400" : "text-lime-600"
+                          }`}
+                          aria-hidden
+                        />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      trackGA4Event("landing_cta_click", {
+                        cta_name: `pricing_${planType.toLowerCase()}`,
+                        placement: "pricing",
+                      });
+                      openCalendly(e);
+                    }}
+                    className={`mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ${
+                      isPopular
+                        ? "bg-lime-400 text-[#0a1e14] hover:bg-lime-300"
+                        : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
+                    }`}
+                  >
+                    Comenzar ahora
+                  </button>
+                </motion.article>
+              );
+            })}
+          </motion.div>
+        )}
 
         {/* Enterprise card */}
-        <article className="relative mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#051a24] via-[#0a1e14] to-[#0d212c] p-6 sm:mt-5 sm:p-8 md:p-10">
-          <div
-            className="pointer-events-none absolute right-0 top-0 h-64 w-64 opacity-20 blur-[80px]"
-            style={{ background: "rgba(163,230,53,0.5)" }}
-            aria-hidden
-          />
-          <div className="relative grid gap-6 lg:grid-cols-2 lg:items-center lg:gap-8">
-            <div>
-              <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-lime-300 sm:px-4 sm:text-[11px]">
-                Plan empresarial
-              </span>
-              <h3 className="mt-3 text-2xl font-extrabold text-white sm:mt-4 sm:text-3xl">{enterprise.displayName}</h3>
-              <p className="mt-3 leading-relaxed text-white/60">{enterprise.description}</p>
-              <div className="mt-5 inline-block rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Precio</p>
-                <p className="mt-0.5 text-2xl font-black text-white">Bajo consulta</p>
-                <p className="text-xs text-white/40">Implementación según alcance</p>
-              </div>
+        {reduced === true ? (
+          <article className="relative mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#0a1e14] to-[#0d212c] p-6 sm:mt-5 sm:p-8 md:p-10">
+            <div
+              className="pointer-events-none absolute right-0 top-0 h-64 w-64 opacity-20 blur-[80px]"
+              style={{ background: "rgba(163,230,53,0.5)" }}
+              aria-hidden
+            />
+            <div className="relative grid gap-6 lg:grid-cols-2 lg:items-center lg:gap-8">
               <div>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    trackGA4Event("landing_cta_click", {
-                      cta_name: "pricing_enterprise",
-                      placement: "pricing",
-                    });
-                    openCalendly(e);
-                  }}
-                  className="mt-6 rounded-xl bg-lime-400 px-8 py-3.5 text-sm font-bold text-[#051a24] transition hover:bg-lime-300"
-                >
-                  Hablar con un consultor
-                </button>
+                <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-lime-300 sm:px-4 sm:text-[11px]">
+                  Plan empresarial
+                </span>
+                <h3 className="mt-3 text-2xl font-extrabold text-white sm:mt-4 sm:text-3xl">{enterprise.displayName}</h3>
+                <p className="mt-3 leading-relaxed text-white/60">{enterprise.description}</p>
+                <div className="mt-5 inline-block rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Precio</p>
+                  <p className="mt-0.5 text-2xl font-black text-white">Bajo consulta</p>
+                  <p className="text-xs text-white/40">Implementación según alcance</p>
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      trackGA4Event("landing_cta_click", {
+                        cta_name: "pricing_enterprise",
+                        placement: "pricing",
+                      });
+                      openCalendly(e);
+                    }}
+                    className="mt-6 rounded-xl bg-lime-400 px-8 py-3.5 text-sm font-bold text-[#0a1e14] transition hover:bg-lime-300"
+                  >
+                    Hablar con un consultor
+                  </button>
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {enterprise.features.highlights.slice(0, 6).map((feature) => (
+                  <div
+                    key={feature}
+                    className="flex gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-4"
+                  >
+                    <i className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 text-lime-400" aria-hidden />
+                    <p className="text-sm leading-snug text-white/75">{feature}</p>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {enterprise.features.highlights.slice(0, 6).map((feature) => (
-                <div
-                  key={feature}
-                  className="flex gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-4"
-                >
-                  <i className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 text-lime-400" aria-hidden />
-                  <p className="text-sm leading-snug text-white/75">{feature}</p>
+          </article>
+        ) : (
+          <motion.article
+            className="relative mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#0a1e14] to-[#0d212c] p-6 sm:mt-5 sm:p-8 md:p-10"
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={LANDING_VIEWPORT}
+            transition={{ duration: 0.58, ease: LANDING_EASE, delay: 0.08 }}
+          >
+            <div
+              className="pointer-events-none absolute right-0 top-0 h-64 w-64 opacity-20 blur-[80px]"
+              style={{ background: "rgba(163,230,53,0.5)" }}
+              aria-hidden
+            />
+            <div className="relative grid gap-6 lg:grid-cols-2 lg:items-center lg:gap-8">
+              <div>
+                <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-lime-300 sm:px-4 sm:text-[11px]">
+                  Plan empresarial
+                </span>
+                <h3 className="mt-3 text-2xl font-extrabold text-white sm:mt-4 sm:text-3xl">{enterprise.displayName}</h3>
+                <p className="mt-3 leading-relaxed text-white/60">{enterprise.description}</p>
+                <div className="mt-5 inline-block rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Precio</p>
+                  <p className="mt-0.5 text-2xl font-black text-white">Bajo consulta</p>
+                  <p className="text-xs text-white/40">Implementación según alcance</p>
                 </div>
-              ))}
+                <div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      trackGA4Event("landing_cta_click", {
+                        cta_name: "pricing_enterprise",
+                        placement: "pricing",
+                      });
+                      openCalendly(e);
+                    }}
+                    className="mt-6 rounded-xl bg-lime-400 px-8 py-3.5 text-sm font-bold text-[#0a1e14] transition hover:bg-lime-300"
+                  >
+                    Hablar con un consultor
+                  </button>
+                </div>
+              </div>
+              <motion.div
+                className="grid gap-3 sm:grid-cols-2"
+                initial="hidden"
+                whileInView="visible"
+                viewport={LANDING_VIEWPORT}
+                variants={LANDING_STAGGER_CONTAINER}
+              >
+                {enterprise.features.highlights.slice(0, 6).map((feature) => (
+                  <motion.div
+                    key={feature}
+                    variants={LANDING_STAGGER_ITEM}
+                    className="flex gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-4"
+                  >
+                    <i className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 text-lime-400" aria-hidden />
+                    <p className="text-sm leading-snug text-white/75">{feature}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
             </div>
-          </div>
-        </article>
+          </motion.article>
+        )}
 
         <p className="mt-5 text-center text-xs text-slate-400">
           * Precios en USD. La configuración final depende del alcance de implementación.
         </p>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 function FAQSection() {
+  const reduced = useReducedMotion();
+  const reveal = useInViewReveal();
   return (
-    <section className="scroll-mt-24 bg-slate-50 py-16 sm:py-20 md:py-24" id="faq">
+    <motion.section className="scroll-mt-24 bg-slate-50 py-16 sm:py-20 md:py-24" id="faq" {...reveal}>
       <div className="mx-auto max-w-3xl px-5 sm:px-6 lg:px-8">
         <div className="mb-8 text-center sm:mb-12">
           <p className="mb-3 text-xs font-bold uppercase tracking-widest text-lime-700">FAQ</p>
@@ -971,28 +1670,68 @@ function FAQSection() {
             Todo lo que necesitas saber antes de implementar tu canal ético.
           </p>
         </div>
-        <div className="space-y-3">
-          {FAQS.map((item) => (
-            <details key={item.q} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 text-left text-sm font-bold leading-snug text-[#0d212c] transition-colors hover:bg-slate-50 sm:gap-4 sm:px-6 sm:py-5 sm:text-base">
-                {item.q}
-                <i
-                  className="icon-[lucide--plus] h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:hidden"
-                  aria-hidden
-                />
-                <i
-                  className="icon-[lucide--minus] hidden h-4 w-4 shrink-0 text-lime-600 group-open:block"
-                  aria-hidden
-                />
-              </summary>
-              <div className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-6 sm:pb-5 sm:pt-4">
-                <p className="text-sm leading-relaxed text-slate-600 sm:text-base">{item.a}</p>
-              </div>
-            </details>
-          ))}
-        </div>
+        {reduced === true ? (
+          <div className="space-y-3">
+            {FAQS.map((item) => (
+              <details key={item.q} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 text-left text-sm font-bold leading-snug text-[#0d212c] transition-colors hover:bg-slate-50 sm:gap-4 sm:px-6 sm:py-5 sm:text-base">
+                  {item.q}
+                  <i
+                    className="icon-[lucide--plus] h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:hidden"
+                    aria-hidden
+                  />
+                  <i
+                    className="icon-[lucide--minus] hidden h-4 w-4 shrink-0 text-lime-600 group-open:block"
+                    aria-hidden
+                  />
+                </summary>
+                <div className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-6 sm:pb-5 sm:pt-4">
+                  <p className="text-sm leading-relaxed text-slate-600 sm:text-base">{item.a}</p>
+                </div>
+              </details>
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            className="space-y-3"
+            initial="hidden"
+            whileInView="visible"
+            viewport={LANDING_VIEWPORT}
+            variants={LANDING_STAGGER_CONTAINER}
+          >
+            {FAQS.map((item) => (
+              <motion.div key={item.q} variants={LANDING_STAGGER_ITEM}>
+                <details className="group overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 text-left text-sm font-bold leading-snug text-[#0d212c] transition-colors hover:bg-slate-50 sm:gap-4 sm:px-6 sm:py-5 sm:text-base">
+                    {item.q}
+                    <i
+                      className="icon-[lucide--plus] h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:hidden"
+                      aria-hidden
+                    />
+                    <i
+                      className="icon-[lucide--minus] hidden h-4 w-4 shrink-0 text-lime-600 group-open:block"
+                      aria-hidden
+                    />
+                  </summary>
+                  <div className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-6 sm:pb-5 sm:pt-4">
+                    <p className="text-sm leading-relaxed text-slate-600 sm:text-base">{item.a}</p>
+                  </div>
+                </details>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
-    </section>
+    </motion.section>
+  );
+}
+
+function LandingClosingCtaSection() {
+  const reveal = useInViewReveal();
+  return (
+    <motion.section className="border-t border-slate-200" aria-label="Siguiente paso" {...reveal}>
+      <FooterDemoCtaBand ctaName="closing_demo" placement="closing" />
+    </motion.section>
   );
 }
 
@@ -1041,6 +1780,7 @@ export function LandingV3() {
 
       <main className="pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] pt-[calc(4rem+env(safe-area-inset-top,0px))] sm:pb-12 sm:pt-[calc(4.5rem+env(safe-area-inset-top,0px))] md:pb-10">
         <HeroSection variant={variant} />
+        <HeroDemoVideoStrip />
         <StatsBand />
         <LogoProofSection />
         <FeaturesSection />
@@ -1051,9 +1791,7 @@ export function LandingV3() {
         <FAQSection />
       </main>
 
-      <section className="border-t border-slate-200" aria-label="Siguiente paso">
-        <FooterDemoCtaBand ctaName="closing_demo" placement="closing" />
-      </section>
+      <LandingClosingCtaSection />
       <LandingMinimalFooter />
     </div>
   );

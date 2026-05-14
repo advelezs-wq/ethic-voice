@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
@@ -11,6 +12,7 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  Tooltip,
 } from "@heroui/react";
 import { useSidebar } from "../../context/SidebarContext";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
@@ -20,10 +22,32 @@ import { CreateReportModal } from "../reports/CreateReportModal";
 export function Header() {
   const { toggleSidebar } = useSidebar();
   const { permissions, isSuperAdmin } = useUserRole();
-  const { currentOrganization, organizations, switchOrganization } =
+  const { currentOrganization, organizations, switchOrganization, setCurrentOrganization } =
     useOrganization();
   const { isLoaded: _userLoaded } = useUser();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [superAdminScope, setSuperAdminScope] = useState<"all" | "org">("org");
+  const organizationOptions = (organizations || []).map((org) => ({
+    id: org.id,
+    name: org.name || "Organización",
+    initial: org.name?.charAt(0).toUpperCase() || "O",
+  }));
+
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    const scopeCookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("ev_scope="))
+      ?.split("=")[1];
+    if (scopeCookie === "org") {
+      setSuperAdminScope("org");
+    } else {
+      setSuperAdminScope("all");
+      try {
+        document.cookie = `ev_scope=all; path=/; max-age=${60 * 60 * 24 * 30}`;
+      } catch {}
+    }
+  }, [isSuperAdmin]);
 
   return (
     <header className="flex items-center justify-between h-16 px-4 sm:px-6 bg-white border-b border-gray-200">
@@ -97,49 +121,105 @@ export function Header() {
         )}
 
         {isSuperAdmin && organizations?.length > 0 && (
-          <Dropdown>
-            <DropdownTrigger>
-              <Button
-                variant="light"
-                className="min-w-[140px] sm:min-w-[180px] max-w-[220px] justify-start"
-              >
-                <span className="inline-flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center">
-                    {currentOrganization?.name?.charAt(0).toUpperCase() || "O"}
-                  </span>
-                  <span className="truncate max-w-[90px] sm:max-w-[120px]">
-                    {currentOrganization?.name || "Seleccionar organización"}
-                  </span>
-                  <i className="icon-[lucide--chevrons-up-down] size-4 opacity-70" />
-                </span>
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu
-              aria-label="Organizaciones disponibles"
-              selectionMode="single"
-              selectedKeys={new Set([currentOrganization?.id || ""])}
-              onAction={(key) => {
-                const orgId = String(key);
-                switchOrganization(orgId);
-                try {
-                  document.cookie = `ev_org=${orgId}; path=/; max-age=${60 * 60 * 24 * 30}`;
-                } catch {}
-              }}
-            >
-              {organizations.map((org) => (
-                <DropdownItem
-                  key={org.id}
-                  startContent={
-                    <span className="w-7 h-7 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center">
-                      {org.name?.charAt(0).toUpperCase() || "O"}
-                    </span>
-                  }
+          <div className="flex items-center gap-2">
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  variant="flat"
+                  className="min-w-[170px] sm:min-w-[230px] max-w-[280px] justify-start border border-emerald-200 bg-emerald-50/60"
                 >
-                  {org.name}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
+                  <span className="inline-flex min-w-0 items-center gap-2">
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
+                        superAdminScope === "all"
+                          ? "bg-lime-300 text-[#052b24]"
+                          : "bg-emerald-200 text-emerald-900"
+                      }`}
+                    >
+                      {superAdminScope === "all" ? "Global" : "Por org"}
+                    </span>
+                    <span className="truncate max-w-[130px] sm:max-w-[160px] text-sm font-medium text-[#0d212c]">
+                      {superAdminScope === "all"
+                        ? "Todas las organizaciones"
+                        : currentOrganization?.name || "Seleccionar organización"}
+                    </span>
+                    <i className="icon-[lucide--chevrons-up-down] size-4 opacity-70 flex-shrink-0" />
+                  </span>
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                aria-label="Ámbito de visualización"
+                selectionMode="single"
+                selectedKeys={new Set([superAdminScope === "all" ? "__all__" : currentOrganization?.id || ""])}
+                items={[
+                  { id: "__all__", name: "Vista general (todas)", isGlobal: true },
+                  ...organizationOptions.map((opt) => ({
+                    id: opt.id,
+                    name: opt.name,
+                    isGlobal: false,
+                    initial: opt.initial,
+                  })),
+                ]}
+                onAction={(key) => {
+                  const value = String(key);
+                  try {
+                    if (value === "__all__") {
+                      setSuperAdminScope("all");
+                      setCurrentOrganization(null);
+                      document.cookie = `ev_scope=all; path=/; max-age=${60 * 60 * 24 * 30}`;
+                      return;
+                    }
+
+                    setSuperAdminScope("org");
+                    switchOrganization(value);
+                    document.cookie = `ev_org=${value}; path=/; max-age=${60 * 60 * 24 * 30}`;
+                    document.cookie = `ev_scope=org; path=/; max-age=${60 * 60 * 24 * 30}`;
+                  } catch {}
+                }}
+              >
+                {(item) => (
+                  <DropdownItem
+                    key={String(item.id)}
+                    description={
+                      item.isGlobal
+                        ? "Ve denuncias, métricas y datos de todas las organizaciones."
+                        : "Limita vistas y acciones al contexto de esta organización."
+                    }
+                    startContent={
+                      item.isGlobal ? (
+                        <i className="icon-[lucide--globe-2] size-4 text-emerald-700" />
+                      ) : (
+                        <span className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold flex items-center justify-center">
+                          {"initial" in item ? item.initial : "O"}
+                        </span>
+                      )
+                    }
+                  >
+                    {item.name}
+                  </DropdownItem>
+                )}
+              </DropdownMenu>
+            </Dropdown>
+            <Tooltip
+              content={
+                superAdminScope === "all"
+                  ? "Ver reportes globales"
+                  : `Ver reportes de ${currentOrganization?.name || "la organización seleccionada"}`
+              }
+            >
+              <Button
+                as={Link}
+                href="/app/reports"
+                variant="flat"
+                className="border border-emerald-200 bg-white text-[#0d212c]"
+                startContent={
+                  <i className="icon-[lucide--file-text] size-4" aria-hidden="true" />
+                }
+              >
+                Ir a reportes
+              </Button>
+            </Tooltip>
+          </div>
         )}
         {isSuperAdmin && (!organizations || organizations.length === 0) && (
           <span className="text-sm text-gray-500 truncate">

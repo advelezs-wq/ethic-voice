@@ -19,41 +19,41 @@ export function SystemStats({ stats }: SystemStatsProps) {
       title: "Total Organizaciones",
       value: stats.totalOrganizations,
       icon: "icon-[lucide--building-2]",
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      color: "text-emerald-700",
+      bgColor: "bg-emerald-50",
     },
     {
       title: "Organizaciones Activas",
       value: stats.activeOrganizations,
       icon: "icon-[lucide--check-circle]",
-      color: "text-green-600",
-      bgColor: "bg-green-50",
+      color: "text-lime-700",
+      bgColor: "bg-lime-50",
     },
     {
       title: "Total Usuarios",
       value: stats.totalUsers,
       icon: "icon-[lucide--users]",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
+      color: "text-emerald-700",
+      bgColor: "bg-emerald-50",
     },
     {
       title: "Total Reportes",
       value: stats.totalReports,
       icon: "icon-[lucide--file-text]",
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
+      color: "text-lime-700",
+      bgColor: "bg-lime-50",
     },
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {statCards.map((stat, index) => (
-        <Card key={index} className="hover:shadow-lg transition-shadow">
+        <Card key={index} className="border border-emerald-200/60 bg-white/90 shadow-sm transition hover:shadow-md">
           <CardBody className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">{stat.title}</p>
-                <p className="text-2xl font-bold">{stat.value}</p>
+                <p className="text-sm text-default-600">{stat.title}</p>
+                <p className="text-2xl font-bold text-[#0d212c]">{stat.value}</p>
               </div>
               <div className={`p-3 rounded-lg ${stat.bgColor}`}>
                 <i className={`${stat.icon} size-6 ${stat.color}`} />

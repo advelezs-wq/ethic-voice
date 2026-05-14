@@ -23,6 +23,8 @@ interface ReportsContentWithTabsProps {
   userId: string;
   organizationId?: string;
   activeTab: string;
+  superAdminScope?: "all" | "org";
+  selectedOrganizationName?: string;
 }
 
 export function ReportsContentWithTabs({
@@ -37,6 +39,8 @@ export function ReportsContentWithTabs({
   userId,
   organizationId,
   activeTab,
+  superAdminScope = "org",
+  selectedOrganizationName,
 }: ReportsContentWithTabsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -68,14 +72,18 @@ export function ReportsContentWithTabs({
       <div>
         <h1 className="text-2xl font-semibold text-gray-900">
           {isSuperAdmin
-            ? "Gestión Global de Reportes"
+            ? superAdminScope === "all"
+              ? "Gestión Global de Reportes"
+              : "Reportes por Organización"
             : userRole === "ADMIN"
               ? "Gestión de Reportes"
               : "Mis Reportes Asignados"}
         </h1>
         <p className="text-sm text-gray-600 mt-1">
           {isSuperAdmin
-            ? "Administra reportes de todas las organizaciones"
+            ? superAdminScope === "all"
+              ? "Administra reportes de todas las organizaciones en una sola vista."
+              : `Estás viendo únicamente la organización seleccionada${selectedOrganizationName ? `: ${selectedOrganizationName}` : ""}.`
             : userRole === "ADMIN"
               ? "Administra y da seguimiento a todas las denuncias de tu organización"
               : "Revisa y gestiona los reportes que tienes asignados"}
@@ -150,6 +158,8 @@ export function ReportsContentWithTabs({
         userId={userId}
         organizationId={organizationId}
         isArchivedView={isArchivedView}
+        superAdminScope={superAdminScope}
+        selectedOrganizationName={selectedOrganizationName}
       />
     </div>
   );

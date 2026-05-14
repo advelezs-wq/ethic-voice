@@ -117,11 +117,11 @@ export function SuperAdminEbookLeadsTable() {
   };
 
   return (
-    <Card>
+    <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
       <CardBody>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold">Leads · Guía PDF</h2>
+            <h2 className="text-xl font-semibold text-[#0d212c]">Leads · Guía PDF</h2>
             <p className="mt-1 text-sm text-default-500">
               Registros desde el formulario público de descarga ({total} en esta vista filtrada).
             </p>

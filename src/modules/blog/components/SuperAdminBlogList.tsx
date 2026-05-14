@@ -197,10 +197,10 @@ export function SuperAdminBlogList() {
 
   return (
     <>
-      <Card>
+      <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
         <CardBody className="gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold">Entradas del blog</h2>
+            <h2 className="text-lg font-semibold text-[#0d212c]">Entradas del blog</h2>
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 variant="light"

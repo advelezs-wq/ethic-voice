@@ -31,7 +31,23 @@ import {
   ReportComment,
 } from "@/types/reports";
 import { SubmissionSource } from "@/types/submission.types";
-import { userHasPermission } from "@/modules/core/utils/permissions";
+import {
+  userHasPermission,
+  isSuperAdmin as isSuperAdminByEmail,
+} from "@/modules/core/utils/permissions";
+import { cookies } from "next/headers";
+
+async function resolveReportsScope() {
+  const orgId = await resolveOrgId();
+  const jar = await cookies();
+  const scopeCookie = jar.get("ev_scope")?.value;
+  const user = await currentUser();
+  const email = user?.emailAddresses?.[0]?.emailAddress || "";
+  const isSuperAdmin = Boolean(email && isSuperAdminByEmail(email));
+  const isGlobalScope = isSuperAdmin && scopeCookie !== "org";
+
+  return { orgId, isGlobalScope };
+}
 
 // ============================
 // ORIGINAL DASHBOARD METHODS
@@ -383,19 +399,21 @@ export async function getReportsWithFilters(
   counts: FilterCounts;
 }> {
   const { userId: authUserId } = await auth();
-  const orgId = await resolveOrgId();
+  const { orgId, isGlobalScope } = await resolveReportsScope();
 
   if (!authUserId) {
     redirect("/sign-in");
   }
 
-  if (!orgId) {
+  if (!isGlobalScope && !orgId) {
     throw new Error("Organization not found");
   }
 
-  const whereClause: Prisma.FormSubmissionWhereInput = {
-    orgId,
-  };
+  const whereClause: Prisma.FormSubmissionWhereInput = isGlobalScope
+    ? {}
+    : {
+        orgId: orgId as string,
+      };
 
   // Status filtering
   if (typeof filters.status === "string" && filters.status !== "all") {
@@ -590,17 +608,17 @@ export async function getReportsWithFilters(
       const [byStatus, bySeverity, bySource] = await Promise.all([
         prisma.formSubmission.groupBy({
           by: ["status"],
-          where: { orgId },
+          where: isGlobalScope ? {} : { orgId: orgId as string },
           _count: { _all: true },
         }),
         prisma.formSubmission.groupBy({
           by: ["aiSeverity"],
-          where: { orgId },
+          where: isGlobalScope ? {} : { orgId: orgId as string },
           _count: { _all: true },
         }),
         prisma.formSubmission.groupBy({
           by: ["source"],
-          where: { orgId },
+          where: isGlobalScope ? {} : { orgId: orgId as string },
           _count: { _all: true },
         }),
       ]);
@@ -1920,18 +1938,18 @@ export async function getArchivedReports(
   departmentId?: string
 ): Promise<ReportsWithPagination> {
   const { userId: authUserId } = await auth();
-  const orgId = await resolveOrgId();
+  const { orgId, isGlobalScope } = await resolveReportsScope();
 
   if (!authUserId) {
     redirect("/sign-in");
   }
 
-  if (!orgId) {
+  if (!isGlobalScope && !orgId) {
     throw new Error("Organization not found");
   }
 
   const whereClause: Prisma.FormSubmissionWhereInput = {
-    orgId,
+    ...(isGlobalScope ? {} : { orgId: orgId as string }),
     status: "ARCHIVED", // Only show archived reports
   };
 
@@ -2102,18 +2120,18 @@ export async function getClosedReports(
   departmentId?: string
 ): Promise<ReportsWithPagination> {
   const { userId: authUserId } = await auth();
-  const orgId = await resolveOrgId();
+  const { orgId, isGlobalScope } = await resolveReportsScope();
 
   if (!authUserId) {
     redirect("/sign-in");
   }
 
-  if (!orgId) {
+  if (!isGlobalScope && !orgId) {
     throw new Error("Organization not found");
   }
 
   const whereClause: Prisma.FormSubmissionWhereInput = {
-    orgId,
+    ...(isGlobalScope ? {} : { orgId: orgId as string }),
     status: { in: ["CLOSED", "RESOLVED"] } as any,
   };
 

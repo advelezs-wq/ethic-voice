@@ -106,9 +106,16 @@ export default function ManualClientCreator() {
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Crear Cliente Manualmente</h1>
-      <Card>
+    <div className="mx-auto max-w-3xl">
+      <div className="mb-4">
+        <h2 className="text-2xl font-semibold text-[#0d212c]">
+          Crear cliente manualmente
+        </h2>
+        <p className="mt-1 text-sm text-default-500">
+          Alta asistida de cliente, organizaci?n, plan y logo inicial.
+        </p>
+      </div>
+      <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
         <CardBody className="space-y-4">
           <Input
             label="Nombre del cliente"
@@ -121,12 +128,14 @@ export default function ManualClientCreator() {
             onChange={(e) => setEmail(e.target.value)}
           />
           <Input
-            label="Nombre de la organización"
+            label="Nombre de la organizaci?n"
             value={orgName}
             onChange={(e) => setOrgName(e.target.value)}
           />
           <div className="space-y-2">
-            <label className="text-sm text-gray-700">Logo de la organización (opcional)</label>
+            <label className="text-sm text-default-700">
+              Logo de la organizaci?n (opcional)
+            </label>
             <input
               type="file"
               accept="image/*"
@@ -138,8 +147,9 @@ export default function ManualClientCreator() {
                 }
                 if (!file.type.startsWith("image/")) {
                   addToast({
-                    title: "Archivo no válido",
-                    description: "Selecciona un archivo de imagen (PNG, JPG, JPEG, SVG, GIF)",
+                    title: "Archivo no v?lido",
+                    description:
+                      "Selecciona un archivo de imagen (PNG, JPG, JPEG, SVG, GIF)",
                     color: "danger",
                   });
                   e.currentTarget.value = "";
@@ -148,7 +158,7 @@ export default function ManualClientCreator() {
                 if (file.size > 5 * 1024 * 1024) {
                   addToast({
                     title: "Archivo muy grande",
-                    description: "El archivo debe ser menor a 5MB",
+                    description: "El archivo debe ser menor de 5MB",
                     color: "danger",
                   });
                   e.currentTarget.value = "";
@@ -157,9 +167,11 @@ export default function ManualClientCreator() {
                 setLogoFile(file);
               }}
             />
-            <p className="text-xs text-gray-500">Formatos: PNG, JPG, JPEG, SVG o GIF. Máx 5MB.</p>
+            <p className="text-xs text-default-500">
+              Formatos: PNG, JPG, JPEG, SVG o GIF. M?x. 5MB.
+            </p>
           </div>
-          {/* Invitación por email: el usuario definirá su contraseña al aceptar */}
+          {/* Invitaci?n por email: el usuario definir? su contrase?a al aceptar */}
           <Select
             label="Plan"
             selectedKeys={new Set([plan])}
@@ -186,13 +198,13 @@ export default function ManualClientCreator() {
               <div>
                 Cliente creado.{" "}
                 <a className="underline" href={resultUrl}>
-                  Ir a la organización
+                  Ir a la organizaci?n
                 </a>
               </div>
               {createdOrgId && (
                 <div className="space-y-3">
-                  <p className="text-gray-700">
-                    Sube el logo ahora usando el mismo componente de configuración:
+                  <p className="text-default-700">
+                    Sube el logo ahora usando el mismo componente de configuraci?n:
                   </p>
                   <OrganizationLogoDropzone
                     organizationId={createdOrgId}
@@ -200,7 +212,7 @@ export default function ManualClientCreator() {
                     onLogoUpdated={() => {
                       addToast({
                         title: "Logo actualizado",
-                        description: "El logo se actualizó correctamente",
+                        description: "El logo se actualiz? correctamente",
                         color: "success",
                       });
                     }}

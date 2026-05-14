@@ -13,6 +13,8 @@ import {
   isSuperAdmin as checkSuperAdmin,
 } from "@/modules/core/utils/permissions";
 import { UserRole } from "@/types/auth.types";
+import { cookies } from "next/headers";
+import prisma from "@/modules/prisma/lib/prisma";
 
 interface ReportsPageProps {
   searchParams: Promise<{
@@ -33,7 +35,6 @@ interface ReportsPageProps {
 
 export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
 
   if (!userId) {
     return (
@@ -48,7 +49,16 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     );
   }
 
-  if (!orgId) {
+  // Get user details and role
+  const clerkUser = await currentUser();
+  const userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
+  const isSuperAdmin = userEmail ? checkSuperAdmin(userEmail) : false;
+  const orgId = await resolveOrgId();
+  const jar = await cookies();
+  const superAdminScopeCookie = jar.get("ev_scope")?.value;
+  const isGlobalScope = isSuperAdmin && superAdminScopeCookie !== "org";
+
+  if (!isGlobalScope && !orgId) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -63,13 +73,19 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     );
   }
 
-  // Get user details and role
-  const clerkUser = await currentUser();
-  const userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
-  const isSuperAdmin = userEmail ? checkSuperAdmin(userEmail) : false;
-
   // Get user role from database with super admin check
-  const userRole = await getUserRoleWithSuperAdmin(userId, orgId, userEmail);
+  const userRole = isGlobalScope
+    ? UserRole.SUPER_ADMIN
+    : await getUserRoleWithSuperAdmin(userId, orgId as string, userEmail);
+
+  let selectedOrganizationName: string | undefined;
+  if (!isGlobalScope && orgId) {
+    const selectedOrg = await prisma.organization.findUnique({
+      where: { id: orgId },
+      select: { name: true },
+    });
+    selectedOrganizationName = selectedOrg?.name;
+  }
 
   const params = await searchParams;
   const {
@@ -157,8 +173,10 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
         userRole={userRole}
         isSuperAdmin={isSuperAdmin}
         userId={userId}
-        organizationId={orgId}
+        organizationId={isGlobalScope ? undefined : orgId || undefined}
         activeTab={activeTab}
+        superAdminScope={isGlobalScope ? "all" : "org"}
+        selectedOrganizationName={selectedOrganizationName}
       />
     </div>
   );

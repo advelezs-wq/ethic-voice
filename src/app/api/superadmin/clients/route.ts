@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
+import { cookies } from "next/headers";
 
 export async function GET(_req: NextRequest) {
   const { userId } = await auth();
@@ -13,7 +14,12 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const jar = await cookies();
+  const scope = jar.get("ev_scope")?.value === "org" ? "org" : "all";
+  const selectedOrgId = jar.get("ev_org")?.value || null;
+
   const organizations = await prisma.organization.findMany({
+    ...(scope === "org" && selectedOrgId ? { where: { id: selectedOrgId } } : {}),
     orderBy: { createdAt: "desc" },
     include: {
       subscriptions: { orderBy: { createdAt: "desc" }, take: 1 },
@@ -37,7 +43,12 @@ export async function GET(_req: NextRequest) {
     };
   });
 
-  return NextResponse.json({ organizations: data });
+  return NextResponse.json({
+    organizations: data,
+    scope,
+    selectedOrgId,
+    selectedOrganizationName: data[0]?.name || null,
+  });
 }
 
 

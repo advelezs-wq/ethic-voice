@@ -23,6 +23,8 @@ interface ReportsContentProps {
   userId: string;
   organizationId?: string;
   isArchivedView?: boolean; // New prop for archived reports view
+  superAdminScope?: "all" | "org";
+  selectedOrganizationName?: string;
 }
 
 export function ReportsContent({
@@ -35,6 +37,8 @@ export function ReportsContent({
   isSuperAdmin,
   organizationId,
   isArchivedView = false, // Default to false
+  superAdminScope = "org",
+  selectedOrganizationName,
 }: ReportsContentProps) {
   const [selectedReports, setSelectedReports] = useState<number[]>([]);
   const [viewMode, setViewMode] = useState<"table" | "cards">(
@@ -153,7 +157,9 @@ export function ReportsContent({
   // Show different header based on user role
   const getPageTitle = () => {
     if (isSuperAdmin) {
-      return "Gestión Global de Reportes";
+      return superAdminScope === "all"
+        ? "Gestión Global de Reportes"
+        : "Reportes por Organización";
     } else if (userRole === "ADMIN") {
       return "Gestión de Reportes";
     } else {
@@ -163,7 +169,9 @@ export function ReportsContent({
 
   const getPageDescription = () => {
     if (isSuperAdmin) {
-      return "Administra reportes de todas las organizaciones";
+      return superAdminScope === "all"
+        ? "Administra reportes de todas las organizaciones"
+        : `Vista filtrada por organización${selectedOrganizationName ? `: ${selectedOrganizationName}` : ""}`;
     } else if (userRole === "ADMIN") {
       return "Administra y da seguimiento a todas las denuncias de tu organización";
     } else {

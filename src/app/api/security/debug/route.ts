@@ -26,14 +26,18 @@ export async function GET() {
       whitelistedIPs,
       ipRequestStats,
       recentAttacks,
-      rateLimitStats
+      rateLimitStats,
+      quarantineFiles,
+      idempotencyStats,
     ] = await Promise.all([
       securityManager.getBlockedIPs(),
       securityManager.getSuspiciousIPs(),
       securityManager.getWhitelistedIPs(),
       securityManager.getIPRequestStats(),
       securityManager.getRecentAttacks(),
-      securityManager.getRateLimitStats()
+      securityManager.getRateLimitStats(),
+      securityManager.getQuarantineFiles(100),
+      securityManager.getIdempotencyStats(),
     ]);
 
     const debugInfo = {
@@ -50,6 +54,8 @@ export async function GET() {
       
       // Rate limit stats
       rateLimitStats,
+      quarantineFiles,
+      idempotencyStats,
       
       // System info
       systemInfo: {
@@ -58,6 +64,7 @@ export async function GET() {
         totalTrackedIPs: ipRequestStats.length,
         totalBlockedIPs: blockedIPs.length,
         totalWhitelistedIPs: whitelistedIPs.length,
+        totalQuarantineFiles: quarantineFiles.length,
       },
       
       // Help for debugging

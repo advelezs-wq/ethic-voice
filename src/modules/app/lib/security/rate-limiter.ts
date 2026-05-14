@@ -1,18 +1,18 @@
-import { RateLimiter } from 'limiter';
 import { NextRequest } from 'next/server';
 import { upstashRedis } from '@/modules/app/lib/queue/redis-config';
 
-// Rate limiters for different endpoints
-const rateLimiters = {
-  form: new RateLimiter({ tokensPerInterval: 5, interval: 'minute' }),
-  email: new RateLimiter({ tokensPerInterval: 10, interval: 'minute' }),
-  upload: new RateLimiter({ tokensPerInterval: 20, interval: 'minute' }),
-  general: new RateLimiter({ tokensPerInterval: 100, interval: 'minute' }),
+// Per-endpoint limits (requests/minute) applied per identifier (IP/email)
+const RATE_LIMITS: Record<'form' | 'email' | 'upload' | 'general', number> = {
+  form: 5,
+  email: 10,
+  upload: 20,
+  general: 100,
 };
 
 // Redis keys for persistence
 const REDIS_KEYS = {
   BLOCKED_IPS: 'security:blocked_ips',
+  BLOCKED_IP_PREFIX: 'security:blocked_ip',
   SUSPICIOUS_IPS: 'security:suspicious_ips',
   WHITELISTED_IPS: 'security:whitelisted_ips',
   RECENT_ATTACKS: 'security:recent_attacks',
@@ -20,6 +20,9 @@ const REDIS_KEYS = {
   RATE_LIMIT_STATS: 'security:rate_limit_stats',
   IP_REQUEST_STATS: 'security:ip_request_stats',
   REQUEST_COUNTS: 'security:request_counts',
+  RATE_LIMIT_PREFIX: 'security:rate_limit',
+  QUARANTINE_FILES: 'security:quarantine_files',
+  IDEMPOTENCY_STATS: 'security:idempotency_stats',
 };
 
 // Store request counts per IP/email (keeping in memory for performance)
@@ -51,6 +54,17 @@ export interface RateLimitResult {
   blockDuration?: number;
 }
 
+export interface QuarantineFileEvent {
+  ip: string;
+  organizationId?: string;
+  filename: string;
+  mimeType: string;
+  fileSize: number;
+  sha256?: string;
+  reason: string;
+  timestamp: string;
+}
+
 export class SecurityManager {
   private static instance: SecurityManager;
 
@@ -75,7 +89,17 @@ export class SecurityManager {
     const { type, identifier, additionalChecks } = config;
     
     // Check if IP is blocked (from Redis)
-    const isBlocked = await this.safeRedisOperation(
+    const blockedKey = `${REDIS_KEYS.BLOCKED_IP_PREFIX}:${identifier}`;
+    const blockedTtl = await this.safeRedisOperation(
+      async () => {
+        const ttl = await upstashRedis.ttl(blockedKey);
+        return typeof ttl === 'number' ? ttl : -1;
+      },
+      -1
+    );
+    const isBlockedByKey = blockedTtl > 0;
+
+    const isBlockedByLegacySet = await this.safeRedisOperation(
       async () => {
         const result = await upstashRedis.sismember(REDIS_KEYS.BLOCKED_IPS, identifier);
         return result === 1;
@@ -83,14 +107,15 @@ export class SecurityManager {
       false
     );
 
-    if (isBlocked) {
+    if (isBlockedByKey || isBlockedByLegacySet) {
+      const ttlMs = isBlockedByKey ? blockedTtl * 1000 : 3600000;
       return {
         allowed: false,
         remaining: 0,
-        resetTime: Date.now() + 3600000, // 1 hour
+        resetTime: Date.now() + ttlMs,
         requiresCaptcha: true,
         reason: 'IP temporarily blocked',
-        blockDuration: 3600000,
+        blockDuration: ttlMs,
       };
     }
 
@@ -112,8 +137,24 @@ export class SecurityManager {
       };
     }
 
-    const limiter = rateLimiters[type];
-    const allowed = await limiter.tryRemoveTokens(1);
+    const now = Date.now();
+    const currentWindow = Math.floor(now / 60000);
+    const rateKey = `${REDIS_KEYS.RATE_LIMIT_PREFIX}:${type}:${identifier}:${currentWindow}`;
+    const maxTokens = RATE_LIMITS[type];
+
+    const currentCount = await this.safeRedisOperation(
+      async () => {
+        const next = await upstashRedis.incr(rateKey);
+        if (next === 1) {
+          await upstashRedis.expire(rateKey, 70); // slightly above 60s window
+        }
+        return Number(next || 0);
+      },
+      maxTokens + 1
+    );
+    const allowed = currentCount <= maxTokens;
+    const remaining = Math.max(0, maxTokens - currentCount);
+    const resetTime = (currentWindow + 1) * 60000;
 
     // Track request patterns
     this.trackRequest(identifier, additionalChecks);
@@ -124,8 +165,8 @@ export class SecurityManager {
 
     return {
       allowed: allowed,
-      remaining: limiter.getTokensRemaining(),
-      resetTime: Date.now() + (limiter.getTokensRemaining() === 0 ? 60000 : 0),
+      remaining,
+      resetTime,
       requiresCaptcha,
       reason: !allowed ? 'Rate limit exceeded' : undefined,
     };
@@ -189,34 +230,33 @@ export class SecurityManager {
       }
     }
 
-    // Check for missing or suspicious referrer
-    if (additionalChecks?.referrer === undefined || additionalChecks?.referrer === '') {
-      // Missing referrer might be suspicious for form submissions
-      return true;
-    }
-
     return false;
   }
 
   async blockIP(ip: string, duration: number = 3600000) {
+    const ttlSeconds = Math.max(60, Math.floor(duration / 1000));
+    const blockedKey = `${REDIS_KEYS.BLOCKED_IP_PREFIX}:${ip}`;
+
     // Add to Redis set
     await this.safeRedisOperation(
-      () => upstashRedis.sadd(REDIS_KEYS.BLOCKED_IPS, ip),
+      async () => {
+        await upstashRedis.sadd(REDIS_KEYS.BLOCKED_IPS, ip); // backwards compatibility
+        await upstashRedis.set(blockedKey, '1', { ex: ttlSeconds });
+      },
       null
     );
 
     this.logAttack(ip, 'IP Blocked', `Automatically blocked for ${duration}ms`);
-    
-    // Auto-unblock after duration
-    setTimeout(async () => {
-      await this.unblockIP(ip);
-    }, duration);
   }
 
   async unblockIP(ip: string): Promise<boolean> {
     try {
-      const result = await upstashRedis.srem(REDIS_KEYS.BLOCKED_IPS, ip);
-      return result > 0;
+      const blockedKey = `${REDIS_KEYS.BLOCKED_IP_PREFIX}:${ip}`;
+      const [setRemoved, keyDeleted] = await Promise.all([
+        upstashRedis.srem(REDIS_KEYS.BLOCKED_IPS, ip),
+        upstashRedis.del(blockedKey),
+      ]);
+      return setRemoved > 0 || keyDeleted > 0;
     } catch (error) {
       console.error('[SECURITY] Error unblocking IP:', error);
       return false;
@@ -271,10 +311,25 @@ export class SecurityManager {
     type: string;
     reason: string;
   }>> {
+    const parseEntry = (entry: unknown) => {
+      if (!entry) return null;
+      if (typeof entry === 'string') {
+        try {
+          return JSON.parse(entry);
+        } catch {
+          return null;
+        }
+      }
+      if (typeof entry === 'object') return entry;
+      return null;
+    };
+
     const attacks = await this.safeRedisOperation(
       async () => {
         const rawAttacks = await upstashRedis.lrange(REDIS_KEYS.RECENT_ATTACKS, 0, 49);
-        return rawAttacks.map(attack => JSON.parse(attack));
+        return rawAttacks
+          .map(parseEntry)
+          .filter((attack): attack is { ip: string; timestamp: string; type: string; reason: string } => Boolean(attack));
       },
       []
     );
@@ -288,10 +343,25 @@ export class SecurityManager {
     type: string;
     details: string;
   }>> {
+    const parseEntry = (entry: unknown) => {
+      if (!entry) return null;
+      if (typeof entry === 'string') {
+        try {
+          return JSON.parse(entry);
+        } catch {
+          return null;
+        }
+      }
+      if (typeof entry === 'object') return entry;
+      return null;
+    };
+
     const activities = await this.safeRedisOperation(
       async () => {
         const rawActivities = await upstashRedis.lrange(REDIS_KEYS.RECENT_ACTIVITIES, 0, 49);
-        return rawActivities.map(activity => JSON.parse(activity));
+        return rawActivities
+          .map(parseEntry)
+          .filter((activity): activity is { ip: string; timestamp: string; type: string; details: string } => Boolean(activity));
       },
       []
     );
@@ -332,6 +402,39 @@ export class SecurityManager {
     );
   }
 
+  async getIdempotencyStats(): Promise<{
+    attempts: number;
+    acquired: number;
+    collisions: number;
+    invalid: number;
+  }> {
+    return this.safeRedisOperation(
+      async () => {
+        const stats = await upstashRedis.hgetall(REDIS_KEYS.IDEMPOTENCY_STATS);
+        if (!stats || typeof stats !== 'object') {
+          return {
+            attempts: 0,
+            acquired: 0,
+            collisions: 0,
+            invalid: 0,
+          };
+        }
+        return {
+          attempts: parseInt(String(stats.attempts || '0')),
+          acquired: parseInt(String(stats.acquired || '0')),
+          collisions: parseInt(String(stats.collisions || '0')),
+          invalid: parseInt(String(stats.invalid || '0')),
+        };
+      },
+      {
+        attempts: 0,
+        acquired: 0,
+        collisions: 0,
+        invalid: 0,
+      }
+    );
+  }
+
   // Log security events to Redis
   async logAttack(ip: string, type: string, reason: string) {
     const attack = {
@@ -365,6 +468,89 @@ export class SecurityManager {
         await upstashRedis.lpush(REDIS_KEYS.RECENT_ACTIVITIES, JSON.stringify(activity));
         // Keep only last 1000 activities
         await upstashRedis.ltrim(REDIS_KEYS.RECENT_ACTIVITIES, 0, 999);
+      },
+      null
+    );
+  }
+
+  async addQuarantineFile(event: Omit<QuarantineFileEvent, 'timestamp'>) {
+    const entry: QuarantineFileEvent = {
+      ...event,
+      timestamp: new Date().toISOString(),
+    };
+
+    await this.safeRedisOperation(
+      async () => {
+        await upstashRedis.lpush(REDIS_KEYS.QUARANTINE_FILES, JSON.stringify(entry));
+        await upstashRedis.ltrim(REDIS_KEYS.QUARANTINE_FILES, 0, 499);
+      },
+      null
+    );
+  }
+
+  async getQuarantineFiles(limit = 100): Promise<QuarantineFileEvent[]> {
+    return this.safeRedisOperation(
+      async () => {
+        const raw = await upstashRedis.lrange(REDIS_KEYS.QUARANTINE_FILES, 0, Math.max(0, limit - 1));
+        return raw
+          .map((entry) => {
+            if (!entry) return null;
+            if (typeof entry === 'object') return entry as QuarantineFileEvent;
+            if (typeof entry === 'string') {
+              try {
+                return JSON.parse(entry) as QuarantineFileEvent;
+              } catch {
+                return null;
+              }
+            }
+            return null;
+          })
+          .filter((entry): entry is QuarantineFileEvent => Boolean(entry))
+          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      },
+      []
+    );
+  }
+
+  async updateIdempotencyStats(type: 'attempts' | 'acquired' | 'collisions' | 'invalid') {
+    await this.safeRedisOperation(
+      () => upstashRedis.hincrby(REDIS_KEYS.IDEMPOTENCY_STATS, type, 1),
+      null
+    );
+  }
+
+  async notifySecurityAlert(params: {
+    title: string;
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    details: Record<string, unknown>;
+  }) {
+    const webhookUrl = process.env.SECURITY_ALERT_WEBHOOK_URL;
+    const payload = {
+      source: 'ethicvoice-security',
+      title: params.title,
+      severity: params.severity,
+      details: params.details,
+      timestamp: new Date().toISOString(),
+    };
+
+    // Always log locally even if webhook is not configured.
+    await this.logAttack(
+      String(params.details.ip || 'unknown'),
+      `Security Alert (${params.severity})`,
+      params.title
+    );
+
+    if (!webhookUrl) return;
+
+    await this.safeRedisOperation(
+      async () => {
+        await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
       },
       null
     );

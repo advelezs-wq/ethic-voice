@@ -6,7 +6,7 @@ export default async function SubmitPage() {
   const organizations = await getActiveOrganizations();
 
   return (
-    <div className="min-h-[calc(100dvh-5rem)] bg-gradient-to-br from-[#f5f3ee] via-white to-emerald-50/20">
+    <div className="min-h-[calc(100dvh-5rem)] bg-gradient-to-br from-[#f7faf9] via-white to-lime-50/30">
       <SubmitPageWrapper organizations={organizations as Organization[]} />
     </div>
   );

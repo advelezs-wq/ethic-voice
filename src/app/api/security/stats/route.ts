@@ -26,14 +26,18 @@ export async function GET() {
       recentAttacks,
       recentActivities,
       rateLimitStats,
-      ipRequestStats
+      ipRequestStats,
+      quarantineFiles,
+      idempotencyStats,
     ] = await Promise.all([
       securityManager.getBlockedIPs(),
       securityManager.getSuspiciousIPs(),
       securityManager.getRecentAttacks(),
       securityManager.getRecentActivities(),
       securityManager.getRateLimitStats(),
-      securityManager.getIPRequestStats()
+      securityManager.getIPRequestStats(),
+      securityManager.getQuarantineFiles(100),
+      securityManager.getIdempotencyStats(),
     ]);
 
     const stats = {
@@ -43,6 +47,8 @@ export async function GET() {
       recentActivities,
       rateLimitStats,
       ipRequestStats,
+      quarantineFiles,
+      idempotencyStats,
       timestamp: new Date().toISOString(),
     };
 

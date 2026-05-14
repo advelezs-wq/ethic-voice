@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { securityManager, getClientIP } from '@/modules/app/lib/security/rate-limiter';
 import { submitEthicLineReport } from '@/actions/submission.actions';
 import { verifyHcaptchaToken } from '@/lib/security/verify-hcaptcha';
+import { normalizeIdempotencyKey } from '@/lib/security/submission-security';
+import { upstashRedis } from '@/modules/app/lib/queue/redis-config';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,6 +11,35 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || '';
     const referrer = request.headers.get('referer') || '';
     const contentLength = parseInt(request.headers.get('content-length') || '0');
+    const origin = request.headers.get('origin') || '';
+    const host = request.headers.get('host') || '';
+
+    // Basic request-size hard limit (JSON)
+    if (contentLength > 1_500_000) {
+      return NextResponse.json(
+        { error: 'Payload too large' },
+        { status: 413 }
+      );
+    }
+
+    // Origin/Host consistency check (defense in depth against cross-site abuse)
+    if (origin && host) {
+      try {
+        const originHost = new URL(origin).host;
+        if (originHost !== host) {
+          securityManager.logAttack(clientIP, 'Origin Mismatch', `origin=${originHost}, host=${host}`);
+          return NextResponse.json(
+            { error: 'Invalid request origin' },
+            { status: 403 }
+          );
+        }
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid origin header' },
+          { status: 400 }
+        );
+      }
+    }
 
     // Check rate limiting and security
     const rateLimitResult = await securityManager.checkRateLimit({
@@ -40,14 +71,46 @@ export async function POST(request: NextRequest) {
     // Parse request body
     const body = await request.json();
     const { formData, captchaToken, organizationId } = body;
+    const idempotencyKey =
+      normalizeIdempotencyKey(body?.idempotencyKey) ||
+      normalizeIdempotencyKey(request.headers.get('x-idempotency-key'));
 
-            // Verify required fields
-        if (!organizationId) {
-          return NextResponse.json(
-            { error: 'Organization ID is required' },
-            { status: 400 }
-          );
-        }
+    if ((body?.idempotencyKey || request.headers.get('x-idempotency-key')) && !idempotencyKey) {
+      await securityManager.updateIdempotencyStats('invalid');
+      return NextResponse.json(
+        { error: 'Invalid idempotency key format' },
+        { status: 400 }
+      );
+    }
+
+    // Verify required fields
+    if (!organizationId || typeof organizationId !== 'string') {
+      return NextResponse.json(
+        { error: 'Organization ID is required' },
+        { status: 400 }
+      );
+    }
+
+    let lockKey: string | null = null;
+    let lockAcquired = false;
+    if (idempotencyKey) {
+      await securityManager.updateIdempotencyStats('attempts');
+      lockKey = `submit:idempotency:lock:${organizationId}:${idempotencyKey}`;
+      const lockResult = await upstashRedis.set(lockKey, "1", {
+        nx: true,
+        ex: 60,
+      });
+      lockAcquired = lockResult === "OK";
+
+      if (!lockAcquired) {
+        await securityManager.updateIdempotencyStats('collisions');
+        return NextResponse.json(
+          { error: 'Duplicate submission in progress. Please wait a moment.' },
+          { status: 409 }
+        );
+      }
+      await securityManager.updateIdempotencyStats('acquired');
+    }
 
             // Verify captcha if required or if suspicious behavior detected
         if (rateLimitResult.requiresCaptcha) {
@@ -94,13 +157,12 @@ export async function POST(request: NextRequest) {
 
     // Check for suspicious patterns in form data
     const suspiciousPatterns = [
-      /script/i,
-      /javascript/i,
-      /onload/i,
-      /onerror/i,
-      /<iframe/i,
-      /<object/i,
-      /<embed/i,
+      /<script\b/i,
+      /\bon\w+\s*=/i,
+      /<iframe\b/i,
+      /<object\b/i,
+      /<embed\b/i,
+      /javascript:\s*/i,
     ];
 
     const formDataString = JSON.stringify(formData).toLowerCase();
@@ -116,30 +178,37 @@ export async function POST(request: NextRequest) {
         }
 
         // Process the submission using the existing action
-    const result = await submitEthicLineReport({ 
-      organizationId,
-      formData 
-    });
+    try {
+      const result = await submitEthicLineReport({ 
+        organizationId,
+        formData,
+        idempotencyKey: idempotencyKey || undefined,
+      });
 
-        if (!result.success) {
-          return NextResponse.json(
-            { error: result.error || 'Submission failed' },
-            { status: 400 }
-          );
-        }
-
-        // Log successful submission activity
-        securityManager.logActivity(
-          clientIP, 
-          'Form Submission', 
-          `Report submitted successfully: ${result.trackingCode}`
+      if (!result.success) {
+        return NextResponse.json(
+          { error: result.error || 'Submission failed' },
+          { status: 400 }
         );
+      }
 
-        return NextResponse.json({
-      success: true,
-      trackingCode: result.trackingCode,
-      message: 'Report submitted successfully',
-    });
+      // Log successful submission activity
+      securityManager.logActivity(
+        clientIP, 
+        'Form Submission', 
+        `Report submitted successfully: ${result.trackingCode}`
+      );
+
+      return NextResponse.json({
+        success: true,
+        trackingCode: result.trackingCode,
+        message: 'Report submitted successfully',
+      });
+    } finally {
+      if (lockAcquired && lockKey) {
+        await upstashRedis.del(lockKey);
+      }
+    }
 
   } catch (error) {
     const clientIP = getClientIP(request);

@@ -28,7 +28,7 @@ export function OrganizationSelector({
   const selectedOrg = organizations.find((o) => o.id === selected);
 
   return (
-    <div className="container max-w-2xl mx-auto px-4 py-20">
+    <div className="container mx-auto max-w-3xl px-4 py-16 md:py-20">
       <Button
         onPress={() => router.back()}
         variant="light"
@@ -39,20 +39,32 @@ export function OrganizationSelector({
             aria-hidden="true"
           />
         }
-        className="group mb-4"
+        className="group mb-5 text-[#0d212c]"
       >
         Volver
       </Button>
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+
+      <div className="mb-8 rounded-3xl border border-[#0a1e14]/10 bg-white/90 p-6 text-center shadow-[0_14px_50px_rgba(10,30,20,0.08)] backdrop-blur-sm md:p-8">
+        <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+          <span className="rounded-full border border-lime-300 bg-lime-100/70 px-3 py-1 text-xs font-semibold text-[#0a1e14]">
+            Canal confidencial
+          </span>
+          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-[#0a1e14]">
+            Protección de identidad
+          </span>
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-[#0d212c]">
+            Cifrado en tránsito
+          </span>
+        </div>
+        <h1 className="mb-3 text-3xl font-extrabold tracking-tight text-[#0a1e14] md:text-4xl">
           Seleccionar Organización
         </h1>
-        <p className="text-xl text-gray-600">
+        <p className="text-base text-[#273c46] md:text-xl">
           Selecciona tu organización para continuar con el reporte ético
         </p>
       </div>
 
-      <Card className="p-8">
+      <Card className="rounded-3xl border border-[#0a1e14]/10 bg-white/95 p-6 shadow-[0_20px_60px_rgba(10,30,20,0.1)] md:p-8">
         <div className="space-y-6">
           <Select
             label="Organización"
@@ -62,6 +74,13 @@ export function OrganizationSelector({
               setSelected(Array.from(keys)[0] as string)
             }
             size="lg"
+            radius="lg"
+            classNames={{
+              trigger:
+                "bg-[#f7faf9] border border-[#0a1e14]/10 data-[hover=true]:border-lime-500",
+              value: "text-[#0d212c]",
+              label: "text-[#0a1e14] font-medium",
+            }}
             startContent={
               selectedOrg?.logoUrl ? (
                 <div className="relative w-6 h-6 flex items-center justify-center">
@@ -109,7 +128,7 @@ export function OrganizationSelector({
           </Select>
 
           {selectedOrg && (
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="rounded-2xl border border-lime-200 bg-lime-50/80 p-4">
               <div className="flex items-center space-x-4">
                 {selectedOrg.logoUrl ? (
                   <div className="relative w-16 h-16 flex items-center justify-center">
@@ -127,8 +146,10 @@ export function OrganizationSelector({
                   />
                 )}
                 <div>
-                  <h3 className="font-semibold text-lg">{selectedOrg.name}</h3>
-                  <p className="text-sm text-gray-600">
+                  <h3 className="text-lg font-semibold text-[#0a1e14]">
+                    {selectedOrg.name}
+                  </h3>
+                  <p className="text-sm text-[#273c46]">
                     Organización seleccionada
                   </p>
                 </div>
@@ -148,10 +169,18 @@ export function OrganizationSelector({
                 aria-hidden="true"
               />
             }
-            className="w-full"
+            className="w-full bg-[#0a1e14] text-white data-[hover=true]:!bg-[#0f3423]"
           >
             Continuar
           </Button>
+
+          <div className="rounded-xl border border-[#0a1e14]/10 bg-[#f7faf9] p-3">
+            <p className="text-xs leading-relaxed text-[#273c46]">
+              La información que envíes se procesa bajo un flujo de
+              confidencialidad. Si tu organización lo permite, puedes mantener
+              tu identidad en anonimato durante toda la investigación.
+            </p>
+          </div>
         </div>
       </Card>
     </div>

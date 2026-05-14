@@ -21,7 +21,15 @@ export function Step1Personal() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-4">Denunciante</h3>
+        <h3 className="mb-4 text-lg font-semibold text-[#0a1e14]">Denunciante</h3>
+
+        <div className="mb-4 rounded-xl border border-lime-200 bg-lime-50/80 p-3">
+          <p className="text-xs leading-relaxed text-[#1f3d31]">
+            Puedes activar el anonimato para ocultar tu identidad durante el
+            proceso. Solo comparte datos personales si deseas recibir contacto
+            de seguimiento directo.
+          </p>
+        </div>
 
         <Controller
           name="isAnonymous"
@@ -32,7 +40,7 @@ export function Step1Personal() {
               onValueChange={field.onChange}
               classNames={{
                 base: "max-w-full",
-                wrapper: "bg-gray-300 group-data-[selected=true]:bg-black",
+                wrapper: "bg-gray-300 group-data-[selected=true]:bg-[#0a1e14]",
                 thumb: "bg-white",
               }}
               className="mb-6"
@@ -141,8 +149,8 @@ export function Step1Personal() {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-2">Denunciado</h3>
-        <p className="text-sm text-gray-600 mb-4">
+        <h3 className="mb-2 text-lg font-semibold text-[#0a1e14]">Denunciado</h3>
+        <p className="mb-4 text-sm text-[#273c46]">
           Si no conoce al denunciado, escriba &quot;No especificado&quot; en los
           campos de nombre.
         </p>
@@ -225,8 +233,10 @@ export function Step1Personal() {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">Información adicional</h3>
-        
+        <h3 className="mb-4 text-lg font-semibold text-[#0a1e14]">
+          Información adicional
+        </h3>
+
         <div className="space-y-6">
           <Controller
             name="workRelationship"
@@ -292,6 +302,14 @@ export function Step1Personal() {
             />
           )}
         </div>
+      </div>
+
+      <div className="rounded-xl border border-[#0a1e14]/10 bg-[#f7faf9] p-3">
+        <p className="text-xs leading-relaxed text-[#273c46]">
+          Recomendación de seguridad: evita incluir contraseñas, datos
+          bancarios completos o información de terceros no relacionada con el
+          hecho reportado.
+        </p>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import { createTrackingCode } from "@/actions/tracking.actions";
 import { ComplianceAIProcessor } from "../lib/ai/compliance-ai-processor";
 import { notificationsService } from "./notifications.service";
 import { v2 as cloudinary } from "cloudinary";
+import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
 
 export class SubmissionProcessorService {
   private aiProcessor: ComplianceAIProcessor;
@@ -143,6 +144,38 @@ export class SubmissionProcessorService {
     // Return early if duplicate
     if (duplicate) {
       return duplicate;
+    }
+
+    // Defense in depth: even if job exists, enforce plan before AI execution
+    const planInfo = await getOrganizationPlanInfo(orgId);
+    const canUseAI = Boolean(planInfo?.features?.hasAiProcessing);
+    if (!canUseAI) {
+      await prisma.aiProcessingJob.update({
+        where: { id: job.id },
+        data: {
+          status: "completed",
+          errorMessage: "AI skipped: organization plan does not allow AI processing",
+          completedAt: new Date(),
+        },
+      });
+
+      if (metadata?.submissionId) {
+        return {
+          success: true,
+          submissionId: metadata.submissionId,
+          trackingCode: await createTrackingCode(metadata.submissionId),
+          analysis: null,
+          skippedByPlan: true,
+        };
+      }
+
+      return {
+        success: false,
+        submissionId: 0,
+        trackingCode: "",
+        analysis: null,
+        skippedByPlan: true,
+      };
     }
 
     // STEP 2: AI Processing outside transaction (slow operation)
@@ -388,8 +421,10 @@ export class SubmissionProcessorService {
             },
           });
 
-          // Update organization counters
-          await this.updateOrganizationCounters(tx, orgId, source);
+          // Update organization counters only when creating a new submission
+          if (!existingSubmission) {
+            await this.updateOrganizationCounters(tx, orgId, source);
+          }
 
           // Track usage
           await this.trackUsage(tx, orgId, content.length);

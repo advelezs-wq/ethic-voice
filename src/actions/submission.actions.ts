@@ -9,38 +9,112 @@ import { addSubmissionToQueue } from "@/modules/app/lib/queue/queue-manager";
 import { createTrackingCode } from "@/actions/tracking.actions";
 
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
+import {
+  normalizeIdempotencyKey,
+  sanitizeEthicLineFormData,
+} from "@/lib/security/submission-security";
+
+const MAX_TEXT_FIELD_LENGTH = 5000;
+const MAX_QUESTIONNAIRE_KEYS = 120;
+const MAX_ATTACHMENTS = 10;
+const MAX_ATTACHMENT_SIZE_BYTES = 50 * 1024 * 1024;
+
+const ALLOWED_ATTACHMENT_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/plain",
+  "audio/mpeg",
+  "audio/wav",
+  "audio/mp4",
+  "video/mp4",
+  "video/avi",
+  "video/quicktime",
+  "video/webm",
+]);
+
+function isTrustedAttachmentUrl(fileUrl: string): boolean {
+  try {
+    const parsed = new URL(fileUrl);
+    if (parsed.protocol !== "https:") return false;
+    if (!parsed.hostname.endsWith("res.cloudinary.com")) return false;
+    // Enforce attachments folder convention
+    return parsed.pathname.includes("/reports/");
+  } catch {
+    return false;
+  }
+}
+
+async function canUseAiProcessing(orgId: string): Promise<boolean> {
+  try {
+    const planInfo = await getOrganizationPlanInfo(orgId);
+    return Boolean(planInfo?.features?.hasAiProcessing);
+  } catch {
+    return false;
+  }
+}
 
 const ethicLineSubmissionSchema = z.object({
-  organizationId: z.string(),
+  organizationId: z.string().min(2).max(100),
+  idempotencyKey: z
+    .string()
+    .regex(/^[a-zA-Z0-9:_-]{8,128}$/)
+    .optional(),
   formData: z
     .object({
       isAnonymous: z.boolean(),
       reporter: z.object({
-        firstName: z.string(),
-        lastName: z.string(),
-        gender: z.string(),
-        email: z.string(),
-        idDocument: z.string().optional(),
-        phone: z.string().optional(),
+        firstName: z.string().max(100),
+        lastName: z.string().max(100),
+        gender: z.string().max(60),
+        email: z.string().max(200),
+        idDocument: z.string().max(100).optional(),
+        phone: z.string().max(60).optional(),
       }),
       reported: z.object({
-        firstName: z.string().min(1),
-        lastName: z.string().min(1),
-        department: z.string().min(1),
-        position: z.string().min(1),
+        firstName: z.string().min(1).max(120),
+        lastName: z.string().min(1).max(120),
+        department: z.string().min(1).max(120),
+        position: z.string().min(1).max(120),
       }),
-      irregularityType: z.string().min(1),
-      questionnaire: z.record(z.string(), z.any()),
+      irregularityType: z.string().min(1).max(100),
+      questionnaire: z
+        .record(
+          z.string().max(100),
+          z.union([z.string().max(MAX_TEXT_FIELD_LENGTH), z.boolean(), z.null()])
+        )
+        .refine(
+          (q) => Object.keys(q).length <= MAX_QUESTIONNAIRE_KEYS,
+          "Demasiados campos en el cuestionario"
+        ),
       uploadedFiles: z
         .array(
           z.object({
-            filename: z.string(),
-            fileUrl: z.string(),
-            fileSize: z.number(),
-            mimeType: z.string(),
-            cloudinaryPublicId: z.string().optional(),
+            filename: z.string().min(1).max(255),
+            fileUrl: z
+              .string()
+              .url()
+              .refine(
+                (url) => isTrustedAttachmentUrl(url),
+                "URL de archivo no permitida"
+              ),
+            fileSize: z.number().int().positive().max(MAX_ATTACHMENT_SIZE_BYTES),
+            mimeType: z
+              .string()
+              .refine(
+                (mime) => ALLOWED_ATTACHMENT_MIME_TYPES.has(mime),
+                "Tipo de archivo no permitido"
+              ),
+            cloudinaryPublicId: z.string().max(500).optional(),
           })
         )
+        .max(MAX_ATTACHMENTS)
         .optional(),
       agreedToTerms: z.literal(true),
     })
@@ -369,6 +443,11 @@ async function createSubmission({
 
   // Add to AI processing queue (non-blocking)
   try {
+    const aiAllowed = await canUseAiProcessing(orgId);
+    if (!aiAllowed) {
+      return submission;
+    }
+
     // Parse content to get readable text
     let readableContent = content;
     try {
@@ -448,20 +527,45 @@ export async function submitEthicLineReport(
 ): Promise<SubmitReportResult> {
   try {
     const validatedData = ethicLineSubmissionSchema.parse(data);
+    const idempotencyKey = normalizeIdempotencyKey(validatedData.idempotencyKey);
+    const sanitizedFormData = sanitizeEthicLineFormData(validatedData.formData);
+
+    if (idempotencyKey) {
+      const existingSubmission = await prisma.formSubmission.findFirst({
+        where: {
+          orgId: validatedData.organizationId,
+          metadata: {
+            path: ["idempotencyKey"],
+            equals: idempotencyKey,
+          },
+        },
+        orderBy: { id: "desc" },
+        select: { id: true },
+      });
+
+      if (existingSubmission) {
+        const trackingCode = await createTrackingCode(existingSubmission.id);
+        return {
+          success: true,
+          submissionId: existingSubmission.id,
+          trackingCode,
+        };
+      }
+    }
 
     // Create submission first to get the numeric ID and build canonical code like REP-000001
 
     const reporterInfo = {
-      name: validatedData.formData.isAnonymous
+      name: sanitizedFormData.isAnonymous
         ? null
-        : `${validatedData.formData.reporter.firstName} ${validatedData.formData.reporter.lastName}`.trim(),
-      email: validatedData.formData.isAnonymous
+        : `${sanitizedFormData.reporter.firstName} ${sanitizedFormData.reporter.lastName}`.trim(),
+      email: sanitizedFormData.isAnonymous
         ? null
-        : validatedData.formData.reporter.email,
-      phone: validatedData.formData.isAnonymous
+        : sanitizedFormData.reporter.email,
+      phone: sanitizedFormData.isAnonymous
         ? null
-        : validatedData.formData.reporter.phone || null,
-      isAnonymous: validatedData.formData.isAnonymous,
+        : sanitizedFormData.reporter.phone || null,
+      isAnonymous: sanitizedFormData.isAnonymous,
     };
 
     // Get organization to validate
@@ -473,10 +577,10 @@ export async function submitEthicLineReport(
       return { success: false, error: "Organization not found" };
     }
 
-    const content = JSON.stringify(validatedData.formData);
+    const content = JSON.stringify(sanitizedFormData);
     // Build a rich, human-readable narrative for AI instead of raw JSON
     const readableContent = convertToReadableText(
-      validatedData.formData,
+      sanitizedFormData,
       SubmissionSource.ETHIC_LINE
     );
 
@@ -493,6 +597,7 @@ export async function submitEthicLineReport(
         reporterPhone: reporterInfo.isAnonymous ? null : reporterInfo.phone,
         metadata: {
           source: SubmissionSource.ETHIC_LINE,
+          ...(idempotencyKey ? { idempotencyKey } : {}),
         },
       },
     });
@@ -512,12 +617,13 @@ export async function submitEthicLineReport(
           metadata: {
             submissionId: submission.id,
             originalContent: content,
-            formData: validatedData.formData,
-            questionnaire: validatedData.formData.questionnaire,
-            files: validatedData.formData.uploadedFiles,
+            formData: sanitizedFormData,
+            questionnaire: sanitizedFormData.questionnaire,
+            files: sanitizedFormData.uploadedFiles,
+            ...(idempotencyKey ? { idempotencyKey } : {}),
           },
           reporterInfo,
-          attachments: validatedData.formData.uploadedFiles || [],
+          attachments: sanitizedFormData.uploadedFiles || [],
         });
         aiEnqueued = true;
       } else {
@@ -536,14 +642,14 @@ export async function submitEthicLineReport(
     // If AI not enqueued, persist attachments immediately so they are visible in report detail
     if (
       !aiEnqueued &&
-      Array.isArray(validatedData.formData.uploadedFiles) &&
-      validatedData.formData.uploadedFiles.length > 0
+      Array.isArray(sanitizedFormData.uploadedFiles) &&
+      sanitizedFormData.uploadedFiles.length > 0
     ) {
       const uploaderName = reporterInfo.isAnonymous
         ? "Anónimo"
         : reporterInfo.name || "Reportante";
 
-      for (const attachment of validatedData.formData.uploadedFiles) {
+      for (const attachment of sanitizedFormData.uploadedFiles) {
         try {
           await prisma.reportAttachment.create({
             data: {

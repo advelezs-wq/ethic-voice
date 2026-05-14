@@ -17,10 +17,13 @@ import {
   reconstructFormData,
   transformFormDataForSubmission,
 } from "../utils/ethicline.utils";
-import { submitEthicLineReport } from "@/actions/submission.actions";
 import { addToast } from "@/modules/core/utils/safe-toast";
 import { STEPS } from "../constants/ethicline.constants";
 import { Organization } from "@prisma/client";
+import {
+  IntelligentCaptcha,
+  useIntelligentCaptcha,
+} from "@/modules/app/components/security/IntelligentCaptcha";
 
 interface EthicLineFormProps {
   organization: Organization;
@@ -31,6 +34,20 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
   const [pending, startTransition] = useTransition();
   const [submitted, setSubmitted] = useState(false);
   const [trackingCode, setTrackingCode] = useState<string>("");
+  const [idempotencyKey] = useState(() =>
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `submit-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+  );
+  const {
+    captchaToken,
+    captchaRequired,
+    captchaError,
+    handleCaptchaVerify,
+    handleCaptchaError,
+    resetCaptcha,
+    requireCaptcha,
+  } = useIntelligentCaptcha();
 
   const {
     currentStep,
@@ -81,14 +98,41 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
         // Transform the data for submission
         const transformedData = transformFormDataForSubmission(processedData);
 
-        const result = await submitEthicLineReport({
-          organizationId: organization.id,
-          formData: transformedData,
+        const response = await fetch("/api/submit/secure", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-idempotency-key": idempotencyKey,
+          },
+          body: JSON.stringify({
+            organizationId: organization.id,
+            formData: transformedData,
+            captchaToken,
+            idempotencyKey,
+          }),
         });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          if (result?.requiresCaptcha) {
+            requireCaptcha();
+            addToast({
+              title: "Verificación requerida",
+              description:
+                "Completa la verificación de seguridad para continuar.",
+              color: "warning",
+            });
+            return;
+          }
+
+          throw new Error(result?.error || "Error al enviar el reporte");
+        }
 
         if (result.success && result.trackingCode) {
           setTrackingCode(result.trackingCode);
           setSubmitted(true);
+          resetCaptcha();
 
           addToast({
             title: "Reporte enviado",
@@ -96,7 +140,7 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
             color: "success",
           });
         } else {
-          throw new Error(result.error || "Error al enviar el reporte");
+          throw new Error(result?.error || "Error al enviar el reporte");
         }
       } catch (error) {
         console.error("Submission error:", error);
@@ -138,8 +182,31 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
 
   return (
     <FormProvider {...form}>
-      <div className="container max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8">
+      <div className="container mx-auto max-w-5xl px-4 py-8 md:py-10">
+        <div className="mb-6 grid gap-3 md:grid-cols-3">
+          <div className="rounded-xl border border-[#0a1e14]/10 bg-white/80 p-3 text-sm text-[#0d212c]">
+            <p className="mb-1 font-semibold text-[#0a1e14]">Confidencial</p>
+            <p className="text-xs text-[#273c46]">
+              Solo personal autorizado accede al caso.
+            </p>
+          </div>
+          <div className="rounded-xl border border-[#0a1e14]/10 bg-white/80 p-3 text-sm text-[#0d212c]">
+            <p className="mb-1 font-semibold text-[#0a1e14]">
+              Protección de identidad
+            </p>
+            <p className="text-xs text-[#273c46]">
+              Puedes denunciar de forma anónima.
+            </p>
+          </div>
+          <div className="rounded-xl border border-[#0a1e14]/10 bg-white/80 p-3 text-sm text-[#0d212c]">
+            <p className="mb-1 font-semibold text-[#0a1e14]">Integridad del reporte</p>
+            <p className="text-xs text-[#273c46]">
+              Validamos campos clave antes del envío.
+            </p>
+          </div>
+        </div>
+
+        <div className="mb-8 rounded-3xl border border-[#0a1e14]/10 bg-white/90 p-5 shadow-[0_18px_55px_rgba(10,30,20,0.08)] md:p-7">
           <Button
             variant="light"
             startContent={
@@ -151,15 +218,16 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
             }
             onPress={onBack}
             isDisabled={pending}
+            className="text-[#0d212c]"
           >
             Volver
           </Button>
 
           <div className="mt-4">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-[#0a1e14]">
               {organization.name}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-[#273c46]">
               Paso {currentStep} de {totalSteps} - {STEPS[currentStep - 1]}
             </p>
           </div>
@@ -168,24 +236,50 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
             value={(currentStep / totalSteps) * 100}
             color="primary"
             className="mt-4"
+            classNames={{
+              track: "bg-[#e6efe9]",
+              indicator: "bg-[#0a1e14]",
+            }}
           />
         </div>
 
-        <Card className="p-8">
+        <Card className="rounded-3xl border border-[#0a1e14]/10 bg-white/95 p-6 shadow-[0_20px_60px_rgba(10,30,20,0.1)] md:p-8">
           <form onSubmit={form.handleSubmit(handleSubmit)}>
+            {(captchaRequired || captchaError) && (
+              <div className="mb-6">
+                <IntelligentCaptcha
+                  siteKey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || ""}
+                  onVerify={handleCaptchaVerify}
+                  onError={handleCaptchaError}
+                  required={captchaRequired}
+                />
+                {captchaError && (
+                  <p className="mt-2 text-sm text-red-600">
+                    Error en la verificación: {captchaError}
+                  </p>
+                )}
+              </div>
+            )}
+
             {renderStep()}
 
-            <div className="flex justify-between mt-8">
+            <div className="mt-8 flex justify-between">
               <Button
                 type="button"
                 variant="bordered"
                 onPress={previousStep}
                 isDisabled={isFirstStep || pending}
+                className="border-[#0a1e14]/30 text-[#0d212c]"
               >
                 Anterior
               </Button>
 
-              <Button type="submit" color="primary" isLoading={pending}>
+              <Button
+                type="submit"
+                color="primary"
+                isLoading={pending}
+                className="bg-[#0a1e14] text-white data-[hover=true]:!bg-[#0f3423]"
+              >
                 {isLastStep ? "Enviar Reporte" : "Continuar"}
               </Button>
             </div>

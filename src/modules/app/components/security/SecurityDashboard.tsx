@@ -26,6 +26,22 @@ interface SecurityStats {
     captchaRequired: number;
     captchaPassed: number;
   };
+  idempotencyStats: {
+    attempts: number;
+    acquired: number;
+    collisions: number;
+    invalid: number;
+  };
+  quarantineFiles: Array<{
+    ip: string;
+    organizationId?: string;
+    filename: string;
+    mimeType: string;
+    fileSize: number;
+    sha256?: string;
+    reason: string;
+    timestamp: string;
+  }>;
   ipRequestStats: Array<{
     ip: string;
     count: number;
@@ -68,6 +84,13 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
       captchaRequired: 0,
       captchaPassed: 0,
     },
+    idempotencyStats: {
+      attempts: 0,
+      acquired: 0,
+      collisions: 0,
+      invalid: 0,
+    },
+    quarantineFiles: [],
     ipRequestStats: [],
   });
   
@@ -524,7 +547,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
       )}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-100 rounded-lg">
@@ -572,6 +595,102 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               </p>
               <p className="text-sm text-gray-600">Tasa de Éxito</p>
             </div>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <i className="icon-[lucide--file-warning] size-6 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">{stats.quarantineFiles.length}</p>
+              <p className="text-sm text-gray-600">Archivos en Cuarentena</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-indigo-100 rounded-lg">
+              <i className="icon-[lucide--repeat] size-6 text-indigo-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-gray-900">{stats.idempotencyStats.collisions}</p>
+              <p className="text-sm text-gray-600">Colisiones Idempotencia</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Idempotency & Quarantine */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <i className="icon-[lucide--repeat] size-5 text-indigo-600" />
+              Métricas de Idempotencia
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="rounded-lg bg-gray-50 p-3">
+                <p className="text-xs text-gray-500">Intentos</p>
+                <p className="text-xl font-bold">{stats.idempotencyStats.attempts}</p>
+              </div>
+              <div className="rounded-lg bg-green-50 p-3">
+                <p className="text-xs text-gray-500">Locks OK</p>
+                <p className="text-xl font-bold text-green-700">{stats.idempotencyStats.acquired}</p>
+              </div>
+              <div className="rounded-lg bg-orange-50 p-3">
+                <p className="text-xs text-gray-500">Colisiones</p>
+                <p className="text-xl font-bold text-orange-700">{stats.idempotencyStats.collisions}</p>
+              </div>
+              <div className="rounded-lg bg-red-50 p-3">
+                <p className="text-xs text-gray-500">Invalid Key</p>
+                <p className="text-xl font-bold text-red-700">{stats.idempotencyStats.invalid}</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <i className="icon-[lucide--shield-alert] size-5 text-purple-600" />
+              Archivos en Cuarentena (últimos 100)
+            </h3>
+
+            {stats.quarantineFiles.length === 0 ? (
+              <p className="text-gray-500 text-sm">No hay archivos en cuarentena.</p>
+            ) : (
+              <Table aria-label="Quarantine files">
+                <TableHeader>
+                  <TableColumn>ARCHIVO</TableColumn>
+                  <TableColumn>IP</TableColumn>
+                  <TableColumn>MOTIVO</TableColumn>
+                  <TableColumn>FECHA</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {stats.quarantineFiles.slice(0, 12).map((file, idx) => (
+                    <TableRow key={`${file.sha256 || file.filename}-${idx}`}>
+                      <TableCell>
+                        <div className="max-w-[220px] truncate" title={file.filename}>
+                          {file.filename}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="font-mono text-xs">{file.ip}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-xs">{file.reason}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-xs text-gray-500">{formatTimestamp(file.timestamp)}</span>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </div>
         </Card>
       </div>

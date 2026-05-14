@@ -56,7 +56,7 @@ export function Step3Questions() {
   if (isReporteLibre) {
     return (
       <div className="space-y-6">
-        <p className="text-gray-600">
+        <p className="text-[#273c46]">
           Redacte el caso con el mayor detalle posible para una mejor
           investigación.
         </p>
@@ -82,14 +82,14 @@ export function Step3Questions() {
 
   return (
     <div className="space-y-8">
-      <p className="text-gray-600">
+      <p className="text-[#273c46]">
         Complete las siguientes preguntas para ayudarnos a entender mejor la
         situación.
       </p>
 
       {/* Question 1: What happened - Multiple selection with individual checkboxes */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
+      <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
+        <label className="text-sm font-semibold text-[#0a1e14]">
           ¿En qué consistió el hecho? * (Seleccione todas las que apliquen)
         </label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -117,8 +117,8 @@ export function Step3Questions() {
       </div>
 
       {/* Question 2: How it happened - Multiple selection with individual checkboxes */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
+      <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
+        <label className="text-sm font-semibold text-[#0a1e14]">
           ¿Cómo se llevó a cabo? * (Seleccione todas las que apliquen)
         </label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -146,9 +146,11 @@ export function Step3Questions() {
       </div>
 
       {/* Question 3: Where and When - Split into two parts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">¿Dónde sucedió? *</label>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
+          <label className="text-sm font-semibold text-[#0a1e14]">
+            ¿Dónde sucedió? *
+          </label>
           <Controller
             name="questionnaire.where"
             control={control}
@@ -175,8 +177,10 @@ export function Step3Questions() {
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-medium">¿Cuándo sucedió? *</label>
+        <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
+          <label className="text-sm font-semibold text-[#0a1e14]">
+            ¿Cuándo sucedió? *
+          </label>
           <Controller
             name="questionnaire.when"
             control={control}
@@ -205,8 +209,8 @@ export function Step3Questions() {
       </div>
 
       {/* Question 4: Other involved - Radio + Text */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium">
+      <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
+        <label className="text-sm font-semibold text-[#0a1e14]">
           ¿Considera que existen otros involucrados?
         </label>
         <Controller
@@ -238,7 +242,7 @@ export function Step3Questions() {
       </div>
 
       {/* Additional details - Always show */}
-      <div className="space-y-2">
+      <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
         <Controller
           name="questionnaire.additionalDetails"
           control={control}

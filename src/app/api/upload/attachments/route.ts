@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { securityManager, getClientIP } from '@/modules/app/lib/security/rate-limiter';
+import { scanUploadedFile } from '@/lib/security/submission-security';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -41,6 +42,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
+    if (!orgId || typeof orgId !== 'string' || orgId.length < 2 || orgId.length > 100) {
+      return NextResponse.json({ error: 'Invalid organization ID' }, { status: 400 });
+    }
+
+    // Basic filename hardening
+    if (!file.name || file.name.length > 255 || /[<>:"/\\|?*\x00-\x1F]/.test(file.name)) {
+      return NextResponse.json({ error: 'Invalid file name' }, { status: 400 });
+    }
+
     // Validate file size (50MB max)
     if (file.size > 50 * 1024 * 1024) {
       return NextResponse.json({ error: 'File too large. Maximum size is 50MB' }, { status: 400 });
@@ -64,12 +74,57 @@ export async function POST(request: NextRequest) {
     // Convert file to base64
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+
+    const scanResult = await scanUploadedFile(buffer, file.name, file.type);
+    if (!scanResult.safe) {
+      await securityManager.addQuarantineFile({
+        ip: clientIP,
+        organizationId: orgId,
+        filename: file.name,
+        mimeType: file.type,
+        fileSize: file.size,
+        sha256: scanResult.sha256,
+        reason: scanResult.reason || 'Security scanner rejection',
+      });
+
+      securityManager.logAttack(
+        clientIP,
+        'Malicious Upload Blocked',
+        `Blocked file ${file.name}: ${scanResult.reason || 'scan failed'}`
+      );
+
+      await securityManager.notifySecurityAlert({
+        title: 'Archivo bloqueado por scanner de seguridad',
+        severity: 'high',
+        details: {
+          ip: clientIP,
+          organizationId: orgId,
+          filename: file.name,
+          mimeType: file.type,
+          fileSize: file.size,
+          sha256: scanResult.sha256,
+          reason: scanResult.reason || 'scan failed',
+        },
+      });
+
+      return NextResponse.json(
+        { error: 'File rejected by security scanner' },
+        { status: 400 }
+      );
+    }
+
     const base64 = buffer.toString('base64');
     const dataURI = `data:${file.type};base64,${base64}`;
 
     // Upload to Cloudinary
+    const safeBaseName = file.name
+      .replace(/\.[^/.]+$/, '')
+      .replace(/[^a-zA-Z0-9_-]/g, '_')
+      .slice(0, 64);
+
     const uploadResponse = await cloudinary.uploader.upload(dataURI, {
       folder: `reports/${orgId}/temp-attachments`,
+      public_id: `${Date.now()}_${safeBaseName}`,
       resource_type: 'auto',
                 max_file_size: 50000000,
       allowed_formats: ['jpg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'mp3', 'mp4', 'avi', 'mov', 'xlsx', 'txt', 'wav'],

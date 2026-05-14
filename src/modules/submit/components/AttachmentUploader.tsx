@@ -204,7 +204,7 @@ export function AttachmentUploader({
     <div className="space-y-4">
       {/* Upload Area */}
       <div
-        className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer"
+        className="cursor-pointer rounded-2xl border-2 border-dashed border-[#0a1e14]/20 bg-[#f7faf9] p-6 text-center transition-colors hover:border-lime-500"
         onClick={(e) => {
           // Only trigger file selection if clicking outside the button
           if (
@@ -229,16 +229,17 @@ export function AttachmentUploader({
             <i className="icon-[lucide--paperclip] size-12 text-gray-400" />
           </div>
           <div>
-            <p className="text-lg font-medium text-gray-900">
+            <p className="text-lg font-medium text-[#0a1e14]">
               Arrastra archivos aquí o haz clic para seleccionar
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="mt-1 text-sm text-[#273c46]">
               Imágenes, documentos, audio, video - Máximo 50MB por archivo
             </p>
           </div>
           <Button
             color="primary"
             variant="flat"
+            className="bg-[#0a1e14] text-white"
             onPress={() => {
               fileInputRef.current?.click();
             }}
@@ -280,10 +281,10 @@ export function AttachmentUploader({
 
       {/* Upload Status */}
       {isUploading && (
-        <Card className="p-4 bg-blue-50 border-blue-200">
+        <Card className="border border-lime-300 bg-lime-50 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            <span className="text-blue-800 font-medium">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#0a1e14] border-t-transparent" />
+            <span className="font-medium text-[#0a1e14]">
               Subiendo archivos... Por favor espera antes de enviar el
               formulario.
             </span>
@@ -339,51 +340,37 @@ export function AttachmentUploader({
       )}
 
       {/* Info Card */}
-      <Card className="p-4 bg-blue-50 border-blue-200">
+      <Card className="border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
         <div className="space-y-2">
-          <h4 className="font-semibold text-blue-900 flex items-center gap-2">
+          <h4 className="flex items-center gap-2 font-semibold text-[#0a1e14]">
             <i className="icon-[lucide--info] size-4" />
             Tipos de archivos permitidos:
           </h4>
-          <ul className="text-sm text-blue-800 space-y-1">
+          <ul className="space-y-1 text-sm text-[#273c46]">
             <li>
-              <i className="icon-[lucide--image] size-4 inline mr-2 text-blue-600" />{" "}
+              <i className="icon-[lucide--image] mr-2 inline size-4 text-[#0a1e14]" />{" "}
               <strong>Imágenes:</strong> JPG, PNG, GIF, WebP
             </li>
             <li>
-              <i className="icon-[lucide--file-text] size-4 inline mr-2 text-blue-600" />{" "}
+              <i className="icon-[lucide--file-text] mr-2 inline size-4 text-[#0a1e14]" />{" "}
               <strong>Documentos:</strong> PDF, Word, Excel, TXT
             </li>
             <li>
-              <i className="icon-[lucide--volume-2] size-4 inline mr-2 text-blue-600" />{" "}
+              <i className="icon-[lucide--volume-2] mr-2 inline size-4 text-[#0a1e14]" />{" "}
               <strong>Audio:</strong> MP3, WAV, M4A
             </li>
             <li>
-              <i className="icon-[lucide--video] size-4 inline mr-2 text-blue-600" />{" "}
+              <i className="icon-[lucide--video] mr-2 inline size-4 text-[#0a1e14]" />{" "}
               <strong>Video:</strong> MP4, AVI, MOV, WebM
             </li>
           </ul>
-          <p className="text-xs text-blue-600 mt-2">
-            <strong>Nota:</strong> Todos los archivos son tratados con total
-            confidencialidad y almacenados de forma segura.
+          <p className="mt-2 text-xs text-[#273c46]">
+            <strong>Nota:</strong> Los adjuntos se protegen como información
+            sensible del caso. Comparte solo evidencia relevante para la
+            investigación.
           </p>
         </div>
       </Card>
-
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.txt,audio/*,video/*"
-        aria-label="Seleccionar archivos para cargar"
-        onChange={(e) => {
-          if (e.target.files) {
-            handleFileSelect(e.target.files);
-          }
-        }}
-        style={{ display: "none" }}
-      />
     </div>
   );
 }

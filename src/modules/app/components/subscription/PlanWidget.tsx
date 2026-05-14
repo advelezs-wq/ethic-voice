@@ -116,6 +116,12 @@ export function PlanWidget() {
               </div>
             )}
 
+            {planInfo.maxUsers === -1 && (
+              <div className="text-sm text-gray-600">
+                <span className="font-medium">Usuarios:</span> {planInfo.currentUsers}/∞
+              </div>
+            )}
+
             {planInfo.maxInvestigators > 0 && (
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
@@ -140,6 +146,13 @@ export function PlanWidget() {
                       : "primary"
                   }
                 />
+              </div>
+            )}
+
+            {planInfo.maxInvestigators === -1 && (
+              <div className="text-sm text-gray-600">
+                <span className="font-medium">Investigadores:</span>{" "}
+                {planInfo.currentInvestigators}/∞
               </div>
             )}
           </div>

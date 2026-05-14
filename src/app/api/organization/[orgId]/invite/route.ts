@@ -4,6 +4,7 @@ import prisma from "@/modules/prisma/lib/prisma";
 import { Resend } from "resend";
 import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -26,20 +27,67 @@ export async function POST(
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }
 
-  // Enforce plan limits: Grow Pro max 2 admins and 20 investigators
+  // Enforce plan limits robustly (including pending invitations)
   try {
     const planInfo = await getOrganizationPlanInfo(orgId);
     const planType = (planInfo?.planType || "STARTER") as PlanType;
     const config = PLAN_CONFIGS[planType];
+    const memberships = await prisma.organizationMembership.findMany({
+      where: { orgId },
+      include: { user: { select: { email: true } } },
+    });
+    const visibleMemberships = memberships.filter(
+      (membership) => !isSuperAdmin(membership.user.email)
+    );
 
-    const adminCount = await prisma.organizationMembership.count({ where: { orgId, role: "ADMIN" } });
-    const memberCount = await prisma.organizationMembership.count({ where: { orgId, role: "MEMBER" } });
+    const activeAdminCount = visibleMemberships.filter(
+      (membership) => membership.role === "ADMIN"
+    ).length;
+    const activeMemberCount = visibleMemberships.filter(
+      (membership) => membership.role === "MEMBER"
+    ).length;
 
-    if (role === "ADMIN" && config.features.maxUsers >= 0 && adminCount >= config.features.maxUsers) {
-      return NextResponse.json({ error: `Límite de administradores alcanzado (${config.features.maxUsers})` }, { status: 403 });
+    const now = new Date();
+    const pendingAdminInvites = await prisma.organizationInvitation.count({
+      where: {
+        orgId,
+        role: "ADMIN",
+        status: "pending",
+        expiresAt: { gt: now },
+      },
+    });
+    const pendingMemberInvites = await prisma.organizationInvitation.count({
+      where: {
+        orgId,
+        role: "MEMBER",
+        status: "pending",
+        expiresAt: { gt: now },
+      },
+    });
+
+    if (
+      role === "ADMIN" &&
+      config.features.maxUsers >= 0 &&
+      activeAdminCount + pendingAdminInvites >= config.features.maxUsers
+    ) {
+      return NextResponse.json(
+        {
+          error: `Límite de administradores alcanzado (${activeAdminCount + pendingAdminInvites}/${config.features.maxUsers} considerando invitaciones pendientes)`,
+        },
+        { status: 403 }
+      );
     }
-    if (role !== "ADMIN" && config.features.maxInvestigators >= 0 && memberCount >= config.features.maxInvestigators) {
-      return NextResponse.json({ error: `Límite de investigadores alcanzado (${config.features.maxInvestigators})` }, { status: 403 });
+    if (
+      role !== "ADMIN" &&
+      config.features.maxInvestigators >= 0 &&
+      activeMemberCount + pendingMemberInvites >= config.features.maxInvestigators
+    ) {
+      return NextResponse.json(
+        {
+          error: `Límite de investigadores alcanzado (${activeMemberCount + pendingMemberInvites}/${config.features.maxInvestigators} considerando invitaciones pendientes)`,
+        },
+        { status: 403 }
+      );
     }
   } catch {
     // If plan lookup fails, continue but do not block unexpectedly

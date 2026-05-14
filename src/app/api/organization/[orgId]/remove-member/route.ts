@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, clerkClient, createClerkClient } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
+import { recalculateOrganizationSeatUsage } from "@/modules/core/utils/subscription.utils";
 
 // ✅ Helper function to get Clerk client safely
 async function getClerkClient() {
@@ -171,28 +172,8 @@ export async function POST(
       }
     });
 
-    // Update organization counters
-    const _updateData: Record<string, unknown> = {};
-
-    if (membership.role === "ADMIN") {
-      await prisma.organization.update({
-        where: { id: orgId },
-        data: {
-          currentUsers: {
-            decrement: 1,
-          },
-        },
-      });
-    } else {
-      await prisma.organization.update({
-        where: { id: orgId },
-        data: {
-          currentInvestigators: {
-            decrement: 1,
-          },
-        },
-      });
-    }
+    // Recalculate counters from real memberships to avoid drift/negative values
+    await recalculateOrganizationSeatUsage(orgId);
 
     console.log("🎉 [REMOVE-MEMBER] Member removed successfully");
 

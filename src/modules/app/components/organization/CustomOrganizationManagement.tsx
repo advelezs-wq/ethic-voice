@@ -305,7 +305,7 @@ export function CustomOrganizationManagement({
                     <div className="text-center">
                       <p className="text-xl sm:text-2xl font-bold text-primary">
                         {members.filter((m) => m.role === "ADMIN").length} /{" "}
-                        {planInfo?.maxUsers ?? 1}
+                        {planInfo?.maxUsers === -1 ? "∞" : (planInfo?.maxUsers ?? 1)}
                       </p>
                       <p className="text-sm text-gray-600">Administradores</p>
                     </div>
@@ -508,7 +508,7 @@ export function CustomOrganizationManagement({
         onSuccess={handleInviteSuccess}
         currentMembersCount={members.filter((m) => m.role === "MEMBER").length}
         currentAdminsCount={members.filter((m) => m.role === "ADMIN").length}
-        maxUsers={planInfo?.maxUsers || 1}
+        maxUsers={planInfo?.maxUsers ?? 1}
         maxInvestigators={planInfo?.maxInvestigators ?? 4}
         planType={planInfo?.planType || "STARTER"}
       />

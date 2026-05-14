@@ -76,7 +76,8 @@ export function EnhancedInviteMemberModal({
 
   const checkPlanLimits = (role: "ADMIN" | "MEMBER"): boolean => {
     if (role === "ADMIN") {
-      if (currentAdminsCount >= maxUsers) {
+      const adminUnlimited = maxUsers === -1;
+      if (!adminUnlimited && currentAdminsCount >= maxUsers) {
         addToast({
           title: "Límite de administradores alcanzado",
           description: `Tu plan ${planType} permite máximo ${maxUsers} administrador${maxUsers > 1 ? "es" : ""}. Actualiza tu plan para agregar más.`,
@@ -194,6 +195,7 @@ export function EnhancedInviteMemberModal({
 
   const getAvailableSlots = (role: "ADMIN" | "MEMBER") => {
     if (role === "ADMIN") {
+      if (maxUsers === -1) return "∞";
       const remaining = Math.max(maxUsers - currentAdminsCount, 0);
       return remaining;
     }
@@ -226,7 +228,7 @@ export function EnhancedInviteMemberModal({
                 <div>
                   <span className="text-blue-700">Administradores:</span>
                   <span className="ml-1 font-medium">
-                    {currentAdminsCount}/{maxUsers}
+                    {currentAdminsCount}/{maxUsers === -1 ? "∞" : maxUsers}
                   </span>
                 </div>
                 <div>

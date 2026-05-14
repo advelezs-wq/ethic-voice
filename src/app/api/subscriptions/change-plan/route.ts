@@ -432,16 +432,6 @@ export async function POST(req: NextRequest) {
             isAiProcessingActive: newPlanConfig.features.hasAiProcessing,
             isChatbotActive: newPlanConfig.features.hasChatbotChannel,
             isPhoneChannelActive: newPlanConfig.features.hasPhoneChannel,
-
-            // Update counters
-            currentUsers: Math.min(
-              currentSubscription.organization?.currentUsers || 1,
-              newPlanConfig.features.maxUsers
-            ),
-            currentInvestigators: Math.min(
-              currentSubscription.organization?.currentInvestigators || 0,
-              newPlanConfig.features.maxInvestigators
-            ),
           },
         });
 

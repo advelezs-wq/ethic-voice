@@ -323,7 +323,10 @@ export async function checkUserLimits(
 
     switch (actionType) {
       case "create_user":
-        if (planPermissions.canCreateUnlimitedUsers) {
+        if (
+          planPermissions.canCreateUnlimitedUsers ||
+          planPermissions.maxUsersAllowed === -1
+        ) {
           return { allowed: true };
         }
 

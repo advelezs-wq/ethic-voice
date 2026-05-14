@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { PLAN_CONFIGS } from "@/types/subscription.types";
+import { recalculateOrganizationSeatUsage } from "@/modules/core/utils/subscription.utils";
 
 export async function POST(req: NextRequest) {
   try {
@@ -129,11 +130,10 @@ export async function POST(req: NextRequest) {
         isAiProcessingActive: subscription.hasAiProcessing,
         isChatbotActive: subscription.hasChatbotChannel,
         isPhoneChannelActive: subscription.hasPhoneChannel,
-        currentUsers: subscription.maxUsers,
-        currentInvestigators: subscription.maxInvestigators,
         subscriptionSetupCompleted: true,
       },
     });
+    await recalculateOrganizationSeatUsage(organizationId);
 
     // Create organization settings if they don't exist
     const existingSettings = await prisma.organizationSettings.findUnique({

@@ -5,6 +5,7 @@ import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import { getAvailableMembersForAssignment } from "@/actions/report-assignments.actions";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
 import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
+import { recalculateOrganizationSeatUsage } from "@/modules/core/utils/subscription.utils";
 
 export async function GET(
   req: NextRequest,
@@ -242,28 +243,12 @@ export async function PATCH(
         },
       });
 
-      if (previousRole !== role) {
-        if (previousRole === "MEMBER" && role === "ADMIN") {
-          await tx.organization.update({
-            where: { id: orgId },
-            data: {
-              currentUsers: { increment: 1 },
-              currentInvestigators: { decrement: 1 },
-            },
-          });
-        } else if (previousRole === "ADMIN" && role === "MEMBER") {
-          await tx.organization.update({
-            where: { id: orgId },
-            data: {
-              currentUsers: { decrement: 1 },
-              currentInvestigators: { increment: 1 },
-            },
-          });
-        }
-      }
-
       return updated;
     });
+
+    if (previousRole !== role) {
+      await recalculateOrganizationSeatUsage(orgId);
+    }
 
     return NextResponse.json({
       success: true,

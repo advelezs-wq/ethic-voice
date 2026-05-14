@@ -3,6 +3,7 @@ import prisma from "@/modules/prisma/lib/prisma";
 import mercadoPagoService from "@/modules/app/services/mercadopago.service";
 import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
 import { EmailAccountService } from "@/modules/app/services/email-account.service";
+import { recalculateOrganizationSeatUsage } from "@/modules/core/utils/subscription.utils";
 
 const emailAccountService = new EmailAccountService();
 
@@ -192,10 +193,9 @@ export async function POST(req: NextRequest) {
                     isAiProcessingActive: cfg.features.hasAiProcessing,
                     isChatbotActive: cfg.features.hasChatbotChannel,
                     isPhoneChannelActive: cfg.features.hasPhoneChannel,
-                    currentUsers: cfg.features.maxUsers,
-                    currentInvestigators: cfg.features.maxInvestigators,
                   },
                 });
+                await recalculateOrganizationSeatUsage(subscription.orgId);
                 await emailAccountService.enforceEmailChannelPlanCompliance(
                   subscription.orgId
                 );

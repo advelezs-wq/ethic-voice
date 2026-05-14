@@ -4,6 +4,7 @@ import rebillService from "@/modules/app/services/rebill.service";
 import subscriptionManager from "@/modules/app/services/subscription-manager.service";
 import { EmailAccountService } from "@/modules/app/services/email-account.service";
 import type { Prisma, SubscriptionStatus } from "@prisma/client";
+import { recalculateOrganizationSeatUsage } from "@/modules/core/utils/subscription.utils";
 
 const emailAccountService = new EmailAccountService();
 
@@ -325,11 +326,10 @@ async function handleSubscriptionActivated(event: any) {
             isAiProcessingActive: subscription.hasAiProcessing,
             isChatbotActive: subscription.hasChatbotChannel,
             isPhoneChannelActive: subscription.hasPhoneChannel,
-            currentUsers: subscription.maxUsers,
-            currentInvestigators: subscription.maxInvestigators,
             subscriptionSetupCompleted: true,
           },
         });
+        await recalculateOrganizationSeatUsage(subscription.orgId);
 
         // If this was an upgrade, enforce new plan limits
         if (isUpgrade) {

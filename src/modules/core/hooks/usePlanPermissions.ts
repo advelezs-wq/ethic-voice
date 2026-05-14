@@ -200,7 +200,8 @@ export function usePlanPermissions(): UsePlanPermissionsReturn {
 
       const isUnlimited =
         type === "users"
-          ? permissions.canCreateUnlimitedUsers
+          ? permissions.canCreateUnlimitedUsers ||
+            permissions.maxUsersAllowed === -1
           : permissions.maxInvestigatorsAllowed === -1;
 
       if (isUnlimited) {

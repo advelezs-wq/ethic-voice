@@ -1,6 +1,7 @@
 import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
 import prisma from "@/modules/prisma/lib/prisma";
 import { Organization, Subscription } from "@prisma/client";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 /**
  * Update organization plan features based on subscription
@@ -204,11 +205,10 @@ export async function getOrganizationPlanInfo(orgId: string, userId?: string) {
             isAiProcessingActive: unlinkedSubscription.hasAiProcessing,
             isChatbotActive: unlinkedSubscription.hasChatbotChannel,
             isPhoneChannelActive: unlinkedSubscription.hasPhoneChannel,
-            currentUsers: unlinkedSubscription.maxUsers,
-            currentInvestigators: unlinkedSubscription.maxInvestigators,
             subscriptionSetupCompleted: true,
           },
         });
+        await recalculateOrganizationSeatUsage(orgId);
 
         // Update organization object for the response
         organization.hasActivePlan = true;
@@ -250,11 +250,50 @@ export async function getOrganizationPlanInfo(orgId: string, userId?: string) {
       configMaxInvestigators
     );
 
+    const memberships = await prisma.organizationMembership.findMany({
+      where: { orgId },
+      include: {
+        user: {
+          select: { email: true },
+        },
+      },
+    });
+
+    const visibleMemberships = memberships.filter(
+      (membership) => !isSuperAdmin(membership.user.email)
+    );
+    const currentAdmins = visibleMemberships.filter(
+      (membership) => membership.role === "ADMIN"
+    ).length;
+    const currentMembers = visibleMemberships.filter(
+      (membership) => membership.role === "MEMBER"
+    ).length;
+
+    const isOverUserLimit =
+      effectiveMaxUsers !== -1 && currentAdmins > effectiveMaxUsers;
+    const isOverInvestigatorLimit =
+      effectiveMaxInvestigators !== -1 &&
+      currentMembers > effectiveMaxInvestigators;
+
     return {
       orgId: organization.id,
       planType,
       hasActivePlan: organization.hasActivePlan,
       subscriptionStatus: activeSubscription?.status || "INACTIVE",
+      currentUsers: currentAdmins,
+      currentInvestigators: currentMembers,
+      isOverUserLimit,
+      isOverInvestigatorLimit,
+      restrictions: [
+        ...(isOverUserLimit
+          ? [`Administradores por encima del límite (${currentAdmins}/${effectiveMaxUsers})`]
+          : []),
+        ...(isOverInvestigatorLimit
+          ? [
+              `Investigadores por encima del límite (${currentMembers}/${effectiveMaxInvestigators})`,
+            ]
+          : []),
+      ],
       features: planConfig?.features || PLAN_CONFIGS.STARTER.features,
       limits: {
         maxUsers: effectiveMaxUsers,
@@ -273,6 +312,41 @@ export async function getOrganizationPlanInfo(orgId: string, userId?: string) {
     console.error("❌ Error getting organization plan info:", error);
     throw error;
   }
+}
+
+export async function recalculateOrganizationSeatUsage(orgId: string) {
+  const memberships = await prisma.organizationMembership.findMany({
+    where: { orgId },
+    include: {
+      user: {
+        select: { email: true },
+      },
+    },
+  });
+
+  const visibleMemberships = memberships.filter(
+    (membership) => !isSuperAdmin(membership.user.email)
+  );
+
+  const adminCount = visibleMemberships.filter(
+    (membership) => membership.role === "ADMIN"
+  ).length;
+  const memberCount = visibleMemberships.filter(
+    (membership) => membership.role === "MEMBER"
+  ).length;
+
+  await prisma.organization.update({
+    where: { id: orgId },
+    data: {
+      currentUsers: Math.max(adminCount, 0),
+      currentInvestigators: Math.max(memberCount, 0),
+    },
+  });
+
+  return {
+    currentUsers: adminCount,
+    currentInvestigators: memberCount,
+  };
 }
 
 /**

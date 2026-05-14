@@ -133,16 +133,16 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
     optimisticQueued || submissionIdToStatus.get(report.id) === "processing";
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
+    <div className="mb-6 overflow-hidden rounded-2xl border border-emerald-100 bg-white/95 shadow-[0_20px_55px_-42px_rgba(5,26,36,0.72)]">
       {/* Urgent action banner */}
       {requiresUrgentAction && (
-        <div className="bg-red-500 text-white px-5 py-2.5 flex items-center gap-2.5 text-sm font-semibold">
+        <div className="flex items-center gap-2.5 bg-red-500 px-5 py-2.5 text-sm font-semibold text-white">
           <i className="icon-[lucide--alert-triangle] size-4 shrink-0" />
           Este reporte requiere acción urgente — revisa las acciones recomendadas
         </div>
       )}
 
-      <div className="px-5 sm:px-7 py-5">
+      <div className="bg-gradient-to-r from-emerald-50/65 to-lime-50/40 px-5 py-5 sm:px-7">
         <div className="flex items-start gap-4 flex-wrap">
           {/* Left: reference + title */}
           <div className="min-w-0 flex-1">

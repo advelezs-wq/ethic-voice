@@ -41,13 +41,13 @@ export default async function ReportDetailsPage({
     }
 
     return (
-      <div className="min-h-screen bg-gray-50">
-        <main className="pt-6 sm:pt-10">
+      <div className="min-h-screen bg-gradient-to-br from-[#f8fbfa] via-white to-emerald-50/35">
+        <main className="pt-6 sm:pt-8">
           <div className="container mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             {/* Back link */}
             <Link
               href="/app/reports"
-              className="mb-5 inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-gray-600 hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200 transition-all"
+              className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm text-emerald-900 hover:bg-emerald-50 transition-all"
             >
               <i className="icon-[lucide--arrow-left] size-4" />
               Todas las denuncias

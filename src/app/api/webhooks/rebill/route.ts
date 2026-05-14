@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import rebillService from "@/modules/app/services/rebill.service";
 import subscriptionManager from "@/modules/app/services/subscription-manager.service";
+import { EmailAccountService } from "@/modules/app/services/email-account.service";
 import type { Prisma, SubscriptionStatus } from "@prisma/client";
+
+const emailAccountService = new EmailAccountService();
 
 // Enhanced webhook handler for all Rebill subscription events
 export async function POST(req: NextRequest) {
@@ -352,6 +355,10 @@ async function handleSubscriptionActivated(event: any) {
             // Don't fail activation
           }
         }
+
+        await emailAccountService.enforceEmailChannelPlanCompliance(
+          subscription.orgId
+        );
       }
 
       // Create payment transaction record
@@ -435,6 +442,12 @@ async function handleSubscriptionUpdated(event: any) {
         },
       });
 
+      if (subscription.orgId) {
+        await emailAccountService.enforceEmailChannelPlanCompliance(
+          subscription.orgId
+        );
+      }
+
       console.log("✅ Subscription update processed");
     }
 
@@ -492,6 +505,12 @@ async function handleSubscriptionCancelled(event: any) {
           } as Prisma.InputJsonValue,
         },
       });
+
+      if (subscription.orgId) {
+        await emailAccountService.enforceEmailChannelPlanCompliance(
+          subscription.orgId
+        );
+      }
 
       console.log("✅ Subscription cancellation processed");
     }
@@ -555,6 +574,12 @@ async function handlePaymentFailed(event: any) {
             } as Prisma.InputJsonValue,
           },
         });
+
+        if (subscription.orgId) {
+          await emailAccountService.enforceEmailChannelPlanCompliance(
+            subscription.orgId
+          );
+        }
 
         console.log("✅ Payment failure processed");
       }
@@ -707,6 +732,12 @@ async function handleSubscriptionPaused(event: any) {
           } as Prisma.InputJsonValue,
         },
       });
+
+      if (subscription.orgId) {
+        await emailAccountService.enforceEmailChannelPlanCompliance(
+          subscription.orgId
+        );
+      }
     }
 
     return NextResponse.json({ received: true });
@@ -755,6 +786,12 @@ async function handleSubscriptionResumed(event: any) {
           } as Prisma.InputJsonValue,
         },
       });
+
+      if (subscription.orgId) {
+        await emailAccountService.enforceEmailChannelPlanCompliance(
+          subscription.orgId
+        );
+      }
     }
 
     return NextResponse.json({ received: true });

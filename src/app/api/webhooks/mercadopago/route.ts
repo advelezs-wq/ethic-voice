@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import mercadoPagoService from "@/modules/app/services/mercadopago.service";
 import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
+import { EmailAccountService } from "@/modules/app/services/email-account.service";
+
+const emailAccountService = new EmailAccountService();
 
 export async function GET() {
   return NextResponse.json({ ok: true });
@@ -193,6 +196,9 @@ export async function POST(req: NextRequest) {
                     currentInvestigators: cfg.features.maxInvestigators,
                   },
                 });
+                await emailAccountService.enforceEmailChannelPlanCompliance(
+                  subscription.orgId
+                );
               }
               if (debug) {
                 console.log(`✅ [MP-WEBHOOK][${reqId}] Pending upgrade applied`);
@@ -203,7 +209,15 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        await prisma.subscription.update({ where: { id: internalSubscriptionId }, data: updates });
+        const updatedSubscription = await prisma.subscription.update({
+          where: { id: internalSubscriptionId },
+          data: updates,
+        });
+        if (updatedSubscription.orgId) {
+          await emailAccountService.enforceEmailChannelPlanCompliance(
+            updatedSubscription.orgId
+          );
+        }
         if (debug) {
           console.log(`💾 [MP-WEBHOOK][${reqId}] Subscription updated from payment`, {
             subscriptionId: internalSubscriptionId,
@@ -262,7 +276,15 @@ export async function POST(req: NextRequest) {
       } else if (status === "cancelled") {
         updates.status = "CANCELED";
       }
-      await prisma.subscription.update({ where: { id: internalSubscriptionId }, data: updates });
+      const updatedSubscription = await prisma.subscription.update({
+        where: { id: internalSubscriptionId },
+        data: updates,
+      });
+      if (updatedSubscription.orgId) {
+        await emailAccountService.enforceEmailChannelPlanCompliance(
+          updatedSubscription.orgId
+        );
+      }
       if (debug) {
         console.log(`💾 [MP-WEBHOOK][${reqId}] Subscription updated from preapproval`, {
           subscriptionId: internalSubscriptionId,

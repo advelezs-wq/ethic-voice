@@ -174,11 +174,11 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-4">
+    <Card className="border border-emerald-100 bg-white/95 shadow-none">
+      <CardHeader className="pb-4 border-b border-emerald-100 bg-emerald-50/50">
         <div className="flex items-center justify-between w-full flex-wrap gap-2">
           <div className="flex items-center gap-2 sm:gap-3">
-            <h3 className="text-base sm:text-lg font-semibold">
+            <h3 className="text-base sm:text-lg font-semibold text-[#0d212c]">
               Reportes Recientes
             </h3>
             <div className="flex items-center gap-1.5 sm:gap-2">
@@ -193,7 +193,13 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
               )}
             </div>
           </div>
-          <Button as={Link} href="/app/reports" variant="bordered" size="sm">
+          <Button
+            as={Link}
+            href="/app/reports"
+            variant="bordered"
+            size="sm"
+            className="border-emerald-200 text-emerald-900"
+          >
             Ver todos
           </Button>
         </div>
@@ -215,7 +221,7 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
                 shadow="sm"
                 isHoverable
                 key={report.id}
-                className={`transition-all hover:shadow-md ${
+                className={`border border-emerald-100 transition-all hover:shadow-[0_20px_40px_-34px_rgba(5,26,36,0.75)] ${
                   reportInfo.requiresUrgentAction
                     ? "border-l-4 border-l-red-500"
                     : ""
@@ -226,7 +232,7 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
                     <div className="flex-1">
                       {/* Header Row */}
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                        <span className="text-sm font-semibold text-gray-500">
+                        <span className="text-sm font-semibold text-emerald-900/70">
                           {report.idTable}
                         </span>
                         {getSourceIcon(report.source)}
@@ -381,7 +387,7 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
 
                       {/* Key Findings - Show only if AI analysis exists */}
                       {reportInfo.keyFindings.length > 0 && (
-                        <div className="mb-2 p-2 bg-gray-50 rounded-md">
+                        <div className="mb-2 rounded-md border border-emerald-100 bg-emerald-50/50 p-2">
                           <p className="text-xs font-semibold text-gray-700 mb-1">
                             Hallazgos clave:
                           </p>
@@ -411,7 +417,7 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
                       {/* Immediate Actions - Show for urgent reports */}
                       {reportInfo.requiresUrgentAction &&
                         reportInfo.immediateActions.length > 0 && (
-                          <div className="mb-2 p-2 bg-red-50 rounded-md">
+                          <div className="mb-2 rounded-md border border-red-200 bg-red-50 p-2">
                             <p className="text-xs font-semibold text-red-700 mb-1">
                               Acciones inmediatas:
                             </p>

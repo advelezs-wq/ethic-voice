@@ -66,9 +66,9 @@ export const ReportTabsContainer: React.FC<ReportTabsContainerProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white/95 shadow-none">
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200 overflow-x-auto">
+      <div className="overflow-x-auto border-b border-emerald-100 bg-emerald-50/45">
         <nav className="flex px-2 pt-2 gap-1 min-w-max" aria-label="Secciones del caso">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.key;
@@ -80,8 +80,8 @@ export const ReportTabsContainer: React.FC<ReportTabsContainerProps> = ({
                 className={`relative flex items-center gap-2 px-4 py-2.5 rounded-t-lg text-sm font-medium transition-all duration-150 whitespace-nowrap
                   ${
                     isActive
-                      ? "bg-blue-50 text-blue-900 border-b-2 border-blue-900"
-                      : "text-gray-500 hover:text-gray-800 hover:bg-gray-50 border-b-2 border-transparent"
+                      ? "bg-white text-emerald-900 border-b-2 border-emerald-700"
+                      : "text-gray-500 hover:text-emerald-800 hover:bg-white/70 border-b-2 border-transparent"
                   }`}
                 aria-current={isActive ? "page" : undefined}
               >

@@ -33,7 +33,7 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <Card className="shadow-sm border border-gray-200">
+    <Card className="border border-emerald-100 bg-white/95 shadow-none">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
           <div className={`p-1.5 ${colorClass} rounded-lg`}>
@@ -240,10 +240,10 @@ export const ReportContent: React.FC<ReportContentProps> = ({
 
       {/* ── AI Analysis ── */}
       {hasAiAnalysis && (
-        <div className="rounded-2xl border-2 border-violet-200 bg-gradient-to-br from-violet-50 to-blue-50 overflow-hidden">
+        <div className="overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/55 to-lime-50/35">
           {/* Header */}
-          <div className="flex items-center gap-3 px-5 py-4 border-b border-violet-200 bg-violet-50/60">
-            <div className="p-2 bg-violet-600 rounded-xl">
+          <div className="flex items-center gap-3 border-b border-emerald-200 bg-white/70 px-5 py-4">
+            <div className="rounded-xl bg-emerald-700 p-2">
               <i className="icon-[lucide--sparkles] size-5 text-white" />
             </div>
             <div>
@@ -275,7 +275,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
             {/* Summary */}
             {(aiAnalysis?.summary || report.aiSummary) && (
               <div>
-                <h3 className="text-xs font-bold text-violet-700 uppercase tracking-wider mb-2">
+                <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Resumen ejecutivo
                 </h3>
                 <p className="text-sm text-gray-800 leading-relaxed">
@@ -508,7 +508,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
 
       {/* ── No AI analysis state ── */}
       {!hasAiAnalysis && (
-        <div className="flex flex-col items-center justify-center py-10 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/35 py-10 text-center">
           <i className="icon-[lucide--brain] size-10 text-gray-300 mb-3" />
           <p className="text-sm font-semibold text-gray-500">
             Sin análisis de IA

@@ -74,11 +74,11 @@ function SidebarSection({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+    <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white/95 shadow-none">
+      <div className="flex items-center justify-between border-b border-emerald-100 bg-emerald-50/40 px-4 py-3">
         <div className="flex items-center gap-2">
-          <i className={`${icon} size-4 text-gray-500`} />
-          <span className="text-sm font-semibold text-gray-800">{title}</span>
+          <i className={`${icon} size-4 text-emerald-700`} />
+          <span className="text-sm font-semibold text-[#0d212c]">{title}</span>
         </div>
         {action && <div>{action}</div>}
       </div>
@@ -704,10 +704,10 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
 
       {/* ── 9. Read-only notice for members ── */}
       {!permissions.canEditReports && !permissions.canAssignReports && (
-        <div className="rounded-2xl bg-blue-50 border border-blue-200 p-4 text-center">
-          <i className="icon-[lucide--eye] size-7 text-blue-500 mx-auto mb-2" />
-          <p className="text-sm font-semibold text-blue-900">Vista de solo lectura</p>
-          <p className="text-xs text-blue-700 mt-1">
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+          <i className="icon-[lucide--eye] mx-auto mb-2 size-7 text-emerald-600" />
+          <p className="text-sm font-semibold text-emerald-900">Vista de solo lectura</p>
+          <p className="mt-1 text-xs text-emerald-800">
             Puedes ver los detalles del reporte. Para hacer cambios, contacta a
             un administrador.
           </p>

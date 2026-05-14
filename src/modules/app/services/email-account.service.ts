@@ -5,15 +5,109 @@ import { addSubmissionToQueue } from "@/modules/app/lib/queue/queue-manager";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
 import { sanitizeSubmissionText } from "@/lib/security/submission-security";
 import { SubmissionSource } from "@/types/submission.types";
+import { userHasPermission } from "@/modules/core/utils/permissions";
+import type { Prisma } from "@prisma/client";
 
 export class EmailAccountService {
+  private async appendEmailAuditEvent(
+    orgId: string,
+    event: {
+      type:
+        | "EMAIL_CONFIG_CREATED"
+        | "EMAIL_INBOX_ACTIVATED"
+        | "EMAIL_INBOX_DEACTIVATED"
+        | "EMAIL_INBOX_AUTO_DEACTIVATED_PLAN";
+      actorUserId?: string | null;
+      actorEmail?: string | null;
+      reason?: string;
+    }
+  ) {
+    const config = await prisma.emailConfiguration.findUnique({
+      where: { orgId },
+      select: { id: true, providerConfig: true },
+    });
+
+    if (!config) return;
+
+    const current =
+      config.providerConfig &&
+      typeof config.providerConfig === "object" &&
+      !Array.isArray(config.providerConfig)
+        ? (config.providerConfig as Record<string, unknown>)
+        : {};
+
+    const existing = Array.isArray(current.auditEvents)
+      ? (current.auditEvents as unknown[])
+      : [];
+
+    const nextEvents = [
+      ...existing.slice(-49),
+      {
+        type: event.type,
+        actorUserId: event.actorUserId || null,
+        actorEmail: event.actorEmail || null,
+        reason: event.reason || null,
+        timestamp: new Date().toISOString(),
+      },
+    ];
+
+    await prisma.emailConfiguration.update({
+      where: { id: config.id },
+      data: {
+        providerConfig: ({
+          ...current,
+          auditEvents: nextEvents,
+        } as unknown) as Prisma.InputJsonValue,
+      },
+    });
+  }
+
+  async enforceEmailChannelPlanCompliance(orgId: string) {
+    const planInfo = await getOrganizationPlanInfo(orgId);
+    const hasEmailChannel = Boolean(
+      planInfo?.hasActivePlan && planInfo?.features?.hasEmailChannel
+    );
+
+    if (!hasEmailChannel) {
+      const deactivation = await prisma.emailConfiguration.updateMany({
+        where: { orgId, isActive: true },
+        data: {
+          isActive: false,
+          autoProcess: false,
+        },
+      });
+
+      await prisma.organization.update({
+        where: { id: orgId },
+        data: { isEmailChannelActive: false },
+      });
+
+      if (deactivation.count > 0) {
+        await this.appendEmailAuditEvent(orgId, {
+          type: "EMAIL_INBOX_AUTO_DEACTIVATED_PLAN",
+          reason: "Plan inactive or without email channel",
+        });
+      }
+
+      return {
+        compliant: false,
+        deactivated: deactivation.count > 0,
+      };
+    }
+
+    return {
+      compliant: true,
+      deactivated: false,
+    };
+  }
+
   /**
    * Crear cuenta de email para una organización
    * Usa Google Workspace API o servicio de email
    */
-  async createOrganizationEmail(orgId: string, userId: string) {
+  async createOrganizationEmail(orgId: string, userId: string, userEmail?: string) {
     // Verificar permisos y plan
-    const hasPermission = await this.checkEmailPermission(orgId, userId);
+    const hasPermission = await this.checkEmailPermission(orgId, userId, userEmail);
     if (!hasPermission) {
       throw new Error("Plan no incluye recepción de emails");
     }
@@ -31,21 +125,149 @@ export class EmailAccountService {
     // Opción 2: Crear cuenta real en Google Workspace (más complejo)
     // const emailConfig = await this.createGoogleWorkspaceAccount(org);
 
-    // Guardar configuración
-    const config = await prisma.emailConfiguration.create({
-      data: {
+    // Guardar configuración inactiva hasta activación explícita
+    const config = await prisma.emailConfiguration.upsert({
+      where: { orgId },
+      update: {
+        emailAlias: org.slug,
+        emailAddress: emailConfig.address,
+        forwardingAddress: emailConfig.forwardingAddress,
+        subjectKeywords: ["reporte", "denuncia", "report"],
+        emailProvider: emailConfig.provider,
+        providerConfig: emailConfig.config,
+      },
+      create: {
         orgId,
         emailAlias: org.slug,
         emailAddress: emailConfig.address,
         forwardingAddress: emailConfig.forwardingAddress,
         subjectKeywords: ["reporte", "denuncia", "report"],
-        isActive: true,
+        autoProcess: true,
+        isActive: false,
         emailProvider: emailConfig.provider,
         providerConfig: emailConfig.config,
       },
     });
 
+    await this.appendEmailAuditEvent(orgId, {
+      type: "EMAIL_CONFIG_CREATED",
+      actorUserId: userId,
+      actorEmail: userEmail || null,
+    });
+
     return config;
+  }
+
+  async getOrganizationEmailConfiguration(
+    orgId: string,
+    userId: string,
+    userEmail?: string
+  ) {
+    const canManage = await userHasPermission(
+      userId,
+      orgId,
+      "canManageOrganization",
+      userEmail
+    );
+    if (!canManage) {
+      throw new Error("No autorizado para gestionar correo de la organización");
+    }
+
+    const config = await prisma.emailConfiguration.findUnique({
+      where: { orgId },
+      select: {
+        id: true,
+        orgId: true,
+        emailAlias: true,
+        emailAddress: true,
+        forwardingAddress: true,
+        subjectKeywords: true,
+        isActive: true,
+        autoProcess: true,
+        emailProvider: true,
+        emailsProcessed: true,
+        lastCheckedAt: true,
+        createdAt: true,
+        updatedAt: true,
+        providerConfig: true,
+      },
+    });
+
+    if (!config) return null;
+
+    const providerConfig =
+      config.providerConfig &&
+      typeof config.providerConfig === "object" &&
+      !Array.isArray(config.providerConfig)
+        ? (config.providerConfig as Record<string, unknown>)
+        : {};
+
+    const auditEvents = Array.isArray(providerConfig.auditEvents)
+      ? providerConfig.auditEvents
+      : [];
+
+    return {
+      ...config,
+      auditEvents,
+    };
+  }
+
+  async setEmailActivation(
+    orgId: string,
+    userId: string,
+    activate: boolean,
+    userEmail?: string
+  ) {
+    const canManage = await userHasPermission(
+      userId,
+      orgId,
+      "canManageOrganization",
+      userEmail
+    );
+    if (!canManage) {
+      throw new Error("No autorizado para activar/desactivar la bandeja");
+    }
+
+    const config = await prisma.emailConfiguration.findUnique({
+      where: { orgId },
+      select: { id: true, isActive: true },
+    });
+
+    if (!config) {
+      throw new Error("Primero debes crear la configuración de bandeja");
+    }
+
+    if (activate) {
+      const planInfo = await getOrganizationPlanInfo(orgId);
+      const hasEmailChannel = Boolean(
+        planInfo?.hasActivePlan && planInfo?.features?.hasEmailChannel
+      );
+      if (!hasEmailChannel) {
+        throw new Error(
+          "Tu plan actual no permite activar la bandeja de correo. Actualiza a GROW o superior."
+        );
+      }
+    }
+
+    const updated = await prisma.emailConfiguration.update({
+      where: { orgId },
+      data: {
+        isActive: activate,
+        autoProcess: activate,
+        lastCheckedAt: activate ? new Date() : undefined,
+      },
+    });
+
+    await this.appendEmailAuditEvent(orgId, {
+      type: activate ? "EMAIL_INBOX_ACTIVATED" : "EMAIL_INBOX_DEACTIVATED",
+      actorUserId: userId,
+      actorEmail: userEmail || null,
+      reason: activate
+        ? "Manual activation by organization manager"
+        : "Manual deactivation by organization manager",
+    });
+
+    return updated;
   }
 
   /**
@@ -77,14 +299,16 @@ export class EmailAccountService {
    */
   private async checkEmailPermission(
     orgId: string,
-    userId: string
+    userId: string,
+    userEmail?: string
   ): Promise<boolean> {
-    // Verificar membership
-    const membership = await prisma.organizationMembership.findFirst({
-      where: { orgId, userId, role: "ADMIN" },
-    });
-
-    if (!membership) return false;
+    const canManage = await userHasPermission(
+      userId,
+      orgId,
+      "canManageOrganization",
+      userEmail
+    );
+    if (!canManage) return false;
 
     // Verificar plan y que incluya canal de email
     const sub = await prisma.subscription.findFirst({
@@ -149,6 +373,9 @@ export class EmailWebhookService {
       planInfo?.hasActivePlan && planInfo?.features?.hasEmailChannel
     );
     if (!hasEmailChannel) {
+      await new EmailAccountService().enforceEmailChannelPlanCompliance(
+        emailConfig.orgId
+      );
       console.log(
         `[EMAIL_WEBHOOK] Canal email no habilitado para org ${emailConfig.orgId}`
       );

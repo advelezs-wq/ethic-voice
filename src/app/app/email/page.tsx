@@ -20,6 +20,7 @@ export default function EmailSetupPage() {
   const [emailConfig, setEmailConfig] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [togglingActivation, setTogglingActivation] = useState(false);
 
   useEffect(() => {
     // If the plan cannot access the email channel, don't fetch config
@@ -69,7 +70,9 @@ export default function EmailSetupPage() {
       const data = await response.json();
       setEmailConfig(data.config);
       addToast({
-        title: "¡Email creado exitosamente!",
+        title: "Bandeja creada",
+        description:
+          "La bandeja quedó en estado pendiente. Actívala manualmente para iniciar detección de denuncias.",
         color: "success",
       });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,6 +83,38 @@ export default function EmailSetupPage() {
       });
     } finally {
       setCreating(false);
+    }
+  };
+
+  const setActivation = async (activate: boolean) => {
+    setTogglingActivation(true);
+    try {
+      const response = await fetch("/api/organization/email/activation", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ activate }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || "No se pudo actualizar la activación");
+      }
+
+      setEmailConfig(data.config);
+      addToast({
+        title: activate ? "Bandeja activada" : "Bandeja desactivada",
+        description: data?.message,
+        color: "success",
+      });
+    } catch (error) {
+      addToast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "No se pudo actualizar el estado",
+        color: "danger",
+      });
+    } finally {
+      setTogglingActivation(false);
     }
   };
 
@@ -133,30 +168,34 @@ export default function EmailSetupPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">
-        Configuración de Email para Reportes
-      </h1>
+    <div className="mx-auto max-w-5xl space-y-6 p-6">
+      <section className="ev-page-hero">
+        <p className="ev-page-hero-kicker">Canal de correo</p>
+        <h1 className="ev-page-hero-title">Bandeja de entrada para denuncias</h1>
+        <p className="ev-page-hero-description">
+          Configura, activa y controla la detección de denuncias por email de forma segura.
+        </p>
+      </section>
 
       {!emailConfig ? (
-        <Card>
+        <Card className="border border-emerald-100 bg-white/95 shadow-none">
           <CardBody className="text-center py-12">
             <i
               className="icon-[lucide--mail] size-16 mx-auto mb-4 text-gray-400"
               role="img"
               aria-hidden="true"
             />
-            <h2 className="text-xl font-semibold mb-2">
-              Activa la recepción de reportes por email
+            <h2 className="text-xl font-semibold mb-2 text-[#0d212c]">
+              Crea tu bandeja de entrada
             </h2>
             <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              Crea una dirección de email única para tu organización donde los
-              usuarios podrán enviar reportes directamente.
+              Se reservará una dirección única para tu organización. Luego podrás
+              activarla manualmente para empezar a detectar denuncias.
             </p>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
-              <p className="text-sm text-blue-900">
-                Tu email será:{" "}
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-6 max-w-md mx-auto">
+              <p className="text-sm text-emerald-900">
+                Email preasignado:{" "}
                 <strong>{currentOrganization?.slug}@ethicvoice.co</strong>
               </p>
             </div>
@@ -174,36 +213,117 @@ export default function EmailSetupPage() {
                 />
               }
             >
-              Crear Email de Reportes
+              Crear bandeja
             </Button>
 
             <div className="mt-8 text-sm text-gray-500">
               <p>
-                Puedes desactivar o cambiar esta configuración en cualquier
-                momento.
+                La detección de denuncias solo inicia cuando la bandeja esté activa.
               </p>
             </div>
           </CardBody>
         </Card>
       ) : (
-        <Card>
+        <Card className="border border-emerald-100 bg-white/95 shadow-none">
           <CardHeader>
-            <div className="flex items-center gap-3">
-              <h2 className="text-lg font-semibold">Bandeja activa</h2>
-              <Badge color="success" variant="flat">
-                Activa
+            <div className="flex items-center justify-between w-full flex-wrap gap-3">
+              <h2 className="text-lg font-semibold text-[#0d212c]">
+                Estado de la bandeja
+              </h2>
+              <Badge
+                color={emailConfig.isActive ? "success" : "warning"}
+                variant="flat"
+              >
+                {emailConfig.isActive ? "Activa" : "Pendiente de activación"}
               </Badge>
             </div>
           </CardHeader>
-          <CardBody className="space-y-3">
+          <CardBody className="space-y-5">
             <p className="text-gray-700">
               Dirección: <strong>{emailConfig.emailAddress}</strong>
             </p>
-            <div>
-              <Button size="sm" onPress={copyEmail}>
+            <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
+              <p className="text-sm text-emerald-900">
+                {emailConfig.isActive
+                  ? "La bandeja está activa. Los correos entrantes al alias configurado se detectarán y procesarán."
+                  : "La bandeja está inactiva. No se detectarán denuncias por correo hasta que la actives."}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button size="sm" onPress={copyEmail} variant="bordered">
                 Copiar dirección
               </Button>
+              {emailConfig.isActive ? (
+                <Button
+                  size="sm"
+                  color="danger"
+                  variant="flat"
+                  onPress={() => setActivation(false)}
+                  isLoading={togglingActivation}
+                >
+                  Desactivar bandeja
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  color="primary"
+                  onPress={() => setActivation(true)}
+                  isLoading={togglingActivation}
+                >
+                  Activar bandeja
+                </Button>
+              )}
             </div>
+
+            {Array.isArray(emailConfig?.auditEvents) &&
+              emailConfig.auditEvents.length > 0 && (
+                <div className="rounded-xl border border-emerald-100 bg-white p-4">
+                  <p className="text-sm font-semibold text-[#0d212c] mb-3">
+                    Historial de activación
+                  </p>
+                  <div className="space-y-2">
+                    {emailConfig.auditEvents
+                      .slice()
+                      .reverse()
+                      .slice(0, 6)
+                      .map(
+                        (
+                          event: {
+                            type: string;
+                            timestamp?: string;
+                            reason?: string | null;
+                            actorEmail?: string | null;
+                          },
+                          idx: number
+                        ) => (
+                          <div
+                            key={`${event.type}-${event.timestamp || idx}-${idx}`}
+                            className="text-xs text-gray-700 border-b border-emerald-50 pb-2 last:border-0 last:pb-0"
+                          >
+                            <p className="font-medium text-emerald-900">
+                              {event.type === "EMAIL_INBOX_ACTIVATED"
+                                ? "Bandeja activada"
+                                : event.type === "EMAIL_INBOX_DEACTIVATED"
+                                  ? "Bandeja desactivada"
+                                  : event.type === "EMAIL_INBOX_AUTO_DEACTIVATED_PLAN"
+                                    ? "Desactivación automática por plan"
+                                    : "Configuración creada"}
+                            </p>
+                            <p className="text-gray-500">
+                              {event.timestamp
+                                ? new Date(event.timestamp).toLocaleString("es-MX")
+                                : "Fecha no disponible"}
+                              {event.actorEmail ? ` · ${event.actorEmail}` : ""}
+                            </p>
+                            {event.reason && (
+                              <p className="text-gray-600 mt-0.5">{event.reason}</p>
+                            )}
+                          </div>
+                        )
+                      )}
+                  </div>
+                </div>
+              )}
           </CardBody>
         </Card>
       )}

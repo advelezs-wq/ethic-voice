@@ -7,6 +7,7 @@ import {
   BillingCycle,
 } from "@/types/subscription.types";
 import { clerkClient } from "@clerk/nextjs/server";
+import { EmailAccountService } from "./email-account.service";
 
 export interface SubscriptionChangeRequest {
   subscriptionId: number;
@@ -40,6 +41,8 @@ export interface CancellationResult {
 }
 
 class SubscriptionManagerService {
+  private readonly emailAccountService = new EmailAccountService();
+
   // ✅ Upgrade/Downgrade subscription
   async changeSubscriptionPlan(
     request: SubscriptionChangeRequest
@@ -221,6 +224,12 @@ class SubscriptionManagerService {
         prorationAmount
       );
 
+      if (updatedSubscription.orgId) {
+        await this.emailAccountService.enforceEmailChannelPlanCompliance(
+          updatedSubscription.orgId
+        );
+      }
+
       console.log("✅ Subscription plan changed successfully:", {
         subscriptionId: updatedSubscription.id,
         newPlan: updatedSubscription.planType,
@@ -355,6 +364,12 @@ class SubscriptionManagerService {
         refundAmount
       );
 
+      if (cancelledSubscription.orgId) {
+        await this.emailAccountService.enforceEmailChannelPlanCompliance(
+          cancelledSubscription.orgId
+        );
+      }
+
       console.log("✅ Subscription cancelled successfully:", {
         subscriptionId: cancelledSubscription.id,
         status: cancelledSubscription.status,
@@ -429,6 +444,12 @@ class SubscriptionManagerService {
       });
 
       await this.sendReactivationNotification(reactivatedSubscription);
+
+      if (reactivatedSubscription.orgId) {
+        await this.emailAccountService.enforceEmailChannelPlanCompliance(
+          reactivatedSubscription.orgId
+        );
+      }
 
       return {
         success: true,

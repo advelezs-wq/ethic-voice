@@ -334,7 +334,7 @@ export function ReportsTable({
             return (
               <Card
                 key={report.id}
-                className={`border border-emerald-100 transition-all hover:shadow-[0_20px_40px_-34px_rgba(5,26,36,0.7)] ${
+                className={`border border-emerald-100 bg-white/95 transition-all hover:shadow-[0_24px_50px_-36px_rgba(5,26,36,0.78)] ${
                   isSelected ? "ring-2 ring-primary" : ""
                 } ${
                   reportInfo.requiresUrgentAction
@@ -476,7 +476,7 @@ export function ReportsTable({
                         </Dropdown>
                       </div>
 
-                      <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
+                      <h3 className="text-base md:text-lg font-semibold text-[#0d212c] mb-2">
                         {reportInfo.title}
                       </h3>
 
@@ -486,7 +486,7 @@ export function ReportsTable({
 
                       {/* Key Findings Section */}
                       {reportInfo.keyFindings.length > 0 && (
-                        <div className="mb-3 p-3 bg-emerald-50/40 rounded-lg border border-emerald-100">
+                        <div className="mb-3 rounded-lg border border-emerald-100 bg-emerald-50/55 p-3">
                           <h4 className="text-xs font-semibold text-gray-700 mb-1">
                             Hallazgos clave:
                           </h4>
@@ -664,7 +664,7 @@ export function ReportsTable({
   // Enhanced Table view
   return (
     <div className="space-y-4">
-      <Card className="border border-emerald-100 shadow-none">
+      <Card className="border border-emerald-100 bg-white/95 shadow-none">
         <CardBody className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full table-auto min-w-[1100px]">

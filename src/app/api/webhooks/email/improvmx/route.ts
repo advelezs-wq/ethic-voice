@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/webhooks/email/improvmx/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { SubmissionSource } from "@prisma/client";
+import { SubmissionSource } from "@/types/submission.types";
 import prisma from "@/modules/prisma/lib/prisma";
 import crypto from "crypto";
 import {
@@ -37,8 +37,26 @@ export async function POST(req: NextRequest) {
   try {
     const clientIP = getClientIP(req);
     const userAgent = req.headers.get("user-agent") || "";
+    const expectedWebhookSecret =
+      process.env.IMPROVMX_WEBHOOK_SECRET ||
+      process.env.EMAIL_WEBHOOK_SHARED_SECRET;
+    const providedWebhookSecret =
+      req.headers.get("x-improvmx-webhook-secret") ||
+      req.headers.get("x-webhook-secret");
 
     console.log(`[WEBHOOK] Webhook de ImprovMX recibido desde IP: ${clientIP}`);
+
+    if (expectedWebhookSecret && providedWebhookSecret !== expectedWebhookSecret) {
+      securityManager.logAttack(
+        clientIP,
+        "Invalid Signature",
+        "Invalid ImprovMX webhook secret"
+      );
+      return NextResponse.json(
+        { error: "Unauthorized webhook" },
+        { status: 401 }
+      );
+    }
 
     // Apply security checks
     const rateLimitResult = await securityManager.checkRateLimit({

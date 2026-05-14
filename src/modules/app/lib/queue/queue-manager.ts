@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Queue, Worker, Job } from "bullmq";
 import { queueRedisConnection } from "./redis-config";
+import { SubmissionSource } from "@/types/submission.types";
 
 // Queues enabled by default (no env var dependency)
 export const QUEUE_ENABLED = true;
@@ -14,7 +15,7 @@ export interface EmailCheckJob {
 export interface DirectSubmissionJob {
   orgId: string;
   content: string;
-  source: any;
+  source: SubmissionSource;
   metadata?: any;
   reporterInfo?: any;
   attachments?: Array<{
@@ -157,6 +158,16 @@ export function createSubmissionWorker() {
 // Enhanced submission queue function with better error handling and deduplication
 export async function addSubmissionToQueue(data: DirectSubmissionJob) {
   try {
+    if (!data.orgId || typeof data.orgId !== "string") {
+      throw new Error("Invalid orgId for submission queue");
+    }
+    if (!data.content || typeof data.content !== "string") {
+      throw new Error("Invalid content for submission queue");
+    }
+    if (!data.source) {
+      throw new Error("Invalid source for submission queue");
+    }
+
     // Generate job ID for deduplication
     let jobId: string;
     

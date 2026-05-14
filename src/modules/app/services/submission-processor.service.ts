@@ -427,7 +427,7 @@ export class SubmissionProcessorService {
           }
 
           // Track usage
-          await this.trackUsage(tx, orgId, content.length);
+          await this.trackUsage(tx, orgId, content.length, source);
 
           // Process attachments if any
           if (attachments && attachments.length > 0) {
@@ -949,7 +949,12 @@ export class SubmissionProcessorService {
     });
   }
 
-  private async trackUsage(tx: any, orgId: string, contentLength: number) {
+  private async trackUsage(
+    tx: any,
+    orgId: string,
+    contentLength: number,
+    source: SubmissionSource
+  ) {
     const estimatedTokens = Math.ceil(contentLength / 4);
     const estimatedCost = (estimatedTokens / 1000) * 0.02;
 
@@ -962,7 +967,7 @@ export class SubmissionProcessorService {
         estimatedCost,
         metadata: {
           contentLength,
-          source: "email_webhook",
+          source,
           timestamp: new Date().toISOString(),
         },
       },

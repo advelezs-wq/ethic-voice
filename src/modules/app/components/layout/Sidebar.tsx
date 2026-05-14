@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { SignedIn, SignOutButton, useUser } from "@clerk/nextjs";
 import { Button, User } from "@heroui/react";
 import { useUserStore } from "@/modules/store/user-store";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { SidebarItem } from "./SidebarItem";
@@ -12,10 +13,38 @@ import { useUserRole } from "@/modules/core/hooks/useUserRole";
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const isLoading = useUserStore((state) => state.isLoading);
   const { isCollapsed } = useSidebar();
   const { user } = useUser();
   const { permissions, isSuperAdmin } = useUserRole();
+  const [superAdminScope, setSuperAdminScope] = useState<"all" | "org">("all");
+
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    const readScope = () => {
+      const scopeCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("ev_scope="))
+        ?.split("=")[1];
+      setSuperAdminScope(scopeCookie === "org" ? "org" : "all");
+    };
+    readScope();
+    window.addEventListener("ev-scope-changed", readScope as EventListener);
+    return () => {
+      window.removeEventListener("ev-scope-changed", readScope as EventListener);
+    };
+  }, [isSuperAdmin]);
+
+  const isSuperAdminOrgWorkspace = isSuperAdmin && superAdminScope === "org";
+
+  const returnToSuperAdminPanel = () => {
+    try {
+      document.cookie = `ev_scope=all; path=/; max-age=${60 * 60 * 24 * 30}`;
+      window.dispatchEvent(new Event("ev-scope-changed"));
+    } catch {}
+    router.push("/app");
+  };
 
   const isActive = (path: string) => {
     if (path === "/app") {
@@ -52,7 +81,7 @@ export const Sidebar: React.FC = () => {
 
   // Organization admin items
   const adminItems =
-    permissions.canManageOrganization && !isSuperAdmin
+    permissions.canManageOrganization && (!isSuperAdmin || isSuperAdminOrgWorkspace)
       ? [
           {
             icon: (
@@ -156,6 +185,7 @@ export const Sidebar: React.FC = () => {
 
   // Super admin items
   const superAdminItems = isSuperAdmin
+    && !isSuperAdminOrgWorkspace
     ? [
         {
           icon: (
@@ -262,12 +292,12 @@ export const Sidebar: React.FC = () => {
     <aside
       className={`
       ${isCollapsed ? "w-20" : "w-[270px] 2xl:w-[283px]"} 
-      h-screen bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative z-10
+      ev-sidebar-surface h-screen flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative z-10
     `}
     >
       {/* Header */}
       <div
-        className={`h-[89px] flex items-center border-b border-gray-200 ${
+        className={`h-[89px] flex items-center border-b border-emerald-100 ${
           isCollapsed ? "justify-center" : "justify-start p-6"
         }`}
       >
@@ -294,12 +324,23 @@ export const Sidebar: React.FC = () => {
       {/* Navigation */}
       <nav className="flex-1 px-4 py-6 overflow-y-auto">
         <div className="mb-8">
+          {isSuperAdminOrgWorkspace && !isCollapsed && (
+            <Button
+              size="sm"
+              variant="flat"
+              className="mb-3 w-full justify-start border border-emerald-200 bg-emerald-50 text-[#0d212c]"
+              startContent={<i className="icon-[lucide--arrow-left] size-4" />}
+              onPress={returnToSuperAdminPanel}
+            >
+              Volver a Super Admin
+            </Button>
+          )}
           <p
-            className={`text-xs font-semibold text-gray-500 uppercase mb-3 px-3 transition-all duration-300 ${
+            className={`text-xs font-semibold text-emerald-700/70 uppercase mb-3 px-3 transition-all duration-300 ${
               isCollapsed ? "opacity-0 h-0" : "opacity-100 h-auto"
             }`}
           >
-            Navegación
+            Navegación por rol
           </p>
           <div className="space-y-1">
             {navigationItems.map((item) => (

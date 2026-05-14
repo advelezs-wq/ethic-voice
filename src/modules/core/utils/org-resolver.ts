@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import prisma from "@/modules/prisma/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import type { FormSubmission } from "@prisma/client";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 /**
  * Resolve active organization id for the authenticated user.
@@ -16,7 +17,31 @@ export async function resolveOrgId(): Promise<string | null> {
 
     const jar = await cookies();
     const fromCookie = jar.get("ev_org")?.value || null;
-    if (fromCookie) return fromCookie;
+    if (fromCookie) {
+      const looksLikeUuid =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          fromCookie
+        );
+
+      if (looksLikeUuid) {
+        const user = await currentUser();
+        const email = user?.emailAddresses?.[0]?.emailAddress || "";
+        if (email && isSuperAdmin(email)) {
+          return fromCookie;
+        }
+
+        const hasMembership = await prisma.organizationMembership.findUnique({
+          where: {
+            userId_orgId: {
+              userId,
+              orgId: fromCookie,
+            },
+          },
+          select: { orgId: true },
+        });
+        if (hasMembership) return fromCookie;
+      }
+    }
 
     const membership = await prisma.organizationMembership.findFirst({
       where: { userId },

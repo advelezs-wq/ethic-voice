@@ -15,10 +15,10 @@ export default function AppDashboard() {
   // Show loading while auth or role is loading
   if (!isLoaded || !user || roleLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <div className="text-center rounded-2xl border border-emerald-100 bg-white px-8 py-7 shadow-sm">
           <Spinner size="lg" color="primary" className="mb-4" />
-          <p className="text-gray-600">Cargando...</p>
+          <p className="text-gray-600">Preparando tu workspace...</p>
         </div>
       </div>
     );
@@ -39,10 +39,10 @@ export default function AppDashboard() {
 
   // Fallback for non-superadmin without org
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
+    <div className="min-h-[70vh] flex items-center justify-center">
+      <div className="text-center rounded-2xl border border-amber-200 bg-amber-50 px-8 py-7">
         <Spinner size="lg" color="primary" className="mb-4" />
-        <p className="text-gray-600">
+        <p className="text-amber-900">
           Aún no tienes una organización configurada.
         </p>
       </div>

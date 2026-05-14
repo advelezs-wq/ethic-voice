@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useOrganization } from "@/modules/app/hooks/useOrganization";
 import {
@@ -20,6 +21,7 @@ import { NotificationBell } from "../notifications/NotificationBell";
 import { CreateReportModal } from "../reports/CreateReportModal";
 
 export function Header() {
+  const router = useRouter();
   const { toggleSidebar } = useSidebar();
   const { permissions, isSuperAdmin } = useUserRole();
   const { currentOrganization, organizations, switchOrganization, setCurrentOrganization } =
@@ -35,22 +37,37 @@ export function Header() {
 
   useEffect(() => {
     if (!isSuperAdmin) return;
-    const scopeCookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("ev_scope="))
-      ?.split("=")[1];
-    if (scopeCookie === "org") {
-      setSuperAdminScope("org");
-    } else {
-      setSuperAdminScope("all");
-      try {
-        document.cookie = `ev_scope=all; path=/; max-age=${60 * 60 * 24 * 30}`;
-      } catch {}
-    }
+    const readScope = () => {
+      const scopeCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("ev_scope="))
+        ?.split("=")[1];
+      if (scopeCookie === "org") {
+        setSuperAdminScope("org");
+      } else {
+        setSuperAdminScope("all");
+        try {
+          document.cookie = `ev_scope=all; path=/; max-age=${60 * 60 * 24 * 30}`;
+        } catch {}
+      }
+    };
+    readScope();
+    window.addEventListener("ev-scope-changed", readScope as EventListener);
+    return () => {
+      window.removeEventListener("ev-scope-changed", readScope as EventListener);
+    };
   }, [isSuperAdmin]);
 
+  const goBackToSuperAdminPanel = () => {
+    try {
+      document.cookie = `ev_scope=all; path=/; max-age=${60 * 60 * 24 * 30}`;
+      window.dispatchEvent(new Event("ev-scope-changed"));
+    } catch {}
+    router.push("/app");
+  };
+
   return (
-    <header className="flex items-center justify-between h-16 px-4 sm:px-6 bg-white border-b border-gray-200">
+    <header className="ev-header-surface flex items-center justify-between h-16 px-4 sm:px-6">
       <div className="flex items-center gap-3 sm:gap-4">
         {/* Sidebar toggle button */}
         <Button
@@ -84,14 +101,18 @@ export function Header() {
         <div className="hidden lg:block">
           <h1 className="text-xl font-semibold text-gray-900">
             {isSuperAdmin
-              ? "Panel de Super Administrador"
+              ? superAdminScope === "org"
+                ? "Workspace de Organización"
+                : "Panel de Super Administrador"
               : permissions.canViewAllReports
                 ? "Panel de Control"
                 : "Mi Espacio de Trabajo"}
           </h1>
           <p className="text-sm text-gray-500">
             {isSuperAdmin
-              ? "Gestión global del sistema"
+              ? superAdminScope === "org"
+                ? "Operando dentro de la organización seleccionada"
+                : "Gestión global del sistema"
               : permissions.canViewAllReports
                 ? "Gestión de denuncias y reportes"
                 : "Gestión de casos asignados"}
@@ -101,6 +122,11 @@ export function Header() {
 
       {/* Actions and Navigation */}
       <div className="flex items-center gap-2 md:gap-3 flex-wrap justify-end min-w-0">
+        {!isSuperAdmin && (
+          <span className="hidden xl:inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-800">
+            {permissions.canManageOrganization ? "Workspace Admin" : "Workspace Investigador"}
+          </span>
+        )}
         {/* Create Report Button - Only for Admins */}
         {permissions.canManageOrganization && currentOrganization && (
           <Button
@@ -122,6 +148,16 @@ export function Header() {
 
         {isSuperAdmin && organizations?.length > 0 && (
           <div className="flex items-center gap-2">
+            {superAdminScope === "org" && (
+              <Button
+                variant="flat"
+                className="border border-emerald-200 bg-white text-[#0d212c]"
+                onPress={goBackToSuperAdminPanel}
+                startContent={<i className="icon-[lucide--arrow-left] size-4" />}
+              >
+                Volver a Super Admin
+              </Button>
+            )}
             <Dropdown>
               <DropdownTrigger>
                 <Button
@@ -167,6 +203,8 @@ export function Header() {
                       setSuperAdminScope("all");
                       setCurrentOrganization(null);
                       document.cookie = `ev_scope=all; path=/; max-age=${60 * 60 * 24 * 30}`;
+                      window.dispatchEvent(new Event("ev-scope-changed"));
+                      router.push("/app");
                       return;
                     }
 
@@ -174,6 +212,8 @@ export function Header() {
                     switchOrganization(value);
                     document.cookie = `ev_org=${value}; path=/; max-age=${60 * 60 * 24 * 30}`;
                     document.cookie = `ev_scope=org; path=/; max-age=${60 * 60 * 24 * 30}`;
+                    window.dispatchEvent(new Event("ev-scope-changed"));
+                    router.push("/app/reports");
                   } catch {}
                 }}
               >

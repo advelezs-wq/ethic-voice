@@ -153,7 +153,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   );
 
   return (
-    <div className="p-6">
+    <div className="space-y-6">
       <ReportsContentWithTabs
         activeReports={{
           reports: activeReportsData.reports,

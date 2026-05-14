@@ -33,9 +33,6 @@ import { deleteReport, updateReportStatus } from "@/actions/reports.actions";
 import { UserRole } from "@/types/auth.types";
 import { useSafeToast } from "../../hooks/useSafeToast";
 import { useAiQueue } from "../../hooks/useAiQueue";
-import { Spinner } from "@heroui/react";
-import { useSubmissionQueueInfo } from "../../hooks/useSubmissionQueueInfo";
-import { formatEtaShort } from "../../utils/date.utils";
 import { AIQueueInlineStatus } from "../ai/AIQueueInlineStatus";
 
 interface ReportsTableProps {
@@ -337,7 +334,7 @@ export function ReportsTable({
             return (
               <Card
                 key={report.id}
-                className={`transition-all hover:shadow-lg ${
+                className={`border border-emerald-100 transition-all hover:shadow-[0_20px_40px_-34px_rgba(5,26,36,0.7)] ${
                   isSelected ? "ring-2 ring-primary" : ""
                 } ${
                   reportInfo.requiresUrgentAction
@@ -360,7 +357,7 @@ export function ReportsTable({
 
                     {/* Main Content */}
                     <div className="flex-1">
-                      <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
+                        <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
                         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                           <span className="text-sm font-semibold text-gray-500">
                             {generateReportReference(report.id)}
@@ -489,7 +486,7 @@ export function ReportsTable({
 
                       {/* Key Findings Section */}
                       {reportInfo.keyFindings.length > 0 && (
-                        <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="mb-3 p-3 bg-emerald-50/40 rounded-lg border border-emerald-100">
                           <h4 className="text-xs font-semibold text-gray-700 mb-1">
                             Hallazgos clave:
                           </h4>
@@ -667,11 +664,11 @@ export function ReportsTable({
   // Enhanced Table view
   return (
     <div className="space-y-4">
-      <Card>
+      <Card className="border border-emerald-100 shadow-none">
         <CardBody className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full table-auto min-w-[1100px]">
-              <thead className="bg-gray-50">
+              <thead className="bg-emerald-50/50">
                 <tr>
                   <th className="p-4 text-left w-12">
                     <input
@@ -730,7 +727,7 @@ export function ReportsTable({
                   return (
                     <tr
                       key={report.id}
-                      className={`hover:bg-gray-50 border-b transition-colors ${
+                      className={`hover:bg-emerald-50/30 border-b border-emerald-100 transition-colors ${
                         isSelected ? "bg-primary-50" : ""
                       } ${
                         reportInfo.requiresUrgentAction

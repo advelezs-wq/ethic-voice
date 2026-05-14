@@ -44,12 +44,15 @@ export function RoleBasedOrganizationView() {
   // Los super administradores deben ver la misma pantalla y pestañas que un admin de organización
 
   return (
-    <section className="h-full w-full p-4 md:p-6">
-      <div className="mb-4 md:mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+    <section className="h-full w-full space-y-6">
+      <div className="ev-page-hero">
+        <p className="ev-page-hero-kicker">
+          {isSuperAdmin ? "Workspace de organización" : "Gestión interna"}
+        </p>
+        <h1 className="ev-page-hero-title">
           {isSuperAdmin ? "Organización" : "Mi Organización"}
         </h1>
-        <p className="text-gray-600 text-sm sm:text-base">
+        <p className="ev-page-hero-description">
           {permissions.canManageOrganization
             ? "Gestiona la configuración, miembros y departamentos de la organización."
             : "Información de tu organización."}
@@ -57,7 +60,7 @@ export function RoleBasedOrganizationView() {
       </div>
 
       {permissions.canManageOrganization ? (
-        <div className="overflow-x-auto pb-1 -mb-px">
+        <div className="overflow-x-auto pb-1 -mb-px rounded-2xl border border-emerald-100 bg-white p-3 sm:p-4">
           <Tabs aria-label="Opciones de organización" className="min-w-max">
             <Tab key="profile" title="Configuración y Miembros">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mt-4 sm:mt-6">
@@ -65,7 +68,7 @@ export function RoleBasedOrganizationView() {
                   <CustomOrganizationManagement />
                 </div>
                 <div className="space-y-4 col-span-1">
-                  <Card>
+                  <Card className="border border-emerald-100 shadow-none">
                     <CardBody className="p-6">
                       <h3 className="text-lg font-semibold mb-4">
                         Invitar Miembros
@@ -135,7 +138,7 @@ export function RoleBasedOrganizationView() {
             <CustomOrganizationManagement />
           </div>
           <div className="space-y-4 col-span-1">
-            <Card>
+            <Card className="border border-emerald-100 shadow-none">
               <CardBody className="p-4 sm:p-6">
                 <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
                   Información

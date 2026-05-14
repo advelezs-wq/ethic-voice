@@ -22,12 +22,12 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
     <Link
       href={to}
       className={`
-        flex items-center gap-3 px-4 py-3 rounded-md transition-all duration-300 ease-in-out
+        flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ease-in-out border
         ${isCollapsed ? "justify-center" : "justify-start"}
         ${
           isActive
-            ? "bg-primary-50 text-primary font-medium"
-            : "text-gray-700 hover:bg-background hover:text-gray-900"
+            ? "border-emerald-200 bg-gradient-to-r from-emerald-50 to-lime-50 text-primary font-medium shadow-[0_10px_20px_-18px_rgba(16,185,129,0.8)]"
+            : "border-transparent text-gray-700 hover:border-emerald-100 hover:bg-emerald-50/60 hover:text-gray-900"
         }
       `}
       title={isCollapsed ? text : undefined}

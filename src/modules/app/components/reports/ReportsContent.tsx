@@ -154,19 +154,6 @@ export function ReportsContent({
     }
   };
 
-  // Show different header based on user role
-  const getPageTitle = () => {
-    if (isSuperAdmin) {
-      return superAdminScope === "all"
-        ? "Gestión Global de Reportes"
-        : "Reportes por Organización";
-    } else if (userRole === "ADMIN") {
-      return "Gestión de Reportes";
-    } else {
-      return "Mis Reportes Asignados";
-    }
-  };
-
   const getPageDescription = () => {
     if (isSuperAdmin) {
       return superAdminScope === "all"
@@ -181,13 +168,13 @@ export function ReportsContent({
 
   return (
     <div className="space-y-6">
-      {/* Custom header for role-based content */}
-      <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap">
+      <div className="rounded-2xl border border-emerald-100 bg-emerald-50/40 p-3 sm:p-4">
+        <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-xl md:text-2xl font-semibold text-gray-900">
-            {getPageTitle()}
-          </h1>
-          <p className="text-sm md:text-base text-gray-600 mt-1">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
+            Contexto activo
+          </p>
+          <p className="text-sm md:text-base text-gray-700 mt-1">
             {getPageDescription()}
           </p>
         </div>
@@ -196,10 +183,11 @@ export function ReportsContent({
         <Button
           onPress={handleRefreshStats}
           disabled={reportsStatsLoading}
-          className="px-3 md:px-4 py-2 text-xs md:text-sm bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 disabled:opacity-50"
+          className="px-3 md:px-4 py-2 text-xs md:text-sm border border-emerald-200 bg-white text-emerald-800 rounded-lg hover:bg-emerald-50 disabled:opacity-50"
         >
           {reportsStatsLoading ? "Actualizando..." : "Actualizar Estadísticas"}
         </Button>
+      </div>
       </div>
 
       <ReportsHeader
@@ -208,6 +196,12 @@ export function ReportsContent({
         onViewModeChange={setViewMode}
         onBulkAction={handleBulkAction}
       />
+
+      {!isSuperAdmin && userRole !== "ADMIN" && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-sm text-amber-900">
+          Estás en vista de investigador: solo ves casos asignados a ti para mantener foco operativo y cumplimiento de SLA.
+        </div>
+      )}
 
       {/* Show stats only if available */}
       {reportsStats ? (

@@ -39,7 +39,7 @@ export function TrackingPageContent({
   };
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-20">
+    <div className="container max-w-6xl mx-auto px-4 py-16 sm:py-20">
       <Button
         onPress={() => router.push("/")}
         variant="light"
@@ -55,8 +55,10 @@ export function TrackingPageContent({
         Volver
       </Button>
       <div className="container mx-auto px-4 max-w-4xl">
-        {/* Header */}
-        <div className="text-center mb-12">
+        <div className="mb-10 rounded-3xl border border-[#0a1e14]/10 bg-white/85 p-6 text-center shadow-[0_20px_60px_-35px_rgba(10,30,20,0.4)]">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-700">
+            Seguimiento seguro
+          </p>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Seguimiento de Denuncia
           </h1>
@@ -85,7 +87,7 @@ export function TrackingPageContent({
         )}
 
         {/* Help Section */}
-        <Card className="mt-16 p-8">
+        <Card className="mt-16 border border-emerald-100 bg-white/95 p-8 shadow-none">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">
             ¿Necesitas ayuda?
           </h2>

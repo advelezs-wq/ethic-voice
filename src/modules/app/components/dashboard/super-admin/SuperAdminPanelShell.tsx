@@ -29,8 +29,13 @@ const NAV_ITEMS = [
     icon: "icon-[lucide--wrench]",
   },
   {
+    href: "/app/security",
+    label: "Seguridad",
+    icon: "icon-[lucide--shield-check]",
+  },
+  {
     href: "/app/superadmin/leads",
-    label: "Leads",
+    label: "Contenido y leads",
     icon: "icon-[lucide--book-user]",
   },
   {
@@ -58,8 +63,8 @@ const QUICK_ACTIONS = [
   },
   {
     href: "/app/superadmin/leads",
-    label: "Revisar leads",
-    hint: "Comercial",
+    label: "Revisar contenido",
+    hint: "Contenido",
   },
 ];
 

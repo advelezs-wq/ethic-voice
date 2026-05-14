@@ -60,6 +60,14 @@ const config: Config = {
           ignored: "#EA384C",
           influential: "#6936F5",
         },
+        ev: {
+          ink: "#0d212c",
+          forest: "#0a1e14",
+          mint: "#f7faf9",
+          lime: "#a3e635",
+          emerald: "#10b981",
+          sand: "#f5f3ee",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

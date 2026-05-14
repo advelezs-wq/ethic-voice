@@ -68,9 +68,11 @@ export function ReportsContentWithTabs({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-gray-900">
+      <div className="ev-page-hero">
+        <p className="ev-page-hero-kicker">
+          {isSuperAdmin ? "Centro de operaciones · Super Admin" : "Centro de casos · Organización"}
+        </p>
+        <h1 className="ev-page-hero-title">
           {isSuperAdmin
             ? superAdminScope === "all"
               ? "Gestión Global de Reportes"
@@ -79,7 +81,7 @@ export function ReportsContentWithTabs({
               ? "Gestión de Reportes"
               : "Mis Reportes Asignados"}
         </h1>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="ev-page-hero-description">
           {isSuperAdmin
             ? superAdminScope === "all"
               ? "Administra reportes de todas las organizaciones en una sola vista."
@@ -90,8 +92,7 @@ export function ReportsContentWithTabs({
         </p>
       </div>
 
-      {/* Tabs */}
-      <Card>
+      <Card className="border border-emerald-100 shadow-none">
         <CardBody className="p-0">
           <Tabs
             selectedKey={selectedTab}

@@ -5,6 +5,7 @@ import prisma from "@/modules/prisma/lib/prisma";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import { sanitizeBlogHtml } from "@/lib/blog/sanitize";
 import { ensureUniqueBlogSlug } from "@/lib/blog/ensureUniqueSlug";
+import { notifySitemapUpdated } from "@/lib/seo/sitemap-ping";
 import { BlogPostStatus, Prisma } from "@prisma/client";
 
 const secureUrl = z
@@ -188,6 +189,10 @@ export async function POST(req: NextRequest) {
       authorEmail: gate.email,
     },
   });
+
+  if (post.status === BlogPostStatus.PUBLISHED && !post.noIndex) {
+    void notifySitemapUpdated();
+  }
 
   return NextResponse.json({ post });
 }

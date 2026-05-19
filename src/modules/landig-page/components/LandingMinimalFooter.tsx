@@ -6,6 +6,8 @@ const LINKS = [
   { href: "/terms", label: "Términos" },
   { href: "/about", label: "Empresa" },
   { href: "/blog", label: "Blog" },
+  { href: "/sitemap", label: "Sitemap" },
+  { href: "/sitemap.xml", label: "Sitemap XML" },
 ] as const;
 
 /**
@@ -37,9 +39,7 @@ export function LandingMinimalFooter() {
             </Link>
           ))}
         </div>
-        <span>
-          Copyright © {year} EthicVoice
-        </span>
+        <span>Copyright © {year} EthicVoice</span>
       </div>
     </footer>
   );

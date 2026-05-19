@@ -5,6 +5,7 @@ import prisma from "@/modules/prisma/lib/prisma";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import { sanitizeBlogHtml } from "@/lib/blog/sanitize";
 import { ensureUniqueBlogSlug } from "@/lib/blog/ensureUniqueSlug";
+import { notifySitemapUpdated } from "@/lib/seo/sitemap-ping";
 import { BlogPostStatus } from "@prisma/client";
 
 const secureUrl = z
@@ -171,6 +172,20 @@ export async function PATCH(
     },
   });
 
+  const wasIndexablePublished =
+    existing.status === BlogPostStatus.PUBLISHED && !existing.noIndex;
+  const isIndexablePublished =
+    post.status === BlogPostStatus.PUBLISHED && !post.noIndex;
+  const shouldPing =
+    wasIndexablePublished ||
+    isIndexablePublished ||
+    (existing.slug !== post.slug &&
+      (wasIndexablePublished || isIndexablePublished));
+
+  if (shouldPing) {
+    void notifySitemapUpdated();
+  }
+
   return NextResponse.json({ post });
 }
 
@@ -182,10 +197,20 @@ export async function DELETE(
   if ("error" in gate) return gate.error;
 
   const { id } = await ctx.params;
+  const existing = await prisma.blogPost.findUnique({ where: { id } });
+  if (!existing) {
+    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  }
+
   try {
     await prisma.blogPost.delete({ where: { id } });
   } catch {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   }
+
+  if (existing.status === BlogPostStatus.PUBLISHED && !existing.noIndex) {
+    void notifySitemapUpdated();
+  }
+
   return NextResponse.json({ ok: true });
 }

@@ -98,8 +98,27 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/partners" className="text-black hover:text-green-700 transition-colors">
+                <Link
+                  href="/partners"
+                  className="text-black hover:text-green-700 transition-colors"
+                >
                   Partners
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/sitemap"
+                  className="text-black hover:text-green-700 transition-colors"
+                >
+                  Sitemap
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/sitemap.xml"
+                  className="text-black hover:text-green-700 transition-colors"
+                >
+                  Sitemap XML
                 </Link>
               </li>
             </ul>
@@ -114,7 +133,9 @@ export const Footer = () => {
             </div>
             {/* Cumplimiento / Marcos de referencia */}
             <div className="flex flex-wrap gap-2 mt-4">
-              <div className="px-2 py-1 bg-slate-100 rounded text-xs">ISO 37002</div>
+              <div className="px-2 py-1 bg-slate-100 rounded text-xs">
+                ISO 37002
+              </div>
               <div className="px-2 py-1 bg-slate-100 rounded text-xs">GDPR</div>
               <div className="px-2 py-1 bg-slate-100 rounded text-xs">
                 SOC 2
@@ -143,6 +164,12 @@ export const Footer = () => {
                 className="hover:text-green-700 transition-colors"
               >
                 Partners
+              </Link>
+              <Link
+                href="/sitemap"
+                className="hover:text-green-700 transition-colors"
+              >
+                Sitemap
               </Link>
             </div>
             <p className="text-sm text-black">

@@ -12,6 +12,8 @@ const NAV_LINKS = [
   { label: "Soporte", href: "mailto:soporte@ethicvoice.com" },
   { label: "Política de Privacidad", href: "/privacidad" },
   { label: "Términos", href: "/terms" },
+  { label: "Sitemap", href: "/sitemap" },
+  { label: "Sitemap XML", href: "/sitemap.xml" },
 ] as const;
 
 export const FooterCTA = () => {
@@ -55,7 +57,7 @@ export const FooterCTA = () => {
                 >
                   {l.label}
                 </Link>
-              )
+              ),
             )}
           </nav>
 

@@ -7,25 +7,46 @@ import { sanitizeBlogHtml } from "@/lib/blog/sanitize";
 import { ensureUniqueBlogSlug } from "@/lib/blog/ensureUniqueSlug";
 import { BlogPostStatus, Prisma } from "@prisma/client";
 
+const secureUrl = z
+  .string()
+  .url()
+  .max(2048)
+  .refine((v) => v.startsWith("https://"), "URL inválida");
+
 const createBody = z.object({
   title: z.string().min(1).max(300),
   excerpt: z.string().max(4000).optional().nullable(),
-  contentHtml: z.string(),
+  contentHtml: z.string().max(300000),
   coverImageUrl: z
     .union([z.string().url(), z.literal(""), z.null()])
     .optional(),
   status: z.nativeEnum(BlogPostStatus),
-  slug: z.string().max(200).optional().nullable(),
+  slug: z
+    .string()
+    .max(200)
+    .regex(/^[a-z0-9-]+$/, "Slug inválido")
+    .optional()
+    .nullable(),
   publishedAt: z.string().datetime().optional().nullable(),
+  metaTitle: z.string().max(160).optional().nullable(),
+  metaDescription: z.string().max(320).optional().nullable(),
+  canonicalUrl: z.union([secureUrl, z.literal(""), z.null()]).optional(),
+  ogImageUrl: z.union([secureUrl, z.literal(""), z.null()]).optional(),
+  noIndex: z.boolean().optional(),
 });
 
 async function requireSuperAdmin() {
   const { userId } = await auth();
-  if (!userId) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  if (!userId)
+    return {
+      error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
+    };
   const me = await currentUser();
   const email = me?.emailAddresses?.[0]?.emailAddress || "";
   if (!email || !isSuperAdmin(email)) {
-    return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
+    return {
+      error: NextResponse.json({ error: "Forbidden" }, { status: 403 }),
+    };
   }
   return { userId, email };
 }
@@ -59,7 +80,7 @@ export async function GET(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Parámetros inválidos", details: parsed.error.flatten() },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -113,7 +134,7 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Validación fallida", details: parsed.error.flatten() },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -125,6 +146,11 @@ export async function POST(req: NextRequest) {
     status,
     slug,
     publishedAt,
+    metaTitle,
+    metaDescription,
+    canonicalUrl,
+    ogImageUrl,
+    noIndex,
   } = parsed.data;
 
   const cleanHtml = sanitizeBlogHtml(contentHtml);
@@ -138,7 +164,9 @@ export async function POST(req: NextRequest) {
   }
 
   const cover =
-    coverImageUrl === "" || coverImageUrl === null || coverImageUrl === undefined
+    coverImageUrl === "" ||
+    coverImageUrl === null ||
+    coverImageUrl === undefined
       ? null
       : coverImageUrl;
 
@@ -151,6 +179,11 @@ export async function POST(req: NextRequest) {
       status,
       slug: slugFinal,
       publishedAt: pubAt,
+      metaTitle: metaTitle?.trim() || null,
+      metaDescription: metaDescription?.trim() || null,
+      canonicalUrl: canonicalUrl?.trim() || null,
+      ogImageUrl: ogImageUrl?.trim() || null,
+      noIndex: noIndex ?? false,
       authorId: gate.userId,
       authorEmail: gate.email,
     },

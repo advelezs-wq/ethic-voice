@@ -205,39 +205,39 @@ model Organization {
   updatedAt  DateTime @updatedAt
 
   // Plan and subscription info
-  currentPlan         PlanType?           @default(STARTER)
-  hasActivePlan       Boolean             @default(false)
-  planExpiresAt       DateTime?
-  subscriptionSetupCompleted Boolean      @default(false)
-  
+  currentPlan                PlanType? @default(STARTER)
+  hasActivePlan              Boolean   @default(false)
+  planExpiresAt              DateTime?
+  subscriptionSetupCompleted Boolean   @default(false)
+
   // Plan usage tracking
-  currentUsers        Int                 @default(1)
-  currentInvestigators Int                @default(0)
-  emailReportsCount   Int                 @default(0)
-  aiProcessingCount   Int                 @default(0)
-  
+  currentUsers         Int @default(1)
+  currentInvestigators Int @default(0)
+  emailReportsCount    Int @default(0)
+  aiProcessingCount    Int @default(0)
+
   // Plan restrictions
-  isEmailChannelActive Boolean            @default(false)
-  isAiProcessingActive Boolean            @default(false)
-  isChatbotActive     Boolean            @default(false)
-  isPhoneChannelActive Boolean           @default(false)
+  isEmailChannelActive Boolean @default(false)
+  isAiProcessingActive Boolean @default(false)
+  isChatbotActive      Boolean @default(false)
+  isPhoneChannelActive Boolean @default(false)
 
   // Relations
-  forms               Form[]
-  complaints          FormSubmission[]
-  subscriptions       Subscription[]
-  paymentTransactions PaymentTransaction[]
-  memberships         OrganizationMembership[]
-  departments         Department[]
-  User                User?                    @relation(fields: [userId], references: [id])
-  userId              String?
-  emailConfigurations EmailConfiguration[]
-  usageTracking       UsageTracking[]
-  aiTemplates         AiTemplate[]
-  settings            OrganizationSettings?    // New relation
-  userSettings        UserSettings[]           // New relation
-  aiProcessingJobs    AiProcessingJob[]
-  notifications       Notification[]
+  forms                Form[]
+  complaints           FormSubmission[]
+  subscriptions        Subscription[]
+  paymentTransactions  PaymentTransaction[]
+  memberships          OrganizationMembership[]
+  departments          Department[]
+  User                 User?                    @relation(fields: [userId], references: [id])
+  userId               String?
+  emailConfigurations  EmailConfiguration[]
+  usageTracking        UsageTracking[]
+  aiTemplates          AiTemplate[]
+  settings             OrganizationSettings? // New relation
+  userSettings         UserSettings[] // New relation
+  aiProcessingJobs     AiProcessingJob[]
+  notifications        Notification[]
   notificationSettings NotificationSettings[]
   invitations          OrganizationInvitation[]
 
@@ -251,63 +251,63 @@ model Organization {
 }
 
 model OrganizationSettings {
-  id               String  @id @default(uuid())
-  organizationId   String  @unique
-  theme            String  @default("default")
-  logoUrl          String?
-  primaryColor     String? @default("#0066CC")
-  secondaryColor   String? @default("#4A90E2")
-  accentColor      String? @default("#E3F2FD")
-  backgroundColor  String? @default("#F8FAFC")
-  customCSS        String? @db.Text
-  dashboardLayout  Json?
-  emailTemplates   Json?
-  brandingConfig   Json?
+  id                   String   @id @default(uuid())
+  organizationId       String   @unique
+  theme                String   @default("default")
+  logoUrl              String?
+  primaryColor         String?  @default("#0066CC")
+  secondaryColor       String?  @default("#4A90E2")
+  accentColor          String?  @default("#E3F2FD")
+  backgroundColor      String?  @default("#F8FAFC")
+  customCSS            String?  @db.Text
+  dashboardLayout      Json?
+  emailTemplates       Json?
+  brandingConfig       Json?
   notificationSettings Json?
-  securitySettings Json?
-  featureFlags     Json?
-  isActive         Boolean @default(true)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  securitySettings     Json?
+  featureFlags         Json?
+  isActive             Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   // Relations
-  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([organizationId])
 }
 
 model OrganizationInvitation {
-  id             String           @id @default(uuid())
-  orgId          String
-  email          String
-  invitedById    String
-  role           OrganizationRole @default(MEMBER)
-  token          String           @unique
-  status         String           @default("pending") // pending, accepted, revoked, expired
-  expiresAt      DateTime?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  id          String           @id @default(uuid())
+  orgId       String
+  email       String
+  invitedById String
+  role        OrganizationRole @default(MEMBER)
+  token       String           @unique
+  status      String           @default("pending") // pending, accepted, revoked, expired
+  expiresAt   DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
 
-  organization   Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
 
   @@index([orgId])
   @@index([email])
 }
 
 model UserSettings {
-  id                    String   @id @default(uuid())
-  userId                String
-  organizationId        String
-  language              String?  @default("es")
-  timezone              String?  @default("America/Bogota")
+  id                      String   @id @default(uuid())
+  userId                  String
+  organizationId          String
+  language                String?  @default("es")
+  timezone                String?  @default("America/Bogota")
   notificationPreferences Json?
-  dashboardPreferences  Json?
-  uiPreferences         Json?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  dashboardPreferences    Json?
+  uiPreferences           Json?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   // Relations
-  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([userId, organizationId])
   @@index([userId])
@@ -385,14 +385,14 @@ model FormSubmission {
   internalNotes String?
 
   // Relations
-  form         Form?              @relation(fields: [formId], references: [id], onDelete: Cascade)
-  organization Organization       @relation(fields: [orgId], references: [id])
-  department   Department?        @relation(fields: [departmentId], references: [id], onDelete: SetNull)
-  comments     ReportComment[]
-  attachments  ReportAttachment[]
-  activities   ReportActivity[]
-  assignments  ReportAssignment[] // NEW: Multiple assignments
-  updates      ReportUpdate[]     // NEW: Report updates
+  form          Form?              @relation(fields: [formId], references: [id], onDelete: Cascade)
+  organization  Organization       @relation(fields: [orgId], references: [id])
+  department    Department?        @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  comments      ReportComment[]
+  attachments   ReportAttachment[]
+  activities    ReportActivity[]
+  assignments   ReportAssignment[] // NEW: Multiple assignments
+  updates       ReportUpdate[] // NEW: Report updates
   notifications Notification[]
 
   createdAt       DateTime          @default(now())
@@ -439,18 +439,18 @@ model ReportActivity {
 }
 
 model ReportUpdate {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String   @default("")
-  status      String   @default("pending") // pending, in_progress, completed, blocked
-  priority    String   @default("medium") // low, medium, high
-  dueDate     DateTime?
-  assignedTo  String?
-  completedAt DateTime?
+  id              Int       @id @default(autoincrement())
+  title           String
+  description     String    @default("")
+  status          String    @default("pending") // pending, in_progress, completed, blocked
+  priority        String    @default("medium") // low, medium, high
+  dueDate         DateTime?
+  assignedTo      String?
+  completedAt     DateTime?
   completionNotes String? // Notes/conclusions added when task is completed
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   submissionId Int
   submission   FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
@@ -460,7 +460,7 @@ model ReportUpdate {
 
   // Subtasks relation
   parentId Int?
-  parent   ReportUpdate? @relation("Subtasks", fields: [parentId], references: [id])
+  parent   ReportUpdate?  @relation("Subtasks", fields: [parentId], references: [id])
   subtasks ReportUpdate[] @relation("Subtasks")
 
   // Ordering among siblings
@@ -622,46 +622,46 @@ model AiTemplate {
 }
 
 model Subscription {
-  id        Int                @id @default(autoincrement())
-  orgId     String?
-  planType  PlanType
-  planName  String
-  billingCycle BillingCycle    @default(MONTHLY)
-  status    SubscriptionStatus @default(TRIALING)
-  startDate DateTime
-  endDate   DateTime?
-  
+  id           Int                @id @default(autoincrement())
+  orgId        String?
+  planType     PlanType
+  planName     String
+  billingCycle BillingCycle       @default(MONTHLY)
+  status       SubscriptionStatus @default(TRIALING)
+  startDate    DateTime
+  endDate      DateTime?
+
   // Plan features and limits
-  maxUsers              Int       @default(1)
-  maxInvestigators      Int       @default(4)
-  maxEmployees          Int       @default(50)
-  hasEmailChannel       Boolean   @default(false)
-  hasAiProcessing       Boolean   @default(false)
-  hasChatbotChannel     Boolean   @default(false)
-  hasPhoneChannel       Boolean   @default(false)
-  hasExternalManager    Boolean   @default(false)
-  hasBilingualSupport   Boolean   @default(false)
-  hasUnlimitedUsers     Boolean   @default(false)
-  hasAdvancedAnalytics  Boolean   @default(false)
-  hasCustomization      Boolean   @default(false)
-  hasColorThemes        Boolean   @default(false)
+  maxUsers                  Int     @default(1)
+  maxInvestigators          Int     @default(4)
+  maxEmployees              Int     @default(50)
+  hasEmailChannel           Boolean @default(false)
+  hasAiProcessing           Boolean @default(false)
+  hasChatbotChannel         Boolean @default(false)
+  hasPhoneChannel           Boolean @default(false)
+  hasExternalManager        Boolean @default(false)
+  hasBilingualSupport       Boolean @default(false)
+  hasUnlimitedUsers         Boolean @default(false)
+  hasAdvancedAnalytics      Boolean @default(false)
+  hasCustomization          Boolean @default(false)
+  hasColorThemes            Boolean @default(false)
   hasUnlimitedCustomization Boolean @default(false)
-  
+
   // Pricing
-  monthlyPrice          Decimal?
-  yearlyPrice           Decimal?
-  currency              String    @default("USD")
+  monthlyPrice Decimal?
+  yearlyPrice  Decimal?
+  currency     String   @default("USD")
 
   // Provider details
   providerCustomerId     String?
   providerSubscriptionId String?
-  
+
   // Trial information
-  trialDays             Int?      @default(14)
-  isTrialActive         Boolean   @default(false)
+  trialDays     Int?    @default(14)
+  isTrialActive Boolean @default(false)
 
   // Additional metadata (JSON storage for MercadoPago data, etc.)
-  metadata              Json?
+  metadata Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -725,41 +725,41 @@ enum NotificationStatus {
 }
 
 model Notification {
-  id          String             @id @default(uuid())
-  userId      String
-  orgId       String?
-  type        NotificationType
-  channel     NotificationChannel @default(IN_APP)
-  status      NotificationStatus  @default(PENDING)
-  
+  id      String              @id @default(uuid())
+  userId  String
+  orgId   String?
+  type    NotificationType
+  channel NotificationChannel @default(IN_APP)
+  status  NotificationStatus  @default(PENDING)
+
   // Content
-  title       String
-  message     String             @db.Text
-  actionUrl   String?            // URL to redirect when clicked
-  
+  title     String
+  message   String  @db.Text
+  actionUrl String? // URL to redirect when clicked
+
   // Related entities
-  reportId    Int?               // If related to a specific report
-  
+  reportId Int? // If related to a specific report
+
   // Metadata
-  metadata    Json?              // Additional data specific to notification type
-  
+  metadata Json? // Additional data specific to notification type
+
   // Email tracking (when channel includes EMAIL)
-  emailSent   Boolean            @default(false)
-  emailError  String?
-  
+  emailSent  Boolean @default(false)
+  emailError String?
+
   // Read tracking
-  readAt      DateTime?
-  
+  readAt DateTime?
+
   // Timestamps
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  scheduledAt DateTime?          // For scheduled notifications
-  sentAt      DateTime?          // When email was sent
-  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  scheduledAt DateTime? // For scheduled notifications
+  sentAt      DateTime? // When email was sent
+
   // Relations
-  organization Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  organization Organization?   @relation(fields: [orgId], references: [id], onDelete: Cascade)
   report       FormSubmission? @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
   @@index([orgId])
   @@index([reportId])
@@ -769,35 +769,35 @@ model Notification {
 }
 
 model NotificationSettings {
-  id                        String   @id @default(uuid())
-  userId                    String   @unique
-  orgId                     String?
-  
+  id     String  @id @default(uuid())
+  userId String  @unique
+  orgId  String?
+
   // Email notification preferences - gentle defaults for better UX
-  emailReportCreated        Boolean  @default(false)
-  emailReportAssigned       Boolean  @default(true)
-  emailReportStatusChanged  Boolean  @default(false)
-  emailReportComment        Boolean  @default(false)
-  emailSystemAlerts         Boolean  @default(false)
-  
+  emailReportCreated       Boolean @default(false)
+  emailReportAssigned      Boolean @default(true)
+  emailReportStatusChanged Boolean @default(false)
+  emailReportComment       Boolean @default(false)
+  emailSystemAlerts        Boolean @default(false)
+
   // In-app notification preferences  
-  inAppReportCreated        Boolean  @default(true)
-  inAppReportAssigned       Boolean  @default(true)
-  inAppReportStatusChanged  Boolean  @default(true)
-  inAppReportComment        Boolean  @default(true)
-  inAppSystemAlerts         Boolean  @default(true)
-  
+  inAppReportCreated       Boolean @default(true)
+  inAppReportAssigned      Boolean @default(true)
+  inAppReportStatusChanged Boolean @default(true)
+  inAppReportComment       Boolean @default(true)
+  inAppSystemAlerts        Boolean @default(true)
+
   // Digest settings
-  enableDailyDigest         Boolean  @default(false)
-  enableWeeklyDigest        Boolean  @default(false)
-  digestTime                String   @default("09:00") // HH:MM format
-  
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
-  
+  enableDailyDigest  Boolean @default(false)
+  enableWeeklyDigest Boolean @default(false)
+  digestTime         String  @default("09:00") // HH:MM format
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Relations
   organization Organization? @relation(fields: [orgId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
   @@index([orgId])
 }
@@ -808,39 +808,44 @@ enum BlogPostStatus {
 }
 
 model BlogPost {
-  id            String         @id @default(uuid())
-  slug          String         @unique
-  title         String
-  excerpt       String?        @db.Text
-  contentHtml   String         @db.Text
-  coverImageUrl String?
-  status        BlogPostStatus @default(DRAFT)
-  publishedAt   DateTime?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  authorId      String
-  authorEmail   String
+  id              String         @id @default(uuid())
+  slug            String         @unique
+  title           String
+  excerpt         String?        @db.Text
+  contentHtml     String         @db.Text
+  coverImageUrl   String?
+  metaTitle       String?
+  metaDescription String?        @db.Text
+  canonicalUrl    String?
+  ogImageUrl      String?
+  noIndex         Boolean        @default(false)
+  status          BlogPostStatus @default(DRAFT)
+  publishedAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  authorId        String
+  authorEmail     String
 
   @@index([status, publishedAt])
 }
 
 /// Capturas de leads desde landings de campaña (p. ej. guía PDF).
 model EbookLead {
-  id           String   @id @default(uuid())
-  fullName     String
-  phone        String
-  email        String
-  company      String
-  role         String
-  campaign     String   @default("guia_canal_denuncias")
-  sourcePath   String?
-  utmSource    String?
-  utmMedium    String?
-  utmCampaign  String?
-  utmContent   String?
-  utmTerm      String?
-  userAgent    String?  @db.Text
-  createdAt    DateTime @default(now())
+  id          String   @id @default(uuid())
+  fullName    String
+  phone       String
+  email       String
+  company     String
+  role        String
+  campaign    String   @default("guia_canal_denuncias")
+  sourcePath  String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmContent  String?
+  utmTerm     String?
+  userAgent   String?  @db.Text
+  createdAt   DateTime @default(now())
 
   @@index([email])
   @@index([campaign, createdAt])

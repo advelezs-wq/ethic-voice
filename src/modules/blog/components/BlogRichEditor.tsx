@@ -16,7 +16,16 @@ import {
 } from "@tiptap/extension-text-style";
 import { Button } from "@heroui/react";
 
-const FONT_SIZES = ["12px", "14px", "16px", "18px", "20px", "24px", "28px", "32px"] as const;
+const FONT_SIZES = [
+  "12px",
+  "14px",
+  "16px",
+  "18px",
+  "20px",
+  "24px",
+  "28px",
+  "32px",
+] as const;
 
 const LINE_HEIGHTS: { key: string; label: string }[] = [
   { key: "", label: "Interlineado" },
@@ -28,7 +37,12 @@ const LINE_HEIGHTS: { key: string; label: string }[] = [
 ];
 
 function ToolbarDivider() {
-  return <span className="mx-0.5 hidden h-6 w-px shrink-0 bg-default-200 sm:block" aria-hidden />;
+  return (
+    <span
+      className="mx-0.5 hidden h-6 w-px shrink-0 bg-default-200 sm:block"
+      aria-hidden
+    />
+  );
 }
 
 type Props = {
@@ -394,7 +408,12 @@ export function BlogRichEditor({
 
           <ToolbarDivider />
 
-          <Button size="sm" variant="flat" onPress={setLink} aria-label="Enlace">
+          <Button
+            size="sm"
+            variant="flat"
+            onPress={setLink}
+            aria-label="Enlace"
+          >
             <i className="icon-[lucide--link] size-4" aria-hidden />
           </Button>
           <Button
@@ -415,7 +434,28 @@ export function BlogRichEditor({
             className="text-default-600"
             aria-label="Limpiar formato"
           >
-            <i className="icon-[lucide--remove-formatting] size-4" aria-hidden />
+            <i
+              className="icon-[lucide--remove-formatting] size-4"
+              aria-hidden
+            />
+          </Button>
+          <Button
+            size="sm"
+            variant="flat"
+            onPress={() => editor.chain().focus().undo().run()}
+            isDisabled={!editor.can().undo()}
+            aria-label="Deshacer"
+          >
+            <i className="icon-[lucide--undo-2] size-4" aria-hidden />
+          </Button>
+          <Button
+            size="sm"
+            variant="flat"
+            onPress={() => editor.chain().focus().redo().run()}
+            isDisabled={!editor.can().redo()}
+            aria-label="Rehacer"
+          >
+            <i className="icon-[lucide--redo-2] size-4" aria-hidden />
           </Button>
         </div>
 

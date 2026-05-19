@@ -23,14 +23,47 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       status: BlogPostStatus.PUBLISHED,
       publishedAt: { not: null, lte: new Date() },
     },
-    select: { title: true, excerpt: true, coverImageUrl: true },
+    select: {
+      title: true,
+      excerpt: true,
+      coverImageUrl: true,
+      metaTitle: true,
+      metaDescription: true,
+      canonicalUrl: true,
+      ogImageUrl: true,
+      noIndex: true,
+      slug: true,
+    },
   });
   if (!post) return { title: "Artículo | EthicVoice" };
+  const finalTitle = post.metaTitle?.trim() || post.title;
+  const finalDescription =
+    post.metaDescription?.trim() || post.excerpt || post.title;
+  const finalCanonical = post.canonicalUrl?.trim() || `/blog/${post.slug}`;
+  const ogImage = post.ogImageUrl?.trim() || post.coverImageUrl || undefined;
+
   return {
-    title: `${post.title} | Blog EthicVoice`,
-    description: post.excerpt || post.title,
-    openGraph: post.coverImageUrl
-      ? { images: [{ url: post.coverImageUrl }] }
+    title: `${finalTitle} | Blog EthicVoice`,
+    description: finalDescription,
+    alternates: {
+      canonical: finalCanonical,
+    },
+    robots: post.noIndex
+      ? {
+          index: false,
+          follow: false,
+          googleBot: {
+            index: false,
+            follow: false,
+          },
+        }
+      : undefined,
+    openGraph: ogImage
+      ? {
+          images: [{ url: ogImage }],
+          title: finalTitle,
+          description: finalDescription,
+        }
       : undefined,
   };
 }
@@ -86,7 +119,10 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </MarketingSectionV2>
 
-      <MarketingSectionV2 className="!border-t-0 !pt-0 md:!pt-2" guides={[25, 50, 75]}>
+      <MarketingSectionV2
+        className="!border-t-0 !pt-0 md:!pt-2"
+        guides={[25, 50, 75]}
+      >
         <div className="mx-auto max-w-3xl space-y-10">
           {post.coverImageUrl ? (
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-[0_8px_22px_rgba(0,0,0,0.06)]">

@@ -7,52 +7,75 @@ import { sanitizeBlogHtml } from "@/lib/blog/sanitize";
 import { ensureUniqueBlogSlug } from "@/lib/blog/ensureUniqueSlug";
 import { BlogPostStatus } from "@prisma/client";
 
+const secureUrl = z
+  .string()
+  .url()
+  .max(2048)
+  .refine((v) => v.startsWith("https://"), "URL inválida");
+
 const patchBody = z.object({
   title: z.string().min(1).max(300).optional(),
   excerpt: z.string().max(4000).optional().nullable(),
-  contentHtml: z.string().optional(),
+  contentHtml: z.string().max(300000).optional(),
   coverImageUrl: z
     .union([z.string().url(), z.literal(""), z.null()])
     .optional(),
   status: z.nativeEnum(BlogPostStatus).optional(),
-  slug: z.string().max(200).optional().nullable(),
+  slug: z
+    .string()
+    .max(200)
+    .regex(/^[a-z0-9-]+$/, "Slug inválido")
+    .optional()
+    .nullable(),
   publishedAt: z.string().datetime().optional().nullable(),
+  metaTitle: z.string().max(160).optional().nullable(),
+  metaDescription: z.string().max(320).optional().nullable(),
+  canonicalUrl: z.union([secureUrl, z.literal(""), z.null()]).optional(),
+  ogImageUrl: z.union([secureUrl, z.literal(""), z.null()]).optional(),
+  noIndex: z.boolean().optional(),
 });
 
 async function requireSuperAdmin() {
   const { userId } = await auth();
-  if (!userId) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  if (!userId)
+    return {
+      error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
+    };
   const me = await currentUser();
   const email = me?.emailAddresses?.[0]?.emailAddress || "";
   if (!email || !isSuperAdmin(email)) {
-    return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
+    return {
+      error: NextResponse.json({ error: "Forbidden" }, { status: 403 }),
+    };
   }
   return { userId, email };
 }
 
 export async function GET(
   _req: NextRequest,
-  ctx: { params: Promise<{ id: string }> }
+  ctx: { params: Promise<{ id: string }> },
 ) {
   const gate = await requireSuperAdmin();
   if ("error" in gate) return gate.error;
 
   const { id } = await ctx.params;
   const post = await prisma.blogPost.findUnique({ where: { id } });
-  if (!post) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  if (!post)
+    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   return NextResponse.json({ post });
 }
 
 export async function PATCH(
   req: NextRequest,
-  ctx: { params: Promise<{ id: string }> }
+  ctx: { params: Promise<{ id: string }> },
 ) {
   const gate = await requireSuperAdmin();
   if ("error" in gate) return gate.error;
 
   const { id } = await ctx.params;
   const existing = await prisma.blogPost.findUnique({ where: { id } });
-  if (!existing) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+  if (!existing)
+    return NextResponse.json({ error: "No encontrado" }, { status: 404 });
 
   let json: unknown;
   try {
@@ -65,7 +88,7 @@ export async function PATCH(
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Validación fallida", details: parsed.error.flatten() },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -83,7 +106,7 @@ export async function PATCH(
   const slugNext = await ensureUniqueBlogSlug(
     titleNext,
     slugExplicit,
-    existing.id
+    existing.id,
   );
 
   const statusNext = data.status ?? existing.status;
@@ -109,6 +132,15 @@ export async function PATCH(
         : data.coverImageUrl;
   }
 
+  const canonicalUrl =
+    data.canonicalUrl !== undefined
+      ? data.canonicalUrl?.trim() || null
+      : existing.canonicalUrl;
+  const ogImageUrl =
+    data.ogImageUrl !== undefined
+      ? data.ogImageUrl?.trim() || null
+      : existing.ogImageUrl;
+
   const post = await prisma.blogPost.update({
     where: { id },
     data: {
@@ -125,6 +157,17 @@ export async function PATCH(
       status: statusNext,
       slug: slugNext,
       publishedAt,
+      metaTitle:
+        data.metaTitle !== undefined
+          ? data.metaTitle?.trim() || null
+          : existing.metaTitle,
+      metaDescription:
+        data.metaDescription !== undefined
+          ? data.metaDescription?.trim() || null
+          : existing.metaDescription,
+      canonicalUrl,
+      ogImageUrl,
+      noIndex: data.noIndex ?? existing.noIndex,
     },
   });
 
@@ -133,7 +176,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: NextRequest,
-  ctx: { params: Promise<{ id: string }> }
+  ctx: { params: Promise<{ id: string }> },
 ) {
   const gate = await requireSuperAdmin();
   if ("error" in gate) return gate.error;

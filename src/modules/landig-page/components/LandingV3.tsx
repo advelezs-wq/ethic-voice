@@ -52,7 +52,10 @@ type StatTickerSpec =
 const STATS_BAND: ReadonlyArray<{ label: string; ticker: StatTickerSpec }> = [
   { label: "Canal disponible siempre", ticker: { kind: "24_7" } },
   { label: "Organizaciones confían", ticker: { kind: "plusInt", max: 100 } },
-  { label: "Satisfacción de clientes", ticker: { kind: "decimal", max: 4.9, decimals: 1 } },
+  {
+    label: "Satisfacción de clientes",
+    ticker: { kind: "decimal", max: 4.9, decimals: 1 },
+  },
 ];
 
 function easeOutCubic(t: number) {
@@ -84,7 +87,9 @@ function StatsTickerValue({
   delayMs: number;
   reduceMotion: boolean;
 }) {
-  const [text, setText] = useState(() => formatStatTicker(spec, reduceMotion ? 1 : 0));
+  const [text, setText] = useState(() =>
+    formatStatTicker(spec, reduceMotion ? 1 : 0),
+  );
 
   useEffect(() => {
     if (reduceMotion) {
@@ -259,7 +264,11 @@ const FAQS = [
   },
 ] as const;
 
-const PLAN_ORDER = [PlanType.STARTER, PlanType.GROW, PlanType.GROW_PRO] as const;
+const PLAN_ORDER = [
+  PlanType.STARTER,
+  PlanType.GROW,
+  PlanType.GROW_PRO,
+] as const;
 
 const LANDING_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -279,7 +288,11 @@ const LANDING_STAGGER_ITEM: Variants = {
   },
 };
 
-const LANDING_VIEWPORT = { once: true, amount: 0.14 as const, margin: "-56px 0px -12% 0px" as const };
+const LANDING_VIEWPORT = {
+  once: true,
+  amount: 0.14 as const,
+  margin: "-56px 0px -12% 0px" as const,
+};
 
 function useInViewReveal(delay = 0) {
   const reduced = useReducedMotion();
@@ -368,7 +381,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
   return (
     <section
       ref={heroSectionRef}
-      className="relative min-h-min overflow-hidden bg-[#061f17] sm:min-h-screen"
+      className="relative min-h-min overflow-hidden bg-[#0b1620] sm:min-h-screen"
     >
       {/* Background video — zoom según scroll (solo video; overlays fijos) */}
       <div
@@ -385,7 +398,8 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
           className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
           style={{
             opacity: 0.52,
-            filter: "brightness(0.52) contrast(1.08) saturate(0.72) hue-rotate(12deg)",
+            filter:
+              "brightness(0.52) contrast(1.08) saturate(0.72) hue-rotate(12deg)",
           }}
           muted
           loop
@@ -404,7 +418,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
         className="pointer-events-none absolute inset-0 z-[2]"
         style={{
           background:
-            "linear-gradient(90deg, rgba(6,31,23,0.94) 0%, rgba(6,31,23,0.58) 50%, rgba(6,31,23,0.12) 100%)",
+            "linear-gradient(90deg, rgba(11,22,32,0.94) 0%, rgba(11,22,32,0.58) 50%, rgba(11,22,32,0.12) 100%)",
         }}
         aria-hidden
       />
@@ -414,13 +428,16 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-3/4"
         style={{
           background:
-            "linear-gradient(to top, rgba(6,31,23,0.96) 0%, rgba(6,31,23,0.52) 42%, transparent 100%)",
+            "linear-gradient(to top, rgba(11,22,32,0.96) 0%, rgba(11,22,32,0.52) 42%, transparent 100%)",
         }}
         aria-hidden
       />
 
       {/* Vertical grid lines — desktop only */}
-      <div className="pointer-events-none absolute inset-0 z-[2] hidden md:block" aria-hidden>
+      <div
+        className="pointer-events-none absolute inset-0 z-[2] hidden md:block"
+        aria-hidden
+      >
         {[25, 50, 75].map((left) => (
           <div
             key={left}
@@ -447,8 +464,8 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
         >
           <defs>
             <radialGradient id="heroGlowV3" cx="50%" cy="40%" r="70%">
-              <stop offset="0%" stopColor="rgba(94,210,156,0.32)" />
-              <stop offset="45%" stopColor="rgba(45,212,191,0.16)" />
+              <stop offset="0%" stopColor="rgba(129,140,248,0.26)" />
+              <stop offset="45%" stopColor="rgba(45,212,191,0.12)" />
               <stop offset="100%" stopColor="rgba(255,255,255,0)" />
             </radialGradient>
           </defs>
@@ -463,7 +480,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
       >
         <div className="flex w-full flex-col items-center text-center sm:flex-1 sm:justify-center">
           {/* Eyebrow */}
-          <p className="mb-4 max-w-[min(100%,26rem)] text-pretty text-[11px] font-bold uppercase leading-snug tracking-[0.2em] text-lime-400 sm:mb-5 sm:text-xs sm:tracking-[0.22em] md:mb-6 md:text-[0.8125rem]">
+          <p className="mb-4 max-w-[min(100%,26rem)] text-pretty text-[11px] font-bold uppercase leading-snug tracking-[0.2em] text-emerald-300/90 sm:mb-5 sm:text-xs sm:tracking-[0.22em] md:mb-6 md:text-[0.8125rem]">
             Plataforma de Línea Ética · LATAM
           </p>
 
@@ -474,17 +491,20 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
               const firstLineSingleRowDesktop =
                 variant !== "trust" && idx === 0 ? "md:whitespace-nowrap" : "";
               return (
-                <span key={line} className={`block ${firstLineSingleRowDesktop}`}>
+                <span
+                  key={line}
+                  className={`block ${firstLineSingleRowDesktop}`}
+                >
                   {line}
-                  {isLast ? <span className="text-lime-400">.</span> : null}
+                  {isLast ? <span className="text-emerald-300">.</span> : null}
                 </span>
               );
             })}
           </h1>
 
           <p className="mx-auto mt-5 max-w-[min(100%,32rem)] text-pretty text-sm font-normal leading-relaxed text-white/60 sm:mt-7 sm:max-w-xl sm:text-base sm:leading-[1.65] md:mt-8 md:max-w-2xl md:text-lg md:leading-[1.7]">
-            Cumplimiento proactivo sin fricciones. Tu equipo de compliance al centro
-            con datos claros y decisiones más rápidas.
+            Cumplimiento proactivo sin fricciones. Tu equipo de compliance al
+            centro con datos claros y decisiones más rápidas.
           </p>
 
           {/* CTAs — full width on phone; horizontal from sm; allow wrap on md if needed */}
@@ -492,14 +512,20 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
             <button
               type="button"
               onClick={(e) => {
-                trackGA4Event("landing_cta_click", { cta_name: "hero_demo", placement: "hero" });
+                trackGA4Event("landing_cta_click", {
+                  cta_name: "hero_demo",
+                  placement: "hero",
+                });
                 openCalendly(e);
               }}
               className="inline-flex w-full min-w-0 shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3.5 text-xs font-bold uppercase tracking-[0.12em] transition hover:opacity-90 sm:w-auto sm:px-8 sm:text-sm sm:tracking-wide md:px-9 md:py-4 md:text-[0.9375rem]"
-              style={{ background: "#a3e635", color: "#070b0a" }}
+              style={{ background: "#b9cc8a", color: "#0b1620" }}
             >
               Agendar demo
-              <i className="icon-[lucide--arrow-right] h-4 w-4 shrink-0 sm:h-[1.05rem] sm:w-[1.05rem]" aria-hidden />
+              <i
+                className="icon-[lucide--arrow-right] h-4 w-4 shrink-0 sm:h-[1.05rem] sm:w-[1.05rem]"
+                aria-hidden
+              />
             </button>
             <button
               type="button"
@@ -511,7 +537,10 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
             <Link
               href="/submit"
               onClick={() =>
-                trackGA4Event("landing_cta_click", { cta_name: "hero_report", placement: "hero" })
+                trackGA4Event("landing_cta_click", {
+                  cta_name: "hero_report",
+                  placement: "hero",
+                })
               }
               className="inline-flex w-full min-w-0 shrink-0 items-center justify-center rounded-full border border-white/15 px-6 py-3.5 text-sm font-semibold leading-snug transition hover:border-white/30 sm:w-auto sm:px-8 sm:text-[0.9375rem] md:px-9 md:py-4 md:text-base"
               style={{ color: "rgba(255,255,255,0.72)" }}
@@ -525,7 +554,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
             <div className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 sm:px-3.5 md:py-2">
               <i
                 className="icon-[lucide--shield-check] h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4"
-                style={{ color: "#a3e635" }}
+                style={{ color: "#b9cc8a" }}
                 aria-hidden
               />
               <span className="text-pretty text-[11px] font-medium leading-tight text-white/65 sm:text-xs md:text-[13px]">
@@ -535,7 +564,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
             <div className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 sm:px-3.5 md:py-2">
               <i
                 className="icon-[lucide--zap] h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4"
-                style={{ color: "#a3e635" }}
+                style={{ color: "#b9cc8a" }}
                 aria-hidden
               />
               <span className="text-pretty text-[11px] font-medium leading-tight text-white/65 sm:text-xs md:text-[13px]">
@@ -550,7 +579,10 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
           <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-white/70 sm:text-[11px] md:text-xs">
             Scroll
           </span>
-          <i className="icon-[lucide--chevrons-down] h-4 w-4 animate-bounce text-white sm:h-[1.125rem] sm:w-[1.125rem]" aria-hidden />
+          <i
+            className="icon-[lucide--chevrons-down] h-4 w-4 animate-bounce text-white sm:h-[1.125rem] sm:w-[1.125rem]"
+            aria-hidden
+          />
         </div>
       </motion.div>
     </section>
@@ -561,14 +593,17 @@ function HeroDemoVideoStrip() {
   const reveal = useInViewReveal();
   return (
     <motion.section
-      className="relative z-[1] scroll-mt-24 border-t border-white/[0.07] bg-[#061f17]"
+      className="relative z-[1] scroll-mt-24 border-t border-white/[0.07] bg-[#0b1620]"
       aria-labelledby="hero-demo-video-heading"
       {...reveal}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-lime-400/25 to-transparent" aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300/25 to-transparent"
+        aria-hidden
+      />
       <div className="relative mx-auto max-w-5xl px-5 pb-8 pt-8 sm:px-6 sm:pb-12 sm:pt-10 lg:px-8">
         <div className="mx-auto mb-5 max-w-2xl text-center sm:mb-6">
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-lime-400/95 sm:text-xs sm:tracking-[0.22em]">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300/90 sm:text-xs sm:tracking-[0.22em]">
             Recorrido en vídeo
           </p>
           <h2
@@ -578,7 +613,8 @@ function HeroDemoVideoStrip() {
             Así se ve EthicVoice en el día a día de compliance
           </h2>
           <p className="mt-2 text-pretty text-sm leading-relaxed text-white/55 sm:mt-2.5 sm:text-[0.9375rem]">
-            Transparencia ante tu equipo: mismo tono visual que el panel real, sin promesas vacías.
+            Transparencia ante tu equipo: mismo tono visual que el panel real,
+            sin promesas vacías.
           </p>
         </div>
         <VideoModal
@@ -614,7 +650,7 @@ function StatsBand() {
           io.disconnect();
         }
       },
-      { threshold: 0.22, rootMargin: "0px 0px -6% 0px" }
+      { threshold: 0.22, rootMargin: "0px 0px -6% 0px" },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -623,7 +659,10 @@ function StatsBand() {
   const reveal = useInViewReveal();
 
   return (
-    <motion.section className="relative z-[1] scroll-mt-24 bg-[#061f17] sm:mt-0" {...reveal}>
+    <motion.section
+      className="relative z-[1] scroll-mt-24 bg-[#0b1620] sm:mt-0"
+      {...reveal}
+    >
       <div
         ref={statsRootRef}
         className="mx-auto max-w-5xl px-5 pt-2 pb-8 sm:px-6 sm:py-14 lg:px-8"
@@ -634,7 +673,7 @@ function StatsBand() {
               key={stat.label}
               className="flex flex-col items-center justify-center px-4 py-5 text-center max-sm:first:pt-0 max-sm:last:pb-0 sm:min-h-[9.5rem] sm:px-6 sm:py-6 md:min-h-[10.5rem] md:px-8"
             >
-              <div className="text-3xl font-black tabular-nums leading-none tracking-tight text-lime-400 sm:text-4xl md:text-5xl">
+              <div className="text-3xl font-black tabular-nums leading-none tracking-tight text-white sm:text-4xl md:text-5xl">
                 <StatsTickerValue
                   spec={stat.ticker}
                   active={statsVisible}
@@ -657,7 +696,10 @@ function LogoProofSection() {
   const reduced = useReducedMotion();
   const reveal = useInViewReveal();
   return (
-    <motion.section className="scroll-mt-24 border-b border-slate-100 bg-white py-10 sm:py-14" {...reveal}>
+    <motion.section
+      className="scroll-mt-24 border-b border-slate-100 bg-white py-10 sm:py-14"
+      {...reveal}
+    >
       <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
         <p className="mb-6 text-center text-[10px] font-bold uppercase tracking-widest text-slate-400 sm:mb-8">
           Equipos que ya confían en EthicVoice
@@ -724,7 +766,7 @@ function FeaturesSection() {
         {/* Section header */}
         <div className="mb-10 grid gap-6 sm:mb-12 md:mb-14 lg:grid-cols-2 lg:items-end lg:gap-10">
           <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-lime-700">
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-700">
               Plataforma completa
             </p>
             <h2 className="text-balance text-3xl font-extrabold leading-tight tracking-tight text-[#0d212c] sm:text-4xl md:text-5xl">
@@ -735,21 +777,23 @@ function FeaturesSection() {
           </div>
           <div>
             <p className="text-base leading-relaxed text-slate-500 sm:text-lg">
-              Recepción, investigación, seguimiento y analítica en un flujo continuo
-              para que tu equipo de compliance opere sin fricciones.
+              Recepción, investigación, seguimiento y analítica en un flujo
+              continuo para que tu equipo de compliance opere sin fricciones.
             </p>
             <div className="mt-5 flex flex-wrap gap-2 sm:mt-6">
-              {["Confidencialidad y anonimato real", "SLA y vencimientos legales", "Tableros gerenciales"].map(
-                (tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-lime-200 bg-lime-50 px-3 py-1.5 text-left text-xs font-medium text-lime-800"
-                  >
-                    <i className="icon-[lucide--check] h-3 w-3" aria-hidden />
-                    {tag}
-                  </span>
-                ),
-              )}
+              {[
+                "Confidencialidad y anonimato real",
+                "SLA y vencimientos legales",
+                "Tableros gerenciales",
+              ].map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-left text-xs font-medium text-slate-700"
+                >
+                  <i className="icon-[lucide--check] h-3 w-3" aria-hidden />
+                  {tag}
+                </span>
+              ))}
             </div>
           </div>
         </div>
@@ -762,20 +806,24 @@ function FeaturesSection() {
               return (
                 <article
                   key={feat.title}
-                  className="group rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-lime-200 hover:shadow-xl sm:p-6"
+                  className="group rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-xl sm:p-6"
                 >
                   <div
                     className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
-                      isLime ? "bg-lime-50" : "bg-emerald-50"
+                      isLime ? "bg-emerald-50/70" : "bg-slate-100"
                     }`}
                   >
                     <i
-                      className={`${feat.icon} h-5 w-5 ${isLime ? "text-lime-700" : "text-emerald-700"}`}
+                      className={`${feat.icon} h-5 w-5 ${isLime ? "text-emerald-700" : "text-slate-700"}`}
                       aria-hidden
                     />
                   </div>
-                  <h3 className="mb-2 text-base font-bold text-[#0d212c]">{feat.title}</h3>
-                  <p className="text-sm leading-relaxed text-slate-500">{feat.desc}</p>
+                  <h3 className="mb-2 text-base font-bold text-[#0d212c]">
+                    {feat.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-slate-500">
+                    {feat.desc}
+                  </p>
                 </article>
               );
             })}
@@ -794,20 +842,24 @@ function FeaturesSection() {
                 <motion.article
                   key={feat.title}
                   variants={LANDING_STAGGER_ITEM}
-                  className="group rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-lime-200 hover:shadow-xl sm:p-6"
+                  className="group rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-xl sm:p-6"
                 >
                   <div
                     className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
-                      isLime ? "bg-lime-50" : "bg-emerald-50"
+                      isLime ? "bg-emerald-50/70" : "bg-slate-100"
                     }`}
                   >
                     <i
-                      className={`${feat.icon} h-5 w-5 ${isLime ? "text-lime-700" : "text-emerald-700"}`}
+                      className={`${feat.icon} h-5 w-5 ${isLime ? "text-emerald-700" : "text-slate-700"}`}
                       aria-hidden
                     />
                   </div>
-                  <h3 className="mb-2 text-base font-bold text-[#0d212c]">{feat.title}</h3>
-                  <p className="text-sm leading-relaxed text-slate-500">{feat.desc}</p>
+                  <h3 className="mb-2 text-base font-bold text-[#0d212c]">
+                    {feat.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-slate-500">
+                    {feat.desc}
+                  </p>
                 </motion.article>
               );
             })}
@@ -829,7 +881,9 @@ function FeaturesSection() {
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
                   {kpi.label}
                 </p>
-                <p className="mt-1 text-sm font-extrabold text-[#0d212c] sm:text-base">{kpi.value}</p>
+                <p className="mt-1 text-sm font-extrabold text-[#0d212c] sm:text-base">
+                  {kpi.value}
+                </p>
               </div>
             ))}
           </div>
@@ -854,7 +908,9 @@ function FeaturesSection() {
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
                   {kpi.label}
                 </p>
-                <p className="mt-1 text-sm font-extrabold text-[#0d212c] sm:text-base">{kpi.value}</p>
+                <p className="mt-1 text-sm font-extrabold text-[#0d212c] sm:text-base">
+                  {kpi.value}
+                </p>
               </motion.div>
             ))}
           </motion.div>
@@ -876,7 +932,7 @@ function HowItWorksSection() {
       <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="mb-10 text-center sm:mb-12 md:mb-14">
-          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-lime-700">
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-700">
             Cómo funciona
           </p>
           <h2 className="text-balance text-3xl font-extrabold leading-tight tracking-tight text-[#0d212c] sm:text-4xl md:text-5xl">
@@ -885,7 +941,8 @@ function HowItWorksSection() {
             en 4 pasos claros
           </h2>
           <p className="mx-auto mt-4 max-w-lg px-1 text-base leading-relaxed text-slate-500 sm:text-lg">
-            Proceso estructurado para que ningún caso se pierda y todo quede documentado.
+            Proceso estructurado para que ningún caso se pierda y todo quede
+            documentado.
           </p>
         </div>
 
@@ -895,30 +952,38 @@ function HowItWorksSection() {
             {STEPS.map((step, idx) => (
               <article
                 key={step.title}
-                className="group relative flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-lime-200 hover:shadow-xl sm:p-6"
+                className="group relative flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-emerald-200 hover:shadow-xl sm:p-6"
               >
                 {idx < STEPS.length - 1 && (
                   <div
-                    className="absolute right-0 top-10 hidden h-px w-5 translate-x-full bg-gradient-to-r from-lime-300/70 to-transparent lg:block"
+                    className="absolute right-0 top-10 hidden h-px w-5 translate-x-full bg-gradient-to-r from-emerald-300/70 to-transparent lg:block"
                     aria-hidden
                   />
                 )}
                 <div
-                  className="absolute right-4 top-3 select-none text-5xl font-black text-slate-100 transition-colors group-hover:text-lime-100"
+                  className="absolute right-4 top-3 select-none text-5xl font-black text-slate-100 transition-colors group-hover:text-emerald-100"
                   aria-hidden
                 >
                   {step.num}
                 </div>
                 <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#051a24]">
-                  <i className={`${step.icon} h-5 w-5 text-lime-400`} aria-hidden />
+                  <i
+                    className={`${step.icon} h-5 w-5 text-emerald-400`}
+                    aria-hidden
+                  />
                 </div>
                 <h3 className="mb-2 text-sm font-bold leading-snug text-[#0d212c] sm:text-base">
                   {step.title}
                 </h3>
-                <p className="flex-1 text-xs leading-relaxed text-slate-500">{step.desc}</p>
-                <div className="mt-4 rounded-xl bg-lime-50 px-3 py-2">
-                  <p className="text-[11px] font-semibold text-lime-800">
-                    <i className="icon-[lucide--circle-check] mr-1 inline h-3.5 w-3.5 text-lime-600" aria-hidden />
+                <p className="flex-1 text-xs leading-relaxed text-slate-500">
+                  {step.desc}
+                </p>
+                <div className="mt-4 rounded-xl bg-emerald-50/70 px-3 py-2">
+                  <p className="text-[11px] font-semibold text-emerald-800">
+                    <i
+                      className="icon-[lucide--circle-check] mr-1 inline h-3.5 w-3.5 text-emerald-600"
+                      aria-hidden
+                    />
                     {step.outcome}
                   </p>
                 </div>
@@ -937,30 +1002,38 @@ function HowItWorksSection() {
               <motion.article
                 key={step.title}
                 variants={LANDING_STAGGER_ITEM}
-                className="group relative flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-lime-200 hover:shadow-xl sm:p-6"
+                className="group relative flex min-h-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-emerald-200 hover:shadow-xl sm:p-6"
               >
                 {idx < STEPS.length - 1 && (
                   <div
-                    className="absolute right-0 top-10 hidden h-px w-5 translate-x-full bg-gradient-to-r from-lime-300/70 to-transparent lg:block"
+                    className="absolute right-0 top-10 hidden h-px w-5 translate-x-full bg-gradient-to-r from-emerald-300/70 to-transparent lg:block"
                     aria-hidden
                   />
                 )}
                 <div
-                  className="absolute right-4 top-3 select-none text-5xl font-black text-slate-100 transition-colors group-hover:text-lime-100"
+                  className="absolute right-4 top-3 select-none text-5xl font-black text-slate-100 transition-colors group-hover:text-emerald-100"
                   aria-hidden
                 >
                   {step.num}
                 </div>
                 <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#051a24]">
-                  <i className={`${step.icon} h-5 w-5 text-lime-400`} aria-hidden />
+                  <i
+                    className={`${step.icon} h-5 w-5 text-emerald-400`}
+                    aria-hidden
+                  />
                 </div>
                 <h3 className="mb-2 text-sm font-bold leading-snug text-[#0d212c] sm:text-base">
                   {step.title}
                 </h3>
-                <p className="flex-1 text-xs leading-relaxed text-slate-500">{step.desc}</p>
-                <div className="mt-4 rounded-xl bg-lime-50 px-3 py-2">
-                  <p className="text-[11px] font-semibold text-lime-800">
-                    <i className="icon-[lucide--circle-check] mr-1 inline h-3.5 w-3.5 text-lime-600" aria-hidden />
+                <p className="flex-1 text-xs leading-relaxed text-slate-500">
+                  {step.desc}
+                </p>
+                <div className="mt-4 rounded-xl bg-emerald-50/70 px-3 py-2">
+                  <p className="text-[11px] font-semibold text-emerald-800">
+                    <i
+                      className="icon-[lucide--circle-check] mr-1 inline h-3.5 w-3.5 text-emerald-600"
+                      aria-hidden
+                    />
                     {step.outcome}
                   </p>
                 </div>
@@ -978,7 +1051,7 @@ function SecuritySection() {
   const reveal = useInViewReveal();
   return (
     <motion.section
-      className="scroll-mt-24 relative overflow-hidden bg-[#0a1e14] py-16 sm:py-20 md:py-24"
+      className="scroll-mt-24 relative overflow-hidden bg-[#0f172a] py-16 sm:py-20 md:py-24"
       id="seguridad"
       {...reveal}
     >
@@ -986,7 +1059,8 @@ function SecuritySection() {
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.05]"
         style={{
-          backgroundImage: "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)",
+          backgroundImage:
+            "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)",
           backgroundSize: "28px 28px",
         }}
         aria-hidden
@@ -994,7 +1068,7 @@ function SecuritySection() {
       {/* Right glow */}
       <div
         className="pointer-events-none absolute right-0 top-0 h-[400px] w-[400px] opacity-20 blur-[100px]"
-        style={{ background: "rgba(163,230,53,0.4)" }}
+        style={{ background: "rgba(45,212,191,0.28)" }}
         aria-hidden
       />
 
@@ -1002,7 +1076,7 @@ function SecuritySection() {
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14">
           {/* Left text */}
           <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-lime-400">
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-300">
               Seguridad y privacidad
             </p>
             <h2 className="text-balance text-3xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">
@@ -1016,9 +1090,12 @@ function SecuritySection() {
             </p>
 
             {/* Compliance badge */}
-            <div className="mt-6 inline-flex max-w-full flex-wrap items-center gap-2.5 rounded-full border border-lime-400/25 bg-lime-400/[0.08] px-4 py-2.5 sm:mt-8 sm:px-5">
-              <i className="icon-[lucide--shield-check] h-5 w-5 shrink-0 text-lime-400" aria-hidden />
-              <span className="text-left text-sm font-semibold text-lime-300">
+            <div className="mt-6 inline-flex max-w-full flex-wrap items-center gap-2.5 rounded-full border border-emerald-300/25 bg-emerald-300/[0.08] px-4 py-2.5 sm:mt-8 sm:px-5">
+              <i
+                className="icon-[lucide--shield-check] h-5 w-5 shrink-0 text-emerald-300"
+                aria-hidden
+              />
+              <span className="text-left text-sm font-semibold text-emerald-200">
                 Seguridad orientada a compliance
               </span>
             </div>
@@ -1038,7 +1115,9 @@ function SecuritySection() {
                     <p className="text-pretty text-[10px] font-bold uppercase tracking-widest text-white/35">
                       {item.label}
                     </p>
-                    <p className="mt-1 text-sm font-bold text-white sm:text-base">{item.value}</p>
+                    <p className="mt-1 text-sm font-bold text-white sm:text-base">
+                      {item.value}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -1063,7 +1142,9 @@ function SecuritySection() {
                     <p className="text-pretty text-[10px] font-bold uppercase tracking-widest text-white/35">
                       {item.label}
                     </p>
-                    <p className="mt-1 text-sm font-bold text-white sm:text-base">{item.value}</p>
+                    <p className="mt-1 text-sm font-bold text-white sm:text-base">
+                      {item.value}
+                    </p>
                   </motion.div>
                 ))}
               </motion.div>
@@ -1078,11 +1159,18 @@ function SecuritySection() {
                   key={feat.title}
                   className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:bg-white/[0.07] sm:p-5"
                 >
-                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-lime-400/[0.12]">
-                    <i className={`${feat.icon} h-5 w-5 text-lime-400`} aria-hidden />
+                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-300/[0.12]">
+                    <i
+                      className={`${feat.icon} h-5 w-5 text-emerald-300`}
+                      aria-hidden
+                    />
                   </div>
-                  <h3 className="mb-1.5 text-sm font-bold text-white">{feat.title}</h3>
-                  <p className="text-xs leading-relaxed text-white/50">{feat.desc}</p>
+                  <h3 className="mb-1.5 text-sm font-bold text-white">
+                    {feat.title}
+                  </h3>
+                  <p className="text-xs leading-relaxed text-white/50">
+                    {feat.desc}
+                  </p>
                 </article>
               ))}
             </div>
@@ -1100,11 +1188,18 @@ function SecuritySection() {
                   variants={LANDING_STAGGER_ITEM}
                   className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-colors hover:bg-white/[0.07] sm:p-5"
                 >
-                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-lime-400/[0.12]">
-                    <i className={`${feat.icon} h-5 w-5 text-lime-400`} aria-hidden />
+                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-300/[0.12]">
+                    <i
+                      className={`${feat.icon} h-5 w-5 text-emerald-300`}
+                      aria-hidden
+                    />
                   </div>
-                  <h3 className="mb-1.5 text-sm font-bold text-white">{feat.title}</h3>
-                  <p className="text-xs leading-relaxed text-white/50">{feat.desc}</p>
+                  <h3 className="mb-1.5 text-sm font-bold text-white">
+                    {feat.title}
+                  </h3>
+                  <p className="text-xs leading-relaxed text-white/50">
+                    {feat.desc}
+                  </p>
                 </motion.article>
               ))}
             </motion.div>
@@ -1119,10 +1214,13 @@ function TestimonialsSection() {
   const reduced = useReducedMotion();
   const reveal = useInViewReveal();
   return (
-    <motion.section className="scroll-mt-24 bg-[#0a1e14] py-16 sm:py-20 md:py-24" {...reveal}>
+    <motion.section
+      className="scroll-mt-24 bg-[#111827] py-16 sm:py-20 md:py-24"
+      {...reveal}
+    >
       <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
         <div className="mb-8 text-center sm:mb-12">
-          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-lime-400">
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-300">
             Testimonios
           </p>
           <h2 className="text-balance text-3xl font-extrabold text-white sm:text-4xl">
@@ -1133,28 +1231,36 @@ function TestimonialsSection() {
         <div className="grid gap-5 lg:grid-cols-12 lg:gap-6">
           {reduced === true ? (
             <>
-              <article className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#051a24] to-[#0d2d1e] p-6 ring-1 ring-lime-400/20 sm:p-8 md:p-10 lg:col-span-7">
+              <article className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-6 ring-1 ring-emerald-300/20 sm:p-8 md:p-10 lg:col-span-7">
                 <div
                   className="pointer-events-none absolute right-0 top-0 h-48 w-48 opacity-15 blur-3xl"
-                  style={{ background: "rgba(163,230,53,0.6)" }}
+                  style={{ background: "rgba(45,212,191,0.35)" }}
                   aria-hidden
                 />
                 <div className="relative z-10">
                   <div className="mb-6 flex gap-1">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <i key={i} className="icon-[lucide--star] h-5 w-5 fill-current text-lime-400" aria-hidden />
+                      <i
+                        key={i}
+                        className="icon-[lucide--star] h-5 w-5 fill-current text-amber-300"
+                        aria-hidden
+                      />
                     ))}
                   </div>
                   <blockquote className="text-pretty text-lg font-semibold leading-snug text-white sm:text-xl md:text-2xl lg:text-3xl">
                     "{TESTIMONIALS[0].quote}"
                   </blockquote>
                   <div className="mt-8 flex items-center gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-lime-400 text-sm font-black text-[#051a24]">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-300 text-sm font-black text-[#0f172a]">
                       {TESTIMONIALS[0].initials}
                     </div>
                     <div>
-                      <p className="font-bold text-white">{TESTIMONIALS[0].author}</p>
-                      <p className="text-sm text-white/45">{TESTIMONIALS[0].company}</p>
+                      <p className="font-bold text-white">
+                        {TESTIMONIALS[0].author}
+                      </p>
+                      <p className="text-sm text-white/45">
+                        {TESTIMONIALS[0].company}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1167,7 +1273,11 @@ function TestimonialsSection() {
                   >
                     <div className="mb-3 flex gap-0.5">
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <i key={i} className="icon-[lucide--star] h-3.5 w-3.5 fill-current text-lime-400" aria-hidden />
+                        <i
+                          key={i}
+                          className="icon-[lucide--star] h-3.5 w-3.5 fill-current text-amber-300"
+                          aria-hidden
+                        />
                       ))}
                     </div>
                     <blockquote className="text-sm leading-relaxed text-white/75">
@@ -1178,13 +1288,15 @@ function TestimonialsSection() {
                         {t.initials}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-white">{t.author}</p>
+                        <p className="text-sm font-semibold text-white">
+                          {t.author}
+                        </p>
                         <p className="text-xs text-white/35">{t.company}</p>
                       </div>
                     </div>
                   </article>
                 ))}
-                <div className="rounded-2xl border border-lime-400/20 bg-lime-400/[0.06] px-4 py-4 sm:px-5">
+                <div className="rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.06] px-4 py-4 sm:px-5">
                   <div className="grid grid-cols-1 gap-4 text-center min-[380px]:grid-cols-3 min-[380px]:gap-2 sm:gap-3">
                     {[
                       { label: "Implementación", value: "Rápida" },
@@ -1195,7 +1307,9 @@ function TestimonialsSection() {
                         <p className="text-[10px] font-bold uppercase tracking-widest text-white/35">
                           {item.label}
                         </p>
-                        <p className="mt-0.5 text-sm font-extrabold text-lime-300">{item.value}</p>
+                        <p className="mt-0.5 text-sm font-extrabold text-emerald-200">
+                          {item.value}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -1205,7 +1319,7 @@ function TestimonialsSection() {
           ) : (
             <>
               <motion.article
-                className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#051a24] to-[#0d2d1e] p-6 ring-1 ring-lime-400/20 sm:p-8 md:p-10 lg:col-span-7"
+                className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-6 ring-1 ring-emerald-300/20 sm:p-8 md:p-10 lg:col-span-7"
                 initial={{ opacity: 0, y: 32 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={LANDING_VIEWPORT}
@@ -1213,25 +1327,33 @@ function TestimonialsSection() {
               >
                 <div
                   className="pointer-events-none absolute right-0 top-0 h-48 w-48 opacity-15 blur-3xl"
-                  style={{ background: "rgba(163,230,53,0.6)" }}
+                  style={{ background: "rgba(45,212,191,0.35)" }}
                   aria-hidden
                 />
                 <div className="relative z-10">
                   <div className="mb-6 flex gap-1">
                     {Array.from({ length: 5 }).map((_, i) => (
-                      <i key={i} className="icon-[lucide--star] h-5 w-5 fill-current text-lime-400" aria-hidden />
+                      <i
+                        key={i}
+                        className="icon-[lucide--star] h-5 w-5 fill-current text-amber-300"
+                        aria-hidden
+                      />
                     ))}
                   </div>
                   <blockquote className="text-pretty text-lg font-semibold leading-snug text-white sm:text-xl md:text-2xl lg:text-3xl">
                     "{TESTIMONIALS[0].quote}"
                   </blockquote>
                   <div className="mt-8 flex items-center gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-lime-400 text-sm font-black text-[#051a24]">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-300 text-sm font-black text-[#0f172a]">
                       {TESTIMONIALS[0].initials}
                     </div>
                     <div>
-                      <p className="font-bold text-white">{TESTIMONIALS[0].author}</p>
-                      <p className="text-sm text-white/45">{TESTIMONIALS[0].company}</p>
+                      <p className="font-bold text-white">
+                        {TESTIMONIALS[0].author}
+                      </p>
+                      <p className="text-sm text-white/45">
+                        {TESTIMONIALS[0].company}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1252,7 +1374,11 @@ function TestimonialsSection() {
                   >
                     <div className="mb-3 flex gap-0.5">
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <i key={i} className="icon-[lucide--star] h-3.5 w-3.5 fill-current text-lime-400" aria-hidden />
+                        <i
+                          key={i}
+                          className="icon-[lucide--star] h-3.5 w-3.5 fill-current text-amber-300"
+                          aria-hidden
+                        />
                       ))}
                     </div>
                     <blockquote className="text-sm leading-relaxed text-white/75">
@@ -1263,13 +1389,18 @@ function TestimonialsSection() {
                         {t.initials}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-white">{t.author}</p>
+                        <p className="text-sm font-semibold text-white">
+                          {t.author}
+                        </p>
                         <p className="text-xs text-white/35">{t.company}</p>
                       </div>
                     </div>
                   </motion.article>
                 ))}
-                <motion.div variants={LANDING_STAGGER_ITEM} className="rounded-2xl border border-lime-400/20 bg-lime-400/[0.06] px-4 py-4 sm:px-5">
+                <motion.div
+                  variants={LANDING_STAGGER_ITEM}
+                  className="rounded-2xl border border-emerald-300/20 bg-emerald-300/[0.06] px-4 py-4 sm:px-5"
+                >
                   <div className="grid grid-cols-1 gap-4 text-center min-[380px]:grid-cols-3 min-[380px]:gap-2 sm:gap-3">
                     {[
                       { label: "Implementación", value: "Rápida" },
@@ -1280,7 +1411,9 @@ function TestimonialsSection() {
                         <p className="text-[10px] font-bold uppercase tracking-widest text-white/35">
                           {item.label}
                         </p>
-                        <p className="mt-0.5 text-sm font-extrabold text-lime-300">{item.value}</p>
+                        <p className="mt-0.5 text-sm font-extrabold text-emerald-200">
+                          {item.value}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -1301,10 +1434,14 @@ function PricingSection() {
   const reveal = useInViewReveal();
 
   return (
-    <motion.section className="scroll-mt-24 bg-white py-16 sm:py-20 md:py-24" id="planes" {...reveal}>
+    <motion.section
+      className="scroll-mt-24 bg-white py-16 sm:py-20 md:py-24"
+      id="planes"
+      {...reveal}
+    >
       <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
         <div className="mb-10 text-center sm:mb-12 md:mb-14">
-          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-lime-700">
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-700">
             Planes y precios
           </p>
           <h2 className="text-balance text-3xl font-extrabold leading-tight tracking-tight text-[#0d212c] sm:text-4xl md:text-5xl">
@@ -1333,13 +1470,13 @@ function PricingSection() {
                   key={planType}
                   className={`relative flex min-h-0 flex-col rounded-2xl p-5 transition-all duration-300 sm:p-7 ${
                     isPopular
-                      ? "bg-[#0a1e14] shadow-[0_24px_60px_rgba(10,30,20,0.38)] ring-2 ring-lime-400"
-                      : "border border-slate-200 bg-white hover:border-lime-200 hover:shadow-xl"
+                      ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-emerald-300"
+                      : "border border-slate-200 bg-white hover:border-emerald-200 hover:shadow-xl"
                   }`}
                 >
                   {isPopular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#0a1e14]">
+                      <span className="rounded-full bg-emerald-300 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#0f172a]">
                         Más popular
                       </span>
                     </div>
@@ -1392,7 +1529,7 @@ function PricingSection() {
                       >
                         <i
                           className={`icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 ${
-                            isPopular ? "text-lime-400" : "text-lime-600"
+                            isPopular ? "text-emerald-300" : "text-emerald-600"
                           }`}
                           aria-hidden
                         />
@@ -1412,7 +1549,7 @@ function PricingSection() {
                     }}
                     className={`mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ${
                       isPopular
-                        ? "bg-lime-400 text-[#0a1e14] hover:bg-lime-300"
+                        ? "bg-emerald-300 text-[#0f172a] hover:bg-emerald-200"
                         : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
                     }`}
                   >
@@ -1444,13 +1581,13 @@ function PricingSection() {
                   variants={LANDING_STAGGER_ITEM}
                   className={`relative flex min-h-0 flex-col rounded-2xl p-5 transition-all duration-300 sm:p-7 ${
                     isPopular
-                      ? "bg-[#0a1e14] shadow-[0_24px_60px_rgba(10,30,20,0.38)] ring-2 ring-lime-400"
-                      : "border border-slate-200 bg-white hover:border-lime-200 hover:shadow-xl"
+                      ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-emerald-300"
+                      : "border border-slate-200 bg-white hover:border-emerald-200 hover:shadow-xl"
                   }`}
                 >
                   {isPopular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#0a1e14]">
+                      <span className="rounded-full bg-emerald-300 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#0f172a]">
                         Más popular
                       </span>
                     </div>
@@ -1503,7 +1640,7 @@ function PricingSection() {
                       >
                         <i
                           className={`icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 ${
-                            isPopular ? "text-lime-400" : "text-lime-600"
+                            isPopular ? "text-emerald-300" : "text-emerald-600"
                           }`}
                           aria-hidden
                         />
@@ -1523,7 +1660,7 @@ function PricingSection() {
                     }}
                     className={`mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ${
                       isPopular
-                        ? "bg-lime-400 text-[#0a1e14] hover:bg-lime-300"
+                        ? "bg-emerald-300 text-[#0f172a] hover:bg-emerald-200"
                         : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
                     }`}
                   >
@@ -1537,23 +1674,33 @@ function PricingSection() {
 
         {/* Enterprise card */}
         {reduced === true ? (
-          <article className="relative mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#0a1e14] to-[#0d212c] p-6 sm:mt-5 sm:p-8 md:p-10">
+          <article className="relative mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-6 sm:mt-5 sm:p-8 md:p-10">
             <div
               className="pointer-events-none absolute right-0 top-0 h-64 w-64 opacity-20 blur-[80px]"
-              style={{ background: "rgba(163,230,53,0.5)" }}
+              style={{ background: "rgba(45,212,191,0.3)" }}
               aria-hidden
             />
             <div className="relative grid gap-6 lg:grid-cols-2 lg:items-center lg:gap-8">
               <div>
-                <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-lime-300 sm:px-4 sm:text-[11px]">
+                <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-200 sm:px-4 sm:text-[11px]">
                   Plan empresarial
                 </span>
-                <h3 className="mt-3 text-2xl font-extrabold text-white sm:mt-4 sm:text-3xl">{enterprise.displayName}</h3>
-                <p className="mt-3 leading-relaxed text-white/60">{enterprise.description}</p>
+                <h3 className="mt-3 text-2xl font-extrabold text-white sm:mt-4 sm:text-3xl">
+                  {enterprise.displayName}
+                </h3>
+                <p className="mt-3 leading-relaxed text-white/60">
+                  {enterprise.description}
+                </p>
                 <div className="mt-5 inline-block rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Precio</p>
-                  <p className="mt-0.5 text-2xl font-black text-white">Bajo consulta</p>
-                  <p className="text-xs text-white/40">Implementación según alcance</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+                    Precio
+                  </p>
+                  <p className="mt-0.5 text-2xl font-black text-white">
+                    Bajo consulta
+                  </p>
+                  <p className="text-xs text-white/40">
+                    Implementación según alcance
+                  </p>
                 </div>
                 <div>
                   <button
@@ -1565,7 +1712,7 @@ function PricingSection() {
                       });
                       openCalendly(e);
                     }}
-                    className="mt-6 rounded-xl bg-lime-400 px-8 py-3.5 text-sm font-bold text-[#0a1e14] transition hover:bg-lime-300"
+                    className="mt-6 rounded-xl bg-emerald-300 px-8 py-3.5 text-sm font-bold text-[#0f172a] transition hover:bg-emerald-200"
                   >
                     Hablar con un consultor
                   </button>
@@ -1577,8 +1724,13 @@ function PricingSection() {
                     key={feature}
                     className="flex gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-4"
                   >
-                    <i className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 text-lime-400" aria-hidden />
-                    <p className="text-sm leading-snug text-white/75">{feature}</p>
+                    <i
+                      className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 text-emerald-300"
+                      aria-hidden
+                    />
+                    <p className="text-sm leading-snug text-white/75">
+                      {feature}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -1586,7 +1738,7 @@ function PricingSection() {
           </article>
         ) : (
           <motion.article
-            className="relative mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#0a1e14] to-[#0d212c] p-6 sm:mt-5 sm:p-8 md:p-10"
+            className="relative mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-6 sm:mt-5 sm:p-8 md:p-10"
             initial={{ opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={LANDING_VIEWPORT}
@@ -1594,20 +1746,30 @@ function PricingSection() {
           >
             <div
               className="pointer-events-none absolute right-0 top-0 h-64 w-64 opacity-20 blur-[80px]"
-              style={{ background: "rgba(163,230,53,0.5)" }}
+              style={{ background: "rgba(45,212,191,0.3)" }}
               aria-hidden
             />
             <div className="relative grid gap-6 lg:grid-cols-2 lg:items-center lg:gap-8">
               <div>
-                <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-lime-300 sm:px-4 sm:text-[11px]">
+                <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-200 sm:px-4 sm:text-[11px]">
                   Plan empresarial
                 </span>
-                <h3 className="mt-3 text-2xl font-extrabold text-white sm:mt-4 sm:text-3xl">{enterprise.displayName}</h3>
-                <p className="mt-3 leading-relaxed text-white/60">{enterprise.description}</p>
+                <h3 className="mt-3 text-2xl font-extrabold text-white sm:mt-4 sm:text-3xl">
+                  {enterprise.displayName}
+                </h3>
+                <p className="mt-3 leading-relaxed text-white/60">
+                  {enterprise.description}
+                </p>
                 <div className="mt-5 inline-block rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">Precio</p>
-                  <p className="mt-0.5 text-2xl font-black text-white">Bajo consulta</p>
-                  <p className="text-xs text-white/40">Implementación según alcance</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+                    Precio
+                  </p>
+                  <p className="mt-0.5 text-2xl font-black text-white">
+                    Bajo consulta
+                  </p>
+                  <p className="text-xs text-white/40">
+                    Implementación según alcance
+                  </p>
                 </div>
                 <div>
                   <button
@@ -1619,7 +1781,7 @@ function PricingSection() {
                       });
                       openCalendly(e);
                     }}
-                    className="mt-6 rounded-xl bg-lime-400 px-8 py-3.5 text-sm font-bold text-[#0a1e14] transition hover:bg-lime-300"
+                    className="mt-6 rounded-xl bg-emerald-300 px-8 py-3.5 text-sm font-bold text-[#0f172a] transition hover:bg-emerald-200"
                   >
                     Hablar con un consultor
                   </button>
@@ -1638,8 +1800,13 @@ function PricingSection() {
                     variants={LANDING_STAGGER_ITEM}
                     className="flex gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-4"
                   >
-                    <i className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 text-lime-400" aria-hidden />
-                    <p className="text-sm leading-snug text-white/75">{feature}</p>
+                    <i
+                      className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 text-emerald-300"
+                      aria-hidden
+                    />
+                    <p className="text-sm leading-snug text-white/75">
+                      {feature}
+                    </p>
                   </motion.div>
                 ))}
               </motion.div>
@@ -1648,7 +1815,8 @@ function PricingSection() {
         )}
 
         <p className="mt-5 text-center text-xs text-slate-400">
-          * Precios en USD. La configuración final depende del alcance de implementación.
+          * Precios en USD. La configuración final depende del alcance de
+          implementación.
         </p>
       </div>
     </motion.section>
@@ -1659,10 +1827,16 @@ function FAQSection() {
   const reduced = useReducedMotion();
   const reveal = useInViewReveal();
   return (
-    <motion.section className="scroll-mt-24 bg-slate-50 py-16 sm:py-20 md:py-24" id="faq" {...reveal}>
+    <motion.section
+      className="scroll-mt-24 bg-slate-50 py-16 sm:py-20 md:py-24"
+      id="faq"
+      {...reveal}
+    >
       <div className="mx-auto max-w-3xl px-5 sm:px-6 lg:px-8">
         <div className="mb-8 text-center sm:mb-12">
-          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-lime-700">FAQ</p>
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-700">
+            FAQ
+          </p>
           <h2 className="text-balance text-3xl font-extrabold text-[#0d212c] sm:text-4xl">
             Preguntas frecuentes
           </h2>
@@ -1673,7 +1847,10 @@ function FAQSection() {
         {reduced === true ? (
           <div className="space-y-3">
             {FAQS.map((item) => (
-              <details key={item.q} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white">
+              <details
+                key={item.q}
+                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white"
+              >
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-4 text-left text-sm font-bold leading-snug text-[#0d212c] transition-colors hover:bg-slate-50 sm:gap-4 sm:px-6 sm:py-5 sm:text-base">
                   {item.q}
                   <i
@@ -1681,12 +1858,14 @@ function FAQSection() {
                     aria-hidden
                   />
                   <i
-                    className="icon-[lucide--minus] hidden h-4 w-4 shrink-0 text-lime-600 group-open:block"
+                    className="icon-[lucide--minus] hidden h-4 w-4 shrink-0 text-emerald-600 group-open:block"
                     aria-hidden
                   />
                 </summary>
                 <div className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-6 sm:pb-5 sm:pt-4">
-                  <p className="text-sm leading-relaxed text-slate-600 sm:text-base">{item.a}</p>
+                  <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
+                    {item.a}
+                  </p>
                 </div>
               </details>
             ))}
@@ -1709,12 +1888,14 @@ function FAQSection() {
                       aria-hidden
                     />
                     <i
-                      className="icon-[lucide--minus] hidden h-4 w-4 shrink-0 text-lime-600 group-open:block"
+                      className="icon-[lucide--minus] hidden h-4 w-4 shrink-0 text-emerald-600 group-open:block"
                       aria-hidden
                     />
                   </summary>
                   <div className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-6 sm:pb-5 sm:pt-4">
-                    <p className="text-sm leading-relaxed text-slate-600 sm:text-base">{item.a}</p>
+                    <p className="text-sm leading-relaxed text-slate-600 sm:text-base">
+                      {item.a}
+                    </p>
                   </div>
                 </details>
               </motion.div>
@@ -1729,7 +1910,11 @@ function FAQSection() {
 function LandingClosingCtaSection() {
   const reveal = useInViewReveal();
   return (
-    <motion.section className="border-t border-slate-200" aria-label="Siguiente paso" {...reveal}>
+    <motion.section
+      className="border-t border-slate-200"
+      aria-label="Siguiente paso"
+      {...reveal}
+    >
       <FooterDemoCtaBand ctaName="closing_demo" placement="closing" />
     </motion.section>
   );
@@ -1741,7 +1926,9 @@ export function LandingV3() {
   const phone = process.env.NEXT_PUBLIC_WPP_NUMBER || "";
   const cookie = useCookieConsentOptional();
   const allowFunctional =
-    cookie?.hydrated && !!cookie.consent?.functional && !cookie.needsInteraction;
+    cookie?.hydrated &&
+    !!cookie.consent?.functional &&
+    !cookie.needsInteraction;
   const variant = useLandingVariant();
   useUtmCapture();
   useLandingViewEvent(variant);

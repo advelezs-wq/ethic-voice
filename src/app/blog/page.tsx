@@ -45,8 +45,6 @@ export default async function BlogIndexPage() {
         <div className="sr-only">Introducción al blog EthicVoice</div>
       </MarketingSectionV2>
 
-      <BlogIndexDecor />
-
       <MarketingSectionV2
         id="articulos"
         className="!border-t-0 !pt-4 md:!pt-6"
@@ -93,6 +91,8 @@ export default async function BlogIndexPage() {
           </div>
         )}
       </MarketingSectionV2>
+
+      <BlogIndexDecor />
     </PublicBlogLayout>
   );
 }

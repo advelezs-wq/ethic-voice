@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import {
   PLAN_CONFIGS,
@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import CheckoutSidebar from "@/modules/app/components/checkout/CheckoutSidebar";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 import { MarketingSectionV2 } from "@/modules/landig-page/components/MarketingSectionV2";
+import { showError } from "@/modules/core/utils/safe-toast";
 
 interface PricingPlansProps {
   billingCycle: BillingCycle;
@@ -25,6 +26,7 @@ export default function PricingPlans({ billingCycle }: PricingPlansProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null);
   const [checkoutSidebarOpen, setCheckoutSidebarOpen] = useState(false);
+  const autoFlowTriggeredRef = useRef(false);
   const [subscription, setSubscription] = useState<{
     id: number;
     planName: string;
@@ -47,6 +49,83 @@ export default function PricingPlans({ billingCycle }: PricingPlansProps) {
     return price;
   };
 
+  const resolvePlanType = (raw: string | null): PlanType | null => {
+    if (!raw) return null;
+    if ((Object.values(PlanType) as string[]).includes(raw)) {
+      return raw as PlanType;
+    }
+    return null;
+  };
+
+  const resolveBillingCycle = (raw: string | null): BillingCycle => {
+    if (!raw) return billingCycle;
+    if ((Object.values(BillingCycle) as string[]).includes(raw)) {
+      return raw as BillingCycle;
+    }
+    return billingCycle;
+  };
+
+  const redirectToSignUp = (planType: PlanType, cycle: BillingCycle) => {
+    localStorage.setItem("selectedPlan", planType);
+    localStorage.setItem("selectedBillingCycle", cycle);
+    const returnUrl = encodeURIComponent(
+      `${window.location.origin}/pricing?plan=${planType}&billing=${cycle}`,
+    );
+    window.location.href = `/auth/sign-up?redirect_url=${returnUrl}`;
+  };
+
+  const startCheckoutFlow = async (planType: PlanType, cycle: BillingCycle) => {
+    setIsProcessing(true);
+    setSelectedPlan(planType);
+
+    try {
+      const response = await fetch("/api/subscriptions/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          planType,
+          billingCycle: cycle,
+          returnUrl: "/app",
+          openSidebar: true,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo crear la suscripción");
+      }
+
+      if (data.alreadyActive) {
+        window.location.href = data.redirectUrl || "/app";
+        return;
+      }
+
+      if (data.subscription) {
+        setSubscription({
+          id: data.subscription.id,
+          planName: data.subscription.planName,
+          price: data.subscription.price,
+          currency: data.subscription.currency,
+          returnUrl: data.subscription.returnUrl || "/app",
+          paymentUrl: data.subscription.paymentUrl,
+          ...(planType ? { planType } : {}),
+          billingCycle: cycle,
+        });
+        setCheckoutSidebarOpen(true);
+      }
+    } catch (error) {
+      console.error("❌ Subscription error:", error);
+      showError(
+        "Error al procesar la suscripción",
+        error instanceof Error ? error.message : "Intenta de nuevo",
+      );
+      autoFlowTriggeredRef.current = false;
+    } finally {
+      setIsProcessing(false);
+      setSelectedPlan(null);
+    }
+  };
+
   const handlePlanSelect = async (planType: PlanType) => {
     const plan = PLAN_CONFIGS[planType];
 
@@ -63,61 +142,11 @@ export default function PricingPlans({ billingCycle }: PricingPlansProps) {
 
     // Check if user is authenticated
     if (!isSignedIn) {
-      // Store selected plan in localStorage to restore after sign-in
-      localStorage.setItem("selectedPlan", planType);
-      localStorage.setItem("selectedBillingCycle", billingCycle);
-      // Redirect to sign-in with return URL
-      const returnUrl = encodeURIComponent(
-        `${window.location.origin}/pricing?plan=${planType}&billing=${billingCycle}`
-      );
-      window.location.href = `/auth/sign-in?redirect_url=${returnUrl}`;
+      redirectToSignUp(planType, billingCycle);
       return;
     }
 
-    setIsProcessing(true);
-    setSelectedPlan(planType);
-
-    try {
-      const response = await fetch("/api/subscriptions/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          planType: planType,
-          billingCycle: billingCycle,
-          returnUrl: "/app",
-          openSidebar: true,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create subscription");
-      }
-
-      const data = await response.json();
-      console.log("✅ Subscription created:", data);
-
-      if (data.subscription) {
-        setSubscription({
-          id: data.subscription.id,
-          planName: data.subscription.planName,
-          price: data.subscription.price,
-          currency: data.subscription.currency,
-          returnUrl: data.subscription.returnUrl || "/app",
-          paymentUrl: data.subscription.paymentUrl,
-          // Attach context for token flow
-          ...(planType ? { planType } : {}),
-          billingCycle: billingCycle,
-        });
-        setCheckoutSidebarOpen(true);
-      }
-    } catch (error) {
-      console.error("❌ Subscription error:", error);
-      alert(`Error al procesar tu suscripción: ${(error as Error).message}`);
-    } finally {
-      setIsProcessing(false);
-      setSelectedPlan(null);
-    }
+    await startCheckoutFlow(planType, billingCycle);
   };
 
   const handleCloseSidebar = () => {
@@ -165,106 +194,104 @@ Gracias,
   };
 
   // Check if user returned from sign-in with a selected plan
-  React.useEffect(() => {
-    if (isSignedIn && isLoaded && !isProcessing) {
-      // Check for plan in URL params (from redirect)
-      const urlParams = new URLSearchParams(window.location.search);
-      const planFromUrl = urlParams.get("plan");
-      const billingFromUrl = urlParams.get("billing");
+  useEffect(() => {
+    if (!isLoaded || isProcessing || autoFlowTriggeredRef.current) return;
 
-      // Or check localStorage
-      const planFromStorage = localStorage.getItem("selectedPlan");
-      const billingFromStorage = localStorage.getItem("selectedBillingCycle");
+    const urlParams = new URLSearchParams(window.location.search);
+    const planFromUrl = resolvePlanType(urlParams.get("plan"));
+    const billingFromUrl = resolveBillingCycle(urlParams.get("billing"));
+    const planFromStorage = resolvePlanType(
+      localStorage.getItem("selectedPlan"),
+    );
+    const billingFromStorage = resolveBillingCycle(
+      localStorage.getItem("selectedBillingCycle"),
+    );
 
-      const selectedPlanType = planFromUrl || planFromStorage;
-      const selectedBillingCycle = billingFromUrl || billingFromStorage;
+    const plan = planFromUrl || planFromStorage;
+    const cycle = planFromUrl ? billingFromUrl : billingFromStorage;
+    if (!plan || plan === PlanType.PREMIUM) return;
 
-      if (
-        selectedPlanType &&
-        Object.keys(PLAN_CONFIGS).includes(selectedPlanType as PlanType)
-      ) {
-        // Clear stored plan
-        localStorage.removeItem("selectedPlan");
-        localStorage.removeItem("selectedBillingCycle");
+    autoFlowTriggeredRef.current = true;
 
-        // Auto-trigger plan selection by directly calling the logic
-        const planType = selectedPlanType as PlanType;
-        if (planType !== "PREMIUM") {
-          // Set processing state first
-          setIsProcessing(true);
-          setSelectedPlan(planType);
-
-          // Create subscription
-          fetch("/api/subscriptions/create", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              planType: planType,
-              billingCycle: selectedBillingCycle || billingCycle,
-              returnUrl: "/app",
-              openSidebar: true,
-            }),
-          })
-            .then(async (response) => {
-              if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                  errorData.error || "Failed to create subscription"
-                );
-              }
-              return response.json();
-            })
-            .then((data) => {
-              console.log("✅ Auto-subscription created:", data);
-              if (data.subscription) {
-                setSubscription({
-                  id: data.subscription.id,
-                  planName: data.subscription.planName,
-                  price: data.subscription.price,
-                  currency: data.subscription.currency,
-                  returnUrl: data.subscription.returnUrl || "/app",
-                  paymentUrl: data.subscription.paymentUrl,
-                  planType: planType,
-                  billingCycle: (selectedBillingCycle || billingCycle) as any,
-                });
-                setCheckoutSidebarOpen(true);
-              }
-            })
-            .catch((error) => {
-              console.error("❌ Auto-subscription error:", error);
-              alert(`Error al procesar tu suscripción: ${error.message}`);
-            })
-            .finally(() => {
-              setIsProcessing(false);
-              setSelectedPlan(null);
-            });
-        }
-
-        // Clean up URL if plan was in URL
-        if (planFromUrl) {
-          const newUrl = window.location.origin + window.location.pathname;
-          window.history.replaceState(null, "", newUrl);
-        }
-      }
+    if (!isSignedIn) {
+      redirectToSignUp(plan, cycle);
+      return;
     }
-  }, [isSignedIn, isLoaded, isProcessing, billingCycle]);
+
+    localStorage.removeItem("selectedPlan");
+    localStorage.removeItem("selectedBillingCycle");
+    if (planFromUrl) {
+      const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+      window.history.replaceState(null, "", cleanUrl);
+    }
+
+    void startCheckoutFlow(plan, cycle);
+  }, [isLoaded, isSignedIn, isProcessing, billingCycle]);
 
   const displayPlans = [PlanType.STARTER, PlanType.GROW, PlanType.GROW_PRO];
   const premiumConfig = PLAN_CONFIGS[PlanType.PREMIUM];
 
   const enterpriseFeatures = [
-    { iconClass: "icon-[lucide--users]", title: "Usuarios Ilimitados", desc: "Sin restricciones de equipo" },
-    { iconClass: "icon-[lucide--mail]", title: "Todos los Canales", desc: "Web, Email, Chatbot, Teléfono" },
-    { iconClass: "icon-[lucide--brain]", title: "IA Avanzada Completa", desc: "Procesamiento y análisis automatizado" },
-    { iconClass: "icon-[lucide--chart-column]", title: "Analíticas Premium", desc: "Reportes detallados y métricas" },
-    { iconClass: "icon-[lucide--shield-check]", title: "Seguridad Empresarial", desc: "Cumplimiento y encriptación" },
-    { iconClass: "icon-[lucide--headphones]", title: "Soporte Prioritario", desc: "Atención personalizada 24/7" },
-    { iconClass: "icon-[lucide--palette]", title: "Personalización Total", desc: "Branding y diseño exclusivo" },
-    { iconClass: "icon-[lucide--graduation-cap]", title: "Capacitación Completa", desc: "Training para investigadores" },
-    { iconClass: "icon-[lucide--scale]", title: "Consultoría Legal", desc: "Asesoría especializada incluida" },
-    { iconClass: "icon-[lucide--cog]", title: "Integración API", desc: "Conecta con tus sistemas existentes" },
-    { iconClass: "icon-[lucide--clock]", title: "SLA Garantizado", desc: "Tiempos de respuesta asegurados" },
-    { iconClass: "icon-[lucide--globe]", title: "Soporte Multiidioma", desc: "Disponible en varios idiomas" },
+    {
+      iconClass: "icon-[lucide--users]",
+      title: "Usuarios Ilimitados",
+      desc: "Sin restricciones de equipo",
+    },
+    {
+      iconClass: "icon-[lucide--mail]",
+      title: "Todos los Canales",
+      desc: "Web, Email, Chatbot, Teléfono",
+    },
+    {
+      iconClass: "icon-[lucide--brain]",
+      title: "IA Avanzada Completa",
+      desc: "Procesamiento y análisis automatizado",
+    },
+    {
+      iconClass: "icon-[lucide--chart-column]",
+      title: "Analíticas Premium",
+      desc: "Reportes detallados y métricas",
+    },
+    {
+      iconClass: "icon-[lucide--shield-check]",
+      title: "Seguridad Empresarial",
+      desc: "Cumplimiento y encriptación",
+    },
+    {
+      iconClass: "icon-[lucide--headphones]",
+      title: "Soporte Prioritario",
+      desc: "Atención personalizada 24/7",
+    },
+    {
+      iconClass: "icon-[lucide--palette]",
+      title: "Personalización Total",
+      desc: "Branding y diseño exclusivo",
+    },
+    {
+      iconClass: "icon-[lucide--graduation-cap]",
+      title: "Capacitación Completa",
+      desc: "Training para investigadores",
+    },
+    {
+      iconClass: "icon-[lucide--scale]",
+      title: "Consultoría Legal",
+      desc: "Asesoría especializada incluida",
+    },
+    {
+      iconClass: "icon-[lucide--cog]",
+      title: "Integración API",
+      desc: "Conecta con tus sistemas existentes",
+    },
+    {
+      iconClass: "icon-[lucide--clock]",
+      title: "SLA Garantizado",
+      desc: "Tiempos de respuesta asegurados",
+    },
+    {
+      iconClass: "icon-[lucide--globe]",
+      title: "Soporte Multiidioma",
+      desc: "Disponible en varios idiomas",
+    },
   ];
 
   return (
@@ -379,9 +406,9 @@ Gracias,
               ¿Necesitas algo más específico?
             </h3>
             <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-[#273c46]">
-              Si estos planes no se ajustan a tus necesidades, creemos una solución
-              personalizada para tu organización. Desde startups hasta grandes
-              corporaciones.
+              Si estos planes no se ajustan a tus necesidades, creemos una
+              solución personalizada para tu organización. Desde startups hasta
+              grandes corporaciones.
             </p>
           </div>
 

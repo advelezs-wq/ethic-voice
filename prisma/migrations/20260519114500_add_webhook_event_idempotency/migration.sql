@@ -1,0 +1,23 @@
+-- CreateTable
+CREATE TABLE "WebhookEvent" (
+    "id" SERIAL NOT NULL,
+    "provider" "PaymentGateway" NOT NULL,
+    "eventId" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'PROCESSING',
+    "resourceId" TEXT,
+    "topic" TEXT,
+    "action" TEXT,
+    "error" TEXT,
+    "payload" JSONB,
+    "processedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "WebhookEvent_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "WebhookEvent_provider_eventId_key" ON "WebhookEvent"("provider", "eventId");
+
+-- CreateIndex
+CREATE INDEX "WebhookEvent_provider_status_createdAt_idx" ON "WebhookEvent"("provider", "status", "createdAt");

@@ -9,7 +9,11 @@ import { StickyCalendlyToast } from "@/modules/landig-page/components/StickyCale
 import { useCookieConsentOptional } from "@/modules/core/providers/CookieConsentContext";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 import { trackGA4Event } from "@/lib/google-analytics";
-import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
+import {
+  BillingCycle,
+  PLAN_CONFIGS,
+  PlanType,
+} from "@/types/subscription.types";
 import {
   useLandingVariant,
   useLandingViewEvent,
@@ -1432,6 +1436,14 @@ function PricingSection() {
   const enterprise = PLAN_CONFIGS[PlanType.PREMIUM];
   const reduced = useReducedMotion();
   const reveal = useInViewReveal();
+  const goToCheckoutFlow = (planType: PlanType) => {
+    if (planType === PlanType.PREMIUM) {
+      openCalendly();
+      return;
+    }
+    const target = `/pricing?plan=${planType}&billing=${BillingCycle.MONTHLY}`;
+    window.location.href = target;
+  };
 
   return (
     <motion.section
@@ -1545,7 +1557,8 @@ function PricingSection() {
                         cta_name: `pricing_${planType.toLowerCase()}`,
                         placement: "pricing",
                       });
-                      openCalendly(e);
+                      e.preventDefault();
+                      goToCheckoutFlow(planType);
                     }}
                     className={`mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ${
                       isPopular
@@ -1656,7 +1669,8 @@ function PricingSection() {
                         cta_name: `pricing_${planType.toLowerCase()}`,
                         placement: "pricing",
                       });
-                      openCalendly(e);
+                      e.preventDefault();
+                      goToCheckoutFlow(planType);
                     }}
                     className={`mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ${
                       isPopular

@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import mercadoPagoService from "@/modules/app/services/mercadopago.service";
-import { PLAN_CONFIGS, PlanType, BillingCycle } from "@/types/subscription.types";
+import {
+  PLAN_CONFIGS,
+  PlanType,
+  BillingCycle,
+} from "@/types/subscription.types";
 
 async function updateOrganizationPlanFeatures(orgId: string, planType: string) {
   // Implementation for updating organization plan features
@@ -15,16 +19,22 @@ export async function POST(req: NextRequest) {
 
   try {
     const { userId } = await auth();
-    const body = await req.json().catch(() => ({} as any));
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const body = await req.json().catch(() => ({}) as any);
     let subscriptionId: number | undefined = body.subscriptionId
       ? parseInt(String(body.subscriptionId), 10)
       : undefined;
     const preapprovalId: string | undefined =
       body.preapprovalId || body.preapproval_id || undefined;
-    const paymentId: string | undefined = body.paymentId || body.payment_id || undefined;
+    const paymentId: string | undefined =
+      body.paymentId || body.payment_id || undefined;
 
     if (!subscriptionId) {
-      console.warn("No subscriptionId provided; will try to resolve from preapprovalId or user context");
+      console.warn(
+        "No subscriptionId provided; will try to resolve from preapprovalId or user context",
+      );
     }
 
     console.log("📊 Verification request:", {
@@ -38,25 +48,33 @@ export async function POST(req: NextRequest) {
       try {
         const payment = await mercadoPagoService.getPayment(String(paymentId));
         // Prefer external_reference for our internal subscription id
-        const ext = payment?.external_reference || payment?.metadata?.external_reference;
+        const ext =
+          payment?.external_reference || payment?.metadata?.external_reference;
         if (ext) {
           const parsed = parseInt(String(ext), 10);
           if (Number.isFinite(parsed)) subscriptionId = parsed;
         }
         // Try get preapproval id from payment to verify status downstream
         if (payment?.preapproval_id) {
-          (body as any)._resolvedPreapprovalIdFromPayment = String(payment.preapproval_id);
+          (body as any)._resolvedPreapprovalIdFromPayment = String(
+            payment.preapproval_id,
+          );
         }
         // If we still don't have subscriptionId, attempt by preapproval lookup
         if (!subscriptionId && payment?.preapproval_id) {
           try {
-            const pre = await mercadoPagoService.getPreapproval(String(payment.preapproval_id));
+            const pre = await mercadoPagoService.getPreapproval(
+              String(payment.preapproval_id),
+            );
             const sid = parseInt(String(pre?.external_reference), 10);
             if (Number.isFinite(sid)) subscriptionId = sid;
           } catch {}
         }
       } catch (e) {
-        console.warn("⚠️ Could not fetch payment from MercadoPago during verify POST", e);
+        console.warn(
+          "⚠️ Could not fetch payment from MercadoPago during verify POST",
+          e,
+        );
       }
     }
 
@@ -68,7 +86,7 @@ export async function POST(req: NextRequest) {
         if (!Number.isFinite(internalId)) {
           return NextResponse.json(
             { error: "Invalid external_reference in preapproval" },
-            { status: 400 }
+            { status: 400 },
           );
         }
         const subscription = await prisma.subscription.findUnique({
@@ -78,7 +96,7 @@ export async function POST(req: NextRequest) {
         if (!subscription) {
           return NextResponse.json(
             { error: "Subscription not found" },
-            { status: 404 }
+            { status: 404 },
           );
         }
 
@@ -86,7 +104,8 @@ export async function POST(req: NextRequest) {
           providerSubscriptionId: pre.id,
           updatedAt: new Date(),
           metadata: {
-            ...((subscription.metadata as Record<string, unknown> | null) ?? {}),
+            ...((subscription.metadata as Record<string, unknown> | null) ??
+              {}),
             mpPreapproval: {
               id: pre.id,
               status: pre.status,
@@ -108,7 +127,10 @@ export async function POST(req: NextRequest) {
 
         if (updated.organization) {
           try {
-            await updateOrganizationPlanFeatures(updated.organization.id, updated.planType);
+            await updateOrganizationPlanFeatures(
+              updated.organization.id,
+              updated.planType,
+            );
           } catch {}
         }
 
@@ -126,7 +148,7 @@ export async function POST(req: NextRequest) {
         console.error("❌ Error verifying MP preapproval:", e);
         return NextResponse.json(
           { error: "Failed to verify MercadoPago preapproval" },
-          { status: 500 }
+          { status: 500 },
         );
       }
     }
@@ -140,13 +162,15 @@ export async function POST(req: NextRequest) {
         });
         if (recent) {
           subscriptionId = recent.id;
-          console.log("ℹ️ Using most recent subscription by user context", { subscriptionId });
+          console.log("ℹ️ Using most recent subscription by user context", {
+            subscriptionId,
+          });
         }
       }
       if (!subscriptionId) {
         return NextResponse.json(
           { error: "Subscription ID or preapprovalId is required" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -160,7 +184,7 @@ export async function POST(req: NextRequest) {
       console.error("❌ Subscription not found in database:", subscriptionId);
       return NextResponse.json(
         { error: "Subscription not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -171,6 +195,23 @@ export async function POST(req: NextRequest) {
       orgId: subscription.orgId,
       providerSubscriptionId: subscription.providerSubscriptionId,
     });
+
+    // Enforce ownership: user must own subscription or be ADMIN of the org.
+    if (subscription.userId !== userId) {
+      if (!subscription.orgId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      const membership = await prisma.organizationMembership.findFirst({
+        where: {
+          userId,
+          orgId: subscription.orgId,
+          role: "ADMIN",
+        },
+      });
+      if (!membership) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    }
 
     // If subscription is already active, return success
     if (subscription.status === "ACTIVE") {
@@ -188,25 +229,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Without preapproval info we cannot verify; return current state
+    // Without provider/preapproval confirmation we do not auto-activate.
+    // Activation must come from verified preapproval/payment state.
     let shouldActivate = false;
-    let activationReason = "No provider info to verify";
-
-    // For subscriptions without payment provider, activate immediately
-    // This handles the case where trials are disabled and subscriptions should be active
-    if (!subscription.providerSubscriptionId) {
-      shouldActivate = true;
-      activationReason = "Direct activation - no payment provider required";
-    }
 
     // If we do have a providerSubscriptionId but status still TRIALING, attempt live fetch to update
     if (!shouldActivate && subscription.providerSubscriptionId) {
       try {
-        const pre = await mercadoPagoService.getPreapproval(String(subscription.providerSubscriptionId));
+        const pre = await mercadoPagoService.getPreapproval(
+          String(subscription.providerSubscriptionId),
+        );
         const updates: any = {
           updatedAt: new Date(),
           metadata: {
-            ...((subscription.metadata as Record<string, unknown> | null) ?? {}),
+            ...((subscription.metadata as Record<string, unknown> | null) ??
+              {}),
             mpPreapproval: {
               id: pre.id,
               status: pre.status,
@@ -237,57 +274,15 @@ export async function POST(req: NextRequest) {
           },
         });
       } catch (e) {
-        console.warn("⚠️ Live preapproval fetch failed in POST verify fallback", e);
+        console.warn(
+          "⚠️ Live preapproval fetch failed in POST verify fallback",
+          e,
+        );
       }
     }
 
     if (shouldActivate) {
-      console.log(`✅ Activating subscription: ${activationReason}`);
-
-      // Update subscription status to ACTIVE (no more trial logic)
-      const updatedSubscription = await prisma.subscription.update({
-        where: { id: subscription.id },
-        data: {
-          status: "ACTIVE", // Always set to ACTIVE
-          isTrialActive: false, // No more trials
-          updatedAt: new Date(),
-          metadata: {
-            ...((subscription.metadata as Record<string, unknown> | null) ?? {}),
-            verifiedAt: new Date().toISOString(),
-            verifiedWith: "manual",
-            activationReason,
-          },
-        },
-        include: { organization: true },
-      });
-
-      // Update organization plan features if associated
-      if (updatedSubscription.organization) {
-        try {
-          await updateOrganizationPlanFeatures(
-            updatedSubscription.organization.id,
-            subscription.planType
-          );
-          console.log(
-            "✅ Organization plan features updated:",
-            updatedSubscription.organization.id
-          );
-        } catch (error) {
-          console.error("❌ Error updating organization features:", error);
-        }
-      }
-
-      return NextResponse.json({
-        success: true,
-        status: "ACTIVE",
-        message: `Subscription activated: ${activationReason}`,
-        subscription: {
-          id: updatedSubscription.id,
-          planType: updatedSubscription.planType,
-          status: updatedSubscription.status,
-          organizationId: updatedSubscription.orgId,
-        },
-      });
+      // Reserved for future trusted/manual backoffice activation flows.
     }
 
     // If we reach this point, something went wrong
@@ -307,7 +302,7 @@ export async function POST(req: NextRequest) {
     console.error("❌ Error verifying subscription:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -319,11 +314,14 @@ export async function GET(req: NextRequest) {
       url.searchParams.get("preapproval_id") || url.searchParams.get("id");
     const subscriptionIdFromQuery = url.searchParams.get("subscription_id");
     const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     if (!preapprovalId) {
       return NextResponse.json(
         { error: "preapproval_id is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -366,7 +364,8 @@ export async function GET(req: NextRequest) {
 
     // 5) Last-resort: find TRIALING subscription whose metadata.paymentUrl contains this preapproval plan id
     if (!internalId) {
-      const planIdFromPreapproval: string | undefined = pre?.preapproval_plan_id;
+      const planIdFromPreapproval: string | undefined =
+        pre?.preapproval_plan_id;
       if (planIdFromPreapproval) {
         const candidates = await prisma.subscription.findMany({
           where: { status: "TRIALING" },
@@ -375,17 +374,28 @@ export async function GET(req: NextRequest) {
         });
         const matched = candidates.find((s) => {
           const md = (s.metadata as Record<string, unknown> | null) ?? null;
-          const url = typeof md?.paymentUrl === "string" ? (md.paymentUrl as string) : undefined;
-          return url ? url.includes(encodeURIComponent(planIdFromPreapproval)) || url.includes(planIdFromPreapproval) : false;
+          const url =
+            typeof md?.paymentUrl === "string"
+              ? (md.paymentUrl as string)
+              : undefined;
+          return url
+            ? url.includes(encodeURIComponent(planIdFromPreapproval)) ||
+                url.includes(planIdFromPreapproval)
+            : false;
         });
         if (matched) internalId = matched.id;
       }
     }
 
     // 6) Reverse-map by preapproval_plan_id to planType/billingCycle and pick most recent TRIALING without provider id
-    let matchedPlan: { planType: string; billingCycle: "MONTHLY" | "YEARLY" } | undefined;
+    let matchedPlan:
+      | { planType: string; billingCycle: "MONTHLY" | "YEARLY" }
+      | undefined;
     if (!internalId && pre?.preapproval_plan_id) {
-      const combos: Array<{ planType: string; billingCycle: "MONTHLY" | "YEARLY" }> = [
+      const combos: Array<{
+        planType: string;
+        billingCycle: "MONTHLY" | "YEARLY";
+      }> = [
         { planType: "STARTER", billingCycle: "MONTHLY" },
         { planType: "STARTER", billingCycle: "YEARLY" },
         { planType: "GROW", billingCycle: "MONTHLY" },
@@ -424,9 +434,19 @@ export async function GET(req: NextRequest) {
       // As a last resort, if we can infer the plan and we have a user, create/link a subscription now
       if (matchedPlan && userId) {
         const planCfg = PLAN_CONFIGS[matchedPlan.planType as PlanType];
-        const price = matchedPlan.billingCycle === "YEARLY" ? planCfg.price.yearly : planCfg.price.monthly;
+        const price =
+          matchedPlan.billingCycle === "YEARLY"
+            ? planCfg.price.yearly
+            : planCfg.price.monthly;
         const currency = planCfg.price.currency;
-        const status = pre.status === "authorized" ? "ACTIVE" : pre.status === "paused" ? "PAST_DUE" : pre.status === "cancelled" ? "CANCELED" : "TRIALING";
+        const status =
+          pre.status === "authorized"
+            ? "ACTIVE"
+            : pre.status === "paused"
+              ? "PAST_DUE"
+              : pre.status === "cancelled"
+                ? "CANCELED"
+                : "TRIALING";
 
         const created = await prisma.subscription.create({
           data: {
@@ -462,17 +482,22 @@ export async function GET(req: NextRequest) {
             hasExternalManager: planCfg.features.hasExternalManager || false,
             hasBilingualSupport: planCfg.features.hasBilingualSupport || false,
             hasUnlimitedUsers: planCfg.features.hasUnlimitedUsers || false,
-            hasAdvancedAnalytics: planCfg.features.hasAdvancedAnalytics || false,
+            hasAdvancedAnalytics:
+              planCfg.features.hasAdvancedAnalytics || false,
             hasCustomization: planCfg.features.hasCustomization || false,
             hasColorThemes: planCfg.features.hasColorThemes || false,
-            hasUnlimitedCustomization: planCfg.features.hasUnlimitedCustomization || false,
+            hasUnlimitedCustomization:
+              planCfg.features.hasUnlimitedCustomization || false,
           },
           include: { organization: true },
         });
 
         if (created.organization) {
           try {
-            await updateOrganizationPlanFeatures(created.organization.id, created.planType);
+            await updateOrganizationPlanFeatures(
+              created.organization.id,
+              created.planType,
+            );
           } catch {}
         }
 
@@ -490,7 +515,7 @@ export async function GET(req: NextRequest) {
 
       return NextResponse.json(
         { error: "Invalid external_reference in preapproval" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -502,8 +527,25 @@ export async function GET(req: NextRequest) {
     if (!subscription) {
       return NextResponse.json(
         { error: "Subscription not found" },
-        { status: 404 }
+        { status: 404 },
       );
+    }
+
+    // Enforce ownership: user must own subscription or be ADMIN of the org.
+    if (subscription.userId !== userId) {
+      if (!subscription.orgId) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+      const membership = await prisma.organizationMembership.findFirst({
+        where: {
+          userId,
+          orgId: subscription.orgId,
+          role: "ADMIN",
+        },
+      });
+      if (!membership) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
     }
 
     const updates: any = {
@@ -535,7 +577,7 @@ export async function GET(req: NextRequest) {
       try {
         await updateOrganizationPlanFeatures(
           updated.organization.id,
-          updated.planType
+          updated.planType,
         );
       } catch {}
     }
@@ -554,7 +596,7 @@ export async function GET(req: NextRequest) {
     console.error("❌ Error verifying MP preapproval (GET):", e);
     return NextResponse.json(
       { error: "Failed to verify MercadoPago preapproval" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import mercadoPagoService from "@/modules/app/services/mercadopago.service";
+import { z } from "zod";
 import {
   PLAN_CONFIGS,
   PlanType,
@@ -9,7 +10,12 @@ import {
 } from "@/types/subscription.types";
 import { fetchFxRates } from "@/modules/core/hooks/useExchangeRate";
 
-// Note: Request body is validated ad-hoc below; no explicit interface needed here
+const createSubscriptionBody = z.object({
+  planType: z.nativeEnum(PlanType),
+  billingCycle: z.nativeEnum(BillingCycle).default(BillingCycle.MONTHLY),
+  returnUrl: z.string().max(500).optional(),
+  openSidebar: z.boolean().optional().default(false),
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,25 +25,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const {
-      planType,
-      billingCycle = "MONTHLY",
-      returnUrl,
-      openSidebar = false,
-    } = body;
-
-    if (!planType) {
+    const rawBody = await req.json();
+    const parsed = createSubscriptionBody.safeParse(rawBody);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Plan type is required" },
-        { status: 400 }
+        { error: "Parámetros inválidos", details: parsed.error.flatten() },
+        { status: 400 },
       );
     }
+    const { planType, billingCycle, returnUrl, openSidebar } = parsed.data;
 
     // Get plan configuration
     const planConfig = PLAN_CONFIGS[planType as PlanType];
     if (!planConfig) {
       return NextResponse.json({ error: "Invalid plan type" }, { status: 400 });
+    }
+    if (planType === PlanType.PREMIUM) {
+      return NextResponse.json(
+        {
+          error:
+            "El plan Premium requiere contacto comercial y no se procesa en checkout automático",
+        },
+        { status: 400 },
+      );
     }
 
     console.log("🔄 Creating subscription for user:", {
@@ -61,7 +71,7 @@ export async function POST(req: NextRequest) {
       (sub) =>
         sub.status === "ACTIVE" &&
         sub.planType === planType &&
-        sub.billingCycle === billingCycle
+        sub.billingCycle === billingCycle,
     );
 
     if (samePlanSubscription) {
@@ -74,6 +84,8 @@ export async function POST(req: NextRequest) {
             : planConfig.price.monthly;
 
         return NextResponse.json({
+          alreadyActive: true,
+          redirectUrl: "/app",
           subscription: {
             id: samePlanSubscription.id,
             planName: samePlanSubscription.planName,
@@ -81,7 +93,7 @@ export async function POST(req: NextRequest) {
             currency: samePlanSubscription.currency,
             returnUrl: returnUrl || "/app",
           },
-          message: "Using existing active subscription",
+          message: "La suscripción ya está activa para este plan",
         });
       }
     }
@@ -95,7 +107,7 @@ export async function POST(req: NextRequest) {
     if (!price) {
       return NextResponse.json(
         { error: "Price not available for selected billing cycle" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -151,7 +163,7 @@ export async function POST(req: NextRequest) {
     if (openSidebar) {
       try {
         console.log(
-          "🔄 Preparing MercadoPago hosted checkout for sidebar checkout"
+          "🔄 Preparing MercadoPago hosted checkout for sidebar checkout",
         );
 
         // Build absolute back URL
@@ -173,7 +185,7 @@ export async function POST(req: NextRequest) {
           if (!user?.email) throw new Error("Missing payer email");
           const now = new Date();
           const startISO = new Date(
-            now.getTime() + 60 * 60 * 1000
+            now.getTime() + 60 * 60 * 1000,
           ).toISOString();
           // Convert USD plan price -> COP using live FX (fallback env)
           let copAmount = 0;
@@ -239,7 +251,7 @@ export async function POST(req: NextRequest) {
         // Plan-associated subscription (default)
         const preapprovalPlanId = mercadoPagoService.getPlanId(
           planType,
-          billingCycle
+          billingCycle,
         );
         // Determine correct hosted checkout base by region/currency or env override
         const overrideBase =
@@ -265,9 +277,9 @@ export async function POST(req: NextRequest) {
 
         const hostedBase = `${overrideBase || countryBase}/subscriptions/checkout`;
         const hostedUrl = `${hostedBase}?preapproval_plan_id=${encodeURIComponent(
-          preapprovalPlanId
+          preapprovalPlanId,
         )}&back_url=${encodeURIComponent(absoluteBackUrl)}&external_reference=${encodeURIComponent(
-          subscription.id.toString()
+          subscription.id.toString(),
         )}`;
 
         await prisma.subscription.update({
@@ -313,7 +325,7 @@ export async function POST(req: NextRequest) {
               details:
                 "Configure MercadoPago preapproval plan IDs (MP_*_PLAN_ID) in env.",
             },
-            { status: 500 }
+            { status: 500 },
           );
         }
 
@@ -323,7 +335,7 @@ export async function POST(req: NextRequest) {
             details:
               mpError instanceof Error ? mpError.message : "Unknown error",
           },
-          { status: 500 }
+          { status: 500 },
         );
       }
     }
@@ -353,7 +365,7 @@ export async function POST(req: NextRequest) {
         error: "Internal server error",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

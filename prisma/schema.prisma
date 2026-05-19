@@ -698,6 +698,24 @@ model PaymentTransaction {
   userId       String?
 }
 
+model WebhookEvent {
+  id          Int            @id @default(autoincrement())
+  provider    PaymentGateway
+  eventId     String
+  status      String         @default("PROCESSING")
+  resourceId  String?
+  topic       String?
+  action      String?
+  error       String?
+  payload     Json?
+  processedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([provider, eventId])
+  @@index([provider, status, createdAt])
+}
+
 /// Types of notifications in the system
 enum NotificationType {
   REPORT_CREATED

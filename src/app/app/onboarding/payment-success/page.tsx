@@ -39,16 +39,21 @@ function PaymentSuccessContent() {
 
     // Guard: if user clicked "Volver al sitio" from a one-time preference (e.g., proration), MP may
     // redirect with null params and only preference_id/external_reference. Do not treat as success.
-    const isNullish = (v: string | null) => v == null || v === "null" || v === "undefined";
+    const isNullish = (v: string | null) =>
+      v == null || v === "null" || v === "undefined";
     const looksLikeBackFromPreference =
-      Boolean(preferenceId) && isNullish(paymentId) && isNullish(preapprovalId) && isNullish(paymentStatus) && isNullish(collectionStatus);
+      Boolean(preferenceId) &&
+      isNullish(paymentId) &&
+      isNullish(preapprovalId) &&
+      isNullish(paymentStatus) &&
+      isNullish(collectionStatus);
     const isProrationPreference = (externalRef || "").includes("proration");
     if (looksLikeBackFromPreference) {
       setStatus("failed");
       setMessage(
         isProrationPreference
           ? "Parece que cancelaste o volviste sin completar el cobro de prorrateo. No se realizó ningún cargo."
-          : "Parece que cancelaste o volviste sin completar el pago. No se realizó ningún cargo."
+          : "Parece que cancelaste o volviste sin completar el pago. No se realizó ningún cargo.",
       );
       setPlanName("");
       return; // Avoid calling verification API
@@ -58,16 +63,21 @@ function PaymentSuccessContent() {
     const verifyPaymentWithRetry = async (attempt = 0) => {
       try {
         console.log(
-          `🔄 Payment verification attempt ${attempt + 1}/${MAX_RETRIES + 1}`
+          `🔄 Payment verification attempt ${attempt + 1}/${MAX_RETRIES + 1}`,
         );
 
         // Prefer Mercado Pago verification when preapproval_id is present
         const response = preapprovalId
-          ? await fetch(`/api/subscriptions/verify?preapproval_id=${encodeURIComponent(preapprovalId)}`)
+          ? await fetch(
+              `/api/subscriptions/verify?preapproval_id=${encodeURIComponent(preapprovalId)}`,
+            )
           : await fetch(`/api/subscriptions/verify`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ subscriptionId: subId || undefined, paymentId: paymentId || undefined }),
+              body: JSON.stringify({
+                subscriptionId: subId || undefined,
+                paymentId: paymentId || undefined,
+              }),
             });
         const data = await response.json();
 
@@ -78,10 +88,10 @@ function PaymentSuccessContent() {
             data.status === "ACTIVE"
               ? "success"
               : data.status === "PAST_DUE"
-              ? "pending"
-              : data.status === "CANCELED"
-              ? "failed"
-              : "pending";
+                ? "pending"
+                : data.status === "CANCELED"
+                  ? "failed"
+                  : "pending";
           setStatus(normalizedStatus);
           setPlanName(data.subscription?.planType || data.planName || "");
           if (!subId && data.subscription?.id) {
@@ -90,7 +100,7 @@ function PaymentSuccessContent() {
           setMessage(data.message || "");
 
           // If successful, update user completion status
-          if (data.status === "success") {
+          if (normalizedStatus === "success") {
             try {
               await fetch("/api/users/org-status", {
                 method: "PATCH",
@@ -130,7 +140,7 @@ function PaymentSuccessContent() {
           console.log("🔄 Using URL status as final fallback: success");
           setStatus("success");
           setMessage(
-            "Payment appears successful. If you experience issues, contact support."
+            "Payment appears successful. If you experience issues, contact support.",
           );
           setPlanName("Subscription Plan");
         } else if (paymentStatus === "pending") {
@@ -142,7 +152,7 @@ function PaymentSuccessContent() {
           console.log("🔄 Using URL status as final fallback: failed");
           setStatus("failed");
           setMessage(
-            "We couldn't verify your payment. Please contact support if the issue persists."
+            "We couldn't verify your payment. Please contact support if the issue persists.",
           );
         }
       }
@@ -231,7 +241,7 @@ Please help me resolve this issue.`);
 
     window.open(
       `mailto:support@ethicvoice.co?subject=${subject}&body=${body}`,
-      "_blank"
+      "_blank",
     );
   };
 
@@ -309,8 +319,8 @@ Please help me resolve this issue.`);
                   <strong>¿Qué sigue?</strong>
                   <br />
                   Crea tu organización y empieza a configurar tu canal de
-                  denuncias. Tendrás acceso a todas las funciones incluidas en tu
-                  plan.
+                  denuncias. Tendrás acceso a todas las funciones incluidas en
+                  tu plan.
                 </p>
               </div>
             )}

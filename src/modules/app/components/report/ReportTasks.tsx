@@ -176,6 +176,9 @@ function TaskFormModal({
       onOpenChange={onOpenChange}
       size="2xl"
       scrollBehavior="outside"
+      // El dropdown del MemberPicker vive en un portal fuera del modal; un clic
+      // sobre él contaría como "clic fuera" y cerraba el modal sin crear la tarea.
+      isDismissable={false}
       classNames={{
         base: "max-h-[90vh]",
         body: "overflow-visible",

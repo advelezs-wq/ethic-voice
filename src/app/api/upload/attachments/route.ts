@@ -122,12 +122,24 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-zA-Z0-9_-]/g, '_')
       .slice(0, 64);
 
+    // Documentos de oficina y texto (xlsx, xls, doc, docx, txt) son "raw" para
+    // Cloudinary: no puede inferir su formato desde el data URI, así que deben
+    // subirse con resource_type "raw" y con la extensión incluida en el
+    // public_id para que la URL final los sirva correctamente.
+    const fileExt = (file.name.match(/\.([a-zA-Z0-9]+)$/)?.[1] || '').toLowerCase();
+    const isMedia =
+      file.type.startsWith('image/') ||
+      file.type.startsWith('video/') ||
+      file.type.startsWith('audio/') ||
+      file.type === 'application/pdf';
+
     const uploadResponse = await cloudinary.uploader.upload(dataURI, {
       folder: `reports/${orgId}/temp-attachments`,
-      public_id: `${Date.now()}_${safeBaseName}`,
-      resource_type: 'auto',
-                max_file_size: 50000000,
-      allowed_formats: ['jpg', 'png', 'gif', 'webp', 'pdf', 'doc', 'docx', 'mp3', 'mp4', 'avi', 'mov', 'xlsx', 'txt', 'wav'],
+      public_id: isMedia
+        ? `${Date.now()}_${safeBaseName}`
+        : `${Date.now()}_${safeBaseName}${fileExt ? `.${fileExt}` : ''}`,
+      resource_type: isMedia ? 'auto' : 'raw',
+      max_file_size: 50000000,
     });
 
     // Log successful file upload activity
@@ -151,7 +163,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error uploading file:', error);
     return NextResponse.json(
-      { error: 'Error uploading file' },
+      { error: 'No se pudo subir el archivo. Intenta nuevamente en unos segundos.' },
       { status: 500 }
     );
   }

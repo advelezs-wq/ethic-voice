@@ -27,7 +27,26 @@ export function useCalendlyGate() {
       }
       if (typeof window === "undefined") return;
       if (window.Calendly) {
-        window.Calendly.initPopupWidget({ url: ETHICVOICE_CALENDLY_URL });
+        try {
+          window.Calendly.initPopupWidget({ url: ETHICVOICE_CALENDLY_URL });
+          // Si el widget no logra montar su iframe (script/CSS bloqueados),
+          // el overlay queda "pensando": verificamos y abrimos en pestaña nueva.
+          window.setTimeout(() => {
+            const overlayLoaded = document.querySelector(
+              ".calendly-overlay iframe"
+            );
+            if (!overlayLoaded) {
+              document.querySelector(".calendly-overlay")?.remove();
+              window.open(
+                ETHICVOICE_CALENDLY_URL,
+                "_blank",
+                "noopener,noreferrer"
+              );
+            }
+          }, 2000);
+        } catch {
+          window.open(ETHICVOICE_CALENDLY_URL, "_blank", "noopener,noreferrer");
+        }
       } else {
         window.open(ETHICVOICE_CALENDLY_URL, "_blank", "noopener,noreferrer");
       }

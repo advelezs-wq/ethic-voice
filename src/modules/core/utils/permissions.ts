@@ -99,24 +99,9 @@ export async function getUserRole(
     });
 
     if (!membership) {
-      // First, verify the organization exists
-      const organization = await prisma.organization.findUnique({
-        where: { id: orgId },
-      });
-
-      if (!organization) {
-        console.error(`Organization ${orgId} does not exist`);
-        throw new Error(`Organization ${orgId} not found`);
-      }
-
-      // If no membership exists but org exists, create one as MEMBER by default
-      await prisma.organizationMembership.create({
-        data: {
-          userId,
-          orgId,
-          role: "MEMBER",
-        },
-      });
+      // Sin membresía: NO crear una automáticamente. Hacerlo degradaba de forma
+      // permanente a administradores cuando esta consulta corría con un contexto
+      // de organización transitorio o incorrecto (quedaban como MEMBER).
       return UserRole.ORG_MEMBER;
     }
 
@@ -149,7 +134,33 @@ export async function getUserRoleWithSuperAdmin(
     }
 
     // Get organization role
-    return await getUserRole(userId, orgId);
+    const role = await getUserRole(userId, orgId);
+
+    // Auto-reparación: si el usuario aparece como MEMBER pero fue invitado como
+    // ADMIN a esta organización, la invitación es la fuente de verdad y se
+    // restaura su rol (cubre membresías degradadas por el bug de auto-creación).
+    if (role === UserRole.ORG_MEMBER && userEmail) {
+      const adminInvite = await prisma.organizationInvitation.findFirst({
+        where: {
+          orgId,
+          email: { equals: userEmail, mode: "insensitive" },
+          role: "ADMIN",
+          status: { in: ["pending", "accepted"] },
+        },
+      });
+      if (adminInvite) {
+        await prisma.organizationMembership.updateMany({
+          where: { userId, orgId },
+          data: { role: "ADMIN" },
+        });
+        console.log(
+          `🔧 [ROLES] Rol ADMIN restaurado para ${userEmail} en org ${orgId} (respaldado por invitación)`
+        );
+        return UserRole.ORG_ADMIN;
+      }
+    }
+
+    return role;
   } catch (error) {
     console.error("Error getting user role with super admin check:", error);
     return UserRole.ORG_MEMBER;

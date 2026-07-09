@@ -33,8 +33,15 @@ export async function POST(req: NextRequest) {
       requirePasswordReset,
       inviteInstead,
     } = await req.json();
-    if (!email || !organizationName || !planType) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    const missing: string[] = [];
+    if (!email) missing.push("email");
+    if (!organizationName) missing.push("nombre de la organización");
+    if (!planType) missing.push("plan");
+    if (missing.length > 0) {
+      return NextResponse.json(
+        { error: `Faltan campos: ${missing.join(", ")}` },
+        { status: 400 }
+      );
     }
 
     const normalizedPlan = (planType as string).toUpperCase() as keyof typeof PlanType;
@@ -106,6 +113,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // A partir de aquí la organización ya existe: cualquier fallo posterior se
+    // acumula como advertencia y se responde success para no contradecir al usuario.
+    const warnings: string[] = [];
+
     // 3) Add user as ADMIN member if user exists in Clerk, else send invite via Resend
     if (targetUser?.id) {
       await prisma.organizationMembership.upsert({
@@ -127,15 +138,22 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      const base = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || "";
-      const acceptUrl = `${base}/api/organization/invitations/accept?token=${encodeURIComponent(token)}`;
-      await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || "noreply@ethicvoice.co",
-        to: email,
-        subject: `Invitación a ${organizationName} en EthicVoice`,
-        html: `<div style="text-align:center;margin-bottom:16px;"><img src="${base}/brand/logo-nobg.png" alt="EthicVoice" width="120"/></div><p>Has sido invitado(a) a unirte como Administrador a ${organizationName}.</p><p><a href="${acceptUrl}" style="background:#111827;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;">Aceptar invitación</a></p>`,
-      });
+      try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const base = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || "";
+        const acceptUrl = `${base}/api/organization/invitations/accept?token=${encodeURIComponent(token)}`;
+        await resend.emails.send({
+          from: process.env.RESEND_FROM_EMAIL || "noreply@ethicvoice.co",
+          to: email,
+          subject: `Invitación a ${organizationName} en EthicVoice`,
+          html: `<div style="text-align:center;margin-bottom:16px;"><img src="${base}/brand/logo-nobg.png" alt="EthicVoice" width="120"/></div><p>Has sido invitado(a) a unirte como Administrador a ${organizationName}.</p><p><a href="${acceptUrl}" style="background:#111827;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;">Aceptar invitación</a></p>`,
+        });
+      } catch (e) {
+        console.error("⚠️ [SUPERADMIN] Invitation email failed:", e);
+        warnings.push(
+          "La organización se creó pero el correo de invitación no pudo enviarse. Reenvíalo desde la gestión de la organización."
+        );
+      }
     }
 
     // 3b) Ensure super admin (creator) is member/admin of the new org (DB only)
@@ -181,7 +199,9 @@ export async function POST(req: NextRequest) {
 
     // 6) Create ACTIVE subscription in DB (manual payment handled outside)
     const monthlyPrice = Number(planConfig.price?.monthly || 0);
-    const subscription = await prisma.subscription.create({
+    let subscription: { id: number } | null = null;
+    try {
+      subscription = await prisma.subscription.create({
       data: {
         orgId: org.id,
         userId: targetUser?.id || null,
@@ -209,11 +229,17 @@ export async function POST(req: NextRequest) {
         maxEmployees: planConfig.features.maxEmployees,
         isTrialActive: false,
       },
-    });
+      });
+    } catch (e) {
+      console.error("⚠️ [SUPERADMIN] Subscription creation failed:", e);
+      warnings.push(
+        "La organización se creó pero la suscripción no pudo registrarse. Créala manualmente desde herramientas."
+      );
+    }
 
     // 6b) Backfill a paid transaction for manual subscription so billing shows real amount
     try {
-      if (monthlyPrice > 0) {
+      if (subscription && monthlyPrice > 0) {
         await prisma.paymentTransaction.create({
           data: {
             orgId: org.id,
@@ -255,21 +281,32 @@ export async function POST(req: NextRequest) {
     } catch {}
 
     // 7) Initialize org settings
-    await prisma.organizationSettings.upsert({
-      where: { organizationId: org.id },
-      update: {},
-      create: {
-        organizationId: org.id,
-        theme: "default",
-        primaryColor: "#0066CC",
-        secondaryColor: "#4A90E2",
-        accentColor: "#E3F2FD",
-        backgroundColor: "#F8FAFC",
-        isActive: true,
-      },
-    });
+    try {
+      await prisma.organizationSettings.upsert({
+        where: { organizationId: org.id },
+        update: {},
+        create: {
+          organizationId: org.id,
+          theme: "default",
+          primaryColor: "#0066CC",
+          secondaryColor: "#4A90E2",
+          accentColor: "#E3F2FD",
+          backgroundColor: "#F8FAFC",
+          isActive: true,
+        },
+      });
+    } catch (e) {
+      console.error("⚠️ [SUPERADMIN] Org settings init failed:", e);
+      warnings.push("La configuración inicial de la organización no pudo crearse.");
+    }
 
-    return NextResponse.json({ success: true, organizationId: org.id, subscriptionId: subscription.id, tempPassword: createdTempPassword });
+    return NextResponse.json({
+      success: true,
+      organizationId: org.id,
+      subscriptionId: subscription?.id ?? null,
+      tempPassword: createdTempPassword,
+      warnings: warnings.length > 0 ? warnings : undefined,
+    });
   } catch (error) {
     // Try to surface Clerk backend error details
     const anyErr = error as any;

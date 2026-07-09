@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
+  Input,
   Modal,
   ModalBody,
   ModalContent,
@@ -19,6 +20,8 @@ interface ConfirmActionModalProps {
   confirmLabel: string;
   isLoading?: boolean;
   riskLevel?: RiskLevel;
+  /** Si se define, el usuario debe escribir este texto exacto para habilitar la confirmación */
+  requireMatchText?: string;
   onClose: () => void;
   onConfirm: () => void;
 }
@@ -36,16 +39,25 @@ export function ConfirmActionModal({
   confirmLabel,
   isLoading = false,
   riskLevel = "medium",
+  requireMatchText,
   onClose,
   onConfirm,
 }: ConfirmActionModalProps) {
   const style = riskStyles[riskLevel];
+  const [typedText, setTypedText] = useState("");
+  const confirmBlocked = Boolean(
+    requireMatchText && typedText.trim() !== requireMatchText.trim()
+  );
+
+  useEffect(() => {
+    if (!isOpen) setTypedText("");
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Enter" && !isLoading) {
+      if (event.key === "Enter" && !isLoading && !confirmBlocked) {
         event.preventDefault();
         onConfirm();
         return;
@@ -61,7 +73,7 @@ export function ConfirmActionModal({
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [isOpen, isLoading, onClose, onConfirm]);
+  }, [isOpen, isLoading, confirmBlocked, onClose, onConfirm]);
 
   return (
     <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()} placement="center">
@@ -72,12 +84,32 @@ export function ConfirmActionModal({
         </ModalHeader>
         <ModalBody>
           <p className="text-sm text-default-700">{description}</p>
+          {requireMatchText && (
+            <div className="space-y-1">
+              <p className="text-xs text-default-500">
+                Escribe <span className="font-semibold">{requireMatchText}</span> para
+                confirmar:
+              </p>
+              <Input
+                size="sm"
+                value={typedText}
+                onValueChange={setTypedText}
+                placeholder={requireMatchText}
+                autoFocus
+              />
+            </div>
+          )}
         </ModalBody>
         <ModalFooter>
           <Button variant="light" onPress={onClose} isDisabled={isLoading}>
             Cancelar
           </Button>
-          <Button color={style.confirmColor} onPress={onConfirm} isLoading={isLoading}>
+          <Button
+            color={style.confirmColor}
+            onPress={onConfirm}
+            isLoading={isLoading}
+            isDisabled={confirmBlocked}
+          >
             {confirmLabel}
           </Button>
         </ModalFooter>

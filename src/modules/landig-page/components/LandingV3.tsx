@@ -546,12 +546,34 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
                   placement: "hero",
                 })
               }
-              className="inline-flex w-full min-w-0 shrink-0 items-center justify-center rounded-full border border-white/15 px-6 py-3.5 text-sm font-semibold leading-snug transition hover:border-white/30 sm:w-auto sm:px-8 sm:text-[0.9375rem] md:px-9 md:py-4 md:text-base"
-              style={{ color: "rgba(255,255,255,0.72)" }}
+              className="inline-flex w-full min-w-0 shrink-0 items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-bold leading-snug text-[#0b1620] shadow-[0_4px_14px_rgba(255,255,255,0.25)] transition hover:bg-emerald-50 sm:w-auto sm:px-8 sm:text-[0.9375rem] md:px-9 md:py-4 md:text-base"
             >
+              <i
+                className="icon-[lucide--megaphone] h-4 w-4 shrink-0 sm:h-[1.05rem] sm:w-[1.05rem]"
+                aria-hidden
+              />
               Denunciar ahora
             </Link>
           </div>
+
+          {/* Seguimiento de denuncia existente — visible bajo los CTAs */}
+          <Link
+            href="/track"
+            onClick={() =>
+              trackGA4Event("landing_cta_click", {
+                cta_name: "hero_track",
+                placement: "hero",
+              })
+            }
+            className="mt-5 inline-flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-300/10 px-5 py-2.5 text-sm font-semibold text-emerald-200 transition hover:border-emerald-300/70 hover:bg-emerald-300/20 sm:mt-6"
+          >
+            <i className="icon-[lucide--search] h-4 w-4 shrink-0" aria-hidden />
+            ¿Ya denunciaste? Haz seguimiento con tu código
+            <i
+              className="icon-[lucide--arrow-right] h-4 w-4 shrink-0"
+              aria-hidden
+            />
+          </Link>
 
           {/* Social proof badges */}
           <div className="mt-7 flex w-full max-w-md flex-wrap items-center justify-center gap-2 sm:mt-9 sm:max-w-none sm:gap-3 md:mt-10">

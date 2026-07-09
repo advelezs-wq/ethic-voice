@@ -80,6 +80,21 @@ export function Step3Questions() {
     );
   }
 
+  // Estilos con contraste alto: cada opción es una tarjeta con borde visible
+  // que se resalta en verde al seleccionarse.
+  const checkboxCardClassNames = {
+    base: "m-0 w-full max-w-full items-center rounded-lg border-2 border-slate-300 bg-white px-3 py-2 transition-colors hover:border-emerald-500 data-[selected=true]:border-emerald-600 data-[selected=true]:bg-emerald-50",
+    wrapper: "before:border-2 before:border-slate-400 after:bg-emerald-600",
+    label: "text-sm text-[#273c46]",
+  } as const;
+
+  const radioCardClassNames = {
+    base: "m-0 w-full max-w-full rounded-lg border-2 border-slate-300 bg-white px-3 py-2 transition-colors hover:border-emerald-500 data-[selected=true]:border-emerald-600 data-[selected=true]:bg-emerald-50",
+    wrapper: "border-2 border-slate-400 group-data-[selected=true]:border-emerald-600",
+    control: "bg-emerald-600",
+    label: "text-sm text-[#273c46]",
+  } as const;
+
   return (
     <div className="space-y-8">
       <p className="text-[#273c46]">
@@ -102,6 +117,7 @@ export function Step3Questions() {
                 <Checkbox
                   isSelected={!!field.value}
                   onValueChange={field.onChange}
+                  classNames={checkboxCardClassNames}
                 >
                   {option}
                 </Checkbox>
@@ -131,6 +147,7 @@ export function Step3Questions() {
                 <Checkbox
                   isSelected={!!field.value}
                   onValueChange={field.onChange}
+                  classNames={checkboxCardClassNames}
                 >
                   {option}
                 </Checkbox>
@@ -156,13 +173,13 @@ export function Step3Questions() {
             control={control}
             render={({ field, fieldState }) => (
               <div>
-                <RadioGroup 
+                <RadioGroup
                   onValueChange={field.onChange}
                   value={field.value}
                   isInvalid={!!fieldState.error}
                 >
                   {WHERE_OPTIONS.map((option) => (
-                    <Radio key={option} value={option}>
+                    <Radio key={option} value={option} classNames={radioCardClassNames}>
                       {option}
                     </Radio>
                   ))}
@@ -186,13 +203,13 @@ export function Step3Questions() {
             control={control}
             render={({ field, fieldState }) => (
               <div>
-                <RadioGroup 
+                <RadioGroup
                   onValueChange={field.onChange}
                   value={field.value}
                   isInvalid={!!fieldState.error}
                 >
                   {WHEN_OPTIONS.map((option) => (
-                    <Radio key={option} value={option}>
+                    <Radio key={option} value={option} classNames={radioCardClassNames}>
                       {option}
                     </Radio>
                   ))}
@@ -218,9 +235,9 @@ export function Step3Questions() {
           control={control}
           render={({ field }) => (
             <RadioGroup onValueChange={field.onChange}>
-              <Radio value="yes">Sí</Radio>
-              <Radio value="no">No</Radio>
-              <Radio value="unknown">No estoy seguro/a</Radio>
+              <Radio value="yes" classNames={radioCardClassNames}>Sí</Radio>
+              <Radio value="no" classNames={radioCardClassNames}>No</Radio>
+              <Radio value="unknown" classNames={radioCardClassNames}>No estoy seguro/a</Radio>
             </RadioGroup>
           )}
         />

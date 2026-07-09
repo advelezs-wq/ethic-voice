@@ -212,6 +212,88 @@ export async function GET() {
         error instanceof Error ? error.message : "Unknown error";
     }
 
+    // 3b. Auto-aceptar invitaciones pendientes por email: un usuario invitado
+    // que inicia sesión directamente (sin usar el enlace de la invitación)
+    // debe obtener su membresía en lugar de caer al onboarding de planes.
+    try {
+      const userEmail = debugData.adminStatus.email;
+      if (!debugData.syncStatus.databaseHasOrgs && userEmail) {
+        const pendingInvites = await prisma.organizationInvitation.findMany({
+          where: {
+            email: { equals: userEmail, mode: "insensitive" },
+            status: "pending",
+            OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+          },
+        });
+
+        for (const invite of pendingInvites) {
+          await prisma.user.upsert({
+            where: { id: userId },
+            update: {},
+            create: { id: userId, email: userEmail },
+          });
+          const membership = await prisma.organizationMembership.upsert({
+            where: { userId_orgId: { userId, orgId: invite.orgId } },
+            update: { role: invite.role },
+            create: { userId, orgId: invite.orgId, role: invite.role },
+          });
+
+          try {
+            let defaultDept = await prisma.department.findFirst({
+              where: { orgId: invite.orgId, isDefault: true },
+            });
+            if (!defaultDept) {
+              defaultDept = await prisma.department.upsert({
+                where: { orgId_slug: { orgId: invite.orgId, slug: "general" } },
+                update: { isDefault: true },
+                create: {
+                  orgId: invite.orgId,
+                  name: "General",
+                  slug: "general",
+                  isDefault: true,
+                },
+              });
+            }
+            if (!membership.departmentId) {
+              await prisma.organizationMembership.update({
+                where: { id: membership.id },
+                data: { departmentId: defaultDept.id },
+              });
+            }
+          } catch {}
+
+          await prisma.organizationInvitation.update({
+            where: { id: invite.id },
+            data: { status: "accepted" },
+          });
+
+          const org = await prisma.organization.findUnique({
+            where: { id: invite.orgId },
+          });
+          if (org) {
+            debugData.databaseOrganizations.push({
+              id: org.id,
+              name: org.name,
+              slug: org.slug,
+              role: invite.role,
+              joinedAt: new Date(),
+            });
+          }
+          console.log(
+            `✅ [ORG-STATUS] Invitación pendiente auto-aceptada para ${userEmail} en org ${invite.orgId}`
+          );
+        }
+
+        if (pendingInvites.length > 0) {
+          debugData.syncStatus.databaseUserExists = true;
+          debugData.syncStatus.databaseHasOrgs =
+            debugData.databaseOrganizations.length > 0;
+        }
+      }
+    } catch (error) {
+      console.error("⚠️ [ORG-STATUS] Auto-accept invitation failed:", error);
+    }
+
     // 4. Check subscriptions
     try {
       const subscriptions = await prisma.subscription.findMany({

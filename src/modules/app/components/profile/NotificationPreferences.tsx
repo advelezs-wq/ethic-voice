@@ -7,6 +7,7 @@ import { useNotificationSettings } from '@/modules/app/hooks/useNotificationSett
 import { UpdateNotificationSettingsData } from '@/actions/notification-settings.actions';
 import { useUserRole } from '@/modules/core/hooks/useUserRole';
 import { UserRole } from '@/types/auth.types';
+import { showError, showSuccess } from '@/modules/core/utils/safe-toast';
 
 export function NotificationPreferences() {
   const { settings, isLoading, isUpdating, error, updateSettings } = useNotificationSettings();
@@ -114,8 +115,16 @@ export function NotificationPreferences() {
     try {
       await updateSettings(localSettings);
       setHasChanges(false);
+      showSuccess('Preferencias guardadas', 'Tus preferencias de notificaciones se actualizaron correctamente.');
     } catch (error) {
       console.error('Error saving settings:', error);
+      const msg =
+        error instanceof Error && error.name === 'TimeoutError'
+          ? 'El servidor tardó demasiado en responder. Intenta nuevamente.'
+          : error instanceof Error
+            ? error.message
+            : 'No se pudieron guardar los cambios.';
+      showError('Error al guardar', msg);
     }
   };
 

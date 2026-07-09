@@ -46,6 +46,10 @@ export function Step4Evidence() {
               isSelected={field.value}
               onValueChange={field.onChange}
               isInvalid={!!fieldState.error}
+              classNames={{
+                wrapper:
+                  "before:border-2 before:border-slate-400 after:bg-emerald-600",
+              }}
             >
               <span className="text-sm leading-relaxed text-[#0d212c]">
                 Declaro que la información proporcionada es verídica y autorizo

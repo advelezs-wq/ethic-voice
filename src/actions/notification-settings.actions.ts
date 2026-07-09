@@ -37,6 +37,9 @@ export interface UpdateNotificationSettingsData {
   digestTime?: string;
 }
 
+// Evita spinners infinitos si el servidor no responde
+const REQUEST_TIMEOUT_MS = 15000;
+
 export async function getNotificationSettings(): Promise<NotificationSettings | null> {
   try {
     const response = await fetch('/api/notifications/settings', {
@@ -44,6 +47,7 @@ export async function getNotificationSettings(): Promise<NotificationSettings | 
       headers: {
         'Content-Type': 'application/json',
       },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -68,10 +72,11 @@ export async function updateNotificationSettings(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(settingsData),
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({} as { error?: string }));
       throw new Error(errorData.error || 'Failed to update notification settings');
     }
 

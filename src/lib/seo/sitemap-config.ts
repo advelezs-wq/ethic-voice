@@ -34,9 +34,3 @@ export function getMainSiteBaseUrl() {
     "",
   );
 }
-
-export function getBlogSiteBaseUrl() {
-  return (
-    process.env.NEXT_PUBLIC_BLOG_BASE_URL || "https://blog.ethicvoice.co"
-  ).replace(/\/$/, "");
-}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { trackGA4Event } from "@/lib/google-analytics";
 import {
   EbookLeadCaptcha,
@@ -34,6 +35,7 @@ type Props = {
 };
 
 export function EbookDownloadLeadModal({ open, onClose, pdfUrl, utm }: Props) {
+  const router = useRouter();
   const titleId = useId();
   const captchaRef = useRef<EbookLeadCaptchaHandle>(null);
   const [fullName, setFullName] = useState("");
@@ -132,13 +134,15 @@ export function EbookDownloadLeadModal({ open, onClose, pdfUrl, utm }: Props) {
           placement: "ebook_download_modal",
         });
         setStatus("success");
+        // Thank-you page para medir la conversión (descarga + visitas)
+        router.push("/guia-canal-denuncias/gracias");
       } catch {
         setErrorMsg("Error de red. Revisa tu conexión e inténtalo de nuevo.");
         setStatus("error");
         captchaRef.current?.reset();
       }
     },
-    [company, email, fullName, hcaptchaToken, phone, role, utm]
+    [company, email, fullName, hcaptchaToken, phone, role, utm, router]
   );
 
   if (!open) return null;

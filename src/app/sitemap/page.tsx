@@ -2,15 +2,13 @@ import Link from "next/link";
 import prisma from "@/modules/prisma/lib/prisma";
 import { BlogPostStatus } from "@prisma/client";
 import {
-  getBlogSiteBaseUrl,
   getMainSiteBaseUrl,
   PUBLIC_STATIC_ROUTES,
 } from "@/lib/seo/sitemap-config";
 
 export const metadata = {
   title: "Sitemap | EthicVoice",
-  description:
-    "Mapa del sitio de EthicVoice con enlaces del dominio principal y del subdominio de blog.",
+  description: "Mapa del sitio de EthicVoice con enlaces del dominio principal y del blog.",
   alternates: {
     canonical: "/sitemap",
   },
@@ -18,7 +16,6 @@ export const metadata = {
 
 export default async function SitemapPage() {
   const mainBase = getMainSiteBaseUrl();
-  const blogBase = getBlogSiteBaseUrl();
   const now = new Date();
 
   const posts = await prisma.blogPost.findMany({
@@ -89,31 +86,21 @@ export default async function SitemapPage() {
       </section>
 
       <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-        <h2 className="text-xl font-bold text-[#0d212c]">Subdominio de blog</h2>
+        <h2 className="text-xl font-bold text-[#0d212c]">Blog</h2>
         <p className="mt-2 text-sm text-slate-600">
-          Páginas publicadas en{" "}
-          <span className="font-semibold">{blogBase}</span>.
+          Posts publicados en{" "}
+          <span className="font-semibold">{mainBase}/blog</span>.
         </p>
         <ul className="mt-4 space-y-2">
-          <li>
-            <a
-              href={`${blogBase}/`}
-              className="text-sm text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {`${blogBase}/`}
-            </a>
-          </li>
           {posts.map((post) => (
             <li key={post.slug} className="flex flex-col gap-0.5">
               <a
-                href={`${blogBase}/${post.slug}`}
+                href={`${mainBase}/blog/${post.slug}`}
                 className="text-sm text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {`${blogBase}/${post.slug}`}
+                {`${mainBase}/blog/${post.slug}`}
               </a>
               <span className="text-xs text-slate-500">{post.title}</span>
             </li>

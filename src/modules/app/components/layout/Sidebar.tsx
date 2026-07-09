@@ -245,6 +245,17 @@ export const Sidebar: React.FC = () => {
         {
           icon: (
             <i
+              className="icon-[lucide--download] size-5"
+              role="img"
+              aria-hidden="true"
+            />
+          ),
+          text: "Recursos descargables",
+          to: "/app/superadmin/lead-magnets",
+        },
+        {
+          icon: (
+            <i
               className="icon-[lucide--user-plus] size-5"
               role="img"
               aria-hidden="true"

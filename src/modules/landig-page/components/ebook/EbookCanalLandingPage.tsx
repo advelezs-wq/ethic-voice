@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { trackGA4Event } from "@/lib/google-analytics";
 import { cn } from "@heroui/react";
 import { EbookDownloadLeadModal } from "@/modules/landig-page/components/ebook/EbookDownloadLeadModal";
@@ -480,6 +481,7 @@ type Props = {
 };
 
 export function EbookCanalLandingPage({ utm }: Props) {
+  const router = useRouter();
   const leadCaptchaRef = useRef<EbookLeadCaptchaHandle>(null);
   const [downloadModalOpen, setDownloadModalOpen] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -541,13 +543,15 @@ export function EbookCanalLandingPage({ utm }: Props) {
           placement: "ebook_landing",
         });
         setLeadStatus("success");
+        // Thank-you page para medir la conversión (descarga + visitas)
+        router.push("/guia-canal-denuncias/gracias");
       } catch {
         setLeadErrorMsg("Error de red. Revisa tu conexión e inténtalo de nuevo.");
         setLeadStatus("error");
         leadCaptchaRef.current?.reset();
       }
     },
-    [company, email, fullName, hcaptchaToken, phone, role, utm]
+    [company, email, fullName, hcaptchaToken, phone, role, utm, router]
   );
 
   return (

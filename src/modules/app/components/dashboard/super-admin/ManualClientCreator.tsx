@@ -64,6 +64,34 @@ export default function ManualClientCreator() {
   };
 
   const handleCreate = async () => {
+    // Validación previa con mensajes específicos para evitar 400 "Missing fields"
+    const trimmedEmail = email.trim();
+    const trimmedOrgName = orgName.trim();
+    if (!trimmedOrgName) {
+      addToast({
+        title: "Falta el nombre de la organización",
+        description: "Escribe el nombre de la organización del cliente.",
+        color: "danger",
+      });
+      return;
+    }
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      addToast({
+        title: "Email inválido",
+        description: "Escribe un correo válido para el cliente.",
+        color: "danger",
+      });
+      return;
+    }
+    if (!plan) {
+      addToast({
+        title: "Falta el plan",
+        description: "Selecciona un plan para la organización.",
+        color: "danger",
+      });
+      return;
+    }
+
     setSaving(true);
     setResultUrl(null);
     try {
@@ -71,9 +99,9 @@ export default function ManualClientCreator() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
-          name,
-          organizationName: orgName,
+          email: trimmedEmail,
+          name: name.trim(),
+          organizationName: trimmedOrgName,
           planType: plan,
           inviteInstead: true,
         }),
@@ -88,11 +116,19 @@ export default function ManualClientCreator() {
       setResultUrl(`/app`);
       setTempPassword(data.tempPassword || null);
 
-      addToast({
-        title: "Cliente creado",
-        description: "Se creó el cliente y su organización correctamente",
-        color: "success",
-      });
+      if (Array.isArray(data.warnings) && data.warnings.length > 0) {
+        addToast({
+          title: "Cliente creado con advertencias",
+          description: data.warnings.join(" "),
+          color: "warning",
+        });
+      } else {
+        addToast({
+          title: "Cliente creado",
+          description: "Se creó el cliente y su organización correctamente",
+          color: "success",
+        });
+      }
     } catch (err) {
       const msg = (err as Error).message || "Error desconocido";
       addToast({
@@ -112,7 +148,7 @@ export default function ManualClientCreator() {
           Crear cliente manualmente
         </h2>
         <p className="mt-1 text-sm text-default-500">
-          Alta asistida de cliente, organizaci?n, plan y logo inicial.
+          Alta asistida de cliente, organización, plan y logo inicial.
         </p>
       </div>
       <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
@@ -128,13 +164,13 @@ export default function ManualClientCreator() {
             onChange={(e) => setEmail(e.target.value)}
           />
           <Input
-            label="Nombre de la organizaci?n"
+            label="Nombre de la organización"
             value={orgName}
             onChange={(e) => setOrgName(e.target.value)}
           />
           <div className="space-y-2">
             <label className="text-sm text-default-700">
-              Logo de la organizaci?n (opcional)
+              Logo de la organización (opcional)
             </label>
             <input
               type="file"
@@ -147,7 +183,7 @@ export default function ManualClientCreator() {
                 }
                 if (!file.type.startsWith("image/")) {
                   addToast({
-                    title: "Archivo no v?lido",
+                    title: "Archivo no válido",
                     description:
                       "Selecciona un archivo de imagen (PNG, JPG, JPEG, SVG, GIF)",
                     color: "danger",
@@ -168,16 +204,18 @@ export default function ManualClientCreator() {
               }}
             />
             <p className="text-xs text-default-500">
-              Formatos: PNG, JPG, JPEG, SVG o GIF. M?x. 5MB.
+              Formatos: PNG, JPG, JPEG, SVG o GIF. Máx. 5MB.
             </p>
           </div>
-          {/* Invitaci?n por email: el usuario definir? su contrase?a al aceptar */}
+          {/* Invitación por email: el usuario definirá su contraseña al aceptar */}
           <Select
             label="Plan"
-            selectedKeys={new Set([plan])}
-            onSelectionChange={(keys) =>
-              setPlan(Array.from(keys)[0] as PlanType)
-            }
+            selectedKeys={plan ? new Set([plan]) : new Set([])}
+            disallowEmptySelection
+            onSelectionChange={(keys) => {
+              const next = Array.from(keys)[0] as PlanType | undefined;
+              if (next) setPlan(next);
+            }}
           >
             {planOptions.map((p) => (
               <SelectItem key={p}>{PLAN_CONFIGS[p].displayName}</SelectItem>
@@ -198,13 +236,13 @@ export default function ManualClientCreator() {
               <div>
                 Cliente creado.{" "}
                 <a className="underline" href={resultUrl}>
-                  Ir a la organizaci?n
+                  Ir a la organización
                 </a>
               </div>
               {createdOrgId && (
                 <div className="space-y-3">
                   <p className="text-default-700">
-                    Sube el logo ahora usando el mismo componente de configuraci?n:
+                    Sube el logo ahora usando el mismo componente de configuración:
                   </p>
                   <OrganizationLogoDropzone
                     organizationId={createdOrgId}
@@ -212,7 +250,7 @@ export default function ManualClientCreator() {
                     onLogoUpdated={() => {
                       addToast({
                         title: "Logo actualizado",
-                        description: "El logo se actualiz? correctamente",
+                        description: "El logo se actualizó correctamente",
                         color: "success",
                       });
                     }}

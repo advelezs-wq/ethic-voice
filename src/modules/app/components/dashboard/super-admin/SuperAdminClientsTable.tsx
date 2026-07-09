@@ -25,11 +25,18 @@ interface PendingSubscriptionAction {
   orgName: string;
 }
 
+interface PendingDelete {
+  orgId: string;
+  orgName: string;
+}
+
 export default function SuperAdminClientsTable() {
   const [rows, setRows] = useState<OrgRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [pendingAction, setPendingAction] = useState<PendingSubscriptionAction | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [scope, setScope] = useState<"all" | "org">("all");
   const [selectedOrganizationName, setSelectedOrganizationName] = useState<string | null>(null);
 
@@ -81,6 +88,30 @@ export default function SuperAdminClientsTable() {
     } finally {
       setPendingAction(null);
       setActionLoading(null);
+    }
+  };
+
+  const runDelete = async (target: PendingDelete) => {
+    try {
+      setDeleteLoading(true);
+      const res = await fetch(`/api/superadmin/organizations/${target.orgId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmName: target.orgName }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        showError("No se pudo eliminar", data.error || "Intenta nuevamente.");
+        return;
+      }
+      showSuccess(
+        "Organización eliminada",
+        `${target.orgName} y todos sus datos fueron eliminados.`
+      );
+      await load();
+      setPendingDelete(null);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -223,6 +254,20 @@ export default function SuperAdminClientsTable() {
                           Cancelar
                         </Button>
                       </Tooltip>
+                      <Tooltip content="Eliminar organización y todos sus datos">
+                        <Button
+                          size="sm"
+                          color="danger"
+                          variant="light"
+                          onPress={() =>
+                            setPendingDelete({ orgId: r.id, orgName: r.name })
+                          }
+                          isDisabled={r.status === "ACTIVE"}
+                          startContent={<i className="icon-[lucide--trash-2] size-4" />}
+                        >
+                          Eliminar
+                        </Button>
+                      </Tooltip>
                     </div>
                   </td>
                 </tr>
@@ -267,6 +312,19 @@ export default function SuperAdminClientsTable() {
           isLoading={actionLoading === pendingAction.subscriptionId}
           onClose={() => setPendingAction(null)}
           onConfirm={() => runSubscriptionAction(pendingAction)}
+        />
+      )}
+      {pendingDelete && (
+        <ConfirmActionModal
+          isOpen={Boolean(pendingDelete)}
+          title="Eliminar organización"
+          description={`Vas a eliminar permanentemente ${pendingDelete.orgName} con todas sus denuncias, formularios, miembros y suscripciones. Esta acción no se puede deshacer.`}
+          confirmLabel="Eliminar definitivamente"
+          riskLevel="high"
+          requireMatchText={pendingDelete.orgName}
+          isLoading={deleteLoading}
+          onClose={() => setPendingDelete(null)}
+          onConfirm={() => runDelete(pendingDelete)}
         />
       )}
     </>

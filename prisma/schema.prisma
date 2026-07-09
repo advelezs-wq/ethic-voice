@@ -868,3 +868,31 @@ model EbookLead {
   @@index([email])
   @@index([campaign, createdAt])
 }
+
+/// Recursos descargables (lead magnets) administrables desde el Super Admin:
+/// ebooks, guías, checklists, plantillas, políticas, webinars, etc.
+/// Cada descarga registra un EbookLead con la campaña del recurso.
+model LeadMagnet {
+  id            String   @id @default(uuid())
+  /// URL personalizada: la landing pública vive en /recursos/[slug]
+  slug          String   @unique
+  title         String
+  description   String?  @db.Text
+  coverImageUrl String?
+  /// Archivo descargable (Cloudinary u otra URL pública)
+  fileUrl       String
+  /// Campaña con la que se registran los leads de este recurso
+  campaign      String
+  /// Configuración de campos del formulario: { phone, company, role } booleanos
+  formFields    Json?
+  ctaLabel      String?
+  isActive      Boolean  @default(true)
+  /// Métricas simples para medir la landing y su thank-you page
+  visits        Int      @default(0)
+  downloads     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([campaign])
+  @@index([isActive])
+}

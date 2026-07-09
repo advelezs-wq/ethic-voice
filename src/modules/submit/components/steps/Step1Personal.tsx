@@ -275,7 +275,16 @@ export function Step1Personal() {
                 orientation="horizontal"
               >
                 {YES_NO_OPTIONS.map((option) => (
-                  <Radio key={option.value} value={option.value}>
+                  <Radio
+                    key={option.value}
+                    value={option.value}
+                    classNames={{
+                      base: "m-0 rounded-lg border-2 border-slate-300 bg-white px-3 py-2 transition-colors hover:border-emerald-500 data-[selected=true]:border-emerald-600 data-[selected=true]:bg-emerald-50",
+                      wrapper:
+                        "border-2 border-slate-400 group-data-[selected=true]:border-emerald-600",
+                      control: "bg-emerald-600",
+                    }}
+                  >
                     {option.label}
                   </Radio>
                 ))}

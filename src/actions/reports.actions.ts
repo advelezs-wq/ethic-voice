@@ -2211,6 +2211,52 @@ export async function getClosedReports(
   };
 }
 
+/**
+ * Notifica al miembro asignado a una tarea. `assignedTo` guarda el nombre
+ * legible, así que se resuelve el userId buscando la membresía cuyo nombre
+ * completo coincide.
+ */
+async function notifyTaskAssignment(params: {
+  reportId: number;
+  orgId: string;
+  assignedToName: string;
+  assignedById: string;
+  taskTitle: string;
+}) {
+  const { reportId, orgId, assignedToName, assignedById, taskTitle } = params;
+  try {
+    const memberships = await prisma.organizationMembership.findMany({
+      where: { orgId },
+      include: { user: true },
+    });
+    const normalized = assignedToName.trim().toLowerCase();
+    const target = memberships.find((m) => {
+      const fullName = `${m.user?.firstName || ""} ${m.user?.lastName || ""}`
+        .trim()
+        .toLowerCase();
+      return fullName && fullName === normalized;
+    });
+    if (!target?.userId || target.userId === assignedById) return;
+
+    await notificationsService.createNotification({
+      userId: target.userId,
+      orgId,
+      type: "REPORT_ASSIGNED",
+      title: "Nueva tarea asignada",
+      message: `Se te asignó la tarea "${taskTitle}" en el reporte REP-${String(reportId).padStart(6, "0")}`,
+      actionUrl: `/app/reports/${reportId}?tab=tasks`,
+      reportId,
+      channel: "BOTH",
+      metadata: {
+        reportTitle: `REP-${String(reportId).padStart(6, "0")}`,
+        taskTitle,
+      },
+    });
+  } catch (e) {
+    console.error("No se pudo notificar la asignación de tarea:", e);
+  }
+}
+
 export async function createReportTask(
   reportId: number,
   data: {
@@ -2278,6 +2324,16 @@ export async function createReportTask(
       userName: user.fullName || "Unknown User",
     },
   });
+
+  if (data.assignedTo) {
+    await notifyTaskAssignment({
+      reportId,
+      orgId,
+      assignedToName: data.assignedTo,
+      assignedById: userId,
+      taskTitle: data.title,
+    });
+  }
 
   revalidatePath(`/app/reports/${reportId}`);
   return task;
@@ -2353,6 +2409,17 @@ export async function updateReportTask(
       userName: user.fullName || "Unknown User",
     },
   });
+
+  const newAssignee = data.assignedTo;
+  if (newAssignee && newAssignee !== existing.assignedTo) {
+    await notifyTaskAssignment({
+      reportId: existing.submissionId,
+      orgId,
+      assignedToName: newAssignee,
+      assignedById: userId,
+      taskTitle: data.title || existing.title,
+    });
+  }
 
   revalidatePath(`/app/reports/${existing.submissionId}`);
   return updated;

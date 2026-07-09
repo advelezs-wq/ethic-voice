@@ -13,6 +13,8 @@ export const productLinks = [
   { href: "/platform", label: "Plataforma" },
   { href: "/services", label: "Servicios" },
   { href: "/pricing", label: "Precios" },
+  { href: "/submit", label: "Denunciar" },
+  { href: "/track", label: "Seguir mi denuncia" },
 ] as const;
 
 export const companyLinks = [

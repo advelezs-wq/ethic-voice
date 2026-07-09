@@ -435,6 +435,12 @@ export function BlogPostForm({ mode, initialPost }: Props) {
 
             <div className="space-y-2">
               <p className="text-sm font-medium text-foreground">Portada</p>
+              <p className="text-xs text-default-500">
+                Recomendado: <strong>1600×900&nbsp;px</strong> (proporción 16:9,
+                mínimo 1200×675&nbsp;px). Formatos JPG, PNG, WebP o AVIF, máx.
+                8MB. La imagen se ajusta automáticamente en el blog: se recorta
+                al centro si la proporción es distinta.
+              </p>
               <div className="flex flex-wrap items-end gap-3">
                 {coverImageUrl ? (
                   <div className="relative h-28 w-44 overflow-hidden rounded-lg border border-default-200">

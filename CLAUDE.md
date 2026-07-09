@@ -53,6 +53,7 @@ Code lives in `src/modules/` organized by feature domain. Import via `@/modules/
 | `modules/app/lib/queue` | BullMQ queue manager + Redis config |
 | `modules/app/lib/ai` | Compliance AI processor (LangChain + OpenAI) |
 | `modules/app/services` | Business logic services (analytics, PDF, email, payments, subscriptions, notifications) |
+| `modules/blog` | Marketing blog components |
 | `modules/core` | Shared providers, hooks (`usePlanPermissions`, `useUserRole`), middleware, utils |
 | `modules/forms/builder` | Drag-and-drop form builder (DnD Kit) |
 | `modules/prisma/lib/prisma` | Prisma client singleton |
@@ -129,6 +130,14 @@ Local dev Redis via Docker (`docker compose up -d`). Production uses two Redis i
 
 - `0 5 * * *` → `/api/admin/daily-runner` (daily maintenance + SLA alerts)
 - `0 6 * * 1` → `/api/digest/weekly` (weekly email digest)
+
+### Testing
+
+There is no automated test suite (no Jest/Vitest configured). `bun run lint` and `bun run build` are the available correctness checks. A few scripts double as manual integration checks against a running dev server: `test:pricing` (runs `scripts/test-pricing-system.ts` directly), and `test:rebill` / `rebill:test` (hit local webhook/API endpoints via curl — requires `bun run dev` running).
+
+### Feature setup docs
+
+Several features have their own deep-dive setup doc at the repo root — check these before re-deriving how a subsystem is wired: `PRICING_SETUP_GUIDE.md` / `PRICING_QUICKSTART.md`, `REBILL_SETUP_GUIDE.md` / `REBILL_SUBSCRIPTION_SETUP.md` / `REBILL_IMPLEMENTATION_STATUS.md`, `QUEUE_SETUP.md`, `ANALYTICS_SETUP.md` / `GA4_SETUP.md` / `CLARITY_SETUP.md`, `NOTIFICATIONS_SETUP.md`, `DEMO_MODE_SETUP.md`, `MULTIMEDIA_ATTACHMENTS_SETUP.md`, `BOT_PROTECTION_SETUP.md`, `DIGEST_SETUP.md`, `ERROR_PAGES_SETUP.md`, and `ENVIRONMENT_SETUP.md`.
 
 ### Key conventions
 

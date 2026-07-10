@@ -43,10 +43,11 @@ export function FooterDemoCtaBand({
           Siguiente paso
         </p>
         <h2 className="mt-3 text-balance text-2xl font-extrabold tracking-tight text-[#0d212c] sm:text-3xl md:text-4xl">
-          Agenda tu demo personalizada
+          Protege tu empresa antes de que un caso se convierta en crisis
         </h2>
         <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-[#273c46] sm:mt-4 md:text-base">
-          Descubre cómo EthicVoice protege tu empresa.
+          En 30 minutos te mostramos la plataforma con casos de tu industria y
+          resolvemos tus dudas de implementación.
         </p>
         <button
           type="button"
@@ -56,9 +57,12 @@ export function FooterDemoCtaBand({
           }}
           className="mt-6 inline-flex w-full max-w-sm items-center justify-center gap-2 rounded-full bg-lime-400 px-6 py-3 text-sm font-bold uppercase tracking-wide text-[#052b24] shadow-[0_4px_20px_rgba(163,230,53,0.35)] transition-colors hover:bg-lime-500 sm:mt-8 sm:w-auto sm:max-w-none sm:px-8 sm:py-3.5"
         >
-          Solicitar demo
+          Agendar demo gratis
           <i className="icon-[lucide--arrow-right] h-4 w-4" aria-hidden />
         </button>
+        <p className="mt-4 text-xs text-slate-400">
+          Sin compromiso · Sin tarjeta de crédito · Acompañamiento en español
+        </p>
       </div>
     </div>
   );

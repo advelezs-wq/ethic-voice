@@ -245,7 +245,7 @@ const TESTIMONIALS = [
   },
 ] as const;
 
-const FAQS = [
+export const FAQS = [
   {
     q: "¿Quién está obligado a implementar un canal de denuncias?",
     a: "Depende de la legislación aplicable por país, tamaño y sector. EthicVoice facilita la implementación operativa, pero cada organización debe validar su obligación legal con su equipo jurídico.",
@@ -266,6 +266,40 @@ const FAQS = [
     q: "¿Incluye analítica para comité o compliance?",
     a: "Sí. Puedes revisar estado de casos, tiempos de atención, tipologías y tendencias para tomar decisiones con evidencia.",
   },
+  {
+    q: "¿Hay permanencia mínima o contratos forzosos?",
+    a: "No. Los planes funcionan por suscripción y puedes cambiar de plan o cancelar la renovación desde tu panel de facturación en cualquier momento.",
+  },
+  {
+    q: "¿Qué diferencia a EthicVoice de gestionar denuncias por correo interno?",
+    a: "El correo no garantiza anonimato, trazabilidad ni tiempos de respuesta. EthicVoice centraliza cada caso con historial auditable, comunicación confidencial con el denunciante, alertas de vencimiento y reportes ejecutivos para el comité.",
+  },
+] as const;
+
+const PAIN_POINTS = [
+  {
+    icon: "icon-[lucide--mail-x]",
+    title: "Casos que se pierden",
+    desc: "Correos sueltos y hojas de cálculo sin trazabilidad: denuncias sin respuesta, sin responsable asignado y sin evidencia del proceso.",
+  },
+  {
+    icon: "icon-[lucide--eye-off]",
+    title: "Colaboradores que callan",
+    desc: "Sin anonimato garantizado, la mayoría prefiere no reportar. Los problemas se conocen cuando ya son una crisis.",
+  },
+  {
+    icon: "icon-[lucide--scale]",
+    title: "Riesgo legal y reputacional",
+    desc: "Sanciones, litigios y daño de marca por no atender denuncias a tiempo ni poder demostrar debida diligencia.",
+  },
+] as const;
+
+const COMPARISON_ROWS = [
+  "Anonimato real garantizado",
+  "Trazabilidad y auditoría completa de cada caso",
+  "Comunicación bidireccional confidencial",
+  "Alertas de vencimiento y control de SLA",
+  "Reportes ejecutivos para el comité de ética",
 ] as const;
 
 const PLAN_ORDER = [
@@ -468,7 +502,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
         >
           <defs>
             <radialGradient id="heroGlowV3" cx="50%" cy="40%" r="70%">
-              <stop offset="0%" stopColor="rgba(129,140,248,0.26)" />
+              <stop offset="0%" stopColor="rgba(163,230,53,0.20)" />
               <stop offset="45%" stopColor="rgba(45,212,191,0.12)" />
               <stop offset="100%" stopColor="rgba(255,255,255,0)" />
             </radialGradient>
@@ -507,8 +541,9 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
           </h1>
 
           <p className="mx-auto mt-5 max-w-[min(100%,32rem)] text-pretty text-sm font-normal leading-relaxed text-white/60 sm:mt-7 sm:max-w-xl sm:text-base sm:leading-[1.65] md:mt-8 md:max-w-2xl md:text-lg md:leading-[1.7]">
-            Cumplimiento proactivo sin fricciones. Tu equipo de compliance al
-            centro con datos claros y decisiones más rápidas.
+            Canal de denuncias seguro, anónimo y auditable. Actívalo en días,
+            centraliza cada caso y demuestra debida diligencia ante tu comité —
+            sin fricción para tu equipo ni para quien denuncia.
           </p>
 
           {/* CTAs — full width on phone; horizontal from sm; allow wrap on md if needed */}
@@ -522,10 +557,9 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
                 });
                 openCalendly(e);
               }}
-              className="inline-flex w-full min-w-0 shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3.5 text-xs font-bold uppercase tracking-[0.12em] transition hover:opacity-90 sm:w-auto sm:px-8 sm:text-sm sm:tracking-wide md:px-9 md:py-4 md:text-[0.9375rem]"
-              style={{ background: "#b9cc8a", color: "#0b1620" }}
+              className="inline-flex w-full min-w-0 shrink-0 items-center justify-center gap-2 rounded-full bg-lime-400 px-6 py-3.5 text-xs font-bold uppercase tracking-[0.12em] text-[#052b24] shadow-[0_8px_28px_rgba(163,230,53,0.38)] transition hover:bg-lime-300 sm:w-auto sm:px-8 sm:text-sm sm:tracking-wide md:px-9 md:py-4 md:text-[0.9375rem]"
             >
-              Agendar demo
+              Agendar demo gratis
               <i
                 className="icon-[lucide--arrow-right] h-4 w-4 shrink-0 sm:h-[1.05rem] sm:w-[1.05rem]"
                 aria-hidden
@@ -556,6 +590,11 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
             </Link>
           </div>
 
+          {/* Microcopy de confianza — reduce fricción del CTA principal */}
+          <p className="mt-4 text-pretty text-xs font-medium text-white/45 sm:text-[13px]">
+            Demo de 30 minutos · Sin compromiso · Acompañamiento en español
+          </p>
+
           {/* Seguimiento de denuncia existente — visible bajo los CTAs */}
           <Link
             href="/track"
@@ -579,8 +618,7 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
           <div className="mt-7 flex w-full max-w-md flex-wrap items-center justify-center gap-2 sm:mt-9 sm:max-w-none sm:gap-3 md:mt-10">
             <div className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 sm:px-3.5 md:py-2">
               <i
-                className="icon-[lucide--shield-check] h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4"
-                style={{ color: "#b9cc8a" }}
+                className="icon-[lucide--shield-check] h-3.5 w-3.5 shrink-0 text-lime-300 sm:h-4 sm:w-4"
                 aria-hidden
               />
               <span className="text-pretty text-[11px] font-medium leading-tight text-white/65 sm:text-xs md:text-[13px]">
@@ -589,12 +627,20 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
             </div>
             <div className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 sm:px-3.5 md:py-2">
               <i
-                className="icon-[lucide--zap] h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4"
-                style={{ color: "#b9cc8a" }}
+                className="icon-[lucide--zap] h-3.5 w-3.5 shrink-0 text-lime-300 sm:h-4 sm:w-4"
                 aria-hidden
               />
               <span className="text-pretty text-[11px] font-medium leading-tight text-white/65 sm:text-xs md:text-[13px]">
                 Implementación en días
+              </span>
+            </div>
+            <div className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 sm:px-3.5 md:py-2">
+              <i
+                className="icon-[lucide--lock-keyhole] h-3.5 w-3.5 shrink-0 text-lime-300 sm:h-4 sm:w-4"
+                aria-hidden
+              />
+              <span className="text-pretty text-[11px] font-medium leading-tight text-white/65 sm:text-xs md:text-[13px]">
+                Trazabilidad auditable
               </span>
             </div>
           </div>
@@ -639,8 +685,8 @@ function HeroDemoVideoStrip() {
             Así se ve EthicVoice en el día a día de compliance
           </h2>
           <p className="mt-2 text-pretty text-sm leading-relaxed text-white/55 sm:mt-2.5 sm:text-[0.9375rem]">
-            Transparencia ante tu equipo: mismo tono visual que el panel real,
-            sin promesas vacías.
+            Mira cómo un caso entra, se investiga y se cierra dentro de la
+            plataforma: el mismo panel que usará tu equipo desde el día uno.
           </p>
         </div>
         <VideoModal
@@ -774,6 +820,155 @@ function LogoProofSection() {
             ))}
           </motion.div>
         )}
+      </div>
+    </motion.section>
+  );
+}
+
+export function PainComparisonSection() {
+  const { openCalendly } = useCalendlyGate();
+  const reveal = useInViewReveal();
+  return (
+    <motion.section
+      className="scroll-mt-24 bg-white py-16 sm:py-20 md:py-24"
+      id="problema"
+      {...reveal}
+    >
+      <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-10 text-center sm:mb-12">
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest text-rose-600">
+            El costo de no actuar
+          </p>
+          <h2 className="mx-auto max-w-3xl text-balance text-3xl font-extrabold leading-tight tracking-tight text-[#0d212c] sm:text-4xl md:text-5xl">
+            Gestionar denuncias por correo te está costando más de lo que crees
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl px-1 text-base leading-relaxed text-slate-500 sm:text-lg">
+            Cuando no existe un canal formal, los casos no desaparecen: se
+            acumulan en silencio hasta convertirse en pérdidas.
+          </p>
+        </div>
+
+        {/* Pain cards */}
+        <div className="grid gap-4 sm:grid-cols-3">
+          {PAIN_POINTS.map((pain) => (
+            <article
+              key={pain.title}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6"
+            >
+              <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-rose-50">
+                <i
+                  className={`${pain.icon} h-5 w-5 text-rose-600`}
+                  aria-hidden
+                />
+              </div>
+              <h3 className="mb-2 text-base font-bold text-[#0d212c]">
+                {pain.title}
+              </h3>
+              <p className="text-sm leading-relaxed text-slate-500">
+                {pain.desc}
+              </p>
+            </article>
+          ))}
+        </div>
+
+        {/* Industry stats */}
+        <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8">
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 sm:w-auto">
+              <span className="text-2xl font-black text-[#0d212c] sm:text-3xl">
+                ~5%
+              </span>
+              <span className="text-pretty text-sm leading-snug text-slate-500">
+                de los ingresos anuales se pierden por fraude en las
+                organizaciones
+              </span>
+            </div>
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 sm:w-auto">
+              <span className="text-2xl font-black text-[#0d212c] sm:text-3xl">
+                43%
+              </span>
+              <span className="text-pretty text-sm leading-snug text-slate-500">
+                de los fraudes se detecta gracias a una denuncia interna
+              </span>
+            </div>
+          </div>
+          <p className="text-xs text-slate-400">
+            Fuente: ACFE, Report to the Nations.
+          </p>
+        </div>
+
+        {/* Comparison split card */}
+        <div className="mt-10 grid overflow-hidden rounded-3xl border border-slate-200 shadow-[0_20px_60px_rgba(13,33,44,0.08)] md:grid-cols-2">
+          {/* Sin canal */}
+          <div className="bg-slate-50 p-6 sm:p-8">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+              Hoy
+            </p>
+            <h3 className="mt-2 text-lg font-extrabold text-[#0d212c] sm:text-xl">
+              Correo interno y planillas
+            </h3>
+            <ul className="mt-5 space-y-3.5">
+              {COMPARISON_ROWS.map((row) => (
+                <li
+                  key={`sin-${row}`}
+                  className="flex items-start gap-2.5 text-sm text-slate-500"
+                >
+                  <i
+                    className="icon-[lucide--x] mt-0.5 h-4 w-4 shrink-0 text-rose-400"
+                    aria-hidden
+                  />
+                  {row}
+                </li>
+              ))}
+            </ul>
+          </div>
+          {/* Con EthicVoice */}
+          <div className="relative overflow-hidden bg-[#0b1620] p-6 sm:p-8">
+            <div
+              className="pointer-events-none absolute right-0 top-0 h-40 w-40 opacity-25 blur-3xl"
+              style={{ background: "rgba(163,230,53,0.35)" }}
+              aria-hidden
+            />
+            <p className="text-[11px] font-bold uppercase tracking-widest text-lime-300">
+              Con EthicVoice
+            </p>
+            <h3 className="mt-2 text-lg font-extrabold text-white sm:text-xl">
+              Un canal ético que trabaja por ti
+            </h3>
+            <ul className="mt-5 space-y-3.5">
+              {COMPARISON_ROWS.map((row) => (
+                <li
+                  key={`con-${row}`}
+                  className="flex items-start gap-2.5 text-sm text-white/80"
+                >
+                  <i
+                    className="icon-[lucide--check] mt-0.5 h-4 w-4 shrink-0 text-lime-300"
+                    aria-hidden
+                  />
+                  {row}
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              onClick={(e) => {
+                trackGA4Event("landing_cta_click", {
+                  cta_name: "comparison_demo",
+                  placement: "comparison",
+                });
+                openCalendly(e);
+              }}
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-lime-400 px-6 py-3 text-sm font-bold text-[#052b24] shadow-[0_6px_20px_rgba(163,230,53,0.3)] transition hover:bg-lime-300"
+            >
+              Agendar demo gratis
+              <i
+                className="icon-[lucide--arrow-right] h-4 w-4"
+                aria-hidden
+              />
+            </button>
+          </div>
+        </div>
       </div>
     </motion.section>
   );
@@ -1241,7 +1436,7 @@ function TestimonialsSection() {
   const reveal = useInViewReveal();
   return (
     <motion.section
-      className="scroll-mt-24 bg-[#111827] py-16 sm:py-20 md:py-24"
+      className="scroll-mt-24 bg-[#0f172a] py-16 sm:py-20 md:py-24"
       {...reveal}
     >
       <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
@@ -1453,7 +1648,7 @@ function TestimonialsSection() {
   );
 }
 
-function PricingSection() {
+export function PricingSection() {
   const { openCalendly } = useCalendlyGate();
   const enterprise = PLAN_CONFIGS[PlanType.PREMIUM];
   const reduced = useReducedMotion();
@@ -1504,13 +1699,13 @@ function PricingSection() {
                   key={planType}
                   className={`relative flex min-h-0 flex-col rounded-2xl p-5 transition-all duration-300 sm:p-7 ${
                     isPopular
-                      ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-emerald-300"
+                      ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-lime-400"
                       : "border border-slate-200 bg-white hover:border-emerald-200 hover:shadow-xl"
                   }`}
                 >
                   {isPopular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="rounded-full bg-emerald-300 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#0f172a]">
+                      <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#052b24]">
                         Más popular
                       </span>
                     </div>
@@ -1584,7 +1779,7 @@ function PricingSection() {
                     }}
                     className={`mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ${
                       isPopular
-                        ? "bg-emerald-300 text-[#0f172a] hover:bg-emerald-200"
+                        ? "bg-lime-400 text-[#052b24] shadow-[0_6px_20px_rgba(163,230,53,0.3)] hover:bg-lime-300"
                         : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
                     }`}
                   >
@@ -1616,13 +1811,13 @@ function PricingSection() {
                   variants={LANDING_STAGGER_ITEM}
                   className={`relative flex min-h-0 flex-col rounded-2xl p-5 transition-all duration-300 sm:p-7 ${
                     isPopular
-                      ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-emerald-300"
+                      ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-lime-400"
                       : "border border-slate-200 bg-white hover:border-emerald-200 hover:shadow-xl"
                   }`}
                 >
                   {isPopular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="rounded-full bg-emerald-300 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#0f172a]">
+                      <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#052b24]">
                         Más popular
                       </span>
                     </div>
@@ -1696,7 +1891,7 @@ function PricingSection() {
                     }}
                     className={`mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ${
                       isPopular
-                        ? "bg-emerald-300 text-[#0f172a] hover:bg-emerald-200"
+                        ? "bg-lime-400 text-[#052b24] shadow-[0_6px_20px_rgba(163,230,53,0.3)] hover:bg-lime-300"
                         : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
                     }`}
                   >
@@ -1748,7 +1943,7 @@ function PricingSection() {
                       });
                       openCalendly(e);
                     }}
-                    className="mt-6 rounded-xl bg-emerald-300 px-8 py-3.5 text-sm font-bold text-[#0f172a] transition hover:bg-emerald-200"
+                    className="mt-6 rounded-xl bg-lime-400 px-8 py-3.5 text-sm font-bold text-[#052b24] shadow-[0_6px_20px_rgba(163,230,53,0.3)] transition hover:bg-lime-300"
                   >
                     Hablar con un consultor
                   </button>
@@ -1817,7 +2012,7 @@ function PricingSection() {
                       });
                       openCalendly(e);
                     }}
-                    className="mt-6 rounded-xl bg-emerald-300 px-8 py-3.5 text-sm font-bold text-[#0f172a] transition hover:bg-emerald-200"
+                    className="mt-6 rounded-xl bg-lime-400 px-8 py-3.5 text-sm font-bold text-[#052b24] shadow-[0_6px_20px_rgba(163,230,53,0.3)] transition hover:bg-lime-300"
                   >
                     Hablar con un consultor
                   </button>
@@ -1850,6 +2045,26 @@ function PricingSection() {
           </motion.article>
         )}
 
+        {/* Reaseguro — reduce fricción de compra */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+          {[
+            { icon: "icon-[lucide--calendar-x]", label: "Sin permanencia" },
+            { icon: "icon-[lucide--rocket]", label: "Activación en días" },
+            {
+              icon: "icon-[lucide--graduation-cap]",
+              label: "Onboarding y acompañamiento incluidos",
+            },
+          ].map((item) => (
+            <span
+              key={item.label}
+              className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/60 px-3.5 py-1.5 text-xs font-semibold text-emerald-800"
+            >
+              <i className={`${item.icon} h-3.5 w-3.5 shrink-0`} aria-hidden />
+              {item.label}
+            </span>
+          ))}
+        </div>
+
         <p className="mt-5 text-center text-xs text-slate-400">
           * Precios en USD. La configuración final depende del alcance de
           implementación.
@@ -1859,7 +2074,7 @@ function PricingSection() {
   );
 }
 
-function FAQSection() {
+export function FAQSection() {
   const reduced = useReducedMotion();
   const reveal = useInViewReveal();
   return (
@@ -1943,6 +2158,84 @@ function FAQSection() {
   );
 }
 
+export function LeadMagnetBandSection() {
+  const reveal = useInViewReveal();
+  return (
+    <motion.section
+      className="scroll-mt-24 border-t border-slate-100 bg-white py-14 sm:py-16 md:py-20"
+      aria-labelledby="lead-magnet-heading"
+      {...reveal}
+    >
+      <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-lime-50 p-6 sm:p-10 md:p-12">
+          <div
+            className="pointer-events-none absolute -right-10 -top-10 h-56 w-56 opacity-40 blur-3xl"
+            style={{ background: "rgba(163,230,53,0.3)" }}
+            aria-hidden
+          />
+          <div className="relative grid gap-8 md:grid-cols-[1fr_auto] md:items-center md:gap-10">
+            <div>
+              <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-700">
+                Recurso gratuito
+              </p>
+              <h2
+                id="lead-magnet-heading"
+                className="max-w-xl text-balance text-2xl font-extrabold leading-tight tracking-tight text-[#0d212c] sm:text-3xl"
+              >
+                ¿Aún no estás listo para una demo? Empieza por la guía.
+              </h2>
+              <p className="mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
+                Descarga la guía para implementar un canal de denuncias
+                exitoso: pasos, errores comunes y checklist de lanzamiento
+                interno para tu organización.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {[
+                  "Checklist de implementación",
+                  "Errores comunes a evitar",
+                  "Plan de comunicación interna",
+                ].map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-medium text-emerald-800"
+                  >
+                    <i
+                      className="icon-[lucide--check] h-3 w-3 shrink-0"
+                      aria-hidden
+                    />
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col items-start gap-3 md:items-center">
+              <Link
+                href="/guia-canal-denuncias"
+                onClick={() =>
+                  trackGA4Event("landing_cta_click", {
+                    cta_name: "lead_magnet_guide",
+                    placement: "lead_magnet",
+                  })
+                }
+                className="inline-flex items-center gap-2 rounded-full bg-[#0a1e14] px-7 py-3.5 text-sm font-bold text-white transition hover:bg-[#123527]"
+              >
+                <i
+                  className="icon-[lucide--download] h-4 w-4 shrink-0"
+                  aria-hidden
+                />
+                Descargar guía gratis
+              </Link>
+              <p className="text-xs text-slate-400">
+                Sin costo · Descarga inmediata
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
 function LandingClosingCtaSection() {
   const reveal = useInViewReveal();
   return (
@@ -2006,12 +2299,14 @@ export function LandingV3() {
         <HeroDemoVideoStrip />
         <StatsBand />
         <LogoProofSection />
+        <PainComparisonSection />
         <FeaturesSection />
         <HowItWorksSection />
         <SecuritySection />
         <TestimonialsSection />
         <PricingSection />
         <FAQSection />
+        <LeadMagnetBandSection />
       </main>
 
       <LandingClosingCtaSection />

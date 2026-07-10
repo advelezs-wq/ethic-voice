@@ -129,6 +129,10 @@ const config: Config = {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
         },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -143,6 +147,7 @@ const config: Config = {
         float: "float 6s ease-in-out infinite",
         reveal: "reveal 1s ease-out forwards",
         slowSpin: "slowSpin 20s linear infinite",
+        marquee: "marquee 38s linear infinite",
       },
     },
   },

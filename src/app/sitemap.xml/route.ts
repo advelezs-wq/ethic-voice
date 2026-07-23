@@ -11,6 +11,7 @@ export async function GET() {
   const xml = buildSitemapIndexXml([
     { loc: `${base}/sitemap-main.xml`, lastmod: now },
     { loc: `${base}/sitemap-blog.xml`, lastmod: now },
+    { loc: `${base}/sitemap-semsei-blog.xml`, lastmod: now },
   ]);
 
   return new NextResponse(xml, {

@@ -26,6 +26,11 @@ import {
   SectionEyebrow,
 } from "@/modules/landig-page/components/decor";
 import {
+  handleSpotlightMove,
+  SPOTLIGHT_INITIAL_STYLE,
+  SpotlightGlow,
+} from "@/modules/landig-page/components/SpotlightCard";
+import {
   FAQS,
   FAQSection,
   LeadMagnetBandSection,
@@ -334,11 +339,31 @@ type StatSpec =
   | { kind: "outOf5"; max: number }
   | { kind: "text"; value: string };
 
-const IMPACT_STATS: ReadonlyArray<{ spec: StatSpec; label: string }> = [
-  { spec: { kind: "24_7" }, label: "Canal siempre disponible" },
-  { spec: { kind: "plusInt", max: 100 }, label: "Organizaciones confían" },
-  { spec: { kind: "outOf5", max: 4.9 }, label: "Satisfacción de clientes" },
-  { spec: { kind: "text", value: "Días" }, label: "De contrato a canal activo" },
+const IMPACT_STATS: ReadonlyArray<{
+  spec: StatSpec;
+  label: string;
+  icon: string;
+}> = [
+  {
+    spec: { kind: "24_7" },
+    label: "Canal siempre disponible",
+    icon: "icon-[lucide--clock]",
+  },
+  {
+    spec: { kind: "plusInt", max: 100 },
+    label: "Organizaciones confían",
+    icon: "icon-[lucide--building-2]",
+  },
+  {
+    spec: { kind: "outOf5", max: 4.9 },
+    label: "Satisfacción de clientes",
+    icon: "icon-[lucide--star]",
+  },
+  {
+    spec: { kind: "text", value: "Días" },
+    label: "De contrato a canal activo",
+    icon: "icon-[lucide--rocket]",
+  },
 ];
 
 function easeOutCubic(t: number) {
@@ -422,6 +447,18 @@ const INDUSTRIES_ROW_B = [
   { icon: "icon-[lucide--building-2]", label: "ONG y sector público" },
 ] as const;
 
+/**
+ * El keyframe `marquee` traslada la fila por -50% de su ancho total, así que
+ * el set de chips debe repetirse un número PAR de veces para que el loop siga
+ * siendo perfecto. Con solo 2 copias, en pantallas anchas la mitad del recorrido
+ * ya no alcanza a cubrir el viewport (queda un tramo en blanco antes de reiniciar);
+ * repetir varias veces más garantiza que siempre haya chips de sobra visibles.
+ */
+const MARQUEE_REPEAT = 6;
+function repeatIndustries<T>(row: readonly T[]): T[] {
+  return Array.from({ length: MARQUEE_REPEAT }, () => row).flat();
+}
+
 const TESTIMONIALS = [
   {
     quote:
@@ -477,6 +514,23 @@ const SECURITY_CARDS = [
 function HeroSection({ variant }: { variant: LandingVariant }) {
   const { openCalendly } = useCalendlyGate();
   const reduced = useReducedMotion();
+  const tiltRef = useRef<HTMLDivElement>(null);
+
+  // Tilt 3D sutil que sigue al cursor — extraído del landing de referencia
+  // (laptop parallax) y adaptado a la composición de producto del hero.
+  // Muta el estilo directamente vía ref para no re-renderizar en cada
+  // pointermove.
+  const handleTiltMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (reduced === true || event.pointerType !== "mouse" || !tiltRef.current)
+      return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const px = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const py = (event.clientY - bounds.top) / bounds.height - 0.5;
+    tiltRef.current.style.transform = `rotateX(${py * -8}deg) rotateY(${px * 10}deg)`;
+  };
+  const resetTilt = () => {
+    if (tiltRef.current) tiltRef.current.style.transform = "";
+  };
 
   const headline =
     variant === "trust"
@@ -625,9 +679,16 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
             }}
             aria-hidden
           />
-          <div className="relative flex justify-center lg:justify-end">
-            <div className="relative">
-              <div className="-rotate-1 transition-transform duration-500 hover:rotate-0">
+          <div
+            className="relative flex justify-center [perspective:1400px] lg:justify-end"
+            onPointerMove={handleTiltMove}
+            onPointerLeave={resetTilt}
+          >
+            <div
+              ref={tiltRef}
+              className="relative transition-transform duration-300 ease-out [transform-style:preserve-3d] will-change-transform"
+            >
+              <div className="-rotate-1">
                 <CaseCardMock />
               </div>
               {/* Chat flotante superpuesto */}
@@ -692,20 +753,29 @@ function ImpactStatsSection() {
   }, []);
 
   return (
-    <section className="relative bg-white">
+    <section className="relative bg-[#f7faf9]">
       <motion.div
         ref={rootRef}
-        className="relative z-10 mx-auto -mt-12 max-w-5xl rounded-3xl border border-slate-100 bg-white/90 px-5 py-8 shadow-[0_24px_70px_rgba(10,30,20,0.10)] backdrop-blur sm:-mt-14 sm:px-8 sm:py-10 lg:-mt-16"
+        className="relative z-10 mx-auto -mt-12 max-w-5xl overflow-hidden rounded-[2rem] bg-[#0a1e14] px-5 py-8 shadow-[0_28px_70px_rgba(10,30,20,0.35)] sm:-mt-14 sm:px-8 sm:py-10 lg:-mt-16"
         style={{ marginLeft: "auto", marginRight: "auto" }}
         {...reveal}
       >
-        <div className="grid grid-cols-2 gap-y-8 divide-slate-100 lg:grid-cols-4 lg:divide-x">
+        <LineGridPattern dark />
+        <div
+          className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full opacity-25 blur-[90px]"
+          style={{ background: "rgba(163,230,53,0.4)" }}
+          aria-hidden
+        />
+        <div className="relative grid grid-cols-2 gap-y-8 lg:grid-cols-4 lg:divide-x lg:divide-white/10">
           {IMPACT_STATS.map((stat, index) => (
             <div
               key={stat.label}
-              className="flex flex-col items-center px-4 text-center"
+              className="flex flex-col items-center gap-2.5 px-4 text-center"
             >
-              <span className="text-3xl font-black tracking-tight text-[#0a1e14] sm:text-4xl md:text-5xl">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-lime-300/[0.12]">
+                <i className={`${stat.icon} h-4 w-4 text-lime-300`} aria-hidden />
+              </span>
+              <span className="text-3xl font-black tracking-tight text-white sm:text-4xl md:text-5xl">
                 <StatTicker
                   spec={stat.spec}
                   active={visible}
@@ -713,7 +783,7 @@ function ImpactStatsSection() {
                   reduceMotion={reduceMotion}
                 />
               </span>
-              <span className="mt-2.5 max-w-[11rem] text-pretty text-[11px] font-semibold uppercase leading-snug tracking-widest text-slate-400 sm:text-xs">
+              <span className="max-w-[11rem] text-pretty text-[11px] font-semibold uppercase leading-snug tracking-widest text-white/45 sm:text-xs">
                 {stat.label}
               </span>
             </div>
@@ -815,7 +885,7 @@ function BentoSection() {
   const reveal = useInViewReveal();
 
   const tileBase =
-    "group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_24px_60px_rgba(10,30,20,0.12)]";
+    "group relative isolate flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_24px_60px_rgba(10,30,20,0.12)]";
 
   return (
     <section
@@ -844,10 +914,13 @@ function BentoSection() {
           {/* Tile 1 — Canal 24/7 (alto, con form mock) */}
           <motion.article
             variants={reduced === true ? undefined : STAGGER_ITEM}
+            onMouseMove={handleSpotlightMove}
+            style={SPOTLIGHT_INITIAL_STYLE}
             className={`${tileBase} sm:row-span-2`}
           >
+            <SpotlightGlow color="rgba(163,230,53,0.16)" />
             <div className="mb-4">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#0a1e14]">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#0a1e14] shadow-[0_10px_24px_rgba(163,230,53,0.2)]">
                 <i className="icon-[lucide--megaphone] h-5 w-5 text-lime-300" aria-hidden />
               </span>
             </div>
@@ -865,10 +938,13 @@ function BentoSection() {
           {/* Tile 2 — IA */}
           <motion.article
             variants={reduced === true ? undefined : STAGGER_ITEM}
+            onMouseMove={handleSpotlightMove}
+            style={SPOTLIGHT_INITIAL_STYLE}
             className={tileBase}
           >
+            <SpotlightGlow color="rgba(124,58,237,0.14)" />
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 shadow-[0_10px_24px_rgba(16,185,129,0.2)]">
                 <i className="icon-[lucide--sparkles] h-5 w-5 text-emerald-600" aria-hidden />
               </span>
               <h3 className="text-lg font-extrabold text-[#0a1e14]">
@@ -887,10 +963,13 @@ function BentoSection() {
           {/* Tile 3 — Chat confidencial */}
           <motion.article
             variants={reduced === true ? undefined : STAGGER_ITEM}
+            onMouseMove={handleSpotlightMove}
+            style={SPOTLIGHT_INITIAL_STYLE}
             className={tileBase}
           >
+            <SpotlightGlow color="rgba(6,182,212,0.16)" />
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 shadow-[0_10px_24px_rgba(16,185,129,0.2)]">
                 <i className="icon-[lucide--messages-square] h-5 w-5 text-emerald-600" aria-hidden />
               </span>
               <h3 className="text-lg font-extrabold text-[#0a1e14]">
@@ -917,10 +996,13 @@ function BentoSection() {
           {/* Tile 4 — Analítica */}
           <motion.article
             variants={reduced === true ? undefined : STAGGER_ITEM}
+            onMouseMove={handleSpotlightMove}
+            style={SPOTLIGHT_INITIAL_STYLE}
             className={tileBase}
           >
+            <SpotlightGlow color="rgba(59,130,246,0.16)" />
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 shadow-[0_10px_24px_rgba(16,185,129,0.2)]">
                 <i className="icon-[lucide--bar-chart-3] h-5 w-5 text-emerald-600" aria-hidden />
               </span>
               <h3 className="text-lg font-extrabold text-[#0a1e14]">
@@ -938,10 +1020,13 @@ function BentoSection() {
           {/* Tile 5 — Alertas SLA */}
           <motion.article
             variants={reduced === true ? undefined : STAGGER_ITEM}
+            onMouseMove={handleSpotlightMove}
+            style={SPOTLIGHT_INITIAL_STYLE}
             className={tileBase}
           >
+            <SpotlightGlow color="rgba(245,158,11,0.18)" />
             <div className="flex items-center gap-2">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 shadow-[0_10px_24px_rgba(16,185,129,0.2)]">
                 <i className="icon-[lucide--alarm-clock] h-5 w-5 text-emerald-600" aria-hidden />
               </span>
               <h3 className="text-lg font-extrabold text-[#0a1e14]">
@@ -959,11 +1044,14 @@ function BentoSection() {
           {/* Tile 6 — Reportes ejecutivos (ancho) */}
           <motion.article
             variants={reduced === true ? undefined : STAGGER_ITEM}
+            onMouseMove={handleSpotlightMove}
+            style={SPOTLIGHT_INITIAL_STYLE}
             className={`${tileBase} sm:col-span-2 lg:col-span-3 lg:flex-row lg:items-center lg:gap-10`}
           >
+            <SpotlightGlow color="rgba(163,230,53,0.14)" />
             <div className="lg:max-w-md">
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#0a1e14]">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#0a1e14] shadow-[0_10px_24px_rgba(163,230,53,0.2)]">
                   <i className="icon-[lucide--file-check-2] h-5 w-5 text-lime-300" aria-hidden />
                 </span>
                 <h3 className="text-lg font-extrabold text-[#0a1e14]">
@@ -1025,6 +1113,11 @@ function IndustryChip({
 
 function IndustriesSection() {
   const reveal = useInViewReveal();
+  const reduced = useReducedMotion();
+  // Con movimiento reducido las filas no animan (se envuelven en estático),
+  // así que ahí basta un único set en vez de las copias repetidas del marquee.
+  const rowA = reduced === true ? INDUSTRIES_ROW_A : repeatIndustries(INDUSTRIES_ROW_A);
+  const rowB = reduced === true ? INDUSTRIES_ROW_B : repeatIndustries(INDUSTRIES_ROW_B);
   return (
     <motion.section
       className="relative overflow-hidden bg-white py-16 sm:py-20"
@@ -1040,7 +1133,7 @@ function IndustriesSection() {
       <div className="space-y-4 [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
         <div className="flex overflow-hidden">
           <div className="flex min-w-max gap-4 pr-4 motion-safe:animate-marquee motion-reduce:min-w-0 motion-reduce:flex-wrap motion-reduce:justify-center">
-            {[...INDUSTRIES_ROW_A, ...INDUSTRIES_ROW_A].map((industry, i) => (
+            {rowA.map((industry, i) => (
               <IndustryChip key={`a-${industry.label}-${i}`} industry={industry} />
             ))}
           </div>
@@ -1050,7 +1143,7 @@ function IndustriesSection() {
             className="flex min-w-max gap-4 pr-4 motion-safe:animate-marquee motion-reduce:min-w-0 motion-reduce:flex-wrap motion-reduce:justify-center"
             style={{ animationDirection: "reverse" }}
           >
-            {[...INDUSTRIES_ROW_B, ...INDUSTRIES_ROW_B].map((industry, i) => (
+            {rowB.map((industry, i) => (
               <IndustryChip key={`b-${industry.label}-${i}`} industry={industry} />
             ))}
           </div>
@@ -1214,9 +1307,12 @@ function SecuritySection() {
               <motion.article
                 key={feat.title}
                 variants={reduced === true ? undefined : STAGGER_ITEM}
-                className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.07] sm:p-5"
+                onMouseMove={handleSpotlightMove}
+                style={SPOTLIGHT_INITIAL_STYLE}
+                className="group relative isolate overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-lime-300/25 hover:bg-white/[0.07] sm:p-5"
               >
-                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-lime-300/[0.12]">
+                <SpotlightGlow color="rgba(163,230,53,0.14)" />
+                <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-lime-300/[0.12] shadow-[0_10px_20px_rgba(163,230,53,0.15)]">
                   <i
                     className={`${feat.icon} h-5 w-5 text-lime-300`}
                     aria-hidden

@@ -27,6 +27,11 @@ import {
 import { FooterDemoCtaBand } from "@/modules/landig-page/components/FooterDemoCtaBand";
 import { LandingMinimalFooter } from "@/modules/landig-page/components/LandingMinimalFooter";
 import { VideoModal } from "@/modules/landig-page/components/VideoModal";
+import {
+  handleSpotlightMove,
+  SPOTLIGHT_INITIAL_STYLE,
+  SpotlightGlow,
+} from "@/modules/landig-page/components/SpotlightCard";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 const HERO_BG_VIDEO_SRC = "/video_1778585500522.mp4";
@@ -1809,94 +1814,107 @@ export function PricingSection() {
                 <motion.article
                   key={planType}
                   variants={LANDING_STAGGER_ITEM}
-                  className={`relative flex min-h-0 flex-col rounded-2xl p-5 transition-all duration-300 sm:p-7 ${
+                  onMouseMove={handleSpotlightMove}
+                  style={SPOTLIGHT_INITIAL_STYLE}
+                  className={`group relative isolate flex min-h-0 flex-col rounded-2xl p-5 transition-all duration-300 sm:p-7 ${
                     isPopular
-                      ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-lime-400"
-                      : "border border-slate-200 bg-white hover:border-emerald-200 hover:shadow-xl"
+                      ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-lime-400 hover:-translate-y-2 hover:shadow-[0_34px_80px_rgba(7,35,30,0.34),0_0_38px_rgba(139,229,43,0.18)]"
+                      : "border border-slate-200 bg-white hover:-translate-y-2 hover:border-emerald-200 hover:shadow-[0_30px_70px_rgba(13,57,40,0.15)]"
                   }`}
                 >
+                  <SpotlightGlow
+                    color={
+                      isPopular
+                        ? "rgba(142,235,46,0.17)"
+                        : "rgba(16,185,129,0.14)"
+                    }
+                  />
+                  {/* Fuera del wrapper de contenido: se posiciona relativo al
+                      padding de la tarjeta para que sobresalga por encima del
+                      borde, en vez de superponerse sobre el título. */}
                   {isPopular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#052b24]">
+                    <div className="absolute -top-3 left-1/2 z-20 -translate-x-1/2">
+                      <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#052b24] shadow-[0_8px_18px_rgba(163,230,53,0.35)]">
                         Más popular
                       </span>
                     </div>
                   )}
-
-                  <h3
-                    className={`text-xl font-extrabold ${isPopular ? "text-white" : "text-[#0d212c]"}`}
-                  >
-                    {plan.displayName}
-                  </h3>
-                  <p
-                    className={`mt-2 text-sm leading-relaxed ${isPopular ? "text-white/55" : "text-slate-500"}`}
-                  >
-                    {plan.description}
-                  </p>
-
-                  <div
-                    className={`mt-6 rounded-xl p-4 ${
-                      isPopular
-                        ? "bg-white/[0.08] ring-1 ring-white/10"
-                        : "border border-slate-200 bg-slate-50"
-                    }`}
-                  >
-                    <div className="flex items-baseline gap-1">
-                      <span
-                        className={`text-4xl font-black ${isPopular ? "text-white" : "text-[#0d212c]"}`}
-                      >
-                        ${plan.price.monthly}
-                      </span>
-                      <span
-                        className={`text-sm font-medium ${isPopular ? "text-white/50" : "text-slate-400"}`}
-                      >
-                        USD / mes
-                      </span>
-                    </div>
-                    <p
-                      className={`mt-1 text-xs ${isPopular ? "text-white/40" : "text-slate-400"}`}
+                  <div className="relative z-10 flex min-h-0 flex-1 flex-col">
+                    <h3
+                      className={`text-xl font-extrabold ${isPopular ? "text-white" : "text-[#0d212c]"}`}
                     >
-                      {employees}
+                      {plan.displayName}
+                    </h3>
+                    <p
+                      className={`mt-2 min-h-[3.75rem] text-sm leading-relaxed ${isPopular ? "text-white/55" : "text-slate-500"}`}
+                    >
+                      {plan.description}
                     </p>
-                  </div>
 
-                  <ul className="mt-6 flex-1 space-y-3">
-                    {plan.features.highlights.slice(0, 5).map((item) => (
-                      <li
-                        key={`${planType}-${item}`}
-                        className={`flex items-start gap-2 text-sm ${
-                          isPopular ? "text-white/75" : "text-slate-600"
-                        }`}
+                    <div
+                      className={`mt-6 rounded-xl p-4 ${
+                        isPopular
+                          ? "bg-white/[0.08] ring-1 ring-white/10"
+                          : "border border-slate-200 bg-gradient-to-br from-white to-slate-50"
+                      }`}
+                    >
+                      <div className="flex items-baseline gap-1">
+                        <span
+                          className={`text-4xl font-black ${isPopular ? "text-white" : "text-[#0d212c]"}`}
+                        >
+                          ${plan.price.monthly}
+                        </span>
+                        <span
+                          className={`text-sm font-medium ${isPopular ? "text-white/50" : "text-slate-400"}`}
+                        >
+                          USD / mes
+                        </span>
+                      </div>
+                      <p
+                        className={`mt-1 text-xs ${isPopular ? "text-white/40" : "text-slate-400"}`}
                       >
-                        <i
-                          className={`icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 ${
-                            isPopular ? "text-emerald-300" : "text-emerald-600"
-                          }`}
-                          aria-hidden
-                        />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+                        {employees}
+                      </p>
+                    </div>
 
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      trackGA4Event("landing_cta_click", {
-                        cta_name: `pricing_${planType.toLowerCase()}`,
-                        placement: "pricing",
-                      });
-                      e.preventDefault();
-                      goToCheckoutFlow(planType);
-                    }}
-                    className={`mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ${
-                      isPopular
-                        ? "bg-lime-400 text-[#052b24] shadow-[0_6px_20px_rgba(163,230,53,0.3)] hover:bg-lime-300"
-                        : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
-                    }`}
-                  >
-                    Comenzar ahora
-                  </button>
+                    <ul className="mt-6 flex-1 space-y-3">
+                      {plan.features.highlights.slice(0, 5).map((item) => (
+                        <li
+                          key={`${planType}-${item}`}
+                          className={`flex items-start gap-2 text-sm ${
+                            isPopular ? "text-white/75" : "text-slate-600"
+                          }`}
+                        >
+                          <i
+                            className={`icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 ${
+                              isPopular ? "text-lime-300" : "text-emerald-600"
+                            }`}
+                            aria-hidden
+                          />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        trackGA4Event("landing_cta_click", {
+                          cta_name: `pricing_${planType.toLowerCase()}`,
+                          placement: "pricing",
+                        });
+                        e.preventDefault();
+                        goToCheckoutFlow(planType);
+                      }}
+                      className={`mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-bold transition-all duration-200 ${
+                        isPopular
+                          ? "bg-lime-400 text-[#052b24] shadow-[0_6px_20px_rgba(163,230,53,0.3)] hover:bg-lime-300"
+                          : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
+                      }`}
+                    >
+                      Comenzar ahora
+                    </button>
+                  </div>
                 </motion.article>
               );
             })}
@@ -1969,7 +1987,9 @@ export function PricingSection() {
           </article>
         ) : (
           <motion.article
-            className="relative mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-6 sm:mt-5 sm:p-8 md:p-10"
+            className="group relative isolate mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f172a] to-[#1e293b] p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_34px_80px_rgba(6,25,25,0.4)] sm:mt-5 sm:p-8 md:p-10"
+            onMouseMove={handleSpotlightMove}
+            style={SPOTLIGHT_INITIAL_STYLE}
             initial={{ opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={LANDING_VIEWPORT}
@@ -1980,6 +2000,7 @@ export function PricingSection() {
               style={{ background: "rgba(45,212,191,0.3)" }}
               aria-hidden
             />
+            <SpotlightGlow color="rgba(94,234,212,0.16)" />
             <div className="relative grid gap-6 lg:grid-cols-2 lg:items-center lg:gap-8">
               <div>
                 <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-200 sm:px-4 sm:text-[11px]">
@@ -2029,7 +2050,7 @@ export function PricingSection() {
                   <motion.div
                     key={feature}
                     variants={LANDING_STAGGER_ITEM}
-                    className="flex gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-4"
+                    className="flex gap-3 rounded-xl border border-white/10 bg-white/[0.05] p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-300/40 hover:bg-emerald-400/10"
                   >
                     <i
                       className="icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 text-emerald-300"

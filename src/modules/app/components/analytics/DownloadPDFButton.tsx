@@ -76,19 +76,25 @@ export const DownloadPDFButton: React.FC<DownloadPDFButtonProps> = ({
         throw new Error(errorData.error || 'Failed to generate PDF');
       }
 
-      // Get the PDF blob from the response
+      // El servidor puede degradar a un HTML con el mismo diseño cuando no
+      // puede lanzar Chromium (frecuente en funciones serverless). En ese
+      // caso lo abrimos en una pestaña nueva en vez de forzar una descarga
+      // ".pdf" que contendría HTML.
+      const contentType = response.headers.get('content-type') || '';
       const blob = await response.blob();
-      
-      // Create download link
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${filename}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
 
+      if (contentType.includes('text/html')) {
+        window.open(url, '_blank');
+      } else {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${filename}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Error al generar el PDF. Por favor, intenta nuevamente.');

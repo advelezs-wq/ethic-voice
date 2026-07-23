@@ -136,6 +136,97 @@ export async function GET(request: NextRequest) {
         totalReports > 0 ? Math.round((count / totalReports) * 100) : 0,
     }));
 
+    // Tipología (categoría) de la denuncia — p. ej. Fraude, Acoso, Corrupción.
+    // A diferencia de `reportTypes` (severidad IA), esto agrupa por el tipo de
+    // irregularidad reportada, para el módulo "Inteligencia de Tipologías".
+    const getTypology = (report: (typeof reports)[number]) => {
+      if (report.type) return report.type;
+      try {
+        const content: Record<string, unknown> =
+          typeof report.content === "string"
+            ? JSON.parse(report.content)
+            : (report.content as Record<string, unknown>) || {};
+        return (
+          (content["tipo_incidencia"] as string | undefined) ||
+          (content["category"] as string | undefined) ||
+          "Sin clasificar"
+        );
+      } catch {
+        return "Sin clasificar";
+      }
+    };
+
+    const typologyCounts = reports.reduce(
+      (acc, report) => {
+        const typology = getTypology(report);
+        acc[typology] = (acc[typology] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    const typologyDistribution = Object.entries(typologyCounts)
+      .map(([typology, count]) => ({
+        typology,
+        count,
+        percentage:
+          totalReports > 0 ? Math.round((count / totalReports) * 100) : 0,
+      }))
+      .sort((a, b) => b.count - a.count);
+
+    // Tendencia mensual (últimos 6 meses) para las tipologías con mayor recurrencia
+    const topTypologies = typologyDistribution.slice(0, 5).map((t) => t.typology);
+    const typologyNow = new Date();
+    const typologyMonthLabels: string[] = [];
+    const typologyMonthKeys: string[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(
+        typologyNow.getFullYear(),
+        typologyNow.getMonth() - i,
+        1
+      );
+      typologyMonthKeys.push(`${d.getFullYear()}-${d.getMonth()}`);
+      typologyMonthLabels.push(
+        d.toLocaleDateString("es-ES", { month: "short" })
+      );
+    }
+    const typologyMonthlyTrend = {
+      months: typologyMonthLabels,
+      series: topTypologies.map((typology) => {
+        const counts = typologyMonthKeys.map((key) => {
+          const [year, month] = key.split("-").map(Number);
+          return reports.filter((r) => {
+            if (getTypology(r) !== typology) return false;
+            const d = new Date(r.submittedAt);
+            return d.getFullYear() === year && d.getMonth() === month;
+          }).length;
+        });
+        return { typology, data: counts };
+      }),
+    };
+
+    const typologiesWithRecurrence = typologyDistribution.filter(
+      (t) => t.count > 1
+    ).length;
+    const top3Concentration = totalReports > 0
+      ? Math.round(
+          (typologyDistribution
+            .slice(0, 3)
+            .reduce((sum, t) => sum + t.count, 0) /
+            totalReports) *
+            100
+        )
+      : 0;
+
+    const typologyIntelligence = {
+      activeTypologies: typologyDistribution.length,
+      totalReports,
+      typologiesWithRecurrence,
+      top3Concentration,
+      distribution: typologyDistribution,
+      monthlyTrend: typologyMonthlyTrend,
+    };
+
     // Enhanced team performance calculation
     const assignedReports = reports.filter((r) => r.assignments.length > 0);
     const resolvedReports = reports.filter((r) => r.status === "RESOLVED");
@@ -403,6 +494,7 @@ export async function GET(request: NextRequest) {
       departmentReports,
       teamPerformance,
       reportTypes,
+      typologyIntelligence,
       memberPerformance: memberPerformance, // Include full member performance data
       organizationMetrics: {
         totalMembers: organizationMembers.length,

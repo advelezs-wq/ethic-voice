@@ -15,6 +15,10 @@ import { DepartmentReportsChart } from "./DepartmentReportsChart";
 import { TeamPerformanceMetrics } from "./TeamPerformanceMetrics";
 import { ResolutionTimeMetrics } from "./ResolutionTimeMetrics";
 import { ReportTypesChart } from "./ReportTypesChart";
+import {
+  TypologyIntelligenceSection,
+  type TypologyIntelligenceData,
+} from "./TypologyIntelligenceSection";
 import { DownloadReportModal } from "./DownloadReportModal";
 import { addToast } from "@/modules/core/utils/safe-toast";
 
@@ -81,6 +85,7 @@ interface AnalyticsData {
   };
   slaOrangeCount?: number;
   slaRedCount?: number;
+  typologyIntelligence?: TypologyIntelligenceData;
 }
 
 export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
@@ -598,6 +603,26 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
           </CardBody>
         </Card>
       </div>
+
+      {/* Inteligencia de Tipologías */}
+      {data.typologyIntelligence && (
+        <Card>
+          <CardHeader>
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900">
+                Inteligencia de Tipologías
+              </h3>
+              <p className="text-gray-600 text-sm">
+                Comportamiento de las denuncias según su clasificación:
+                distribución, ranking y tendencia mensual
+              </p>
+            </div>
+          </CardHeader>
+          <CardBody>
+            <TypologyIntelligenceSection data={data.typologyIntelligence} />
+          </CardBody>
+        </Card>
+      )}
 
       {/* Download Modal */}
       <DownloadReportModal

@@ -166,7 +166,60 @@ async function getImageAsBase64(imagePath: string): Promise<string> {
   }
 }
 
+export interface PDFOrHTMLResult {
+  buffer: Buffer;
+  isHtml: boolean;
+}
+
+/**
+ * Inyecta un banner de aviso justo después de <body> para que el fallback HTML
+ * (cuando Puppeteer no está disponible en el entorno serverless) conserve el
+ * branding y los estilos ya renderizados por la plantilla, en vez de mostrar
+ * una página genérica sin formato.
+ */
+export function withPrintFallbackBanner(html: string): string {
+  const banner = `
+    <div style="background:#eff6ff;border:1px solid #0ea5e9;border-radius:8px;padding:16px 20px;margin:12px;font-family:Arial,sans-serif;line-height:1.6;color:#0c4a6e;">
+      <strong>📄 Reporte generado</strong><br/>
+      La generación de PDF en el servidor no está disponible en este momento, así que abrimos el reporte aquí mismo.<br/><br/>
+      <strong>💾 Para guardarlo como PDF:</strong> presiona <kbd style="background:#e5e7eb;border:1px solid #d1d5db;border-radius:4px;padding:2px 6px;font-family:monospace;">Ctrl+P</kbd> (Windows/Linux) o <kbd style="background:#e5e7eb;border:1px solid #d1d5db;border-radius:4px;padding:2px 6px;font-family:monospace;">Cmd+P</kbd> (Mac) y selecciona "Guardar como PDF".
+    </div>
+    <style>@media print { .ev-print-fallback-banner { display: none !important; } }</style>`;
+
+  if (/<body[^>]*>/i.test(html)) {
+    return html.replace(
+      /<body([^>]*)>/i,
+      `<body$1><div class="ev-print-fallback-banner">${banner}</div>`
+    );
+  }
+  return `<div class="ev-print-fallback-banner">${banner}</div>${html}`;
+}
+
 export class ModernPDFGeneratorService {
+  /**
+   * Intenta generar el PDF real vía Puppeteer/Chromium; si el entorno serverless
+   * no puede lanzar el navegador (frecuente en funciones Vercel con memoria/tiempo
+   * limitados), degrada de forma controlada al HTML ya renderizado (con el mismo
+   * branding y logo) en vez de propagar el error al usuario.
+   */
+  private async generatePDFOrHTMLFallback(
+    html: string
+  ): Promise<PDFOrHTMLResult> {
+    try {
+      const pdf = await this.generatePDFFromHTML(html);
+      return { buffer: Buffer.from(pdf), isHtml: false };
+    } catch (error) {
+      console.warn(
+        "⚠️ PDF generation failed, falling back to styled HTML:",
+        error instanceof Error ? error.message : error
+      );
+      return {
+        buffer: Buffer.from(withPrintFallbackBanner(html), "utf-8"),
+        isHtml: true,
+      };
+    }
+  }
+
   private async generatePDFFromHTML(html: string): Promise<Uint8Array> {
     let browser;
 
@@ -340,7 +393,7 @@ export class ModernPDFGeneratorService {
 
   public async generateSuperAdminReport(
     data: Record<string, unknown>
-  ): Promise<Uint8Array> {
+  ): Promise<PDFOrHTMLResult> {
     // Extract real system stats and organizations data
     const systemStats = (data.systemStats as Record<string, unknown>) || {};
     const organizations = (data.organizations as OrganizationData[]) || [];
@@ -404,12 +457,12 @@ export class ModernPDFGeneratorService {
     const content = compileContent(templateData);
     const html = compileBase({ ...templateData, content });
 
-    return this.generatePDFFromHTML(html);
+    return this.generatePDFOrHTMLFallback(html);
   }
 
   public async generateOrganizationReport(
     data: Record<string, unknown>
-  ): Promise<Uint8Array> {
+  ): Promise<PDFOrHTMLResult> {
     // Extract real organization and dashboard data
     const organization = (data.organization as Record<string, unknown>) || {};
     const dashboardData = (data.dashboardData as Record<string, unknown>) || {};
@@ -505,13 +558,13 @@ export class ModernPDFGeneratorService {
     const content = compileContent(templateData);
     const html = compileBase({ ...templateData, content });
 
-    return this.generatePDFFromHTML(html);
+    return this.generatePDFOrHTMLFallback(html);
   }
 
   public async generateMemberReport(
     data: Record<string, unknown>,
     memberName: string
-  ): Promise<Uint8Array> {
+  ): Promise<PDFOrHTMLResult> {
     // Extract real member and dashboard data
     const organization = (data.organization as Record<string, unknown>) || {};
     const dashboardData = (data.dashboardData as Record<string, unknown>) || {};
@@ -562,12 +615,12 @@ export class ModernPDFGeneratorService {
     const content = compileContent(templateData);
     const html = compileBase({ ...templateData, content });
 
-    return this.generatePDFFromHTML(html);
+    return this.generatePDFOrHTMLFallback(html);
   }
 
   public async generateReportCasePDF(
     report: Record<string, unknown>
-  ): Promise<Uint8Array> {
+  ): Promise<PDFOrHTMLResult> {
     // Extract real report data
     const organization = (report.organization as Record<string, unknown>) || {};
     const reportRef = `REP-${String(report.id).padStart(6, "0")}`;
@@ -620,14 +673,14 @@ export class ModernPDFGeneratorService {
     const content = compileContent(templateData);
     const html = compileBase({ ...templateData, content });
 
-    return this.generatePDFFromHTML(html);
+    return this.generatePDFOrHTMLFallback(html);
   }
 
   public async generateReportsListPDF(data: {
     organizationName?: string;
     reports: Array<Record<string, unknown>>;
     ethicVoiceLogo?: string;
-  }): Promise<Uint8Array> {
+  }): Promise<PDFOrHTMLResult> {
     const ethicVoiceLogo =
       data.ethicVoiceLogo || (await getImageAsBase64("brand/logo-nobg.png"));
 
@@ -671,7 +724,7 @@ export class ModernPDFGeneratorService {
     const content = compileContent(templateData);
     const html = compileBase({ ...templateData, content });
 
-    return this.generatePDFFromHTML(html);
+    return this.generatePDFOrHTMLFallback(html);
   }
 }
 
@@ -679,14 +732,14 @@ export class ModernPDFGeneratorService {
 export class ReportPDFFactory {
   static async generateSuperAdminReport(
     data: Record<string, unknown>
-  ): Promise<Uint8Array> {
+  ): Promise<PDFOrHTMLResult> {
     const generator = new ModernPDFGeneratorService();
     return generator.generateSuperAdminReport(data);
   }
 
   static async generateOrganizationReport(
     data: Record<string, unknown>
-  ): Promise<Uint8Array> {
+  ): Promise<PDFOrHTMLResult> {
     const generator = new ModernPDFGeneratorService();
     return generator.generateOrganizationReport(data);
   }
@@ -694,14 +747,14 @@ export class ReportPDFFactory {
   static async generateMemberReport(
     data: Record<string, unknown>,
     memberName: string
-  ): Promise<Uint8Array> {
+  ): Promise<PDFOrHTMLResult> {
     const generator = new ModernPDFGeneratorService();
     return generator.generateMemberReport(data, memberName);
   }
 
   static async generateReportCasePDF(
     report: Record<string, unknown>
-  ): Promise<Uint8Array> {
+  ): Promise<PDFOrHTMLResult> {
     const generator = new ModernPDFGeneratorService();
     return generator.generateReportCasePDF(report);
   }
@@ -709,7 +762,7 @@ export class ReportPDFFactory {
   static async generateReportsList(data: {
     organizationName?: string;
     reports: Array<Record<string, unknown>>;
-  }): Promise<Uint8Array> {
+  }): Promise<PDFOrHTMLResult> {
     const generator = new ModernPDFGeneratorService();
     return generator.generateReportsListPDF(data);
   }

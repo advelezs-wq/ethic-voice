@@ -29,12 +29,14 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
     refreshDashboard,
   } = useAnalytics();
 
-  // Load dashboard data when component mounts or org changes
+  // Load dashboard data when component mounts or org changes. Espera a que
+  // el rol esté resuelto para no disparar una primera carga sin el scope de
+  // usuario (investigador) y quedar con datos de toda la organización cacheados.
   useEffect(() => {
-    if (organizationId) {
+    if (organizationId && !roleLoading) {
       loadDashboardData(organizationId);
     }
-  }, [organizationId, loadDashboardData]);
+  }, [organizationId, roleLoading, loadDashboardData]);
 
   useEffect(() => {
     const handleManualReportCreated = async () => {

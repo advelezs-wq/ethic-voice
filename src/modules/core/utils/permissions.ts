@@ -167,6 +167,22 @@ export async function getUserRoleWithSuperAdmin(
   }
 }
 
+/**
+ * Devuelve el userId al que se debe limitar la consulta de reportes
+ * (exportaciones, PDFs, estadísticas) cuando el usuario autenticado es un
+ * investigador/miembro (ORG_MEMBER): solo debe ver los casos que tiene
+ * asignados, nunca los de toda la organización. Para ADMIN o SUPER_ADMIN
+ * devuelve `undefined` (sin restricción).
+ */
+export async function resolveReportScopeUserId(
+  userId: string,
+  orgId: string,
+  userEmail?: string
+): Promise<string | undefined> {
+  const role = await getUserRoleWithSuperAdmin(userId, orgId, userEmail);
+  return role === UserRole.ORG_MEMBER ? userId : undefined;
+}
+
 // Utility function to check if user has specific permission
 export async function userHasPermission(
   userId: string,

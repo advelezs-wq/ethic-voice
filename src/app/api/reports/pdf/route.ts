@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import { ReportPDFFactory } from "@/modules/app/services/pdf-generator.service";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import {
+  ReportPDFFactory,
+  type PDFOrHTMLResult,
+} from "@/modules/app/services/pdf-generator.service";
 import { getAllOrganizationsStats } from "@/actions/superadmin.actions";
 import { readFileSync } from "fs";
 import { join } from "path";
 import prisma from "@/modules/prisma/lib/prisma";
 import { getFullDashboardData } from "@/modules/app/services/dashboard-data.service";
+import { resolveReportScopeUserId } from "@/modules/core/utils/permissions";
 
 // Helper to convert image to base64
 function getBase64Image(imagePath: string): string {
@@ -59,7 +63,18 @@ export async function POST(request: NextRequest) {
     // Get EthicVoice logo as base64
     const ethicVoiceLogo = getBase64Image("brand/logo-nobg.png");
 
-    let pdfData: Uint8Array;
+    // Los investigadores (ORG_MEMBER) solo deben ver/exportar los casos que
+    // tienen asignados, nunca los de toda la organización.
+    const clerkUser = await currentUser();
+    const scopeUserId = orgId
+      ? await resolveReportScopeUserId(
+          userId,
+          orgId,
+          clerkUser?.primaryEmailAddress?.emailAddress
+        )
+      : undefined;
+
+    let pdfData: PDFOrHTMLResult;
 
     switch (reportType) {
       case "super_admin": {
@@ -118,8 +133,8 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // Fetch dashboard data (org scoped) using shared service
-        const dashboardData = await getFullDashboardData(orgId);
+        // Fetch dashboard data scoped a los casos asignados a este investigador
+        const dashboardData = await getFullDashboardData(orgId, userId);
 
         const organizationInfo = {
           id: orgId,
@@ -219,7 +234,7 @@ export async function POST(request: NextRequest) {
         const pageSize = 500; // export up to 500 rows
         const { reports } = await (
           await import("@/actions/reports.actions")
-        ).getReportsWithFilters(filters, 1, pageSize);
+        ).getReportsWithFilters(filters, 1, pageSize, scopeUserId);
 
         const org = await prisma.organization.findUnique({
           where: { id: orgId },
@@ -243,8 +258,20 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    // Return the PDF as a blob
-    return new NextResponse(pdfData, {
+    // Return the generated PDF as a blob, or the styled HTML fallback (when
+    // Puppeteer/Chromium no está disponible en el entorno serverless) para
+    // que el cliente pueda abrirlo e imprimirlo en vez de fallar.
+    if (pdfData.isHtml) {
+      return new NextResponse(pdfData.buffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "Content-Disposition": `inline; filename="${filename}.html"`,
+        },
+      });
+    }
+
+    return new NextResponse(pdfData.buffer, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",

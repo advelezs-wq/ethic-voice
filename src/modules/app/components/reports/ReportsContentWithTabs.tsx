@@ -77,7 +77,7 @@ export function ReportsContentWithTabs({
             ? superAdminScope === "all"
               ? "Gestión Global de Reportes"
               : "Reportes por Organización"
-            : userRole === "ADMIN"
+            : userRole === "ORG_ADMIN"
               ? "Gestión de Reportes"
               : "Mis Reportes Asignados"}
         </h1>
@@ -86,7 +86,7 @@ export function ReportsContentWithTabs({
             ? superAdminScope === "all"
               ? "Administra reportes de todas las organizaciones en una sola vista."
               : `Estás viendo únicamente la organización seleccionada${selectedOrganizationName ? `: ${selectedOrganizationName}` : ""}.`
-            : userRole === "ADMIN"
+            : userRole === "ORG_ADMIN"
               ? "Administra y da seguimiento a todas las denuncias de tu organización"
               : "Revisa y gestiona los reportes que tienes asignados"}
         </p>

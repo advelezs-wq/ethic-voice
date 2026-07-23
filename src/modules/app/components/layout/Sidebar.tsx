@@ -10,6 +10,7 @@ import Image from "next/image";
 import { SidebarItem } from "./SidebarItem";
 import { useSidebar } from "../../context/SidebarContext";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
+import { useTheme } from "@/modules/core/providers/ThemeProvider";
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
@@ -18,6 +19,8 @@ export const Sidebar: React.FC = () => {
   const { isCollapsed } = useSidebar();
   const { user } = useUser();
   const { permissions, isSuperAdmin } = useUserRole();
+  const { settings } = useTheme();
+  const organizationLogoUrl = settings?.logoUrl;
   const [superAdminScope, setSuperAdminScope] = useState<"all" | "org">("all");
 
   useEffect(() => {
@@ -319,16 +322,30 @@ export const Sidebar: React.FC = () => {
           }`}
           aria-label="EthicVoice — inicio"
         >
-          <Image
-            src="/brand/logo-nobg.png"
-            alt="EthicVoice"
-            width={170}
-            height={40}
-            className={`object-contain ${
-              isCollapsed ? "h-8 w-8" : "h-10 w-auto max-w-[10.5rem]"
-            }`}
-            priority
-          />
+          {organizationLogoUrl ? (
+            <Image
+              src={organizationLogoUrl}
+              alt="Logo de la organización"
+              width={170}
+              height={40}
+              className={`object-contain ${
+                isCollapsed ? "h-8 w-8" : "h-10 w-auto max-w-[10.5rem]"
+              }`}
+              priority
+              unoptimized
+            />
+          ) : (
+            <Image
+              src="/brand/logo-nobg.png"
+              alt="EthicVoice"
+              width={170}
+              height={40}
+              className={`object-contain ${
+                isCollapsed ? "h-8 w-8" : "h-10 w-auto max-w-[10.5rem]"
+              }`}
+              priority
+            />
+          )}
         </Link>
       </div>
 

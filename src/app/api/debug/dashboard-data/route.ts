@@ -7,6 +7,9 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const orgId = searchParams.get("orgId");
+    // Cuando se provee (rol investigador/miembro), limita todo el cálculo a
+    // los reportes asignados a este usuario, en vez de a toda la organización.
+    const scopeUserId = searchParams.get("userId") || undefined;
 
     if (!orgId) {
       return NextResponse.json(
@@ -15,11 +18,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log("🔍 [DEBUG] Using orgId:", orgId);
+    console.log("🔍 [DEBUG] Using orgId:", orgId, "scopeUserId:", scopeUserId);
 
-    // Get all reports for the organization
+    // Get all reports for the organization (o solo los asignados al usuario)
     const reports = await prisma.formSubmission.findMany({
-      where: { orgId: orgId },
+      where: scopeUserId
+        ? { orgId, assignments: { some: { userId: scopeUserId } } }
+        : { orgId: orgId },
       include: {
         assignments: true,
         department: true,

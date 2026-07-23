@@ -12,7 +12,10 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { ReportPDFFactory } from "@/modules/app/services/pdf-generator.service";
+import {
+  ReportPDFFactory,
+  withPrintFallbackBanner,
+} from "@/modules/app/services/pdf-generator.service";
 import { getFullDashboardData } from "@/modules/app/services/dashboard-data.service";
 
 export async function POST(request: NextRequest) {
@@ -502,27 +505,25 @@ async function generateEnhancedPDF(
   organization: any,
   reportType: string
 ) {
+  // Se construye el mismo HTML con marca (logo, colores) una sola vez, y se
+  // intenta renderizarlo con Puppeteer. Si Chromium no está disponible en el
+  // entorno serverless, se degrada al MISMO HTML (con un aviso de impresión)
+  // en vez de un reporte genérico sin estilos.
+  const html = await buildAnalyticsReportHTML(data, organization, reportType);
+
   try {
-    const pdfBuffer = await generatePuppeteerPDF(
-      data,
-      organization,
-      reportType
-    );
+    const pdfBuffer = await renderHtmlToPdfBuffer(html);
     return {
       buffer: pdfBuffer,
       isHtml: false,
     };
   } catch (error) {
     console.warn(
-      "Puppeteer PDF generation failed, falling back to HTML:",
+      "Puppeteer PDF generation failed, falling back to styled HTML:",
       error
     );
-    const htmlBuffer = Buffer.from(
-      generateHTMLReport(data, organization, reportType),
-      "utf-8"
-    );
     return {
-      buffer: htmlBuffer,
+      buffer: Buffer.from(withPrintFallbackBanner(html), "utf-8"),
       isHtml: true,
     };
   }
@@ -1011,11 +1012,11 @@ function buildAnalyticsSectionContent(reportType: string, data: any): string {
   return content;
 }
 
-async function generatePuppeteerPDF(
+async function buildAnalyticsReportHTML(
   data: any,
   organization: any,
   reportType: string
-) {
+): Promise<string> {
   // Register needed helpers once
   handlebars.registerHelper("formatDate", function (date: Date, fmt: string) {
     try {
@@ -1051,8 +1052,10 @@ async function generatePuppeteerPDF(
 
   const compileBase = handlebars.compile(baseTemplate);
   const sectionContent = buildAnalyticsSectionContent(reportType, data);
-  const html = compileBase({ ...templateData, content: sectionContent });
+  return compileBase({ ...templateData, content: sectionContent });
+}
 
+async function renderHtmlToPdfBuffer(html: string) {
   const isServerless =
     !!process.env.VERCEL || process.env.AWS_REGION !== undefined;
   const browser = await puppeteer.launch({
@@ -1097,275 +1100,6 @@ async function generatePuppeteerPDF(
   await browser.close();
 
   return pdfBuffer;
-}
-
-function generateHTMLReport(data: any, organization: any, reportType: string) {
-  let templateContent = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Reporte de Analytics - ${organization?.name || "Organización"}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
-        .stat-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: center; background: #f9f9f9; }
-        .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        .table th, .table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        .table th { background-color: #f5f5f5; font-weight: bold; }
-        .section { margin: 30px 0; }
-        .section h3 { color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
-        .performance-card { background: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; margin: 10px 0; border-radius: 8px; }
-        .download-note { background: #f0f9ff; border: 1px solid #0ea5e9; padding: 20px; border-radius: 8px; margin: 20px 0; line-height: 1.6; }
-        kbd { background: #e5e7eb; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px 6px; font-family: monospace; font-size: 0.875em; }
-        @media print {
-            .download-note { display: none; }
-            body { margin: 0; }
-            .header { margin-bottom: 20px; }
-        }
-    </style>
-</head>
-<body>
-    <div class="download-note">
-        <strong>📄 Reporte Generado Exitosamente</strong><br>
-        Este reporte se abrió en tu navegador porque la generación de PDF no está disponible en el servidor.<br><br>
-        <strong>💾 Para guardar como PDF:</strong><br>
-        1. Presiona <kbd>Ctrl+P</kbd> (Windows/Linux) o <kbd>Cmd+P</kbd> (Mac)<br>
-        2. Selecciona "Guardar como PDF" como destino<br>
-        3. Haz clic en "Guardar"
-    </div>
-    
-    <div class="header">
-        <h1>Reporte de Analytics Avanzado</h1>
-        <h2>${organization?.name || "Organización"}</h2>
-        <p>Generado el: ${new Date().toLocaleDateString("es-ES")} | Tipo: ${getReportTypeLabel(reportType)}</p>
-    </div>`;
-
-  // Add sections based on report type (same logic as PDF)
-  if (
-    reportType === "organization-overview" ||
-    reportType === "total-reports"
-  ) {
-    templateContent += `
-    <div class="section">
-        <h3>Resumen Organizacional</h3>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h4>Total de Miembros</h4>
-                <p style="font-size: 24px; font-weight: bold; color: #3b82f6;">${data.organizationMetrics?.totalMembers || 0}</p>
-            </div>
-            <div class="stat-card">
-                <h4>Miembros Activos</h4>
-                <p style="font-size: 24px; font-weight: bold; color: #10b981;">${data.organizationMetrics?.activeMembersWithReports || 0}</p>
-            </div>
-            <div class="stat-card">
-                <h4>Reportes por Miembro</h4>
-                <p style="font-size: 24px; font-weight: bold; color: #8b5cf6;">${data.organizationMetrics?.averageReportsPerMember || 0}</p>
-            </div>
-            <div class="stat-card">
-                <h4>Total de Reportes</h4>
-                <p style="font-size: 24px; font-weight: bold; color: #0066CC;">${data.totalReports || 0}</p>
-            </div>
-        </div>`;
-
-    if (data.organizationMetrics?.topPerformer) {
-      templateContent += `
-        <div class="performance-card">
-            <h4>Top Performer</h4>
-            <p><strong>${data.organizationMetrics.topPerformer.investigator}</strong> - ${data.organizationMetrics.topPerformer.productivityScore}% de productividad</p>
-            <p>Resueltos: ${data.organizationMetrics.topPerformer.resolvedCount} de ${data.organizationMetrics.topPerformer.assignedCount} asignados</p>
-        </div>`;
-    }
-    templateContent += `</div>`;
-  }
-
-  if (
-    reportType === "team-performance" ||
-    reportType === "organization-overview"
-  ) {
-    templateContent += `
-    <div class="section">
-        <h3>Rendimiento del Equipo</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Investigador</th>
-                    <th>Rol</th>
-                    <th>Asignados</th>
-                    <th>Resueltos</th>
-                    <th>Tiempo Prom. (días)</th>
-                    <th>Productividad (%)</th>
-                </tr>
-            </thead>
-            <tbody>`;
-
-    if (data.memberPerformance && data.memberPerformance.length > 0) {
-      data.memberPerformance.forEach((member: any) => {
-        templateContent += `
-                <tr>
-                    <td>${member.investigator}</td>
-                    <td>${member.role === "ADMIN" ? "Administrador" : "Miembro"}</td>
-                    <td>${member.assignedCount}</td>
-                    <td>${member.resolvedCount}</td>
-                    <td>${member.avgTime}</td>
-                    <td>${member.productivityScore}%</td>
-                </tr>`;
-      });
-    } else {
-      templateContent += `
-                <tr>
-                    <td colspan="6" style="text-align: center; color: #6b7280;">No hay datos de rendimiento disponibles</td>
-                </tr>`;
-    }
-
-    templateContent += `
-            </tbody>
-        </table>
-    </div>`;
-  }
-
-  if (
-    reportType === "status-distribution" ||
-    reportType === "organization-overview"
-  ) {
-    templateContent += `
-    <div class="section">
-        <h3>Distribución por Estado</h3>
-        <table class="table">
-            <thead>
-                <tr><th>Estado</th><th>Cantidad</th><th>Porcentaje</th></tr>
-            </thead>
-            <tbody>`;
-
-    if (data.statusDistribution && data.statusDistribution.length > 0) {
-      data.statusDistribution.forEach((item: any) => {
-        templateContent += `
-                <tr>
-                    <td>${item.status}</td>
-                    <td>${item.count}</td>
-                    <td>${item.percentage}%</td>
-                </tr>`;
-      });
-    }
-
-    templateContent += `</tbody></table></div>`;
-  }
-
-  if (
-    reportType === "department-reports" ||
-    reportType === "organization-overview"
-  ) {
-    templateContent += `
-    <div class="section">
-        <h3>Reportes por Departamento</h3>
-        <table class="table">
-            <thead>
-                <tr><th>Departamento</th><th>Cantidad</th></tr>
-            </thead>
-            <tbody>`;
-
-    if (data.departmentReports && data.departmentReports.length > 0) {
-      data.departmentReports.forEach((item: any) => {
-        templateContent += `
-                <tr>
-                    <td>${item.department}</td>
-                    <td>${item.count}</td>
-                </tr>`;
-      });
-    }
-
-    templateContent += `</tbody></table></div>`;
-  }
-
-  if (reportType === "report-types" || reportType === "organization-overview") {
-    templateContent += `
-    <div class="section">
-        <h3>Distribución por Severidad</h3>
-        <table class="table">
-            <thead>
-                <tr><th>Severidad</th><th>Cantidad</th><th>Porcentaje</th></tr>
-            </thead>
-            <tbody>`;
-
-    if (data.reportTypes && data.reportTypes.length > 0) {
-      data.reportTypes.forEach((item: any) => {
-        templateContent += `
-                <tr>
-                    <td>${item.type}</td>
-                    <td>${item.count}</td>
-                    <td>${item.percentage}%</td>
-                </tr>`;
-      });
-    }
-
-    templateContent += `</tbody></table></div>`;
-  }
-
-  if (
-    reportType === "resolution-time" ||
-    reportType === "organization-overview"
-  ) {
-    const r = data.resolutionMetrics || {
-      averageTime: 0,
-      fastestResolution: 0,
-      slowestResolution: 0,
-      totalResolved: 0,
-      timeDistribution: [],
-      monthlyTrend: [],
-    };
-
-    templateContent += `
-    <div class="section">
-      <h3>Tiempo de Resolución</h3>
-      <div class="stats-grid">
-        <div class="stat-card"><h4>Promedio</h4><p style="font-size: 20px; font-weight: bold;">${r.averageTime} días</p></div>
-        <div class="stat-card"><h4>Más rápido</h4><p style="font-size: 20px; font-weight: bold;">${r.fastestResolution} días</p></div>
-        <div class="stat-card"><h4>Más lento</h4><p style="font-size: 20px; font-weight: bold;">${r.slowestResolution} días</p></div>
-        <div class="stat-card"><h4>Resueltos</h4><p style="font-size: 20px; font-weight: bold;">${r.totalResolved}</p></div>
-      </div>
-      <h4>Distribución por rangos</h4>
-      <table class="table">
-        <thead><tr><th>Rango</th><th>Cantidad</th><th>%</th></tr></thead>
-        <tbody>`;
-
-    if (r.timeDistribution && r.timeDistribution.length > 0) {
-      r.timeDistribution.forEach((row: any) => {
-        templateContent += `
-          <tr>
-            <td>${row.range}</td>
-            <td>${row.count}</td>
-            <td>${row.percentage}%</td>
-          </tr>`;
-      });
-    }
-
-    templateContent += `</tbody></table>
-      <h4>Tendencia mensual</h4>
-      <table class="table">
-        <thead><tr><th>Mes</th><th>Tiempo promedio</th><th>Resueltos</th></tr></thead>
-        <tbody>`;
-
-    if (r.monthlyTrend && r.monthlyTrend.length > 0) {
-      r.monthlyTrend.forEach((row: any) => {
-        templateContent += `
-          <tr>
-            <td>${row.month}</td>
-            <td>${row.avgTime} días</td>
-            <td>${row.count}</td>
-          </tr>`;
-      });
-    }
-
-    templateContent += `</tbody></table>
-    </div>`;
-  }
-
-  templateContent += `
-</body>
-</html>`;
-
-  return templateContent;
 }
 
 function getReportTypeLabel(reportType: string): string {

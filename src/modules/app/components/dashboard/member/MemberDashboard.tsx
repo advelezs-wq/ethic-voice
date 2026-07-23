@@ -24,9 +24,14 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({
   onRefresh,
   refreshing,
 }) => {
-  // Filter reports assigned to this member
+  // Los datos ya vienen filtrados por el servidor a los reportes asignados a
+  // este investigador (ver ReportsDashboard -> loadDashboardData con scope de
+  // usuario). Se revalida contra `assignments` como respaldo defensivo, ya
+  // que `assigneeId` quedó obsoleto desde que se migró a asignaciones múltiples.
   const assignedReports = data.recentReports.filter(
-    (report) => report.assigneeId === userId
+    (report) =>
+      report.assigneeId === userId ||
+      report.assignments?.some((a) => a.userId === userId)
   );
 
   return (

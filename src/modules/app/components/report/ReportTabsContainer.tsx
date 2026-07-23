@@ -6,6 +6,7 @@ import { ReportTimeline } from "./ReportTimeline";
 import { ReportChat } from "./ReportChat";
 import { ReportUpdates } from "./ReportUpdates";
 import { ReportTasks } from "./ReportTasks";
+import { ReportSectionErrorBoundary } from "./ReportSectionErrorBoundary";
 import {
   FormSubmission,
   ReportContent as ReportContentType,
@@ -113,7 +114,11 @@ export const ReportTabsContainer: React.FC<ReportTabsContainerProps> = ({
             onUnreadChange={setUnreadChat}
           />
         )}
-        {activeTab === "tasks" && <ReportTasks reportId={report.id} />}
+        {activeTab === "tasks" && (
+          <ReportSectionErrorBoundary fallbackTitle="No se pudo mostrar el panel de tareas">
+            <ReportTasks reportId={report.id} />
+          </ReportSectionErrorBoundary>
+        )}
         {activeTab === "updates" && (
           <ReportUpdates reportId={reportId} report={report} />
         )}

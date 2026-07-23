@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import * as XLSX from "xlsx";
 import { getReportsWithFilters } from "@/actions/reports.actions";
 import { getReportsStats } from "@/actions/reports-stats";
+import { resolveReportScopeUserId } from "@/modules/core/utils/permissions";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,6 +12,15 @@ export async function POST(req: NextRequest) {
     if (!userId || !orgId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
+
+    // Los investigadores (ORG_MEMBER) solo deben exportar los casos que
+    // tienen asignados, nunca los de toda la organización.
+    const clerkUser = await currentUser();
+    const scopeUserId = await resolveReportScopeUserId(
+      userId,
+      orgId,
+      clerkUser?.primaryEmailAddress?.emailAddress
+    );
 
     const body = await req.json();
     const { format, filename, filters } = body as {
@@ -47,9 +57,10 @@ export async function POST(req: NextRequest) {
     const { reports } = await getReportsWithFilters(
       normalizedFilters as any,
       1,
-      pageSize
+      pageSize,
+      scopeUserId
     );
-    const stats = await getReportsStats(orgId);
+    const stats = await getReportsStats(orgId, scopeUserId);
 
     // Flatten rows for export
     const rows = reports.map((r: any) => ({

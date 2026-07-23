@@ -44,11 +44,15 @@ export interface DashboardData {
 }
 
 export async function getFullDashboardData(
-  orgId: string
+  orgId: string,
+  /** Cuando se provee (rol investigador/miembro), limita todo el cálculo a los reportes asignados a este usuario. */
+  scopeUserId?: string
 ): Promise<DashboardData> {
-  // Get all reports for the organization
+  // Get all reports for the organization (o solo los asignados al usuario si se pasa scopeUserId)
   const reports = await prisma.formSubmission.findMany({
-    where: { orgId },
+    where: scopeUserId
+      ? { orgId, assignments: { some: { userId: scopeUserId } } }
+      : { orgId },
     include: { assignments: true, department: true },
     orderBy: { submittedAt: "desc" },
   });

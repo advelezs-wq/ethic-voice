@@ -4,6 +4,7 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
+import { UserRole } from "@/types/auth.types";
 import { DashboardData } from "@/types/dashboard.types";
 import { ReportsStats } from "@/types/reports";
 // Removed direct imports of server-side functions with Prisma
@@ -107,13 +108,24 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
       setState((prev) => ({ ...prev, dashboardLoading: true }));
 
       try {
+        // Los investigadores (ORG_MEMBER) solo deben ver estadísticas y
+        // reportes recientes de los casos que tienen asignados, no los de
+        // toda la organización.
+        const scopeParam =
+          role === UserRole.ORG_MEMBER && !isSuperAdmin && user?.id
+            ? `&userId=${encodeURIComponent(user.id)}`
+            : "";
+
         // Call the debug analytics API route to bypass permission issues
-        const response = await fetch(`/api/debug/dashboard-data?orgId=${orgId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          `/api/debug/dashboard-data?orgId=${orgId}${scopeParam}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Analytics API failed: ${response.status}`);
@@ -170,7 +182,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
         setState((prev) => ({ ...prev, dashboardLoading: false }));
       }
     },
-    [needsRefresh] // Removed state.lastDashboardUpdate to prevent infinite loops
+    [needsRefresh, role, isSuperAdmin, user?.id]
   );
 
   // Load reports stats via API

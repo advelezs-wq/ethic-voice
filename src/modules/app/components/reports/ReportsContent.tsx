@@ -159,7 +159,7 @@ export function ReportsContent({
       return superAdminScope === "all"
         ? "Administra reportes de todas las organizaciones"
         : `Vista filtrada por organización${selectedOrganizationName ? `: ${selectedOrganizationName}` : ""}`;
-    } else if (userRole === "ADMIN") {
+    } else if (userRole === "ORG_ADMIN") {
       return "Administra y da seguimiento a todas las denuncias de tu organización";
     } else {
       return "Revisa y gestiona únicamente los reportes que tienes asignados";
@@ -197,7 +197,7 @@ export function ReportsContent({
         onBulkAction={handleBulkAction}
       />
 
-      {!isSuperAdmin && userRole !== "ADMIN" && (
+      {!isSuperAdmin && userRole !== "ORG_ADMIN" && (
         <div className="rounded-2xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-sm text-amber-900">
           Estás en vista de investigador: solo ves casos asignados a ti para mantener foco operativo y cumplimiento de SLA.
         </div>

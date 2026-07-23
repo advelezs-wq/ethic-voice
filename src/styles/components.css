@@ -157,6 +157,17 @@
     @apply !bg-slate-800;
   }
 
+  /* La barra lateral, el header y las tarjetas de contenido usan clases con
+     modificador de opacidad (bg-white/95, bg-white/85, bg-white/90), que
+     generan selectores distintos a ".bg-white" y por eso no quedaban
+     cubiertos por la regla anterior: el texto pasaba a un tono claro por el
+     tema oscuro pero el fondo seguía blanco, dejando la columna ilegible. */
+  [data-theme*="dark"] .ev-sidebar-surface,
+  [data-theme*="dark"] .ev-header-surface,
+  [data-theme*="dark"] .ev-content-surface {
+    @apply !bg-slate-800/95 !border-slate-700;
+  }
+
   [data-theme*="dark"] .border-gray-200 {
     @apply !border-slate-700;
   }

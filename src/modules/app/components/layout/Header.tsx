@@ -17,6 +17,7 @@ import {
 } from "@heroui/react";
 import { useSidebar } from "../../context/SidebarContext";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
+import { useTheme } from "@/modules/core/providers/ThemeProvider";
 import { NotificationBell } from "../notifications/NotificationBell";
 import { CreateReportModal } from "../reports/CreateReportModal";
 
@@ -26,6 +27,8 @@ export function Header() {
   const { permissions, isSuperAdmin } = useUserRole();
   const { currentOrganization, organizations, switchOrganization, setCurrentOrganization } =
     useOrganization();
+  const { settings } = useTheme();
+  const organizationLogoUrl = settings?.logoUrl;
   const { isLoaded: _userLoaded } = useUser();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [superAdminScope, setSuperAdminScope] = useState<"all" | "org">("org");
@@ -88,14 +91,26 @@ export function Header() {
           className="lg:hidden inline-flex items-center pl-10 md:pl-16"
           aria-label="EthicVoice — inicio"
         >
-          <Image
-            src="/brand/logo-nobg.png"
-            alt="EthicVoice"
-            width={160}
-            height={38}
-            className="h-8 w-auto max-w-[9.5rem] object-contain"
-            priority
-          />
+          {organizationLogoUrl ? (
+            <Image
+              src={organizationLogoUrl}
+              alt="Logo de la organización"
+              width={160}
+              height={38}
+              className="h-8 w-auto max-w-[9.5rem] object-contain"
+              priority
+              unoptimized
+            />
+          ) : (
+            <Image
+              src="/brand/logo-nobg.png"
+              alt="EthicVoice"
+              width={160}
+              height={38}
+              className="h-8 w-auto max-w-[9.5rem] object-contain"
+              priority
+            />
+          )}
         </Link>
 
         <div className="hidden lg:block">

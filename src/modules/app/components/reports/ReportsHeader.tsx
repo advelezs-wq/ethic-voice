@@ -98,8 +98,18 @@ export function ReportsHeader({
       }),
     });
     if (!res.ok) return;
+
+    // El servidor puede degradar a un HTML con el mismo diseño cuando no
+    // puede lanzar Chromium; en ese caso lo abrimos en una pestaña nueva.
+    const contentType = res.headers.get("content-type") || "";
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
+
+    if (contentType.includes("text/html")) {
+      window.open(url, "_blank");
+      return;
+    }
+
     const a = document.createElement("a");
     a.href = url;
     a.download = `reporte-de-denuncias.pdf`;

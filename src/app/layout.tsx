@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { ClientProvider } from "@/modules/core/providers/ClientProvider";
-import { auth, currentUser } from "@clerk/nextjs/server";
-import prisma from "@/modules/prisma/lib/prisma";
 import "./globals.css";
 import { JsonLd } from "@/modules/core/components/JsonLd";
 import Script from "next/script";
+import { headers } from "next/headers";
+import {
+  getRequestHost,
+  PUBLIC_BLOG_PATH_HEADER,
+  PUBLIC_BLOG_REQUEST_HEADER,
+  verifyPublicBlogMarker,
+} from "@/lib/public-blog";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -79,39 +83,26 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let serverUser = null;
-  const serverToken = "";
+  const requestHeaders = await headers();
+  const marker = requestHeaders.get(PUBLIC_BLOG_REQUEST_HEADER);
+  const currentPathname = requestHeaders.get(PUBLIC_BLOG_PATH_HEADER);
+  const publicBlogContext = await verifyPublicBlogMarker(
+    marker,
+    currentPathname,
+    getRequestHost(requestHeaders),
+    process.env.CLERK_SECRET_KEY,
+  );
+  let content = children;
 
-  try {
-    const { userId: clerkId } = await auth();
-    const clerkUser = await currentUser();
-
-    if (clerkId && clerkUser) {
-      serverUser = await prisma.user.upsert({
-        where: { email: clerkUser.emailAddresses[0].emailAddress },
-        create: {
-          id: clerkId,
-          email: clerkUser.emailAddresses[0].emailAddress,
-          firstName: clerkUser.firstName,
-          lastName: clerkUser.lastName,
-        },
-        update: {
-          id: clerkId,
-          firstName: clerkUser.firstName,
-          lastName: clerkUser.lastName,
-        },
-        include: {
-          organizations: true,
-        },
-      });
-    }
-  } catch (error) {
-    // Auth not available for public routes, continue without user
-    console.log("Auth not available for this route:", error);
+  if (!publicBlogContext) {
+    const { DefaultRootProviders } = await import("./default-root-providers");
+    content = (
+      <DefaultRootProviders>{children}</DefaultRootProviders>
+    );
   }
 
   return (
-    <html lang="en">
+    <html lang={publicBlogContext?.locale ?? "en"}>
       <head>
         <JsonLd />
         <Script
@@ -124,9 +115,7 @@ export default async function RootLayout({
         className={`${inter.variable} font-sans antialiased`}
         suppressHydrationWarning={true}
       >
-        <ClientProvider serverUser={serverUser} serverToken={serverToken}>
-          {children}
-        </ClientProvider>
+        {content}
       </body>
     </html>
   );

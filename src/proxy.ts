@@ -1,7 +1,16 @@
 // proxy.ts
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { checkPlanRestrictions } from "@/modules/core/middleware/plan-restrictions.middleware";
+import {
+  getRequestHost,
+  PUBLIC_BLOG_PATH_HEADER,
+  PUBLIC_BLOG_REQUEST_HEADER,
+  signPublicBlogMarker,
+} from "@/lib/public-blog";
+import { preflightPublicBlog } from "@/lib/public-blog-preflight";
+
+const PUBLIC_BLOG_PREFLIGHT_TIMEOUT_MS = 3000;
 
 const isProtectedRoute = createRouteMatcher([
   "/app(.*)",
@@ -17,11 +26,17 @@ const isPublicRoute = createRouteMatcher([
   "/auth/sign-up(.*)",
   "/api/webhooks(.*)",
   "/api/public(.*)",
+  "/api/semsei/revalidate",
   "/api/submit/secure(.*)",
   "/api/payments(.*)", // Payment routes are public for signup flow
   "/api/subscriptions(.*)", // Subscription routes need to be accessible during signup
   "/submit(.*)",
   "/track(.*)",
+]);
+
+const isPublicBlogRoute = createRouteMatcher([
+  "/en/blogs/(.*)",
+  "/es/blogs/(.*)",
 ]);
 
 // Routes that should skip plan restrictions (mainly webhooks and auth)
@@ -66,18 +81,42 @@ function verifyAdminApiKey(req: Request): boolean {
   return apiKey === expectedApiKey;
 }
 
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
+function sanitizeRequest(req: NextRequest) {
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.delete(PUBLIC_BLOG_REQUEST_HEADER);
+  requestHeaders.delete(PUBLIC_BLOG_PATH_HEADER);
 
+  return new NextRequest(req, { headers: requestHeaders });
+}
+
+function nextWithPublicBlogMarker(
+  req: Request,
+  marker?: string,
+  pathname?: string,
+) {
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.delete(PUBLIC_BLOG_REQUEST_HEADER);
+  requestHeaders.delete(PUBLIC_BLOG_PATH_HEADER);
+  if (marker && pathname) {
+    requestHeaders.set(PUBLIC_BLOG_REQUEST_HEADER, marker);
+    requestHeaders.set(PUBLIC_BLOG_PATH_HEADER, pathname);
+  }
+
+  return NextResponse.next({ request: { headers: requestHeaders } });
+}
+
+const clerkHandler = clerkMiddleware(async (auth, req) => {
   // Skip proxy entirely for public routes
   if (isPublicRoute(req)) {
-    return NextResponse.next();
+    return nextWithPublicBlogMarker(req);
   }
 
   // Skip proxy entirely for unrestricted routes (including checkout)
   if (isUnrestrictedRoute(req)) {
-    return NextResponse.next();
+    return nextWithPublicBlogMarker(req);
   }
+
+  const { userId } = await auth();
 
   // Check for admin routes with API key authentication
   if (isAdminRoute(req)) {
@@ -85,7 +124,7 @@ export default clerkMiddleware(async (auth, req) => {
       req.headers.get("x-vercel-cron") || req.headers.get("x-vercel-signature");
     if (isVercelCron) {
       // Allow Vercel Cron to hit admin endpoints without Clerk/Auth
-      return NextResponse.next();
+      return nextWithPublicBlogMarker(req);
     }
     if (verifyAdminApiKey(req)) {
       // Valid API key, allow access to admin route
@@ -93,7 +132,7 @@ export default clerkMiddleware(async (auth, req) => {
         "✅ [PROXY] Admin API key verified, allowing access to:",
         req.nextUrl.pathname
       );
-      return NextResponse.next();
+      return nextWithPublicBlogMarker(req);
     }
     // Invalid or missing API key, fall through to Clerk authentication
     console.log(
@@ -195,8 +234,55 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // For authenticated users, let them through
-  return NextResponse.next();
+  return nextWithPublicBlogMarker(req);
 });
+
+export default async function proxy(req: NextRequest, event: NextFetchEvent) {
+  const sanitizedRequest = sanitizeRequest(req);
+  if (isPublicBlogRoute(sanitizedRequest)) {
+    const preflight = await preflightPublicBlog(
+      sanitizedRequest.nextUrl.pathname,
+      getRequestHost(sanitizedRequest.headers),
+      {
+        apiKey: process.env.SEMSEI_API_KEY,
+        apiUrl: process.env.SEMSEI_API_URL || "https://app.semsei.io",
+        fetch,
+        timeoutMs: PUBLIC_BLOG_PREFLIGHT_TIMEOUT_MS,
+      },
+    );
+    if (preflight.status === "not-found") {
+      return new NextResponse("Not Found", {
+        status: 404,
+        headers: { "Cache-Control": "private, no-store, max-age=0" },
+      });
+    }
+    if (preflight.status === "bad-gateway") {
+      return new NextResponse("Bad Gateway", {
+        status: 502,
+        headers: { "Cache-Control": "private, no-store, max-age=0" },
+      });
+    }
+
+    const marker = await signPublicBlogMarker(
+      preflight.context,
+      process.env.CLERK_SECRET_KEY,
+    );
+    if (marker) {
+      return nextWithPublicBlogMarker(
+        sanitizedRequest,
+        marker,
+        preflight.context.pathname,
+      );
+    }
+
+    return new NextResponse("Bad Gateway", {
+      status: 502,
+      headers: { "Cache-Control": "private, no-store, max-age=0" },
+    });
+  }
+
+  return clerkHandler(sanitizedRequest, event);
+}
 
 export const config = {
   matcher: [
@@ -204,5 +290,10 @@ export const config = {
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     // Always run for API routes
     "/(api|trpc)(.*)",
+    // Do not let protected app paths with static-looking extensions bypass marker cleanup.
+    "/app(.*)",
+    // Localized article slugs may intentionally end in static-looking extensions.
+    "/en/blogs/:path*",
+    "/es/blogs/:path*",
   ],
 };

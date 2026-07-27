@@ -26,6 +26,14 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
   },
+  // Next's default htmlLimitedBots regex doesn't match plain "Googlebot" (only
+  // Google-prefixed/suffixed variants like AdsBot-Google), so routes with dynamic
+  // generateMetadata (e.g. /blogs/[...slug], which reads headers()) stream their
+  // <title>/meta tags in via client JS instead of embedding them in the initial
+  // <head>. Googlebot's indexer doesn't pick that up, showing "Untitled" in search
+  // results even though the body content is indexed correctly. Force blocking
+  // metadata for every request so <head> is always complete in the first response.
+  htmlLimitedBots: /.*/,
   // Raíz explícita por si usas `bun run dev:turbo` (Turbopack puede fallar con
   // ciertas rutas, p. ej. volúmenes con espacios; el dev por defecto usa Webpack).
   turbopack: {

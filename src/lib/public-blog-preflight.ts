@@ -32,13 +32,21 @@ export async function preflightPublicBlog(
 ): Promise<PublicBlogPreflightResult> {
   const context = createPublicBlogContext(pathname, host);
   const { apiKey, apiUrl, fetch: fetcher, timeoutMs } = dependencies;
-  if (
-    !context ||
-    !apiKey ||
-    !Number.isFinite(timeoutMs) ||
-    timeoutMs <= 0 ||
-    timeoutMs > MAX_TIMEOUT_MS
-  ) {
+  if (!context) {
+    console.error("[public-blog-preflight] bad-gateway: invalid pathname/host context", {
+      pathname,
+      host,
+    });
+    return { status: "bad-gateway" };
+  }
+  if (!apiKey) {
+    console.error(
+      "[public-blog-preflight] bad-gateway: SEMSEI_API_KEY is empty/undefined at runtime",
+    );
+    return { status: "bad-gateway" };
+  }
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0 || timeoutMs > MAX_TIMEOUT_MS) {
+    console.error("[public-blog-preflight] bad-gateway: invalid timeoutMs", { timeoutMs });
     return { status: "bad-gateway" };
   }
 
@@ -53,6 +61,10 @@ export async function preflightPublicBlog(
       base.hash ||
       !["", "/"].includes(base.pathname)
     ) {
+      console.error(
+        "[public-blog-preflight] bad-gateway: SEMSEI_API_URL failed shape validation",
+        { apiUrl },
+      );
       return { status: "bad-gateway" };
     }
 
@@ -63,7 +75,11 @@ export async function preflightPublicBlog(
       slug,
       locale: context.locale,
     }).toString();
-  } catch {
+  } catch (err) {
+    console.error("[public-blog-preflight] bad-gateway: failed to build CODE endpoint URL", {
+      apiUrl,
+      err,
+    });
     return { status: "bad-gateway" };
   }
 
@@ -74,9 +90,19 @@ export async function preflightPublicBlog(
       signal: AbortSignal.timeout(timeoutMs),
     });
     if (response.status === 404) return { status: "not-found" };
-    if (!response.ok) return { status: "bad-gateway" };
+    if (!response.ok) {
+      console.error("[public-blog-preflight] bad-gateway: CODE API returned non-ok status", {
+        status: response.status,
+        endpoint: endpoint.toString(),
+      });
+      return { status: "bad-gateway" };
+    }
     return { status: "ok", context };
-  } catch {
+  } catch (err) {
+    console.error("[public-blog-preflight] bad-gateway: fetch to CODE API threw", {
+      endpoint: endpoint.toString(),
+      err,
+    });
     return { status: "bad-gateway" };
   }
 }

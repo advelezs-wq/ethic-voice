@@ -18,6 +18,12 @@ const nextConfig = {
     return [
       { source: "/eventos", destination: "/blog", permanent: true },
       { source: "/noticias", destination: "/blog", permanent: true },
+      // Legacy non-locale Semsei blog URLs (indexed before the /[locale]/blogs
+      // routing + preflight verification was introduced). Redirect to the
+      // canonical es-locale route instead of letting the orphaned
+      // src/app/blogs/[...slug]/page.tsx render (it bypasses the middleware
+      // preflight and silently breaks — see src/app/[locale]/blogs).
+      { source: "/blogs/:path*", destination: "/es/blogs/:path*", permanent: true },
     ];
   },
   typescript: {

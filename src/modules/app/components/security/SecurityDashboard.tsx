@@ -413,9 +413,9 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
     return (
       <Card className="p-6">
         <div className="text-center space-y-4">
-          <i className="icon-[lucide--shield-x] size-12 text-gray-400 mx-auto" />
-          <h3 className="text-lg font-semibold text-gray-700">Acceso Restringido</h3>
-          <p className="text-gray-500">
+          <i className="icon-[lucide--shield-x] size-12 text-slate-400 mx-auto" />
+          <h3 className="text-lg font-semibold text-slate-600">Acceso Restringido</h3>
+          <p className="text-slate-400">
             No tienes permisos para ver el dashboard de seguridad.
           </p>
         </div>
@@ -428,7 +428,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
       <Card className="p-6">
         <div className="text-center">
           <i className="icon-[lucide--loader-circle] size-8 animate-spin text-primary mx-auto" />
-          <p className="mt-2 text-gray-500">Cargando datos de seguridad...</p>
+          <p className="mt-2 text-slate-400">Cargando datos de seguridad...</p>
         </div>
       </Card>
     );
@@ -441,8 +441,8 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
         <div className="flex items-center gap-3">
           <i className="icon-[lucide--shield-check] size-8 text-green-600" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard de Seguridad</h1>
-            <p className="text-gray-600">
+            <h1 className="text-2xl font-bold text-[#0d212c]">Dashboard de Seguridad</h1>
+            <p className="text-slate-500">
               Monitoreo y gestión de protecciones contra bots y ataques
             </p>
           </div>
@@ -471,28 +471,28 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
 
       {/* Debug Information */}
       {showDebug && debugInfo && (
-        <Card className="p-6 bg-gray-50 border-2 border-gray-200">
+        <Card className="p-6 bg-[#f7faf9] border-2 border-emerald-100">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <i className="icon-[lucide--bug] size-5 text-gray-600" />
+              <i className="icon-[lucide--bug] size-5 text-slate-500" />
               <h3 className="text-lg font-semibold">Información de Debug</h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white p-3 rounded-lg">
-                <p className="text-sm text-gray-600">IPs Rastreadas</p>
+                <p className="text-sm text-slate-500">IPs Rastreadas</p>
                 <p className="text-xl font-bold">{debugInfo.systemInfo?.totalTrackedIPs || 0}</p>
               </div>
               <div className="bg-white p-3 rounded-lg">
-                <p className="text-sm text-gray-600">IPs Bloqueadas</p>
+                <p className="text-sm text-slate-500">IPs Bloqueadas</p>
                 <p className="text-xl font-bold">{debugInfo.systemInfo?.totalBlockedIPs || 0}</p>
               </div>
               <div className="bg-white p-3 rounded-lg">
-                <p className="text-sm text-gray-600">IPs en Whitelist</p>
+                <p className="text-sm text-slate-500">IPs en Whitelist</p>
                 <p className="text-xl font-bold">{debugInfo.systemInfo?.totalWhitelistedIPs || 0}</p>
               </div>
               <div className="bg-white p-3 rounded-lg">
-                <p className="text-sm text-gray-600">Environment</p>
+                <p className="text-sm text-slate-500">Environment</p>
                 <p className="text-sm font-mono">{debugInfo.systemInfo?.environment || 'unknown'}</p>
               </div>
             </div>
@@ -539,7 +539,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               </div>
             )}
 
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-slate-400">
               <p>Última actualización: {debugInfo.systemInfo?.timestamp}</p>
             </div>
           </div>
@@ -554,8 +554,8 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               <i className="icon-[lucide--shield-alert] size-6 text-red-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.blockedIPs.length}</p>
-              <p className="text-sm text-gray-600">IPs Bloqueadas</p>
+              <p className="text-2xl font-bold text-[#0d212c]">{stats.blockedIPs.length}</p>
+              <p className="text-sm text-slate-500">IPs Bloqueadas</p>
             </div>
           </div>
         </Card>
@@ -566,20 +566,20 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               <i className="icon-[lucide--eye] size-6 text-yellow-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.suspiciousIPs.length}</p>
-              <p className="text-sm text-gray-600">IPs Sospechosas</p>
+              <p className="text-2xl font-bold text-[#0d212c]">{stats.suspiciousIPs.length}</p>
+              <p className="text-sm text-slate-500">IPs Sospechosas</p>
             </div>
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <i className="icon-[lucide--zap] size-6 text-blue-600" />
+            <div className="p-2 bg-sky-100 rounded-lg">
+              <i className="icon-[lucide--zap] size-6 text-sky-700" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.rateLimitStats.captchaRequired}</p>
-              <p className="text-sm text-gray-600">Captchas Requeridos</p>
+              <p className="text-2xl font-bold text-[#0d212c]">{stats.rateLimitStats.captchaRequired}</p>
+              <p className="text-sm text-slate-500">Captchas Requeridos</p>
             </div>
           </div>
         </Card>
@@ -590,10 +590,10 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               <i className="icon-[lucide--check-circle] size-6 text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-2xl font-bold text-[#0d212c]">
                 {Math.round((stats.rateLimitStats.captchaPassed / stats.rateLimitStats.captchaRequired) * 100) || 0}%
               </p>
-              <p className="text-sm text-gray-600">Tasa de Éxito</p>
+              <p className="text-sm text-slate-500">Tasa de Éxito</p>
             </div>
           </div>
         </Card>
@@ -604,8 +604,8 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               <i className="icon-[lucide--file-warning] size-6 text-purple-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.quarantineFiles.length}</p>
-              <p className="text-sm text-gray-600">Archivos en Cuarentena</p>
+              <p className="text-2xl font-bold text-[#0d212c]">{stats.quarantineFiles.length}</p>
+              <p className="text-sm text-slate-500">Archivos en Cuarentena</p>
             </div>
           </div>
         </Card>
@@ -616,8 +616,8 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               <i className="icon-[lucide--repeat] size-6 text-indigo-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.idempotencyStats.collisions}</p>
-              <p className="text-sm text-gray-600">Colisiones Idempotencia</p>
+              <p className="text-2xl font-bold text-[#0d212c]">{stats.idempotencyStats.collisions}</p>
+              <p className="text-sm text-slate-500">Colisiones Idempotencia</p>
             </div>
           </div>
         </Card>
@@ -632,20 +632,20 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               Métricas de Idempotencia
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="rounded-lg bg-gray-50 p-3">
-                <p className="text-xs text-gray-500">Intentos</p>
+              <div className="rounded-lg bg-[#f7faf9] p-3">
+                <p className="text-xs text-slate-400">Intentos</p>
                 <p className="text-xl font-bold">{stats.idempotencyStats.attempts}</p>
               </div>
               <div className="rounded-lg bg-green-50 p-3">
-                <p className="text-xs text-gray-500">Locks OK</p>
+                <p className="text-xs text-slate-400">Locks OK</p>
                 <p className="text-xl font-bold text-green-700">{stats.idempotencyStats.acquired}</p>
               </div>
               <div className="rounded-lg bg-orange-50 p-3">
-                <p className="text-xs text-gray-500">Colisiones</p>
+                <p className="text-xs text-slate-400">Colisiones</p>
                 <p className="text-xl font-bold text-orange-700">{stats.idempotencyStats.collisions}</p>
               </div>
               <div className="rounded-lg bg-red-50 p-3">
-                <p className="text-xs text-gray-500">Invalid Key</p>
+                <p className="text-xs text-slate-400">Invalid Key</p>
                 <p className="text-xl font-bold text-red-700">{stats.idempotencyStats.invalid}</p>
               </div>
             </div>
@@ -660,7 +660,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
             </h3>
 
             {stats.quarantineFiles.length === 0 ? (
-              <p className="text-gray-500 text-sm">No hay archivos en cuarentena.</p>
+              <p className="text-slate-400 text-sm">No hay archivos en cuarentena.</p>
             ) : (
               <Table aria-label="Quarantine files">
                 <TableHeader>
@@ -684,7 +684,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
                         <span className="text-xs">{file.reason}</span>
                       </TableCell>
                       <TableCell>
-                        <span className="text-xs text-gray-500">{formatTimestamp(file.timestamp)}</span>
+                        <span className="text-xs text-slate-400">{formatTimestamp(file.timestamp)}</span>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -732,7 +732,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
             </Button>
           </div>
           
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-slate-400">
             Las IPs bloqueadas manualmente permanecerán bloqueadas hasta que se desbloqueen manualmente.
           </p>
         </div>
@@ -752,7 +752,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
             </div>
             
             {stats.blockedIPs.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No hay IPs bloqueadas</p>
+              <p className="text-slate-400 text-center py-4">No hay IPs bloqueadas</p>
             ) : (
               <div className="space-y-2">
                 {stats.blockedIPs.map((ip) => (
@@ -797,14 +797,14 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               </Button>
             </div>
             
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-400">
               Las IPs en la whitelist no están sujetas a rate limiting ni verificación de captcha.
             </p>
 
             {/* Show current whitelisted IPs */}
             {whitelistData.whitelistedIPs.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">IPs en Whitelist:</h4>
+                <h4 className="text-sm font-medium text-slate-600">IPs en Whitelist:</h4>
                 {whitelistData.whitelistedIPs.map((ip) => (
                   <div key={ip} className="flex items-center justify-between p-2 bg-green-50 rounded">
                     <span className="font-mono text-sm">{ip}</span>
@@ -846,7 +846,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
                     <span className="font-mono text-sm">{attack.ip}</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-slate-500">
                       {formatTimestamp(attack.timestamp)}
                     </span>
                   </TableCell>
@@ -890,7 +890,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
                     <span className="font-mono text-sm">{activity.ip}</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-slate-500">
                       {formatTimestamp(activity.timestamp)}
                     </span>
                   </TableCell>

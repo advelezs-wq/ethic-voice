@@ -65,8 +65,8 @@ export function DepartmentList({
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Departamentos</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="text-xl font-bold text-[#0d212c]">Departamentos</h2>
+            <p className="text-sm text-slate-500">
               Gestiona los departamentos de tu organización
             </p>
           </div>
@@ -99,30 +99,30 @@ export function DepartmentList({
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-2 text-sm">
                     <div>
-                      <p className="text-gray-600">Miembros</p>
+                      <p className="text-slate-500">Miembros</p>
                       <p className="font-bold">{department.memberCount}</p>
                     </div>
                     <div>
-                      <p className="text-gray-600">Reportes Total</p>
+                      <p className="text-slate-500">Reportes Total</p>
                       <p className="font-bold">{department.reportCount}</p>
                     </div>
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Pendientes</span>
+                      <span className="text-slate-500">Pendientes</span>
                       <span className="font-medium text-yellow-600">
                         {department.pendingReports}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">En Progreso</span>
-                      <span className="font-medium text-blue-600">
+                      <span className="text-slate-500">En Progreso</span>
+                      <span className="font-medium text-sky-700">
                         {department.inProgressReports}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Resueltos</span>
+                      <span className="text-slate-500">Resueltos</span>
                       <span className="font-medium text-green-600">
                         {department.resolvedReports}
                       </span>

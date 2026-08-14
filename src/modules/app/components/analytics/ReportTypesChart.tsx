@@ -84,12 +84,12 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
     if (props.active && props.payload && props.payload.length) {
       const data = props.payload[0].payload;
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{data.name}</p>
-          <p className="text-sm text-gray-600">
+        <div className="bg-white p-3 border border-emerald-100 rounded-lg shadow-lg">
+          <p className="font-medium text-[#0d212c]">{data.name}</p>
+          <p className="text-sm text-slate-500">
             Cantidad: <span className="font-medium">{data.count}</span>
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Porcentaje: <span className="font-medium">{data.percentage}%</span>
           </p>
         </div>
@@ -107,7 +107,7 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: entry.color }}
             />
-            <span className="text-sm text-gray-700">{entry.value}</span>
+            <span className="text-sm text-slate-600">{entry.value}</span>
           </div>
         ))}
       </div>
@@ -124,8 +124,8 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
               high: "bg-red-50 text-red-800",
               medium: "bg-yellow-50 text-yellow-800",
               low: "bg-green-50 text-green-800",
-              unknown: "bg-gray-50 text-gray-800",
-            }[item.type.toLowerCase()] || "bg-blue-50 text-blue-800";
+              unknown: "bg-emerald-50/40 text-[#0d212c]",
+            }[item.type.toLowerCase()] || "bg-sky-50 text-sky-700";
 
           return (
             <div
@@ -145,10 +145,10 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
       {/* Pie Chart */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">
+          <h4 className="text-lg font-semibold text-[#0d212c]">
             Distribución por Severidad
           </h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Clasificación de reportes según nivel de gravedad
           </p>
         </div>
@@ -178,7 +178,7 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-slate-400">
             <i className="icon-[lucide--pie-chart] size-12 mx-auto mb-4" />
             <p className="text-lg font-medium">No hay datos disponibles</p>
             <p className="text-sm">No se encontraron tipos de reportes</p>
@@ -189,10 +189,10 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
       {/* Bar Chart Alternative View */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">
+          <h4 className="text-lg font-semibold text-[#0d212c]">
             Comparación por Severidad
           </h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Vista comparativa de reportes por nivel de severidad
           </p>
         </div>
@@ -232,7 +232,7 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-slate-400">
             <i className="icon-[lucide--bar-chart-3] size-12 mx-auto mb-4" />
             <p>No hay datos disponibles</p>
           </div>
@@ -243,10 +243,10 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
       {data.length > 0 && (
         <div className="bg-white border rounded-lg p-6">
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-900">
+            <h4 className="text-lg font-semibold text-[#0d212c]">
               Detalle por Tipo
             </h4>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-500">
               Lista detallada de tipos de reportes
             </p>
           </div>
@@ -259,8 +259,8 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
                   high: "bg-red-50 border-red-200",
                   medium: "bg-yellow-50 border-yellow-200",
                   low: "bg-green-50 border-green-200",
-                  unknown: "bg-gray-50 border-gray-200",
-                }[item.type.toLowerCase()] || "bg-blue-50 border-blue-200";
+                  unknown: "bg-emerald-50/40 border-emerald-100",
+                }[item.type.toLowerCase()] || "bg-sky-50 border-sky-200";
 
               return (
                 <div
@@ -274,13 +274,13 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
                     >
                       {index + 1}
                     </div>
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-[#0d212c]">
                       {getSeverityLabel(item.type)}
                     </span>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-gray-900">{item.count}</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="font-bold text-[#0d212c]">{item.count}</div>
+                    <div className="text-sm text-slate-500">
                       {item.percentage}%
                     </div>
                   </div>

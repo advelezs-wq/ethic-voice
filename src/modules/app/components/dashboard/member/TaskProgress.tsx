@@ -52,7 +52,7 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
   return (
     <Card>
       <CardHeader>
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-[#0d212c]">
           Estado de Mis Tareas
         </h3>
       </CardHeader>
@@ -60,10 +60,10 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
         {/* Progress Overview */}
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-slate-600">
               Progreso General
             </span>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-slate-400">
               {statusCounts.closed}/{total} completados
             </span>
           </div>
@@ -77,17 +77,17 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
 
         {/* Status Breakdown */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-gray-700">
+          <h4 className="text-sm font-semibold text-slate-600">
             Distribución por Estado
           </h4>
           {progressData.map((item, index) => (
             <div key={index} className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className={`w-3 h-3 rounded-full ${item.bgColor}`}></div>
-                <span className="text-sm text-gray-600">{item.label}</span>
+                <span className="text-sm text-slate-500">{item.label}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-sm font-medium text-[#0d212c]">
                   {item.count}
                 </span>
                 <Chip
@@ -104,7 +104,7 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
 
         {/* Priority Breakdown */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-gray-700">
+          <h4 className="text-sm font-semibold text-slate-600">
             Prioridad de Casos Pendientes
           </h4>
           <div className="grid grid-cols-2 gap-3">
@@ -144,8 +144,8 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
         </div>
 
         {/* Quick Actions */}
-        <div className="pt-4 border-t border-gray-200">
-          <div className="text-sm text-gray-500 text-center">
+        <div className="pt-4 border-t border-emerald-100">
+          <div className="text-sm text-slate-400 text-center">
             {statusCounts.new > 0
               ? `Tienes ${statusCounts.new} caso${statusCounts.new > 1 ? 's' : ''} nuevo${statusCounts.new > 1 ? 's' : ''} por revisar`
               : "¡Excelente! No tienes casos nuevos pendientes"}

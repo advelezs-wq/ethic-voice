@@ -157,13 +157,13 @@ export function ReportsTable({
 
   const getSourceIcon = (source: string) => {
     if (source === "EMAIL") {
-      return <i className="icon-[lucide--mail] size-4 text-blue-500" />;
+      return <i className="icon-[lucide--mail] size-4 text-sky-600" />;
     } else if (source === "ETHIC_LINE") {
       return (
         <i className="icon-[lucide--shield-check] size-4 text-green-500" />
       );
     }
-    return <i className="icon-[lucide--file-text] size-4 text-gray-500" />;
+    return <i className="icon-[lucide--file-text] size-4 text-slate-400" />;
   };
 
   // Helper function to extract reported person name
@@ -351,7 +351,7 @@ export function ReportsTable({
                         title={`Seleccionar reporte ${report.id}`}
                         checked={isSelected}
                         onChange={() => toggleReportSelection(report.id)}
-                        className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                        className="w-4 h-4 text-primary border-emerald-100 rounded focus:ring-primary"
                       />
                     </div>
 
@@ -359,7 +359,7 @@ export function ReportsTable({
                     <div className="flex-1">
                         <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
                         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                          <span className="text-sm font-semibold text-gray-500">
+                          <span className="text-sm font-semibold text-slate-400">
                             {generateReportReference(report.id)}
                           </span>
                           {getSourceIcon(report.source)}
@@ -480,17 +480,17 @@ export function ReportsTable({
                         {reportInfo.title}
                       </h3>
 
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                      <p className="text-sm text-slate-500 mb-3 line-clamp-2">
                         {reportInfo.description}
                       </p>
 
                       {/* Key Findings Section */}
                       {reportInfo.keyFindings.length > 0 && (
                         <div className="mb-3 rounded-lg border border-emerald-100 bg-emerald-50/55 p-3">
-                          <h4 className="text-xs font-semibold text-gray-700 mb-1">
+                          <h4 className="text-xs font-semibold text-slate-600 mb-1">
                             Hallazgos clave:
                           </h4>
-                          <ul className="text-xs text-gray-600 space-y-1">
+                          <ul className="text-xs text-slate-500 space-y-1">
                             {reportInfo.keyFindings
                               .slice(0, 2)
                               .map((finding: React.ReactNode, idx: number) => (
@@ -511,19 +511,19 @@ export function ReportsTable({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-3">
                         <div>
-                          <p className="text-xs text-gray-500">Categoría</p>
+                          <p className="text-xs text-slate-400">Categoría</p>
                           <p className="text-sm font-medium">
                             {reportInfo.category}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500">Departamento</p>
+                          <p className="text-xs text-slate-400">Departamento</p>
                           <p className="text-sm font-medium">
                             {report.department?.name || "No asignado"}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500">Denunciante</p>
+                          <p className="text-xs text-slate-400">Denunciante</p>
                           <p className="text-sm font-medium">
                             {report.isAnonymous
                               ? "Anónimo"
@@ -533,13 +533,13 @@ export function ReportsTable({
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500">Denunciado</p>
+                          <p className="text-xs text-slate-400">Denunciado</p>
                           <p className="text-sm font-medium">
                             {getReportedPersonName(report)}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500">Fuente</p>
+                          <p className="text-xs text-slate-400">Fuente</p>
                           <p className="text-sm font-medium">
                             {getSourceLabel(report.source)}
                           </p>
@@ -548,7 +548,7 @@ export function ReportsTable({
 
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t">
                         <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm">
-                          <span className="text-gray-600">
+                          <span className="text-slate-500">
                             <i className="icon-[lucide--calendar] size-4 mr-1 inline" />
                             {formatDate(report.submittedAt)}
                           </span>
@@ -556,7 +556,7 @@ export function ReportsTable({
                             className={`flex items-center gap-2 font-medium ${
                               deadline.isOverdue
                                 ? "text-red-600"
-                                : "text-gray-600"
+                                : "text-slate-500"
                             }`}
                           >
                             <span
@@ -679,32 +679,32 @@ export function ReportsTable({
                         reports.length > 0
                       }
                       onChange={selectAllReports}
-                      className="w-4 h-4 text-primary border-gray-300 rounded"
+                      className="w-4 h-4 text-primary border-emerald-100 rounded"
                     />
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-700 w-24 whitespace-nowrap">
+                  <th className="p-4 text-left text-sm font-medium text-slate-600 w-24 whitespace-nowrap">
                     ID
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-700 md:w-[18rem] lg:w-[20rem] xl:w-[26rem]">
+                  <th className="p-4 text-left text-sm font-medium text-slate-600 md:w-[18rem] lg:w-[20rem] xl:w-[26rem]">
                     Asunto / Resumen
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-700 md:w-40 lg:w-48">
+                  <th className="p-4 text-left text-sm font-medium text-slate-600 md:w-40 lg:w-48">
                     Denunciado
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-700 min-w-[140px]">
+                  <th className="p-4 text-left text-sm font-medium text-slate-600 min-w-[140px]">
                     Análisis
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-700 w-24 whitespace-nowrap">
+                  <th className="p-4 text-left text-sm font-medium text-slate-600 w-24 whitespace-nowrap">
                     Severidad
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-700 w-24 lg:w-28">
+                  <th className="p-4 text-left text-sm font-medium text-slate-600 w-24 lg:w-28">
                     Estado
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-700 w-24 whitespace-nowrap">
+                  <th className="p-4 text-left text-sm font-medium text-slate-600 w-24 whitespace-nowrap">
                     Fecha
                   </th>
                   <th
-                    className={`p-4 text-left text-sm font-medium text-gray-700 md:w-40 lg:w-44 whitespace-nowrap ${
+                    className={`p-4 text-left text-sm font-medium text-slate-600 md:w-40 lg:w-44 whitespace-nowrap ${
                       userRole === UserRole.ORG_ADMIN ||
                       userRole === UserRole.SUPER_ADMIN
                         ? ""
@@ -713,7 +713,7 @@ export function ReportsTable({
                   >
                     Asignado
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-gray-700 w-20 whitespace-nowrap">
+                  <th className="p-4 text-left text-sm font-medium text-slate-600 w-20 whitespace-nowrap">
                     Acciones
                   </th>
                 </tr>
@@ -741,28 +741,28 @@ export function ReportsTable({
                           title={`Seleccionar reporte ${report.id}`}
                           checked={isSelected}
                           onChange={() => toggleReportSelection(report.id)}
-                          className="w-4 h-4 text-primary border-gray-300 rounded"
+                          className="w-4 h-4 text-primary border-emerald-100 rounded"
                         />
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           {getSourceIcon(report.source)}
                           {getPriorityIcon(report.priority || "NORMAL")}
-                          <span className="font-medium text-gray-900 text-sm">
+                          <span className="font-medium text-[#0d212c] text-sm">
                             {generateReportReference(report.id)}
                           </span>
                         </div>
                       </td>
                       <td className="p-4 md:w-[28rem] whitespace-nowrap">
                         <div>
-                          <p className="font-medium text-gray-900 line-clamp-2 text-sm">
+                          <p className="font-medium text-[#0d212c] line-clamp-2 text-sm">
                             {reportInfo.title}
                           </p>
-                          <p className="text-sm text-gray-600 line-clamp-1">
+                          <p className="text-sm text-slate-500 line-clamp-1">
                             {reportInfo.category}
                           </p>
                           {report.reporterName && !report.isAnonymous && (
-                            <p className="text-xs text-gray-500 truncate">
+                            <p className="text-xs text-slate-400 truncate">
                               Por: {report.reporterName}
                             </p>
                           )}
@@ -770,7 +770,7 @@ export function ReportsTable({
                       </td>
                       <td className="p-4 md:w-48 whitespace-nowrap">
                         <div>
-                          <span className="text-sm text-gray-900 font-medium truncate block">
+                          <span className="text-sm text-[#0d212c] font-medium truncate block">
                             {getReportedPersonName(report)}
                           </span>
                         </div>
@@ -798,7 +798,7 @@ export function ReportsTable({
                                   </div>
                                 }
                               >
-                                <div className="flex items-center gap-1 text-xs text-gray-600 cursor-help">
+                                <div className="flex items-center gap-1 text-xs text-slate-500 cursor-help">
                                   <i className="icon-[lucide--search] size-3" />
                                   <span className="line-clamp-1">
                                     {reportInfo.keyFindings[0]}
@@ -840,7 +840,7 @@ export function ReportsTable({
                               }
                               // Otherwise, show informative gray text
                               return (
-                                <span className="text-sm text-gray-400">
+                                <span className="text-sm text-slate-400">
                                   Sin análisis AI
                                 </span>
                               );
@@ -945,14 +945,14 @@ export function ReportsTable({
                       </td>
                       <td className="p-4 hidden md:table-cell">
                         <div className="text-sm">
-                          <p className="text-gray-600">
+                          <p className="text-slate-500">
                             {formatDate(report.submittedAt)}
                           </p>
                           <p
                             className={`flex items-center gap-2 text-xs ${
                               deadline.isOverdue
                                 ? "text-red-600 font-medium"
-                                : "text-gray-500"
+                                : "text-slate-400"
                             }`}
                           >
                             <span

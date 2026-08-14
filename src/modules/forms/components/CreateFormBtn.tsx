@@ -55,13 +55,13 @@ export const CreateFormBtn = () => {
         className="group border-primary/20 h-[190px] items-center justify-center flex flex-col hover:border-primary hover:cursor-pointer border-dashed gap-4"
         startContent={
           <i
-            className="icon-[bi--file-earmark-plus-fill] size-8 text-gray-700 group-hover:text-primary"
+            className="icon-[bi--file-earmark-plus-fill] size-8 text-slate-600 group-hover:text-primary"
             role="img"
             aria-hidden="true"
           />
         }
       >
-        <p className="font-bold text-xl text-gray-700 group-hover:text-primary">
+        <p className="font-bold text-xl text-slate-600 group-hover:text-primary">
           Create new form
         </p>
       </Button>

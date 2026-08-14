@@ -129,7 +129,7 @@ export function EmojiPicker({
       <div className="max-h-64 overflow-y-auto">
         {Object.entries(EMOJI_CATEGORIES).map(([category, emojis]) => (
           <div key={category} className="mb-3">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-1 px-1">
+            <h3 className="text-xs font-semibold text-slate-400 uppercase mb-1 px-1">
               {category}
             </h3>
             <div className="grid grid-cols-8 gap-1">
@@ -140,7 +140,7 @@ export function EmojiPicker({
                     onSelect(emoji);
                     onClose();
                   }}
-                  className="p-2 hover:bg-gray-100 rounded transition-colors text-lg"
+                  className="p-2 hover:bg-emerald-50 rounded transition-colors text-lg"
                   title={emoji}
                 >
                   {emoji}

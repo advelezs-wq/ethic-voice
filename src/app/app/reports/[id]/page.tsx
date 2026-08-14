@@ -29,7 +29,7 @@ export default async function ReportDetailsPage({
 
     if (!parsedContent) {
       return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[#f7faf9]">
           <main className="pt-20">
             <ReportError
               error="No se pudo procesar el contenido del reporte"
@@ -78,7 +78,7 @@ export default async function ReportDetailsPage({
     );
   } catch (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-[#f7faf9]">
         <main className="pt-20">
           <ReportError
             error={

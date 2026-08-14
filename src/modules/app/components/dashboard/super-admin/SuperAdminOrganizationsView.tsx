@@ -44,10 +44,10 @@ export function SuperAdminOrganizationsView() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-[#0d212c]">
             Gestión de Organizaciones
           </h1>
-          <p className="text-gray-600">
+          <p className="text-slate-500">
             Administra todas las organizaciones del sistema
           </p>
         </div>
@@ -104,11 +104,11 @@ export function SuperAdminOrganizationsView() {
               }}
             >
               <div>
-                <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                <label className="block text-sm font-medium text-slate-600">Nombre</label>
                 <input name="name" required className="mt-1 w-full border rounded px-3 py-2" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Slug (opcional)</label>
+                <label className="block text-sm font-medium text-slate-600">Slug (opcional)</label>
                 <input name="slug" className="mt-1 w-full border rounded px-3 py-2" />
               </div>
               <div className="pt-2">

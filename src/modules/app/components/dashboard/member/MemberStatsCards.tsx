@@ -40,12 +40,12 @@ export const MemberStatsCards: React.FC<MemberStatsCardsProps> = ({
           aria-hidden="true"
         />
       ),
-      bgColor: "bg-blue-600",
-      iconBgColor: "bg-blue-700",
+      bgColor: "bg-sky-600",
+      iconBgColor: "bg-sky-700",
       textColor: "text-white",
-      subtitleColor: "text-blue-100",
+      subtitleColor: "text-sky-100",
       extra: (
-        <p className="text-sm text-blue-100 mt-1">
+        <p className="text-sm text-sky-100 mt-1">
           de {totalReports} totales
         </p>
       ),

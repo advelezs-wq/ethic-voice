@@ -30,54 +30,6 @@ export function CreateOrganizationStep({
     }
   }, [currentOrganization, organizationCreated]);
 
-  const THEME_COLORS: Record<
-    string,
-    | {
-        primaryColor: string;
-        secondaryColor: string;
-        accentColor: string;
-        backgroundColor: string;
-      }
-    | undefined
-  > = {
-    default: {
-      primaryColor: "#0066CC",
-      secondaryColor: "#4A90E2",
-      accentColor: "#E3F2FD",
-      backgroundColor: "#F8FAFC",
-    },
-    green: {
-      primaryColor: "#10B981",
-      secondaryColor: "#34D399",
-      accentColor: "#ECFDF5",
-      backgroundColor: "#F9FAFB",
-    },
-    purple: {
-      primaryColor: "#8B5CF6",
-      secondaryColor: "#A78BFA",
-      accentColor: "#F3E8FF",
-      backgroundColor: "#FAFAFA",
-    },
-    orange: {
-      primaryColor: "#F59E0B",
-      secondaryColor: "#FBBF24",
-      accentColor: "#FEF3C7",
-      backgroundColor: "#FFFBEB",
-    },
-    "dark-blue": {
-      primaryColor: "#3B82F6",
-      secondaryColor: "#60A5FA",
-      accentColor: "#1F2937",
-      backgroundColor: "#111827",
-    },
-    "dark-purple": {
-      primaryColor: "#A855F7",
-      secondaryColor: "#C084FC",
-      accentColor: "#1F2937",
-      backgroundColor: "#111827",
-    },
-  };
-
   const handleOrganizationCreated = async (org: OrganizationResource) => {
     console.log("🎉 [ONBOARDING] Organization created successfully!", org);
     setOrganizationCreated(true);
@@ -130,24 +82,7 @@ export function CreateOrganizationStep({
         }
       }
 
-      // 3. Apply selected theme now that org exists
-      if (context.selectedTheme && org.id) {
-        const colors = THEME_COLORS[context.selectedTheme];
-        await fetch("/api/organization/settings/update", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            organizationId: org.id,
-            settings: {
-              theme: context.selectedTheme,
-              ...(colors || {}),
-            },
-          }),
-        });
-        console.log("🎨 [ONBOARDING] Theme applied to new organization");
-      }
-
-      // 4. Wait a moment for all operations to complete
+      // 3. Wait a moment for all operations to complete
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // 5. Redirect to the organization
@@ -198,10 +133,10 @@ export function CreateOrganizationStep({
         <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-2xl">{organizationCreated ? "✅" : "🏢"}</span>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-[#0d212c] mb-2">
           {organizationCreated ? "¡Todo listo!" : "Crear tu organización"}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-slate-500">
           {organizationCreated
             ? "Finalizando configuración y llevándote a la plataforma..."
             : "Último paso: crea tu organización para acceder a todas las funcionalidades"}
@@ -234,7 +169,7 @@ export function CreateOrganizationStep({
                   <br />✓ Acceso completo activado
                 </p>
               </div>
-              <div className="mt-6 flex items-center justify-center gap-3 text-sm text-gray-600">
+              <div className="mt-6 flex items-center justify-center gap-3 text-sm text-slate-500">
                 <Spinner size="sm" color="success" />
                 Redirigiéndote a tu espacio de trabajo...
               </div>
@@ -242,14 +177,11 @@ export function CreateOrganizationStep({
           ) : (
             <div className="flex flex-col items-center">
               {/* Summary of previous steps */}
-              <div className="mb-6 bg-blue-50 rounded-lg p-4 w-full">
-                <h3 className="font-semibold text-blue-900 mb-2">
+              <div className="mb-6 bg-sky-50 rounded-lg p-4 w-full">
+                <h3 className="font-semibold text-sky-800 mb-2">
                   📋 Resumen de tu configuración
                 </h3>
-                <div className="text-sm text-blue-700 space-y-1">
-                  <p>
-                    🎨 <strong>Tema:</strong> {context.selectedTheme}
-                  </p>
+                <div className="text-sm text-sky-700 space-y-1">
                   <p>
                     🔔 <strong>Notificaciones:</strong>{" "}
                     {
@@ -278,7 +210,7 @@ export function CreateOrganizationStep({
                 />
                 {/* Slug oculto en UI: lo generará el backend; mostramos una vista previa solo informativa */}
                 {name && (
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-slate-400">
                     URL: /app/organizations/
                     <span className="font-medium">{toSlug(name)}</span>
                   </div>
@@ -288,10 +220,10 @@ export function CreateOrganizationStep({
 
                 {/* Pre-creation logo drop (stores locally, uploads after creation) */}
                 <div>
-                  <p className="text-sm text-gray-700 mb-2">Logo de la organización (opcional)</p>
+                  <p className="text-sm text-slate-600 mb-2">Logo de la organización (opcional)</p>
                   <div className="border-2 border-dashed rounded-lg p-4 text-center">
                     {!previewUrl ? (
-                      <label className="block cursor-pointer text-gray-600">
+                      <label className="block cursor-pointer text-slate-500">
                         <input
                           type="file"
                           accept="image/*"
@@ -336,7 +268,7 @@ export function CreateOrganizationStep({
             Anterior
           </Button>
 
-          <div className="text-sm text-gray-600 self-center">
+          <div className="text-sm text-slate-500 self-center">
             Crea tu organización para completar →
           </div>
         </div>

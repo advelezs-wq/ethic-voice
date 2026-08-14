@@ -53,7 +53,7 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 const AVATAR_COLORS = [
-  "bg-blue-500",
+  "bg-sky-500",
   "bg-violet-500",
   "bg-emerald-500",
   "bg-amber-500",
@@ -202,7 +202,7 @@ export function MemberPicker({
   const dropdownContent = (
     <div
       ref={dropdownRef}
-      className="bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden flex flex-col"
+      className="bg-white border border-emerald-100 rounded-xl shadow-2xl overflow-hidden flex flex-col"
       style={{
         position: "fixed",
         zIndex: 99999,
@@ -216,21 +216,21 @@ export function MemberPicker({
       }}
     >
       {/* Search */}
-      <div className="p-2 border-b border-gray-100 shrink-0">
-        <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-2.5 py-1.5">
-          <i className="icon-[lucide--search] size-3.5 text-gray-400 shrink-0" />
+      <div className="p-2 border-b border-emerald-50 shrink-0">
+        <div className="flex items-center gap-2 bg-emerald-50/40 rounded-lg px-2.5 py-1.5">
+          <i className="icon-[lucide--search] size-3.5 text-slate-400 shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar por nombre o departamento…"
-            className="flex-1 bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none min-w-0"
+            className="flex-1 bg-transparent text-sm text-[#0d212c] placeholder-gray-400 outline-none min-w-0"
           />
           {query && (
             <button
               onClick={() => setQuery("")}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-slate-400 hover:text-slate-500"
               aria-label="Limpiar búsqueda"
             >
               <i className="icon-[lucide--x] size-3" />
@@ -246,17 +246,17 @@ export function MemberPicker({
           <button
             type="button"
             onClick={() => handleSelect("")}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 transition-colors border-b border-gray-100"
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-400 hover:bg-emerald-50/40 transition-colors border-b border-emerald-50"
           >
-            <i className="icon-[lucide--user-x] size-4 text-gray-400" />
+            <i className="icon-[lucide--user-x] size-4 text-slate-400" />
             Sin asignar
           </button>
         )}
 
         {filtered.length === 0 ? (
           <div className="px-4 py-6 text-center">
-            <i className="icon-[lucide--users] size-8 text-gray-200 mx-auto mb-2 block" />
-            <p className="text-sm text-gray-500">
+            <i className="icon-[lucide--users] size-8 text-slate-200 mx-auto mb-2 block" />
+            <p className="text-sm text-slate-400">
               {members.length === 0
                 ? "No hay miembros en la organización"
                 : "Sin coincidencias para tu búsqueda"}
@@ -266,8 +266,8 @@ export function MemberPicker({
           <>
             {admins.length > 0 && (
               <div>
-                <div className="px-3 py-1.5 bg-gray-50 border-b border-gray-100 sticky top-0">
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                <div className="px-3 py-1.5 bg-emerald-50/40 border-b border-emerald-50 sticky top-0">
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
                     Administradores
                   </p>
                 </div>
@@ -284,8 +284,8 @@ export function MemberPicker({
 
             {investigators.length > 0 && (
               <div>
-                <div className="px-3 py-1.5 bg-gray-50 border-b border-gray-100 sticky top-0">
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                <div className="px-3 py-1.5 bg-emerald-50/40 border-b border-emerald-50 sticky top-0">
+                  <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
                     Investigadores
                   </p>
                 </div>
@@ -305,8 +305,8 @@ export function MemberPicker({
 
       {/* Footer: count */}
       {members.length > 0 && (
-        <div className="px-3 py-1.5 bg-gray-50 border-t border-gray-100 shrink-0">
-          <p className="text-[10px] text-gray-400">
+        <div className="px-3 py-1.5 bg-emerald-50/40 border-t border-emerald-50 shrink-0">
+          <p className="text-[10px] text-slate-400">
             {filtered.length} de {members.filter((m) => !m.isBlocked).length}{" "}
             miembro{members.filter((m) => !m.isBlocked).length !== 1 ? "s" : ""}
           </p>
@@ -318,7 +318,7 @@ export function MemberPicker({
   return (
     <div className="relative w-full">
       {label && (
-        <p className="text-xs font-medium text-gray-600 mb-1.5">{label}</p>
+        <p className="text-xs font-medium text-slate-500 mb-1.5">{label}</p>
       )}
 
       {/* Trigger button */}
@@ -333,11 +333,11 @@ export function MemberPicker({
           "w-full flex items-center gap-2 px-3 rounded-xl border transition-all text-left",
           heightClass,
           disabled
-            ? "opacity-50 cursor-not-allowed bg-gray-50"
-            : "bg-white cursor-pointer hover:border-blue-400 hover:bg-blue-50/20",
+            ? "opacity-50 cursor-not-allowed bg-emerald-50/40"
+            : "bg-white cursor-pointer hover:border-sky-400 hover:bg-sky-50/20",
           open
-            ? "border-blue-500 ring-2 ring-blue-100"
-            : "border-gray-300",
+            ? "border-sky-500 ring-2 ring-sky-100"
+            : "border-emerald-200",
         ].join(" ")}
       >
         {value ? (
@@ -349,14 +349,14 @@ export function MemberPicker({
             >
               {initials(value)}
             </span>
-            <span className="flex-1 truncate text-gray-800 text-sm">{value}</span>
+            <span className="flex-1 truncate text-[#0d212c] text-sm">{value}</span>
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onChange("");
               }}
-              className="shrink-0 p-0.5 rounded-full hover:bg-gray-200 text-gray-400 hover:text-gray-600 transition-colors"
+              className="shrink-0 p-0.5 rounded-full hover:bg-emerald-100 text-slate-400 hover:text-slate-500 transition-colors"
               aria-label="Quitar asignación"
             >
               <i className="icon-[lucide--x] size-3" />
@@ -364,12 +364,12 @@ export function MemberPicker({
           </>
         ) : (
           <>
-            <i className={`icon-[lucide--user] ${iconSize} text-gray-400 shrink-0`} />
-            <span className="flex-1 text-gray-400 text-sm">
+            <i className={`icon-[lucide--user] ${iconSize} text-slate-400 shrink-0`} />
+            <span className="flex-1 text-slate-400 text-sm">
               {isLoading ? "Cargando equipo…" : placeholder}
             </span>
             <i
-              className={`icon-[lucide--chevron-down] ${iconSize} text-gray-400 shrink-0 transition-transform ${
+              className={`icon-[lucide--chevron-down] ${iconSize} text-slate-400 shrink-0 transition-transform ${
                 open ? "rotate-180" : ""
               }`}
             />
@@ -399,7 +399,7 @@ function MemberRow({
       aria-selected={isSelected}
       onClick={onSelect}
       className={`w-full flex items-center gap-2.5 px-3 py-2.5 transition-colors text-left ${
-        isSelected ? "bg-blue-50" : "hover:bg-gray-50"
+        isSelected ? "bg-sky-50" : "hover:bg-emerald-50/40"
       }`}
     >
       {/* Avatar */}
@@ -413,11 +413,11 @@ function MemberRow({
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-800 truncate">
+        <p className="text-sm font-medium text-[#0d212c] truncate">
           {member.userName}
         </p>
         {member.department && (
-          <p className="text-xs text-gray-400 truncate">{member.department}</p>
+          <p className="text-xs text-slate-400 truncate">{member.department}</p>
         )}
       </div>
 
@@ -427,13 +427,13 @@ function MemberRow({
           className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
             member.role === "ADMIN"
               ? "bg-violet-100 text-violet-700"
-              : "bg-blue-100 text-blue-700"
+              : "bg-sky-100 text-sky-700"
           }`}
         >
           {member.role === "ADMIN" ? "Admin" : "Invest."}
         </span>
         {isSelected && (
-          <i className="icon-[lucide--check] size-3.5 text-blue-600" />
+          <i className="icon-[lucide--check] size-3.5 text-sky-700" />
         )}
       </div>
     </button>

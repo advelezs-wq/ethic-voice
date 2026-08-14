@@ -240,14 +240,14 @@ export function DashboardLayoutSection({
 
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <i className="icon-[lucide--info] size-5 text-blue-600 mt-0.5" />
+          <i className="icon-[lucide--info] size-5 text-sky-700 mt-0.5" />
           <div>
-            <h5 className="font-medium text-blue-800">
+            <h5 className="font-medium text-sky-700">
               Personalización del Dashboard
             </h5>
-            <p className="text-sm text-blue-700 mt-1">
+            <p className="text-sm text-sky-700 mt-1">
               Arrastra y suelta los elementos para reordenarlos. Usa los
               switches para mostrar/ocultar elementos y cambia el tamaño según
               tus necesidades.
@@ -258,7 +258,7 @@ export function DashboardLayoutSection({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-lg font-medium text-gray-900">
+          <h4 className="text-lg font-medium text-[#0d212c]">
             Elementos del Dashboard
           </h4>
           <div className="flex gap-2">
@@ -286,17 +286,17 @@ export function DashboardLayoutSection({
                 draggedElement === element.id
                   ? "opacity-50 transform rotate-2"
                   : ""
-              } ${!element.isVisible ? "opacity-60 bg-gray-50" : ""}`}
+              } ${!element.isVisible ? "opacity-60 bg-[#f7faf9]" : ""}`}
             >
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-3 flex-1">
-                  <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-lg">
-                    <i className={`${element.icon} size-4 text-gray-600`} />
+                  <div className="flex items-center justify-center w-8 h-8 bg-emerald-50 rounded-lg">
+                    <i className={`${element.icon} size-4 text-slate-500`} />
                   </div>
 
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h5 className="font-medium text-gray-900">
+                      <h5 className="font-medium text-[#0d212c]">
                         {element.name}
                       </h5>
                       <Chip
@@ -307,7 +307,7 @@ export function DashboardLayoutSection({
                         {getSizeLabel(element.size)}
                       </Chip>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-500">
                       {element.description}
                     </p>
                   </div>
@@ -348,7 +348,7 @@ export function DashboardLayoutSection({
                     size="sm"
                   />
 
-                  <div className="flex items-center gap-1 text-gray-400">
+                  <div className="flex items-center gap-1 text-slate-400">
                     <i className="icon-[lucide--grip-vertical] size-4" />
                     <i className="icon-[lucide--grip-vertical] size-4 -ml-2" />
                   </div>
@@ -362,8 +362,8 @@ export function DashboardLayoutSection({
       <div className="border-t pt-6">
         <div className="flex items-center justify-between">
           <div>
-            <h5 className="font-medium text-gray-900">Guardar Configuración</h5>
-            <p className="text-sm text-gray-600">
+            <h5 className="font-medium text-[#0d212c]">Guardar Configuración</h5>
+            <p className="text-sm text-slate-500">
               Los cambios se aplicarán a tu dashboard inmediatamente
             </p>
           </div>

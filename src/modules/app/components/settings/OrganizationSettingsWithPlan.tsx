@@ -129,7 +129,7 @@ export function OrganizationSettingsWithPlan() {
     return (
       <Card>
         <CardBody>
-          <p className="text-center text-gray-500">
+          <p className="text-center text-slate-400">
             Unable to load plan information
           </p>
         </CardBody>
@@ -174,7 +174,7 @@ export function OrganizationSettingsWithPlan() {
                   <i className="icon-[lucide--settings] w-5 h-5" />
                   <div>
                     <h3 className="text-lg font-semibold">Basic Information</h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-500">
                       Basic organization settings available to all plans
                     </p>
                   </div>
@@ -241,7 +241,7 @@ export function OrganizationSettingsWithPlan() {
                   <i className="icon-[lucide--image] w-5 h-5" />
                   <div>
                     <h3 className="text-lg font-semibold">Logo & Branding</h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-500">
                       Customize your organization's visual identity
                     </p>
                   </div>
@@ -263,11 +263,11 @@ export function OrganizationSettingsWithPlan() {
                       />
 
                       {settings.logoUrl ? (
-                        <div className="rounded-lg bg-gray-50 p-4">
-                          <p className="mb-2 text-sm text-gray-600">
+                        <div className="rounded-lg bg-[#f7faf9] p-4">
+                          <p className="mb-2 text-sm text-slate-500">
                             Vista previa del logo
                           </p>
-                          <div className="relative h-16 w-40 overflow-hidden rounded-md border border-gray-200 bg-white">
+                          <div className="relative h-16 w-40 overflow-hidden rounded-md border border-emerald-100 bg-white">
                             <Image
                               src={settings.logoUrl}
                               alt="Vista previa del logo de la organización"
@@ -316,7 +316,7 @@ export function OrganizationSettingsWithPlan() {
                   <i className="icon-[lucide--palette] w-5 h-5" />
                   <div>
                     <h3 className="text-lg font-semibold">Color Theme</h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-500">
                       Customize your platform's color scheme
                     </p>
                   </div>
@@ -392,8 +392,8 @@ export function OrganizationSettingsWithPlan() {
                         </div>
                       </div>
 
-                      <div className="p-4 bg-gray-50 rounded-lg">
-                        <p className="text-sm text-gray-600 mb-2">
+                      <div className="p-4 bg-[#f7faf9] rounded-lg">
+                        <p className="text-sm text-slate-500 mb-2">
                           Theme Preview:
                         </p>
                         <div className="flex gap-2">
@@ -451,7 +451,7 @@ export function OrganizationSettingsWithPlan() {
                     <h3 className="text-lg font-semibold">
                       Advanced Customization
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-500">
                       Advanced branding and customization options
                     </p>
                   </div>
@@ -474,7 +474,7 @@ export function OrganizationSettingsWithPlan() {
                           placeholder="/* Add your custom CSS here */"
                           className="w-full h-32 p-3 border rounded-lg font-mono text-sm"
                         />
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-slate-400 mt-1">
                           Add custom CSS to further customize your platform
                           appearance
                         </p>
@@ -496,7 +496,7 @@ export function OrganizationSettingsWithPlan() {
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-medium">White Label Mode</h4>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-slate-500">
                             Remove EthicVoice branding from your portal
                           </p>
                         </div>
@@ -553,7 +553,7 @@ export function OrganizationSettingsWithPlan() {
                   <i className="icon-[lucide--shield] w-5 h-5" />
                   <div>
                     <h3 className="text-lg font-semibold">Premium Features</h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-slate-500">
                       Enterprise-grade features and integrations
                     </p>
                   </div>
@@ -564,7 +564,7 @@ export function OrganizationSettingsWithPlan() {
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-medium">API Access</h4>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-slate-500">
                             Enable REST API access for custom integrations
                           </p>
                         </div>
@@ -584,7 +584,7 @@ export function OrganizationSettingsWithPlan() {
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-medium">Single Sign-On (SSO)</h4>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-slate-500">
                             Enable SAML/OAuth SSO integration
                           </p>
                         </div>
@@ -604,7 +604,7 @@ export function OrganizationSettingsWithPlan() {
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-medium">Advanced Audit Logs</h4>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-slate-500">
                             Detailed audit logging for compliance
                           </p>
                         </div>

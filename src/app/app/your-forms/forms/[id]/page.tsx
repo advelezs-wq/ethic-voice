@@ -30,13 +30,13 @@ const FormDetailPage = async ({
 
   return (
     <>
-      <div className="py-10 border-y border-gray-600">
+      <div className="py-10 border-y border-emerald-100">
         <div className="flex justify-between container">
           <h1 className="text-4xl font-bold truncate">{form.title}</h1>
           <VisitBtn shareUrl={form.shareURL} />
         </div>
       </div>
-      <div className="py-4 border-b border-gray-600">
+      <div className="py-4 border-b border-emerald-100">
         <div className="container flex gap-2 items-center justify-between">
           <FormLinkShare shareUrl={form.shareURL} />
         </div>

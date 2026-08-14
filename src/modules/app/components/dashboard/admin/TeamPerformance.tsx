@@ -50,18 +50,18 @@ export const TeamPerformance: React.FC<TeamPerformanceProps> = ({
           {teamStats.map((member) => (
             <div
               key={member.userId}
-              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+              className="flex items-center justify-between p-3 bg-[#f7faf9] rounded-lg"
             >
               <div>
                 <p className="font-medium">{member.userName}</p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-slate-500">
                   {member.assignedReports} asignados • {member.completedReports}{" "}
                   completados
                 </p>
               </div>
               <div className="text-right">
                 <p className="text-lg font-bold">{member.performanceScore}%</p>
-                <p className="text-xs text-gray-600">Rendimiento</p>
+                <p className="text-xs text-slate-500">Rendimiento</p>
               </div>
             </div>
           ))}

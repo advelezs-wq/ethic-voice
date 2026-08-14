@@ -95,9 +95,9 @@ function MetaRow({
   value: React.ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-3 py-2 border-b border-gray-50 last:border-0">
-      <span className="text-xs text-gray-500 shrink-0 pt-0.5">{label}</span>
-      <span className="text-xs font-medium text-gray-800 text-right">
+    <div className="flex items-start justify-between gap-3 py-2 border-b border-emerald-50 last:border-0">
+      <span className="text-xs text-slate-400 shrink-0 pt-0.5">{label}</span>
+      <span className="text-xs font-medium text-[#0d212c] text-right">
         {value}
       </span>
     </div>
@@ -360,7 +360,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
 
             {/* Asunto */}
             <div>
-              <label className="text-xs font-medium text-gray-700 mb-1 block">
+              <label className="text-xs font-medium text-slate-600 mb-1 block">
                 Asunto / Resumen corto
               </label>
               <div className="flex gap-2">
@@ -368,7 +368,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
                   type="text"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="flex-1 min-w-0 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                  className="flex-1 min-w-0 px-3 py-1.5 text-sm border border-emerald-200 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent"
                   placeholder="Escribe un asunto breve…"
                 />
                 <Button
@@ -471,7 +471,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
       <SidebarSection title="Tiempo límite" icon="icon-[lucide--timer]">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-gray-600">Días restantes</span>
+            <span className="text-xs text-slate-500">Días restantes</span>
             <Chip
               size="sm"
               variant="flat"
@@ -539,7 +539,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
                         size: "sm",
                         showFallback: true,
                         name: assignment.userName,
-                        classNames: { base: "bg-blue-100 text-blue-900" },
+                        classNames: { base: "bg-sky-100 text-sky-800" },
                       }}
                       classNames={{
                         name: "text-sm font-medium",
@@ -591,7 +591,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
             ) : undefined
           }
         >
-          <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+          <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">
             {report.internalNotes}
           </p>
         </SidebarSection>
@@ -606,7 +606,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
           <div className="space-y-3">
             {aiAnalysis.severity && (
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">Severidad</span>
+                <span className="text-xs text-slate-500">Severidad</span>
                 <Chip
                   size="sm"
                   variant="flat"
@@ -619,8 +619,8 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
             {typeof aiAnalysis.confidence === "number" && (
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-600">Confianza</span>
-                  <span className="text-xs font-semibold text-gray-800">
+                  <span className="text-xs text-slate-500">Confianza</span>
+                  <span className="text-xs font-semibold text-[#0d212c]">
                     {aiAnalysis.confidence}%
                   </span>
                 </div>
@@ -638,7 +638,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
               </div>
             )}
             {aiAnalysis.summary && (
-              <p className="text-xs text-gray-700 leading-relaxed">
+              <p className="text-xs text-slate-600 leading-relaxed">
                 {aiAnalysis.summary}
               </p>
             )}
@@ -735,7 +735,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
             {(onClose) => (
               <>
                 <ModalHeader className="flex items-center gap-2">
-                  <i className="icon-[lucide--notebook-pen] size-5 text-gray-600" />
+                  <i className="icon-[lucide--notebook-pen] size-5 text-slate-500" />
                   Notas internas
                 </ModalHeader>
                 <ModalBody>

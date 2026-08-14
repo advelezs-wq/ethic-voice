@@ -113,10 +113,10 @@ export function TeamMembersView({
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-[#0d212c]">
           Equipo de Investigadores
         </h1>
-        <p className="text-gray-600">
+        <p className="text-slate-500">
           Gestiona y revisa el rendimiento de tu equipo por departamento
         </p>
       </div>
@@ -126,13 +126,13 @@ export function TeamMembersView({
         <Card>
           <CardBody className="text-center">
             <p className="text-2xl font-bold">{members.length}</p>
-            <p className="text-sm text-gray-600">Total Miembros</p>
+            <p className="text-sm text-slate-500">Total Miembros</p>
           </CardBody>
         </Card>
         <Card>
           <CardBody className="text-center">
-            <p className="text-2xl font-bold text-blue-600">{admins.length}</p>
-            <p className="text-sm text-gray-600">Administradores</p>
+            <p className="text-2xl font-bold text-sky-700">{admins.length}</p>
+            <p className="text-sm text-slate-500">Administradores</p>
           </CardBody>
         </Card>
         <Card>
@@ -140,7 +140,7 @@ export function TeamMembersView({
             <p className="text-2xl font-bold text-green-600">
               {regularMembers.length}
             </p>
-            <p className="text-sm text-gray-600">Investigadores</p>
+            <p className="text-sm text-slate-500">Investigadores</p>
           </CardBody>
         </Card>
         <Card>
@@ -148,7 +148,7 @@ export function TeamMembersView({
             <p className="text-2xl font-bold text-purple-600">
               {departments.length}
             </p>
-            <p className="text-sm text-gray-600">Departamentos</p>
+            <p className="text-sm text-slate-500">Departamentos</p>
           </CardBody>
         </Card>
       </div>
@@ -181,12 +181,12 @@ export function TeamMembersView({
                     </div>
 
                     <div className="space-y-3">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-500">
                         Acceso a todos los departamentos
                       </p>
 
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-slate-500">
                           Casos Totales
                         </span>
                         <span className="font-semibold">
@@ -236,7 +236,7 @@ export function TeamMembersView({
 
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-slate-500">
                           Departamento
                         </span>
                         <Chip size="sm" variant="flat">
@@ -245,7 +245,7 @@ export function TeamMembersView({
                       </div>
 
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-slate-500">
                           Casos Asignados
                         </span>
                         <span className="font-semibold">
@@ -254,7 +254,7 @@ export function TeamMembersView({
                       </div>
 
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-slate-500">
                           Completados
                         </span>
                         <span className="font-semibold text-green-600">
@@ -263,17 +263,17 @@ export function TeamMembersView({
                       </div>
 
                       <div className="flex justify-between">
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-slate-500">
                           En Progreso
                         </span>
-                        <span className="font-semibold text-blue-600">
+                        <span className="font-semibold text-sky-700">
                           {member.inProgressReports}
                         </span>
                       </div>
 
                       <div>
                         <div className="flex justify-between mb-1">
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm text-slate-500">
                             Rendimiento
                           </span>
                           <span className="text-sm font-bold">

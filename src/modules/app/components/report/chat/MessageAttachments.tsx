@@ -50,7 +50,7 @@ export function MessageAttachments({
                 className="w-full h-auto"
                 loading="lazy"
               />
-              <div className="bg-gray-100 px-3 py-2 text-xs text-gray-600">
+              <div className="bg-emerald-50 px-3 py-2 text-xs text-slate-500">
                 {attachment.filename} • {formatFileSize(attachment.fileSize)}
               </div>
             </a>
@@ -59,21 +59,21 @@ export function MessageAttachments({
               href={attachment.fileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors"
             >
               <span className="text-lg">
                 {getFileIcon(attachment.mimeType)}
               </span>
               <div className="text-sm">
-                <div className="font-medium text-gray-900">
+                <div className="font-medium text-[#0d212c]">
                   {attachment.filename}
                 </div>
-                <div className="text-gray-500">
+                <div className="text-slate-400">
                   {formatFileSize(attachment.fileSize)}
                 </div>
               </div>
               <svg
-                className="w-4 h-4 text-gray-400"
+                className="w-4 h-4 text-slate-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

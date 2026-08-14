@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Card, CardBody, CardHeader } from "@heroui/card";
+import { CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import { Spinner } from "@heroui/spinner";
@@ -13,6 +13,7 @@ import {
   ModalFooter,
 } from "@heroui/modal";
 import { useDisclosure } from "@heroui/use-disclosure";
+import { Card, EmptyState } from "@/modules/app/components/ui";
 // Local lightweight toast fallback to avoid build-time dependency issues
 const toast = {
   success: (message: string) => {
@@ -351,12 +352,12 @@ export function SubscriptionManagement({
             <div className="flex items-start gap-3">
               <i className="icon-[lucide--alert-triangle] size-6 text-orange-600 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-[#0d212c]">
                   {cancellation?.daysRemaining != null && cancellation.daysRemaining <= 31
                     ? "Cuenta próxima a desactivarse"
                     : "No hay suscripción activa"}
                 </h3>
-                <p className="text-gray-700 mt-1">
+                <p className="text-slate-600 mt-1">
                   {cancellation?.daysRemaining != null && cancellation.daysRemaining <= 31
                     ? `Debido a la cancelación de tu suscripción, tu cuenta será desactivada ${
                         cancellation.daysRemaining <= 0
@@ -368,7 +369,7 @@ export function SubscriptionManagement({
                     : "Esta organización no tiene una suscripción activa."}
                 </p>
                 {cancellation?.endsAt && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-slate-400 mt-1">
                     Fin del ciclo: {new Date(cancellation.endsAt as string).toLocaleDateString("es-CO")}
                   </p>
                 )}
@@ -406,33 +407,33 @@ export function SubscriptionManagement({
                 <h4 className="text-xl font-bold text-primary">
                   {subscription.planName}
                 </h4>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
+                <p className="text-2xl font-bold text-[#0d212c] mt-1">
                   {formatPrice(
                     subscription.billingCycle === "YEARLY"
                       ? (subscription.yearlyPrice as unknown as number) || subscription.monthlyPrice
                       : subscription.monthlyPrice
                   )}
-                  <span className="text-sm font-normal text-gray-600">
+                  <span className="text-sm font-normal text-slate-500">
                     /{subscription.billingCycle === "MONTHLY" ? "mes" : "año"}
                   </span>
                 </p>
               </div>
 
               {subscription.isTrialActive && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
                   <div className="flex items-center gap-2">
-                    <i className="icon-[lucide--clock] size-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-900">
+                    <i className="icon-[lucide--clock] size-4 text-emerald-600" />
+                    <span className="text-sm font-medium text-emerald-900">
                       Periodo de prueba activo
                     </span>
                   </div>
-                  <p className="text-sm text-blue-700 mt-1">
+                  <p className="text-sm text-emerald-700 mt-1">
                     {subscription.trialDaysRemaining} días restantes
                   </p>
                 </div>
               )}
 
-              <div className="space-y-2 text-sm text-gray-600">
+              <div className="space-y-2 text-sm text-slate-500">
                 <p>
                   <strong>Fecha de inicio:</strong>{" "}
                   {formatDate(subscription.startDate)}
@@ -448,7 +449,7 @@ export function SubscriptionManagement({
 
             <div className="space-y-4">
               <div>
-                <h5 className="font-semibold text-gray-900 mb-2">
+                <h5 className="font-semibold text-[#0d212c] mb-2">
                   Características incluidas:
                 </h5>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
@@ -464,8 +465,8 @@ export function SubscriptionManagement({
               </div>
 
               <div>
-                <h5 className="font-semibold text-gray-900 mb-2">Límites:</h5>
-                <div className="space-y-1 text-sm text-gray-600">
+                <h5 className="font-semibold text-[#0d212c] mb-2">Límites:</h5>
+                <div className="space-y-1 text-sm text-slate-500">
                   <p>
                     <strong>Administradores:</strong> {subscription.maxUsers}
                   </p>
@@ -483,7 +484,7 @@ export function SubscriptionManagement({
             </div>
           </div>
 
-          <div className="flex gap-3 mt-6 pt-4 border-t">
+          <div className="flex gap-3 mt-6 pt-4 border-t border-emerald-100">
             {subscription.status === "ACTIVE" && (
               <>
                 <Button
@@ -526,9 +527,10 @@ export function SubscriptionManagement({
         </CardHeader>
         <CardBody>
           {invoices.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No hay facturas disponibles
-            </div>
+            <EmptyState
+              icon={<i className="icon-[lucide--receipt] size-6" />}
+              title="No hay facturas disponibles"
+            />
           ) : (
             <div className="space-y-3">
               {invoices
@@ -545,13 +547,13 @@ export function SubscriptionManagement({
                 .map((invoice) => (
                 <div
                   key={invoice.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                  className="flex items-center justify-between p-4 border border-emerald-100 rounded-xl hover:bg-emerald-50/40 transition-colors"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
                       <div>
                         <p className="font-medium">{invoice.description}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-500">
                           {formatDate(invoice.createdAt)}
                         </p>
                       </div>
@@ -594,14 +596,14 @@ export function SubscriptionManagement({
           <ModalHeader>Cancelar Suscripción</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="bg-rose-50 border border-rose-200 rounded-xl p-4">
                 <div className="flex items-start gap-3">
-                  <i className="icon-[lucide--alert-triangle] size-5 text-red-600 mt-0.5" />
+                  <i className="icon-[lucide--alert-triangle] size-5 text-rose-600 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-red-900">
+                    <h4 className="font-semibold text-rose-900">
                       ¿Estás seguro?
                     </h4>
-                    <p className="text-sm text-red-700 mt-1">
+                    <p className="text-sm text-rose-700 mt-1">
                       Al cancelar tu suscripción perderás acceso a todas las
                       funcionalidades premium al final del periodo de
                       facturación actual.
@@ -610,7 +612,7 @@ export function SubscriptionManagement({
                 </div>
               </div>
 
-              <div className="space-y-2 text-sm text-gray-600">
+              <div className="space-y-2 text-sm text-slate-500">
                 <p>
                   <strong>Plan actual:</strong> {subscription?.planName}
                 </p>
@@ -652,7 +654,7 @@ export function SubscriptionManagement({
           <ModalHeader>Cambiar Plan</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
-              <p className="text-gray-600">
+              <p className="text-slate-500">
                 Selecciona el nuevo plan al que deseas cambiar:
               </p>
 
@@ -680,7 +682,7 @@ export function SubscriptionManagement({
                   <Card
                     key={planType}
                     isPressable
-                    className="border-2 border-transparent hover:border-primary cursor-pointer"
+                    className="border-2 border-transparent hover:border-lime-400 cursor-pointer"
                     onPress={() => handleUpgradeDowngrade(planType)}
                   >
                     <CardBody className="p-4">
@@ -695,7 +697,7 @@ export function SubscriptionManagement({
                                 ? (config.price.yearly as number)
                                 : config.price.monthly) as number
                             )}
-                            <span className="text-sm font-normal text-gray-600">
+                            <span className="text-sm font-normal text-slate-500">
                               /{(targetBillingCycle || subscription.billingCycle) === "YEARLY" ? "año" : "mes"}
                             </span>
                           </p>
@@ -703,19 +705,19 @@ export function SubscriptionManagement({
 
                         <div className="space-y-1 text-sm">
                           <div className="flex items-center gap-2">
-                            <i className="icon-[lucide--users] size-4 text-gray-600" />
+                            <i className="icon-[lucide--users] size-4 text-slate-500" />
                             <span>
                               {config.features.maxUsers} administradores
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <i className="icon-[lucide--user-search] size-4 text-gray-600" />
+                            <i className="icon-[lucide--user-search] size-4 text-slate-500" />
                             <span>
                               {config.features.maxInvestigators} investigadores
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <i className="icon-[lucide--building] size-4 text-gray-600" />
+                            <i className="icon-[lucide--building] size-4 text-slate-500" />
                             <span>
                               {config.features.maxEmployees} empleados
                             </span>

@@ -212,7 +212,7 @@ export function SuperAdminDashboard() {
           {organizations.length === 0 ? (
             <Card className="border border-default-200 bg-white/90">
               <CardBody className="text-center py-10">
-                <p className="text-gray-500">Aún no hay organizaciones creadas</p>
+                <p className="text-slate-400">Aún no hay organizaciones creadas</p>
                 <Button
                   as={Link}
                   href="/app/organizations"

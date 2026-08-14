@@ -310,10 +310,10 @@ export function SubscriptionGuard({ children }: SubscriptionGuardProps) {
   // Show loading during initial auth check
   if (!isLoaded || !user || isCheckingSubscription) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" color="primary" className="mb-4" />
-          <p className="text-gray-600">
+          <p className="text-slate-500">
             {isCheckingSubscription ? "Verificando suscripción..." : "Cargando..."}
           </p>
         </div>
@@ -324,7 +324,7 @@ export function SubscriptionGuard({ children }: SubscriptionGuardProps) {
   // Show pricing modal when subscription is required
   if (showPricingModal) {
     return (
-      <div className="min-h-screen bg-gray-50 relative">
+      <div className="min-h-screen bg-[#f7faf9] relative">
         <InPlatformPricingModal
           isOpen={showPricingModal}
           onClose={() => {
@@ -348,13 +348,13 @@ export function SubscriptionGuard({ children }: SubscriptionGuardProps) {
   // Allow access, but if verification overlay is active, block interactions visually
   const Overlay = () => (
     <div className="fixed inset-0 z-50 bg-white/80 backdrop-blur-sm flex items-center justify-center">
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }} className="w-full max-w-xl">
-        <Card className={`border-2 ${overlayStatus === "success" ? "bg-green-50 border-green-200" : overlayStatus === "pending" ? "bg-orange-50 border-orange-200" : overlayStatus === "failed" ? "bg-red-50 border-red-200" : "bg-blue-50 border-blue-200"}`}>
+      <motion.div initial={{ opacity: 0, transform: "translateY(12px)" }} animate={{ opacity: 1, transform: "translateY(0)" }} transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }} className="w-full max-w-xl">
+        <Card className={`border-2 ${overlayStatus === "success" ? "bg-emerald-50 border-emerald-200" : overlayStatus === "pending" ? "bg-amber-50 border-amber-200" : overlayStatus === "failed" ? "bg-rose-50 border-rose-200" : "bg-emerald-50/60 border-emerald-100"}`}>
           <CardHeader className="text-center pb-3 flex flex-col items-center">
             <div className="mb-3">
-              <i className={`${overlayStatus === "success" ? "icon-[lucide--check-circle] text-green-600" : overlayStatus === "pending" ? "icon-[lucide--clock] text-orange-600" : overlayStatus === "failed" ? "icon-[lucide--x-circle] text-red-600" : "icon-[lucide--loader-2] text-blue-600"} w-14 h-14 ${overlayStatus === "loading" ? "animate-spin" : ""}`} />
+              <i className={`${overlayStatus === "success" ? "icon-[lucide--check-circle] text-emerald-600" : overlayStatus === "pending" ? "icon-[lucide--clock] text-amber-600" : overlayStatus === "failed" ? "icon-[lucide--x-circle] text-rose-600" : "icon-[lucide--loader-2] text-emerald-600"} w-14 h-14 ${overlayStatus === "loading" ? "animate-spin" : ""}`} />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-[#0d212c]">
               {overlayStatus === "success" && "¡Pago exitoso!"}
               {overlayStatus === "pending" && "Procesando pago"}
               {overlayStatus === "failed" && "Pago fallido"}
@@ -362,7 +362,7 @@ export function SubscriptionGuard({ children }: SubscriptionGuardProps) {
             </h1>
           </CardHeader>
           <CardBody className="text-center flex flex-col items-center">
-            <p className="text-gray-700 mb-4 max-w-md">
+            <p className="text-slate-600 mb-4 max-w-md">
               {overlayMessage || (overlayStatus === "success"
                 ? `¡Genial! Tu suscripción ${overlayPlanName} ya está activa. Continúa para completar el onboarding.`
                 : overlayStatus === "pending"
@@ -372,12 +372,12 @@ export function SubscriptionGuard({ children }: SubscriptionGuardProps) {
                 : "Por favor espera mientras verificamos tu pago.")}
             </p>
             {overlaySubscriptionId && (
-              <div className="bg-gray-100 rounded-lg p-3 mb-5">
-                <p className="text-sm text-gray-600">
+              <div className="bg-emerald-50 rounded-lg p-3 mb-5">
+                <p className="text-sm text-slate-500">
                   <strong>ID de suscripción:</strong> {overlaySubscriptionId}
                 </p>
                 {overlayPlanName && (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-500">
                     <strong>Plan:</strong> {overlayPlanName}
                   </p>
                 )}

@@ -16,12 +16,12 @@ export default function FormErrorPage({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f7faf9] to-emerald-50 p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center space-y-6">
         {/* Header icon without logos */}
         <div className="flex justify-center">
-          <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center">
-            <i className="icon-[lucide--layout-dashboard] size-8 text-gray-600" />
+          <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center">
+            <i className="icon-[lucide--layout-dashboard] size-8 text-slate-500" />
           </div>
         </div>
 
@@ -34,10 +34,10 @@ export default function FormErrorPage({
 
         {/* Mensaje de disculpa */}
         <div className="space-y-3">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-[#0d212c]">
             ¡Ups! Algo salió mal
           </h1>
-          <p className="text-gray-600 text-base">
+          <p className="text-slate-500 text-base">
             Lamentamos el inconveniente. No pudimos cargar el formulario.
             Nuestro equipo ha sido notificado y estamos trabajando para resolver
             este problema.
@@ -67,8 +67,8 @@ export default function FormErrorPage({
         </div>
 
         {/* Información de contacto */}
-        <div className="pt-4 border-t border-gray-200">
-          <p className="text-sm text-gray-500">
+        <div className="pt-4 border-t border-emerald-100">
+          <p className="text-sm text-slate-400">
             Si el problema persiste, por favor{" "}
             <a
               href="mailto:support@ethicvoice.co"

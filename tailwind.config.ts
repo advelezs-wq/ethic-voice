@@ -158,24 +158,27 @@ const config: Config = {
       defaultTheme: "light",
       defaultExtendTheme: "light",
       themes: {
+        // EthicVoice brand theme — mirrors the landing page (LandingV4): ink/lime/emerald,
+        // not per-organization customizable. See src/modules/landig-page/components/decor.tsx
+        // and tailwind.config.ts's `ev` color tokens for the same palette.
         light: {
           colors: {
-            background: "#F9F9FB",
-            foreground: "#0F172A",
+            background: "#f7faf9",
+            foreground: "#0d212c",
             content1: "#FFFFFF",
             content2: "#F1F5F9",
             content3: "#E2E8F0",
             content4: "#CBD5E1",
             default: {
               DEFAULT: "#F1F5F9",
-              foreground: "#0F172A",
+              foreground: "#0d212c",
             },
             primary: {
-              DEFAULT: "#0c3b2f",
-              foreground: "#f9f9fb",
+              DEFAULT: "#a3e635",
+              foreground: "#0d212c",
             },
             secondary: {
-              DEFAULT: "#4A90E2",
+              DEFAULT: "#10b981",
               foreground: "#FFFFFF",
             },
             success: {
@@ -194,23 +197,23 @@ const config: Config = {
         },
         dark: {
           colors: {
-            background: "#0F172A",
-            foreground: "#F8FAFC",
-            content1: "#1E293B",
-            content2: "#334155",
-            content3: "#475569",
-            content4: "#64748B",
+            background: "#0a1e14",
+            foreground: "#f7faf9",
+            content1: "#0d212c",
+            content2: "#132c26",
+            content3: "#1c3a32",
+            content4: "#2a4a41",
             default: {
-              DEFAULT: "#1E293B",
-              foreground: "#F8FAFC",
+              DEFAULT: "#132c26",
+              foreground: "#f7faf9",
             },
             primary: {
-              DEFAULT: "#3B82F6",
-              foreground: "#F8FAFC",
+              DEFAULT: "#a3e635",
+              foreground: "#0d212c",
             },
             secondary: {
-              DEFAULT: "#60A5FA",
-              foreground: "#F8FAFC",
+              DEFAULT: "#34d399",
+              foreground: "#0d212c",
             },
             success: {
               DEFAULT: "#22C55E",

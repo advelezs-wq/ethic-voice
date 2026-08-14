@@ -42,10 +42,10 @@ export function MemberDetailsView({ data }: MemberDetailsViewProps) {
           Volver al Equipo
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-[#0d212c]">
             Detalles del Investigador
           </h1>
-          <p className="text-gray-600">Rendimiento y estadísticas detalladas</p>
+          <p className="text-slate-500">Rendimiento y estadísticas detalladas</p>
         </div>
       </div>
 
@@ -77,11 +77,11 @@ export function MemberDetailsView({ data }: MemberDetailsViewProps) {
           <CardBody className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Asignados</p>
+                <p className="text-sm text-slate-500">Total Asignados</p>
                 <p className="text-2xl font-bold">{stats.totalAssigned}</p>
               </div>
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <i className="icon-[lucide--briefcase] size-6 text-blue-600" />
+              <div className="p-3 bg-sky-50 rounded-lg">
+                <i className="icon-[lucide--briefcase] size-6 text-sky-700" />
               </div>
             </div>
           </CardBody>
@@ -91,7 +91,7 @@ export function MemberDetailsView({ data }: MemberDetailsViewProps) {
           <CardBody className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Resueltos</p>
+                <p className="text-sm text-slate-500">Resueltos</p>
                 <p className="text-2xl font-bold text-green-600">
                   {stats.totalResolved}
                 </p>
@@ -107,7 +107,7 @@ export function MemberDetailsView({ data }: MemberDetailsViewProps) {
           <CardBody className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Tiempo Promedio</p>
+                <p className="text-sm text-slate-500">Tiempo Promedio</p>
                 <p className="text-2xl font-bold">
                   {stats.averageResolutionDays} días
                 </p>
@@ -123,7 +123,7 @@ export function MemberDetailsView({ data }: MemberDetailsViewProps) {
           <CardBody className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Tasa de Resolución</p>
+                <p className="text-sm text-slate-500">Tasa de Resolución</p>
                 <p className="text-2xl font-bold">
                   {(stats.resolutionRate ?? 0).toFixed(1)}%
                 </p>
@@ -179,13 +179,13 @@ export function MemberDetailsView({ data }: MemberDetailsViewProps) {
             {recentReports.map((report) => (
               <div
                 key={report.id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                className="flex items-center justify-between p-3 bg-[#f7faf9] rounded-lg"
               >
                 <div>
                   <p className="font-medium">
                     #LIN-{report.id.toString().padStart(3, "0")}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-500">
                     {new Date(report.submittedAt).toLocaleDateString("es-ES")}
                   </p>
                 </div>

@@ -84,12 +84,12 @@ export function StatusDistributionChart({
     if (props.active && props.payload && props.payload.length) {
       const data = props.payload[0].payload;
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{data.name}</p>
-          <p className="text-sm text-gray-600">
+        <div className="bg-white p-3 border border-emerald-100 rounded-lg shadow-lg">
+          <p className="font-medium text-[#0d212c]">{data.name}</p>
+          <p className="text-sm text-slate-500">
             Cantidad: <span className="font-medium">{data.count}</span>
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Porcentaje: <span className="font-medium">{data.percentage}%</span>
           </p>
         </div>
@@ -107,7 +107,7 @@ export function StatusDistributionChart({
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: entry.color }}
             />
-            <span className="text-sm text-gray-700">{entry.value}</span>
+            <span className="text-sm text-slate-600">{entry.value}</span>
           </div>
         ))}
       </div>
@@ -122,10 +122,10 @@ export function StatusDistributionChart({
           const bgClass =
             {
               pending: "bg-yellow-50 text-yellow-800",
-              in_progress: "bg-blue-50 text-blue-800",
+              in_progress: "bg-sky-50 text-sky-700",
               resolved: "bg-green-50 text-green-800",
-              closed: "bg-gray-50 text-gray-800",
-            }[item.status.toLowerCase()] || "bg-gray-50 text-gray-800";
+              closed: "bg-emerald-50/40 text-[#0d212c]",
+            }[item.status.toLowerCase()] || "bg-emerald-50/40 text-[#0d212c]";
 
           return (
             <div
@@ -145,10 +145,10 @@ export function StatusDistributionChart({
       {/* Pie Chart */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">
+          <h4 className="text-lg font-semibold text-[#0d212c]">
             Distribución por Estado
           </h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Visualización proporcional de estados de reportes
           </p>
         </div>
@@ -179,8 +179,8 @@ export function StatusDistributionChart({
           {/* Center total */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900">{total}</div>
-              <div className="text-sm text-gray-600">Total</div>
+              <div className="text-3xl font-bold text-[#0d212c]">{total}</div>
+              <div className="text-sm text-slate-500">Total</div>
             </div>
           </div>
         </div>
@@ -189,10 +189,10 @@ export function StatusDistributionChart({
       {/* Bar Chart Alternative View */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">
+          <h4 className="text-lg font-semibold text-[#0d212c]">
             Comparación por Estado
           </h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Vista comparativa de cantidad de reportes por estado
           </p>
         </div>
@@ -233,12 +233,12 @@ export function StatusDistributionChart({
       </div>
 
       {/* Insights */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <i className="icon-[lucide--info] size-5 text-blue-600 mt-0.5" />
+          <i className="icon-[lucide--info] size-5 text-sky-700 mt-0.5" />
           <div>
-            <h5 className="font-medium text-blue-800">Análisis de Estado</h5>
-            <p className="text-sm text-blue-700 mt-1">
+            <h5 className="font-medium text-sky-700">Análisis de Estado</h5>
+            <p className="text-sm text-sky-700 mt-1">
               {(() => {
                 const pendingPercentage =
                   data.find((d) => d.status.toLowerCase().includes("pending"))

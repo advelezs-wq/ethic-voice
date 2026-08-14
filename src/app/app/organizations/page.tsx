@@ -129,14 +129,14 @@ export default function OrganizationsPage() {
 
   if (!isLoaded || isCheckingStatus) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardBody className="text-center py-8">
             <Spinner size="lg" color="primary" className="mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <h2 className="text-xl font-semibold text-[#0d212c] mb-2">
               Loading your workspace...
             </h2>
-            <p className="text-gray-600">
+            <p className="text-slate-500">
               Please wait while we set up your dashboard.
             </p>
           </CardBody>
@@ -154,7 +154,7 @@ export default function OrganizationsPage() {
     }
     // Regular users are redirected to pricing/onboarding elsewhere; keep a minimal message
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center p-6">
         <Card className="w-full max-w-md">
           <CardBody className="text-center space-y-4">
             <h3 className="text-lg font-semibold">Completa tu compra para crear la organización</h3>
@@ -176,10 +176,10 @@ export default function OrganizationsPage() {
 
   // Fallback UI for edge cases (regular users)
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-[#0d212c]">
             Welcome to EthicVoice
           </h1>
         </CardHeader>
@@ -193,7 +193,7 @@ export default function OrganizationsPage() {
                   <strong>{pendingSubscription.planName}</strong>
                 </p>
               </div>
-              <p className="text-gray-600">
+              <p className="text-slate-500">
                 Ready to create your organization and start using all the
                 features included in your plan.
               </p>
@@ -208,7 +208,7 @@ export default function OrganizationsPage() {
             </>
           ) : (
             <>
-              <p className="text-gray-600">
+              <p className="text-slate-500">
                 You need an active subscription to create an organization.
               </p>
               <Button

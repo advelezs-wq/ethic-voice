@@ -136,11 +136,11 @@ export function MentionAutocomplete({
             setShowSuggestions(false);
           }}
           className={cn(
-            "w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors flex items-center gap-2",
-            index === selectedIndex && "bg-gray-100"
+            "w-full px-4 py-2 text-left hover:bg-emerald-50 transition-colors flex items-center gap-2",
+            index === selectedIndex && "bg-emerald-50"
           )}
         >
-          <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium">
+          <div className="w-8 h-8 rounded-full bg-slate-300 flex items-center justify-center text-sm font-medium">
             {suggestion.userName.charAt(0).toUpperCase()}
           </div>
           <span className="text-sm">{suggestion.userName}</span>

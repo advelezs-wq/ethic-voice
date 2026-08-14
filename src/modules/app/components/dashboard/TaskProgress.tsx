@@ -26,7 +26,7 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
       <CardBody className="space-y-4">
         <div>
           <div className="flex justify-between mb-2">
-            <span className="text-sm text-gray-600">Tasa de Completación</span>
+            <span className="text-sm text-slate-500">Tasa de Completación</span>
             <span className="text-sm font-bold">
               {(completionRate ?? 0).toFixed(1)}%
             </span>
@@ -45,12 +45,12 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
             </span>
           </div>
 
-          <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-sky-50 rounded-lg">
             <div className="flex items-center gap-2">
-              <i className="icon-[lucide--loader] size-5 text-blue-600" />
+              <i className="icon-[lucide--loader] size-5 text-sky-700" />
               <span className="text-sm font-medium">En Progreso</span>
             </div>
-            <span className="text-lg font-bold text-blue-600">
+            <span className="text-lg font-bold text-sky-700">
               {inProgress}
             </span>
           </div>
@@ -64,9 +64,9 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600">Tiempo promedio de resolución</p>
-          <p className="text-xl font-bold text-gray-900">3.5 días</p>
+        <div className="mt-4 p-4 bg-[#f7faf9] rounded-lg">
+          <p className="text-sm text-slate-500">Tiempo promedio de resolución</p>
+          <p className="text-xl font-bold text-[#0d212c]">3.5 días</p>
         </div>
       </CardBody>
     </Card>

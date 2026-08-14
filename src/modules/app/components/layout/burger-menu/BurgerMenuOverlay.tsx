@@ -29,11 +29,11 @@ export const BurgerMenuOverlay = ({
     };
   }, [isOpen, closeMenu]);
 
-  if (!isOpen) return null;
-
   return (
     <div
-      className="fixed inset-0 bg-black/50 lg:hidden"
+      className={`fixed inset-0 bg-black/50 lg:hidden transition-opacity duration-300 ${
+        isOpen ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
       onClick={closeMenu}
       aria-hidden="true"
     />

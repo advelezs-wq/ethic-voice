@@ -197,8 +197,8 @@ function PaymentSuccessContent() {
       default:
         return {
           icon: "icon-[lucide--loader-2]",
-          color: "text-blue-600",
-          bgColor: "bg-blue-50 border-blue-200",
+          color: "text-sky-700",
+          bgColor: "bg-sky-50 border-sky-200",
           title: "Verificando pago...",
           description:
             retryCount > 0
@@ -248,7 +248,7 @@ Please help me resolve this issue.`);
   const config = getStatusConfig();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -262,20 +262,20 @@ Please help me resolve this issue.`);
                 className={`${config.icon} w-16 h-16 ${config.color} ${status === "loading" ? "animate-spin" : ""}`}
               />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">{config.title}</h1>
+            <h1 className="text-2xl font-bold text-[#0d212c]">{config.title}</h1>
           </CardHeader>
           <CardBody className="text-center flex flex-col items-center">
-            <p className="text-gray-600 mb-6 leading-relaxed">
+            <p className="text-slate-500 mb-6 leading-relaxed">
               {config.description}
             </p>
 
             {subscriptionId && (
-              <div className="bg-gray-100 rounded-lg p-3 mb-6">
-                <p className="text-sm text-gray-600">
+              <div className="bg-emerald-50 rounded-lg p-3 mb-6">
+                <p className="text-sm text-slate-500">
                   <strong>ID de suscripción:</strong> {subscriptionId}
                 </p>
                 {planName && (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-500">
                     <strong>Plan:</strong> {planName}
                   </p>
                 )}
@@ -314,8 +314,8 @@ Please help me resolve this issue.`);
             </div>
 
             {(status === "success" || status === "pending") && (
-              <div className="bg-blue-50 rounded-lg p-4 mt-6">
-                <p className="text-sm text-blue-800">
+              <div className="bg-sky-50 rounded-lg p-4 mt-6">
+                <p className="text-sm text-sky-700">
                   <strong>¿Qué sigue?</strong>
                   <br />
                   Crea tu organización y empieza a configurar tu canal de
@@ -344,7 +344,7 @@ Please help me resolve this issue.`);
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-6 text-center"
         >
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-slate-400">
             🔒 Tu información de pago está protegida por nuestro proveedor de
             pagos
           </p>
@@ -358,7 +358,7 @@ export default function PaymentSuccessPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-sky-50 to-white flex items-center justify-center">
           <Spinner size="lg" color="primary" />
         </div>
       }

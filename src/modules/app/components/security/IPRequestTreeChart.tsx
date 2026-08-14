@@ -23,11 +23,11 @@ export function IPRequestTreeChart({
     return (
       <Card className="p-6">
         <div className="text-center space-y-4">
-          <i className="icon-[lucide--bar-chart-3] size-12 text-gray-400 mx-auto" />
-          <h3 className="text-lg font-semibold text-gray-700">
+          <i className="icon-[lucide--bar-chart-3] size-12 text-slate-400 mx-auto" />
+          <h3 className="text-lg font-semibold text-slate-600">
             Sin Datos de Peticiones
           </h3>
-          <p className="text-gray-500">
+          <p className="text-slate-400">
             No hay datos de peticiones para mostrar en las últimas 24 horas.
           </p>
         </div>
@@ -50,7 +50,7 @@ export function IPRequestTreeChart({
     if (percentage > 0.8) return "bg-red-500";
     if (percentage > 0.6) return "bg-orange-500";
     if (percentage > 0.4) return "bg-yellow-500";
-    if (percentage > 0.2) return "bg-blue-500";
+    if (percentage > 0.2) return "bg-sky-600";
     return "bg-green-500";
   };
 
@@ -117,7 +117,7 @@ export function IPRequestTreeChart({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <i className="icon-[lucide--bar-chart-3] size-5 text-blue-600" />
+            <i className="icon-[lucide--bar-chart-3] size-5 text-sky-700" />
             Top IPs por Peticiones (24h)
           </h3>
           <Chip color="primary" size="sm">
@@ -140,7 +140,7 @@ export function IPRequestTreeChart({
             <span>Medio (40-60%)</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-blue-500 rounded"></div>
+            <div className="w-3 h-3 bg-sky-600 rounded"></div>
             <span>Bajo (20-40%)</span>
           </div>
           <div className="flex items-center gap-1">
@@ -156,7 +156,7 @@ export function IPRequestTreeChart({
               {/* IP Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-gray-600">
+                  <span className="text-sm font-medium text-slate-500">
                     #{index + 1}
                   </span>
                   <span className="font-mono text-sm font-medium">
@@ -172,7 +172,7 @@ export function IPRequestTreeChart({
                   <Chip size="sm" variant="bordered">
                     {getTopRequestType(item.types)}
                   </Chip>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-slate-400">
                     {formatLastSeen(item.lastSeen)}
                   </span>
                 </div>
@@ -188,7 +188,7 @@ export function IPRequestTreeChart({
               </div>
 
               {/* Visual Bar */}
-              <div className="relative h-8 bg-gray-100 rounded-lg overflow-hidden">
+              <div className="relative h-8 bg-emerald-50 rounded-lg overflow-hidden">
                 <div
                   className={`absolute top-0 left-0 h-full ${getCountColor(item.count)} transition-all duration-300 rounded-lg`}
                   style={{ width: `${getBarWidth(item.count)}%` }}
@@ -217,8 +217,8 @@ export function IPRequestTreeChart({
         </div>
 
         {data.length > 20 && (
-          <div className="text-center pt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-500">
+          <div className="text-center pt-4 border-t border-emerald-100">
+            <p className="text-sm text-slate-400">
               Mostrando top 20 de {data.length} IPs activas
             </p>
           </div>

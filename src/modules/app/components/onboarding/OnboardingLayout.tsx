@@ -45,13 +45,6 @@ export function OnboardingLayout({
           description: "Gracias por elegirnos",
           icon: "✅",
         };
-      case OnboardingStep.THEME_SELECTION:
-        return {
-          step: s,
-          title: "Personalización",
-          description: "Ajusta tu experiencia",
-          icon: "🎨",
-        };
       case OnboardingStep.NOTIFICATIONS:
         return {
           step: s,
@@ -98,7 +91,7 @@ export function OnboardingLayout({
   return (
     <div className="h-screen w-screen grid grid-cols-[18rem_1fr] overflow-hidden">
       {/* Left Sidebar - Fixed full height */}
-      <div className="h-screen w-72 bg-white/90 backdrop-blur-sm border-r border-gray-200/50 p-6 flex flex-col">
+      <div className="h-screen w-72 bg-white/90 backdrop-blur-sm border-r border-emerald-100/50 p-6 flex flex-col">
         <div className="flex items-center justify-between mb-6">
           <Link href="/" className="flex min-w-0 flex-col gap-1">
             <Image
@@ -109,7 +102,7 @@ export function OnboardingLayout({
               className="h-9 w-auto max-w-[11rem] object-contain"
               priority
             />
-            <p className="text-xs text-gray-500">Configuración inicial</p>
+            <p className="text-xs text-slate-400">Configuración inicial</p>
           </Link>
 
           <Button
@@ -117,7 +110,7 @@ export function OnboardingLayout({
             variant="light"
             size="sm"
             onPress={handleLogout}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-slate-400 hover:text-slate-500"
             title="Cerrar sesión"
           >
             <i className="icon-[lucide--log-out] w-4 h-4" />
@@ -127,12 +120,12 @@ export function OnboardingLayout({
         {/* Progress Bar */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-gray-600">Progreso</span>
+            <span className="text-xs font-medium text-slate-500">Progreso</span>
             <span className="text-xs font-semibold text-emerald-600">
               {Math.round(progress)}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-1.5">
+          <div className="w-full bg-emerald-100 rounded-full h-1.5">
             <div
               className="bg-gradient-to-r from-emerald-500 to-blue-600 h-1.5 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
@@ -151,7 +144,7 @@ export function OnboardingLayout({
                   status === "current"
                     ? "bg-emerald-50 border border-emerald-200"
                     : status === "completed"
-                      ? "bg-gray-50"
+                      ? "bg-emerald-50/50"
                       : "bg-transparent"
                 }`}
               >
@@ -161,7 +154,7 @@ export function OnboardingLayout({
                       ? "bg-emerald-500 text-white"
                       : status === "current"
                         ? "bg-emerald-100 text-emerald-700 border border-emerald-500"
-                        : "bg-gray-200 text-gray-500"
+                        : "bg-emerald-100 text-slate-400"
                   }`}
                 >
                   {status === "completed" ? (
@@ -188,8 +181,8 @@ export function OnboardingLayout({
                       status === "current"
                         ? "text-emerald-700"
                         : status === "completed"
-                          ? "text-gray-700"
-                          : "text-gray-500"
+                          ? "text-slate-600"
+                          : "text-slate-400"
                     }`}
                   >
                     {step.title}
@@ -199,8 +192,8 @@ export function OnboardingLayout({
                       status === "current"
                         ? "text-emerald-600"
                         : status === "completed"
-                          ? "text-gray-500"
-                          : "text-gray-400"
+                          ? "text-slate-400"
+                          : "text-slate-400"
                     }`}
                   >
                     {step.description}
@@ -212,18 +205,18 @@ export function OnboardingLayout({
         </div>
 
         {/* Help Section */}
-        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-          <h4 className="font-medium text-blue-900 mb-1 text-sm">
+        <div className="mt-4 p-3 bg-sky-50 rounded-lg">
+          <h4 className="font-medium text-sky-800 mb-1 text-sm">
             ¿Necesitas ayuda?
           </h4>
-          <p className="text-xs text-blue-700 mb-2">
+          <p className="text-xs text-sky-700 mb-2">
             Nuestro equipo está aquí para ayudarte
           </p>
           <Button
             size="sm"
             variant="light"
             onPress={handleSupportClick}
-            className="group text-blue-600 hover:text-blue-700 transition-transform hover:translate-x-0.5"
+            className="group text-sky-700 hover:text-sky-700 transition-transform hover:translate-x-0.5"
             endContent={
               <i className="icon-[lucide--arrow-right] w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             }
@@ -236,7 +229,7 @@ export function OnboardingLayout({
       {/* Main Content - scrollable area only */}
       <div
         id="onboarding-content"
-        className="h-screen overflow-y-auto p-8 bg-gray-50/50"
+        className="h-screen overflow-y-auto p-8 bg-[#f7faf9]"
       >
         <div className="w-full max-w-3xl mx-auto">{children}</div>
       </div>

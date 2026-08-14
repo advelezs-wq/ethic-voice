@@ -176,7 +176,7 @@ export function ReportChat({
               {hasMore && (
                 <div ref={loadMoreRef} className="flex justify-center py-2">
                   {isLoadingMore && (
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-slate-400">
                       Cargando mensajes anteriores...
                     </div>
                   )}
@@ -224,11 +224,11 @@ export function ReportChat({
             {!isScrolledToBottom && (
               <button
                 onClick={scrollToBottom}
-                className="absolute bottom-20 right-4 bg-white border border-gray-200 shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors"
+                className="absolute bottom-20 right-4 bg-white border border-emerald-100 shadow-lg rounded-full p-2 hover:bg-emerald-50/40 transition-colors"
                 aria-label="Ir al mensaje más reciente"
                 title="Ir al mensaje más reciente"
               >
-                <i className="icon-[lucide--chevrons-down] size-4 text-gray-600" />
+                <i className="icon-[lucide--chevrons-down] size-4 text-slate-500" />
               </button>
             )}
           </>

@@ -214,7 +214,7 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
     return (
       <div className="flex items-center justify-center h-64">
         <Spinner size="lg" color="primary" />
-        <span className="ml-3 text-gray-600">Cargando analíticas...</span>
+        <span className="ml-3 text-slate-500">Cargando analíticas...</span>
       </div>
     );
   }
@@ -225,10 +225,10 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <div className="text-red-500 mb-4">
           <i className="icon-[lucide--alert-circle] size-12 mx-auto" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-[#0d212c] mb-2">
           Error al cargar datos
         </h3>
-        <p className="text-gray-600 mb-4">{error}</p>
+        <p className="text-slate-500 mb-4">{error}</p>
         <Button color="primary" onPress={fetchAnalyticsData}>
           <i className="icon-[lucide--refresh-cw] size-4 mr-2" />
           Reintentar
@@ -248,7 +248,7 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <div className="border rounded-md p-3 bg-yellow-50 border-yellow-200">
           <div className="flex items-center gap-3 text-sm">
             <i className="icon-[lucide--traffic-cone] size-4 text-yellow-600" />
-            <span className="text-gray-800">
+            <span className="text-[#0d212c]">
               {data.slaRedCount ? `${data.slaRedCount} caso(s) vencidos` : ""}
               {data.slaRedCount && data.slaOrangeCount ? " • " : ""}
               {data.slaOrangeCount
@@ -262,10 +262,10 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">
+            <h3 className="text-xl font-semibold text-[#0d212c]">
               Resumen Organizacional
             </h3>
-            <p className="text-gray-600 text-sm">
+            <p className="text-slate-500 text-sm">
               Métricas clave de la organización y equipo de trabajo
             </p>
           </div>
@@ -298,11 +298,11 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         </CardHeader>
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-blue-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-blue-900">
+            <div className="bg-sky-50 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-sky-800">
                 {data.organizationMetrics.totalMembers}
               </div>
-              <div className="text-sm text-blue-600">Total Miembros</div>
+              <div className="text-sm text-sky-700">Total Miembros</div>
             </div>
             <div className="bg-green-50 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-green-900">
@@ -325,12 +325,12 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
           </div>
 
           {data.organizationMetrics.topPerformer && (
-            <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg">
+            <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-green-50 border border-sky-200 rounded-lg">
               <div className="flex items-center gap-3">
-                <i className="icon-[lucide--award] size-5 text-blue-600" />
+                <i className="icon-[lucide--award] size-5 text-sky-700" />
                 <div>
-                  <h5 className="font-medium text-blue-800">Top Performer</h5>
-                  <p className="text-sm text-blue-700">
+                  <h5 className="font-medium text-sky-700">Top Performer</h5>
+                  <p className="text-sm text-sky-700">
                     {data.organizationMetrics.topPerformer.investigator} lidera
                     con{" "}
                     {data.organizationMetrics.topPerformer.productivityScore}%
@@ -351,10 +351,10 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">
+            <h3 className="text-xl font-semibold text-[#0d212c]">
               Total de Denuncias Recibidas
             </h3>
-            <p className="text-gray-600 text-sm">
+            <p className="text-slate-500 text-sm">
               Tendencia de denuncias recibidas en el tiempo
             </p>
           </div>
@@ -393,10 +393,10 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-xl font-semibold text-[#0d212c]">
                 Estado de las Denuncias
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-slate-500 text-sm">
                 Distribución por estado actual
               </p>
             </div>
@@ -437,10 +437,10 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-xl font-semibold text-[#0d212c]">
                 Denuncias por Departamento
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-slate-500 text-sm">
                 Distribución por área organizacional
               </p>
             </div>
@@ -483,10 +483,10 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">
+            <h3 className="text-xl font-semibold text-[#0d212c]">
               Rendimiento del Equipo de Resolución
             </h3>
-            <p className="text-gray-600 text-sm">
+            <p className="text-slate-500 text-sm">
               Métricas de productividad y eficiencia del equipo (excluye super
               admin)
             </p>
@@ -526,10 +526,10 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-xl font-semibold text-[#0d212c]">
                 Tiempo Promedio de Resolución
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-slate-500 text-sm">
                 Análisis de tiempos de respuesta
               </p>
             </div>
@@ -566,10 +566,10 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-xl font-semibold text-[#0d212c]">
                 Tipos de Denuncias Más Comunes
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-slate-500 text-sm">
                 Categorización por tipo de irregularidad
               </p>
             </div>
@@ -609,10 +609,10 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <Card>
           <CardHeader>
             <div>
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-xl font-semibold text-[#0d212c]">
                 Inteligencia de Tipologías
               </h3>
-              <p className="text-gray-600 text-sm">
+              <p className="text-slate-500 text-sm">
                 Comportamiento de las denuncias según su clasificación:
                 distribución, ranking y tendencia mensual
               </p>

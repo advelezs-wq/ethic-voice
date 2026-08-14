@@ -115,7 +115,7 @@ export function SubmissionsTable({ form }: { form: FormWithSubmissions }) {
                 key={column.id}
                 className={
                   column.id === "submittedAt"
-                    ? "text-gray-600 text-right uppercase"
+                    ? "text-slate-500 text-right uppercase"
                     : "uppercase"
                 }
               >
@@ -130,7 +130,7 @@ export function SubmissionsTable({ form }: { form: FormWithSubmissions }) {
                   <TableCell
                     className={
                       columnKey === "submittedAt"
-                        ? "text-gray-600 text-right"
+                        ? "text-slate-500 text-right"
                         : ""
                     }
                   >

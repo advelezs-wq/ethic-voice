@@ -82,7 +82,7 @@ export const ReportTabsContainer: React.FC<ReportTabsContainerProps> = ({
                   ${
                     isActive
                       ? "bg-white text-emerald-900 border-b-2 border-emerald-700"
-                      : "text-gray-500 hover:text-emerald-800 hover:bg-white/70 border-b-2 border-transparent"
+                      : "text-slate-400 hover:text-emerald-800 hover:bg-white/70 border-b-2 border-transparent"
                   }`}
                 aria-current={isActive ? "page" : undefined}
               >

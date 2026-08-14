@@ -148,7 +148,7 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
           <div className="min-w-0 flex-1">
             {/* Reference badge row */}
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="font-mono text-xs font-bold tracking-wide text-blue-900 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">
+              <span className="font-mono text-xs font-bold tracking-wide text-sky-800 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-full">
                 {generateReportReference(report.id)}
               </span>
 
@@ -174,14 +174,14 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
             </div>
 
             {/* Title */}
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#0d212c] leading-tight">
               {getReportTypeLabel(
                 report.type || parsedContent.irregularityType
               )}
             </h1>
 
             {/* Metadata inline row */}
-            <div className="mt-2.5 flex items-center gap-4 text-sm text-gray-500 flex-wrap">
+            <div className="mt-2.5 flex items-center gap-4 text-sm text-slate-400 flex-wrap">
               <span className="flex items-center gap-1.5">
                 <i className="icon-[lucide--calendar] size-3.5" />
                 {formatDate(report.submittedAt)}

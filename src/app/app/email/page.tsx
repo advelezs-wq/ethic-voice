@@ -144,11 +144,11 @@ export default function EmailSetupPage() {
             </h2>
           </CardHeader>
           <CardBody className="space-y-4">
-            <p className="text-gray-700">
+            <p className="text-slate-600">
               Tu plan actual ({planInfo?.planType ?? "DESCONOCIDO"}) no incluye
               una bandeja de entrada para denuncias por correo.
             </p>
-            <p className="text-gray-600">
+            <p className="text-slate-500">
               Para activar el canal de correo y recibir denuncias enviadas a{" "}
               <strong>{currentOrganization?.slug}@ethicvoice.co</strong>,
               actualiza tu plan.
@@ -181,14 +181,14 @@ export default function EmailSetupPage() {
         <Card className="border border-emerald-100 bg-white/95 shadow-none">
           <CardBody className="text-center py-12">
             <i
-              className="icon-[lucide--mail] size-16 mx-auto mb-4 text-gray-400"
+              className="icon-[lucide--mail] size-16 mx-auto mb-4 text-slate-400"
               role="img"
               aria-hidden="true"
             />
             <h2 className="text-xl font-semibold mb-2 text-[#0d212c]">
               Crea tu bandeja de entrada
             </h2>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            <p className="text-slate-500 mb-6 max-w-md mx-auto">
               Se reservará una dirección única para tu organización. Luego podrás
               activarla manualmente para empezar a detectar denuncias.
             </p>
@@ -216,7 +216,7 @@ export default function EmailSetupPage() {
               Crear bandeja
             </Button>
 
-            <div className="mt-8 text-sm text-gray-500">
+            <div className="mt-8 text-sm text-slate-400">
               <p>
                 La detección de denuncias solo inicia cuando la bandeja esté activa.
               </p>
@@ -239,7 +239,7 @@ export default function EmailSetupPage() {
             </div>
           </CardHeader>
           <CardBody className="space-y-5">
-            <p className="text-gray-700">
+            <p className="text-slate-600">
               Dirección: <strong>{emailConfig.emailAddress}</strong>
             </p>
             <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-4">
@@ -298,7 +298,7 @@ export default function EmailSetupPage() {
                         ) => (
                           <div
                             key={`${event.type}-${event.timestamp || idx}-${idx}`}
-                            className="text-xs text-gray-700 border-b border-emerald-50 pb-2 last:border-0 last:pb-0"
+                            className="text-xs text-slate-600 border-b border-emerald-50 pb-2 last:border-0 last:pb-0"
                           >
                             <p className="font-medium text-emerald-900">
                               {event.type === "EMAIL_INBOX_ACTIVATED"
@@ -309,14 +309,14 @@ export default function EmailSetupPage() {
                                     ? "Desactivación automática por plan"
                                     : "Configuración creada"}
                             </p>
-                            <p className="text-gray-500">
+                            <p className="text-slate-400">
                               {event.timestamp
                                 ? new Date(event.timestamp).toLocaleString("es-MX")
                                 : "Fecha no disponible"}
                               {event.actorEmail ? ` · ${event.actorEmail}` : ""}
                             </p>
                             {event.reason && (
-                              <p className="text-gray-600 mt-0.5">{event.reason}</p>
+                              <p className="text-slate-500 mt-0.5">{event.reason}</p>
                             )}
                           </div>
                         )

@@ -2,26 +2,26 @@ import Link from "next/link";
 
 export default function AppNotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f7faf9] to-emerald-50 p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center space-y-6">
         {/* Header icon without logos */}
         <div className="flex justify-center">
-          <div className="w-16 h-16 bg-gray-200 rounded-2xl flex items-center justify-center">
-            <i className="icon-[lucide--layout-dashboard] size-8 text-gray-600" />
+          <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center">
+            <i className="icon-[lucide--layout-dashboard] size-8 text-slate-500" />
           </div>
         </div>
 
         {/* Número 404 */}
         <div>
-          <h1 className="text-8xl font-bold text-gray-300">404</h1>
+          <h1 className="text-8xl font-bold text-slate-300">404</h1>
         </div>
 
         {/* Mensaje */}
         <div className="space-y-3">
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-[#0d212c]">
             Página no encontrada
           </h2>
-          <p className="text-gray-600 text-base">
+          <p className="text-slate-500 text-base">
             Lo sentimos, la página que estás buscando no existe en la
             plataforma. Verifica la URL o regresa al inicio de la aplicación.
           </p>
@@ -38,15 +38,15 @@ export default function AppNotFound() {
 
           <Link
             href="/app/reports"
-            className="w-full font-semibold py-3 px-6 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors text-center"
+            className="w-full font-semibold py-3 px-6 rounded-lg border-2 border-emerald-200 text-slate-600 hover:bg-[#f7faf9] transition-colors text-center"
           >
             Ver reportes
           </Link>
         </div>
 
         {/* Información de ayuda */}
-        <div className="pt-4 border-t border-gray-200">
-          <p className="text-sm text-gray-500">
+        <div className="pt-4 border-t border-emerald-100">
+          <p className="text-sm text-slate-400">
             ¿Necesitas ayuda?{" "}
             <a
               href="mailto:support@ethicvoice.co"

@@ -178,7 +178,7 @@ export function ChatInput({
   // Show read-only message if report is closed
   if (isReportClosed) {
     return (
-      <div className="border-t bg-gray-50 p-4">
+      <div className="border-t bg-emerald-50/40 p-4">
         <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3.5">
           <i className="icon-[lucide--lock] size-5 text-amber-500 shrink-0" />
           <div>
@@ -196,17 +196,17 @@ export function ChatInput({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="border-t bg-gray-50 p-4">
+    <form onSubmit={handleSubmit} className="border-t bg-emerald-50/40 p-4">
       {replyToId && (
-        <div className="flex items-center justify-between mb-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-xl text-sm">
-          <span className="flex items-center gap-1.5 text-blue-700">
+        <div className="flex items-center justify-between mb-2 px-3 py-2 bg-sky-50 border border-sky-200 rounded-xl text-sm">
+          <span className="flex items-center gap-1.5 text-sky-700">
             <i className="icon-[lucide--reply] size-3.5" />
             Respondiendo a un mensaje
           </span>
           <button
             type="button"
             onClick={() => setReplyToId(null)}
-            className="text-blue-400 hover:text-blue-600"
+            className="text-sky-500 hover:text-sky-700"
             disabled={isInputDisabled}
             aria-label="Cancelar respuesta"
           >
@@ -216,22 +216,22 @@ export function ChatInput({
       )}
 
       {attachments.length > 0 && (
-        <div className="mb-2 p-2 bg-white rounded-xl border border-gray-200">
+        <div className="mb-2 p-2 bg-white rounded-xl border border-emerald-100">
           <div className="flex flex-wrap gap-2">
             {attachments.map((file, index) => (
               <div
                 key={`${file.name}-${index}`}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 rounded-full text-sm"
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 rounded-full text-sm"
               >
-                <i className="icon-[lucide--paperclip] size-3.5 text-gray-500 shrink-0" />
-                <span className="max-w-[150px] truncate text-gray-700">{file.name}</span>
-                <span className="text-xs text-gray-400">
+                <i className="icon-[lucide--paperclip] size-3.5 text-slate-400 shrink-0" />
+                <span className="max-w-[150px] truncate text-slate-600">{file.name}</span>
+                <span className="text-xs text-slate-400">
                   {formatFileSize(file.size)}
                 </span>
                 <button
                   type="button"
                   onClick={() => removeAttachment(index)}
-                  className="text-gray-400 hover:text-red-500 transition-colors ml-0.5"
+                  className="text-slate-400 hover:text-red-500 transition-colors ml-0.5"
                   disabled={isInputDisabled || isUploading}
                   aria-label="Eliminar archivo"
                 >
@@ -241,8 +241,8 @@ export function ChatInput({
             ))}
           </div>
           {isUploading && (
-            <div className="mt-2 text-xs text-gray-500 flex items-center gap-2">
-              <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+            <div className="mt-2 text-xs text-slate-400 flex items-center gap-2">
+              <div className="w-3 h-3 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
               Subiendo archivos…
             </div>
           )}
@@ -256,9 +256,9 @@ export function ChatInput({
             checked={isInternal}
             onChange={(e) => setIsInternal(e.target.checked)}
             disabled={isInputDisabled}
-            className="rounded border-gray-300 text-yellow-600 focus:ring-yellow-500 disabled:opacity-50"
+            className="rounded border-emerald-200 text-yellow-600 focus:ring-yellow-500 disabled:opacity-50"
           />
-          <span className={cn("text-gray-700", isInputDisabled && "opacity-50")}>
+          <span className={cn("text-slate-600", isInputDisabled && "opacity-50")}>
             Mensaje interno
           </span>
           <i
@@ -281,7 +281,7 @@ export function ChatInput({
             type="button"
             onClick={() => !isInputDisabled && fileInputRef.current?.click()}
             disabled={isInputDisabled || isUploading || isSending}
-            className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-emerald-50 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             title={isInputDisabled ? "Chat deshabilitado" : "Adjuntar archivo"}
           >
             <i className="icon-[lucide--paperclip] size-5" />
@@ -291,7 +291,7 @@ export function ChatInput({
             type="button"
             onClick={() => !isInputDisabled && setShowEmojiPicker(!showEmojiPicker)}
             disabled={isInputDisabled}
-            className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="p-2 text-slate-400 hover:text-slate-600 hover:bg-emerald-50 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             title={isInputDisabled ? "Chat deshabilitado" : "Emojis"}
           >
             <i className="icon-[lucide--smile] size-5" />
@@ -318,7 +318,7 @@ export function ChatInput({
               "w-full px-4 py-3 border rounded-lg resize-none focus:ring-2 focus:border-transparent transition-colors",
               isInternal && !isInputDisabled
                 ? "border-yellow-300 focus:ring-yellow-500 bg-yellow-50"
-                : "border-gray-300 focus:ring-blue-500",
+                : "border-emerald-200 focus:ring-sky-500",
               (isSending || isUploading || isInputDisabled) && "opacity-50 cursor-not-allowed"
             )}
             style={{ minHeight: "48px", maxHeight: "120px" }}
@@ -352,7 +352,7 @@ export function ChatInput({
             "p-3 rounded-lg transition-colors",
             isInternal && !isInputDisabled
               ? "bg-yellow-600 text-white hover:bg-yellow-700 disabled:bg-yellow-300"
-              : "bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-300",
+              : "bg-sky-600 text-white hover:bg-sky-700 disabled:bg-sky-300",
             "disabled:cursor-not-allowed"
           )}
           title={isInputDisabled ? "Chat deshabilitado — caso cerrado" : "Enviar mensaje"}

@@ -75,7 +75,7 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
   if (!dashboardData) {
     return (
       <div className="p-6 text-center">
-        <p className="text-gray-500 mb-4">No hay datos disponibles</p>
+        <p className="text-slate-400 mb-4">No hay datos disponibles</p>
         <Button
           color="primary"
           onPress={handleRefresh}

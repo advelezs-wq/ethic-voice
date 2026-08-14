@@ -210,29 +210,29 @@ export function EnhancedInviteMemberModal({
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <h2 className="text-xl font-semibold">Invitar Nuevo Miembro</h2>
-          <p className="text-sm text-gray-600 font-normal">
+          <p className="text-sm text-slate-500 font-normal">
             Invita a un nuevo miembro a tu organización y asigna su rol
           </p>
         </ModalHeader>
         <ModalBody>
           <div className="space-y-6">
             {/* Plan Information */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
-                <i className="icon-[lucide--info] size-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-800">
+                <i className="icon-[lucide--info] size-4 text-sky-700" />
+                <span className="text-sm font-medium text-sky-700">
                   Plan {planType}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-blue-700">Administradores:</span>
+                  <span className="text-sky-700">Administradores:</span>
                   <span className="ml-1 font-medium">
                     {currentAdminsCount}/{maxUsers === -1 ? "∞" : maxUsers}
                   </span>
                 </div>
                 <div>
-                  <span className="text-blue-700">Investigadores:</span>
+                  <span className="text-sky-700">Investigadores:</span>
                   <span className="ml-1 font-medium">
                     {currentMembersCount}/{maxInvestigators === -1 ? "∞" : maxInvestigators}
                   </span>
@@ -253,13 +253,13 @@ export function EnhancedInviteMemberModal({
               isInvalid={!!emailError}
               errorMessage={emailError}
               startContent={
-                <i className="icon-[lucide--mail] size-4 text-gray-400" />
+                <i className="icon-[lucide--mail] size-4 text-slate-400" />
               }
             />
 
             {/* Role Selection */}
             <div className="space-y-3">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-slate-600">
                 Rol del usuario
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -267,7 +267,7 @@ export function EnhancedInviteMemberModal({
                   className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
                     form.role === "ADMIN"
                       ? "border-primary bg-primary-50"
-                      : "border-gray-200 hover:border-gray-300"
+                      : "border-emerald-100 hover:border-emerald-200"
                   }`}
                   onClick={() =>
                     setForm((prev) => ({ ...prev, role: "ADMIN" }))
@@ -283,7 +283,7 @@ export function EnhancedInviteMemberModal({
                       {getAvailableSlots("ADMIN")} disponibles
                     </Chip>
                   </div>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-slate-500">
                     {getRoleDescription("ADMIN")}
                   </p>
                 </div>
@@ -292,7 +292,7 @@ export function EnhancedInviteMemberModal({
                   className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
                     form.role === "MEMBER"
                       ? "border-primary bg-primary-50"
-                      : "border-gray-200 hover:border-gray-300"
+                      : "border-emerald-100 hover:border-emerald-200"
                   }`}
                   onClick={() =>
                     setForm((prev) => ({ ...prev, role: "MEMBER" }))
@@ -308,7 +308,7 @@ export function EnhancedInviteMemberModal({
                       {getAvailableSlots("MEMBER")} disponibles
                     </Chip>
                   </div>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-slate-500">
                     {getRoleDescription("MEMBER")}
                   </p>
                 </div>
@@ -316,10 +316,10 @@ export function EnhancedInviteMemberModal({
             </div>
 
             {/* Selected Role Summary */}
-            <div className="bg-gray-50 rounded-lg p-3">
+            <div className="bg-[#f7faf9] rounded-lg p-3">
               <div className="flex items-center gap-2">
-                <i className="icon-[lucide--user-check] size-4 text-gray-600" />
-                <span className="text-sm text-gray-700">
+                <i className="icon-[lucide--user-check] size-4 text-slate-500" />
+                <span className="text-sm text-slate-600">
                   Se enviará invitación como{" "}
                   <span className="font-medium">
                     {form.role === "ADMIN" ? "Administrador" : "Investigador"}

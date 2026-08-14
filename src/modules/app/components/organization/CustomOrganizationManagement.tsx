@@ -307,7 +307,7 @@ export function CustomOrganizationManagement({
                         {members.filter((m) => m.role === "ADMIN").length} /{" "}
                         {planInfo?.maxUsers === -1 ? "∞" : (planInfo?.maxUsers ?? 1)}
                       </p>
-                      <p className="text-sm text-gray-600">Administradores</p>
+                      <p className="text-sm text-slate-500">Administradores</p>
                     </div>
                     <div className="text-center">
                       <p className="text-xl sm:text-2xl font-bold text-primary">
@@ -316,7 +316,7 @@ export function CustomOrganizationManagement({
                           ? "∞"
                           : (planInfo?.maxInvestigators ?? 5)}
                       </p>
-                      <p className="text-sm text-gray-600">Investigadores</p>
+                      <p className="text-sm text-slate-500">Investigadores</p>
                     </div>
                   </div>
                 </CardBody>
@@ -348,7 +348,7 @@ export function CustomOrganizationManagement({
                       <Spinner color="primary" />
                     </div>
                   ) : members.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-slate-400">
                       No hay miembros en la organización
                     </div>
                   ) : (
@@ -367,7 +367,7 @@ export function CustomOrganizationManagement({
                               <p className="font-medium">
                                 {member.user.firstName} {member.user.lastName}
                               </p>
-                              <p className="text-sm text-gray-600">
+                              <p className="text-sm text-slate-500">
                                 {member.user.email}
                               </p>
                             </div>
@@ -478,7 +478,7 @@ export function CustomOrganizationManagement({
                         <h4 className="text-lg sm:text-xl font-semibold">
                           {currentOrganization.name}
                         </h4>
-                        <p className="text-gray-600">
+                        <p className="text-slate-500">
                           {currentOrganization.slug}
                         </p>
                       </div>
@@ -526,7 +526,7 @@ export function CustomOrganizationManagement({
             <h2 className="text-xl font-semibold">
               Configuración de la Organización
             </h2>
-            <p className="text-sm text-gray-600 font-normal">
+            <p className="text-sm text-slate-500 font-normal">
               Actualiza la información y logo de tu organización
             </p>
           </ModalHeader>
@@ -541,13 +541,13 @@ export function CustomOrganizationManagement({
                   }
                   placeholder="Nombre de la empresa"
                   startContent={
-                    <i className="icon-[lucide--building-2] size-4 text-gray-400" />
+                    <i className="icon-[lucide--building-2] size-4 text-slate-400" />
                   }
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-slate-600 mb-3">
                   Logo de la Organización
                 </label>
                 <OrganizationLogoDropzone

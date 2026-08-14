@@ -46,14 +46,14 @@ export const NotificationBell = () => {
       </PopoverTrigger>
 
       <PopoverContent className="w-96 p-0">
-        <div className="border-b border-gray-200 px-4 py-3 flex items-center justify-between w-full">
-          <h3 className="font-semibold text-gray-900">Notificaciones</h3>
+        <div className="border-b border-emerald-100 px-4 py-3 flex items-center justify-between w-full">
+          <h3 className="font-semibold text-[#0d212c]">Notificaciones</h3>
           {unreadCount > 0 && (
             <Button
               size="sm"
               variant="light"
               onPress={handleMarkAllAsRead}
-              className="text-blue-600 hover:text-blue-800"
+              className="text-sky-700 hover:text-sky-700"
               isDisabled={false}
             >
               Marcar todas como leídas

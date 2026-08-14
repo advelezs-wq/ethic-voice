@@ -223,10 +223,10 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h2 className="text-base font-semibold text-gray-900">
+            <h2 className="text-base font-semibold text-[#0d212c]">
               Actualizaciones del caso
             </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-slate-400 mt-0.5">
               Registro de hitos, avances y decisiones
             </p>
           </div>
@@ -256,14 +256,14 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={i} className="h-24 rounded-xl border border-gray-200 bg-gray-100 animate-pulse" />
+              <div key={i} className="h-24 rounded-xl border border-emerald-100 bg-emerald-50 animate-pulse" />
             ))}
           </div>
         ) : updates.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-14 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 text-center">
-            <i className="icon-[lucide--list-checks] size-10 text-gray-300 mb-3" />
-            <p className="text-sm font-semibold text-gray-500">Sin actualizaciones</p>
-            <p className="text-xs text-gray-400 mt-1">
+          <div className="flex flex-col items-center justify-center py-14 rounded-xl border-2 border-dashed border-emerald-100 bg-emerald-50/40 text-center">
+            <i className="icon-[lucide--list-checks] size-10 text-slate-300 mb-3" />
+            <p className="text-sm font-semibold text-slate-400">Sin actualizaciones</p>
+            <p className="text-xs text-slate-400 mt-1">
               {isReportClosed
                 ? "Este caso no tiene actualizaciones registradas."
                 : "Agrega la primera actualización para documentar el avance."}
@@ -296,7 +296,7 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
                           placement="left"
                         >
                           <button
-                            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-emerald-50 transition-colors"
                             onClick={() => {
                               const next: Record<UpdateStatus, UpdateStatus> = {
                                 pending: "in_progress",
@@ -316,13 +316,13 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
                                   ? "text-green-500"
                                   : u.status === "in_progress"
                                     ? "text-yellow-500"
-                                    : "text-gray-400"
+                                    : "text-slate-400"
                               }`}
                             />
                           </button>
                         </Tooltip>
                       ) : (
-                        <i className={`${statusCfg.icon} size-5 text-gray-400 mt-1`} />
+                        <i className={`${statusCfg.icon} size-5 text-slate-400 mt-1`} />
                       )}
                     </div>
 
@@ -333,14 +333,14 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
                           <h3
                             className={`text-sm font-semibold ${
                               u.status === "completed"
-                                ? "line-through text-gray-400"
-                                : "text-gray-900"
+                                ? "line-through text-slate-400"
+                                : "text-[#0d212c]"
                             }`}
                           >
                             {u.title}
                           </h3>
                           {u.description && (
-                            <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                            <p className="text-sm text-slate-500 mt-1 leading-relaxed">
                               {u.description}
                             </p>
                           )}
@@ -389,18 +389,18 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
                           </Chip>
                         )}
                         {u.assignedTo && (
-                          <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <span className="text-xs text-slate-400 flex items-center gap-1">
                             <i className="icon-[lucide--user] size-3" />
                             {u.assignedTo}
                           </span>
                         )}
                         {due && !overdue && (
-                          <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <span className="text-xs text-slate-400 flex items-center gap-1">
                             <i className="icon-[lucide--calendar] size-3" />
                             Vence: {formatDate(due)}
                           </span>
                         )}
-                        <span className="text-xs text-gray-400 ml-auto">
+                        <span className="text-xs text-slate-400 ml-auto">
                           {formatDate(
                             typeof u.updatedAt === "string"
                               ? u.updatedAt
@@ -421,8 +421,8 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
                               disabled={isSaving || u.status === key}
                               className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-colors border ${
                                 u.status === key
-                                  ? "bg-gray-100 border-gray-200 text-gray-500 cursor-default"
-                                  : "border-transparent hover:bg-gray-100 text-gray-500 hover:text-gray-800"
+                                  ? "bg-emerald-50 border-emerald-100 text-slate-400 cursor-default"
+                                  : "border-transparent hover:bg-emerald-50 text-slate-400 hover:text-[#0d212c]"
                               }`}
                             >
                               <i className={`${cfg.icon} size-3`} />
@@ -451,7 +451,7 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
                     editingUpdate
                       ? "icon-[lucide--pencil]"
                       : "icon-[lucide--plus-circle]"
-                  } size-5 text-gray-500`}
+                  } size-5 text-slate-400`}
                 />
                 {editingUpdate ? "Editar actualización" : "Nueva actualización"}
               </ModalHeader>
@@ -555,7 +555,7 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
                     {deleteTarget?.title}
                   </p>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-slate-500">
                   Esta acción no se puede deshacer.
                 </p>
               </ModalBody>

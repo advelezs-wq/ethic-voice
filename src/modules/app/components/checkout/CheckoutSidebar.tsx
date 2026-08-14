@@ -467,16 +467,16 @@ export default function CheckoutSidebar({
         {subscription && (
           <>
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
-              <h2 className="text-xl font-semibold text-gray-900">
+            <div className="flex items-center justify-between p-6 border-b border-emerald-100 flex-shrink-0">
+              <h2 className="text-xl font-semibold text-[#0d212c]">
                 Completar Pago
               </h2>
-              <span className="text-sm text-gray-500 capitalize">
+              <span className="text-sm text-slate-400 capitalize">
                 {subscription.planName}
               </span>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-emerald-50 rounded-full transition-colors"
                 disabled={paymentProcessing}
                 aria-label="Close checkout"
               >
@@ -505,17 +505,17 @@ export default function CheckoutSidebar({
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-6 min-h-0">
               {/* Plan Summary */}
-              <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                <h3 className="font-semibold text-blue-900 mb-2">
+              <div className="bg-sky-50 rounded-lg p-4 mb-6">
+                <h3 className="font-semibold text-sky-800 mb-2">
                   {subscription.planName}
                 </h3>
                 <div className="flex items-center justify-between">
-                  <span className="text-blue-700">Total</span>
-                  <span className="text-lg font-bold text-blue-900">
+                  <span className="text-sky-700">Total</span>
+                  <span className="text-lg font-bold text-sky-800">
                     {subscription.currency === "USD" ? "$" : "COP$ "}
                     {subscription.price?.toLocaleString() || "0"}{" "}
                     {/* ✅ Added defensive null check */}
-                    <span className="text-sm font-normal text-blue-700">
+                    <span className="text-sm font-normal text-sky-700">
                       {" "}
                       /month
                     </span>
@@ -527,11 +527,11 @@ export default function CheckoutSidebar({
               {paymentProcessing && (
                 <div className="fixed inset-0 bg-white/90 flex items-center justify-center z-60">
                   <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
+                    <h3 className="text-lg font-semibold text-[#0d212c] mb-2">
                       Processing Payment...
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-slate-500">
                       Please wait while we activate your subscription.
                     </p>
                   </div>
@@ -541,9 +541,9 @@ export default function CheckoutSidebar({
               {/* Loading state - show during form preparation */}
               {!paymentSuccess && loading && !error && subscription && (
                 <div className="animate-pulse text-center py-8">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-sky-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg
-                      className="w-8 h-8 text-blue-600 animate-spin"
+                      className="w-8 h-8 text-sky-700 animate-spin"
                       fill="none"
                       viewBox="0 0 24 24"
                     >
@@ -562,10 +562,10 @@ export default function CheckoutSidebar({
                       ></path>
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 text-gray-900">
+                  <h3 className="text-lg font-semibold mb-2 text-[#0d212c]">
                     Preparing Payment
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-slate-500">
                     Setting up your secure payment form...
                   </p>
                 </div>
@@ -581,13 +581,13 @@ export default function CheckoutSidebar({
                   {/* Backup form - shown by default, hidden when Rebill form loads */}
                   <div
                     id="rebill-fallback-form"
-                    className="w-full bg-gray-50 rounded-lg p-6 text-center"
+                    className="w-full bg-[#f7faf9] rounded-lg p-6 text-center"
                     style={{ display: "block" }}
                   >
                     <div className="mb-6">
-                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg
-                          className="w-8 h-8 text-gray-400"
+                          className="w-8 h-8 text-slate-400"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -600,10 +600,10 @@ export default function CheckoutSidebar({
                           ></path>
                         </svg>
                       </div>
-                      <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                      <h3 className="text-lg font-semibold mb-2 text-slate-600">
                         Cargando Formulario de Pago Seguro...
                       </h3>
-                      <p className="text-gray-500 mb-4">
+                      <p className="text-slate-400 mb-4">
                         Por favor espera mientras nos conectamos a nuestra
                         pasarela de pago segura.
                       </p>
@@ -611,14 +611,14 @@ export default function CheckoutSidebar({
 
                     <div className="bg-white rounded-lg p-4 mb-4 border">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-600">Plan:</span>
+                        <span className="text-slate-500">Plan:</span>
                         <span className="font-semibold">
                           {subscription.planName}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Monto:</span>
-                        <span className="font-semibold text-blue-600">
+                        <span className="text-slate-500">Monto:</span>
+                        <span className="font-semibold text-sky-700">
                           {subscription.currency}{" "}
                           {subscription.price?.toLocaleString() || "0"}{" "}
                           {/* ✅ Added defensive null check */}
@@ -626,14 +626,14 @@ export default function CheckoutSidebar({
                       </div>
                     </div>
 
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-slate-400">
                       If this page doesn&apos;t load, please refresh your
                       browser or contact support.
                     </p>
                   </div>
 
                   <div className="mt-6 text-center">
-                    <div className="flex items-center justify-center text-xs text-gray-500 mb-2">
+                    <div className="flex items-center justify-center text-xs text-slate-400 mb-2">
                       <svg
                         className="w-4 h-4 mr-1"
                         fill="currentColor"
@@ -647,7 +647,7 @@ export default function CheckoutSidebar({
                       </svg>
                       Secure payment powered by Rebill
                     </div>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-slate-400">
                       Your payment information is encrypted and secure
                     </p>
                   </div>
@@ -684,7 +684,7 @@ export default function CheckoutSidebar({
                           formInjectedRef.current = false;
                           sdkInitializedRef.current = false;
                         }}
-                        className="mt-2 text-sm text-blue-600 hover:text-blue-800 underline"
+                        className="mt-2 text-sm text-sky-700 hover:text-sky-700 underline"
                       >
                         Intentar de Nuevo
                       </button>
@@ -712,18 +712,18 @@ export default function CheckoutSidebar({
                         />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <h3 className="text-xl font-semibold text-[#0d212c] mb-2">
                       ¡Orden confirmada!
                     </h3>
-                    <p className="text-gray-600 text-sm mb-4">
+                    <p className="text-slate-500 text-sm mb-4">
                       En los próximos minutos recibirá un correo electrónico con
                       la confirmación de su pedido.
                     </p>
-                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                      <p className="text-blue-800 text-sm font-medium">
+                    <div className="mt-4 p-3 bg-sky-50 rounded-lg">
+                      <p className="text-sky-700 text-sm font-medium">
                         🚀 Redirigiendo a la configuración de su organización...
                       </p>
-                      <p className="text-blue-600 text-xs mt-1">
+                      <p className="text-sky-700 text-xs mt-1">
                         Por favor espere mientras preparamos su cuenta
                       </p>
                     </div>
@@ -740,11 +740,11 @@ export default function CheckoutSidebar({
                             window.location.href = redirectUrl;
                           }
                         }}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                        className="w-full bg-sky-600 hover:bg-sky-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
                       >
                         Continuar a configuración →
                       </button>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-slate-400 mt-2">
                         Si no se redirige automáticamente, haga clic en el botón
                       </p>
                     </div>

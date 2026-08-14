@@ -6,16 +6,13 @@ import { useRouter } from "next/navigation";
 import { useOrganization } from "@/modules/app/hooks/useOrganization";
 import { OnboardingLayout } from "./OnboardingLayout";
 import { WelcomeStep } from "./steps/WelcomeStep";
-import { ThemeSelectionStep } from "./steps/ThemeSelectionStep";
 import { NotificationStep } from "./steps/NotificationStep";
 import { CreateOrganizationStep } from "./steps/CreateOrganizationStep";
 import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
-import { PlanType } from "@/types/subscription.types";
 import { useSubscription } from "@/modules/core/providers/SubscriptionProvider";
 
 export enum OnboardingStep {
   WELCOME = "welcome",
-  THEME_SELECTION = "theme_selection",
   NOTIFICATIONS = "notifications",
   CREATE_ORGANIZATION = "create_organization",
 }
@@ -33,10 +30,8 @@ interface NotificationSettings {
 
 export interface OnboardingContextType {
   currentStep: OnboardingStep;
-  selectedTheme: string;
   notificationSettings: NotificationSettings;
   setCurrentStep: (step: OnboardingStep) => void;
-  setSelectedTheme: (theme: string) => void;
   setNotificationSettings: (settings: NotificationSettings) => void;
   goToNextStep: () => void;
   goToPreviousStep: () => void;
@@ -57,8 +52,7 @@ export interface OnboardingContextType {
   availableSteps: OnboardingStep[];
 }
 
-// Dynamic step order based on plan
-const baseSteps = [
+const stepOrder = [
   OnboardingStep.WELCOME,
   OnboardingStep.NOTIFICATIONS,
   OnboardingStep.CREATE_ORGANIZATION,
@@ -68,11 +62,10 @@ export function OnboardingClient() {
   const router = useRouter();
   const { currentOrganization, organizations } = useOrganization();
   const { planInfo, isLoading: planLoading } = usePlanPermissions();
-  const { subscription, isLoading: subscriptionLoading } = useSubscription();
+  const { isLoading: subscriptionLoading } = useSubscription();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(
     OnboardingStep.WELCOME
   );
-  const [selectedTheme, setSelectedTheme] = useState("default");
   const [notificationSettings, setNotificationSettings] =
     useState<NotificationSettings>({
       emailReportAssigned: true,
@@ -93,22 +86,7 @@ export function OnboardingClient() {
     teamSize: string;
   } | null>(null);
 
-  // Determine if theme selection is allowed (Grow or higher)
-  // Determine effective plan type: prefer org-based plan; fallback to subscription during onboarding
-  const subscriptionPlan = (subscription?.planType || "") as string;
-  const normalizedSubscriptionPlan = subscriptionPlan.toUpperCase() as keyof typeof PlanType;
-  const effectivePlanType: PlanType | null = currentOrganization?.id
-    ? planInfo?.planType ?? null
-    : (PlanType[normalizedSubscriptionPlan] as PlanType) || null;
-
-  const allowThemeSelection =
-    effectivePlanType === PlanType.GROW ||
-    effectivePlanType === PlanType.GROW_PRO ||
-    effectivePlanType === PlanType.PREMIUM;
-
-  const computedStepOrder: OnboardingStep[] = allowThemeSelection
-    ? [OnboardingStep.WELCOME, OnboardingStep.THEME_SELECTION, ...baseSteps.slice(1)]
-    : [...baseSteps];
+  const computedStepOrder: OnboardingStep[] = stepOrder;
 
   // Helper: scroll onboarding content to top
   const scrollToTop = () => {
@@ -154,15 +132,15 @@ export function OnboardingClient() {
   // Don't render onboarding if user already has organizations
   if (currentOrganization || (organizations && organizations.length > 0)) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-white text-2xl">✓</span>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl font-semibold text-[#0d212c] mb-2">
             ¡Ya tienes una organización!
           </h2>
-          <p className="text-gray-600">
+          <p className="text-slate-500">
             Redirigiendo a tu espacio de trabajo...
           </p>
         </div>
@@ -188,13 +166,11 @@ export function OnboardingClient() {
 
   const context: OnboardingContextType = {
     currentStep,
-    selectedTheme,
     notificationSettings,
     setCurrentStep: (s) => {
       setCurrentStep(s);
       scrollToTop();
     },
-    setSelectedTheme,
     setNotificationSettings,
     goToNextStep,
     goToPreviousStep,
@@ -209,8 +185,6 @@ export function OnboardingClient() {
     switch (currentStep) {
       case OnboardingStep.WELCOME:
         return <WelcomeStep context={context} />;
-      case OnboardingStep.THEME_SELECTION:
-        return <ThemeSelectionStep context={context} />;
       case OnboardingStep.NOTIFICATIONS:
         return <NotificationStep context={context} />;
       case OnboardingStep.CREATE_ORGANIZATION:
@@ -233,10 +207,10 @@ export function OnboardingClient() {
 
   if (!redirectChecked || !isPlanContextReady) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Verificando estado y plan...</p>
+          <div className="w-8 h-8 border-4 border-lime-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-500">Verificando estado y plan...</p>
         </div>
       </div>
     );

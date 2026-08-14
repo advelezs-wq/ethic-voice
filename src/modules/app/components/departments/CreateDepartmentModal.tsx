@@ -85,7 +85,7 @@ export function CreateDepartmentModal({
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <h3 className="text-lg font-semibold">Crear Nuevo Departamento</h3>
-          <p className="text-sm text-gray-600 font-normal">
+          <p className="text-sm text-slate-500 font-normal">
             Selecciona un departamento predefinido o crea uno personalizado
           </p>
         </ModalHeader>
@@ -118,8 +118,8 @@ export function CreateDepartmentModal({
               />
             )}
 
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <p className="text-sm text-blue-800">
+            <div className="bg-sky-50 p-3 rounded-lg">
+              <p className="text-sm text-sky-700">
                 <strong>Nota:</strong> Los miembros nuevos serán asignados
                 automáticamente al departamento &quot;General&quot; si no se
                 especifica otro departamento.

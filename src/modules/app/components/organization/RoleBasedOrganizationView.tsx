@@ -74,10 +74,10 @@ export function RoleBasedOrganizationView() {
                         Invitar Miembros
                       </h3>
                       <div className="space-y-3">
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-500">
                           Para invitar nuevos miembros desde la plataforma:
                         </p>
-                        <ol className="text-sm text-gray-600 space-y-2 list-decimal list-inside">
+                        <ol className="text-sm text-slate-500 space-y-2 list-decimal list-inside">
                           <li>
                             Haz clic en "Invitar Miembro" en la parte superior
                             derecha de esta sección
@@ -143,7 +143,7 @@ export function RoleBasedOrganizationView() {
                 <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
                   Información
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-slate-500">
                   Contacta a un administrador si necesitas cambios en la
                   configuración de la organización o acceso a otras funciones.
                 </p>

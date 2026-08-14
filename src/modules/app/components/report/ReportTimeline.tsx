@@ -110,16 +110,16 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
 
   const getColor = (action: keyof typeof ACTIVITY_TYPES) => {
     const colors = {
-      [ACTIVITY_TYPES.CREATED]: "bg-blue-100 text-blue-900",
+      [ACTIVITY_TYPES.CREATED]: "bg-sky-100 text-sky-800",
       [ACTIVITY_TYPES.ASSIGNED]: "bg-green-100 text-green-900",
       [ACTIVITY_TYPES.STATUS_CHANGED]: "bg-purple-100 text-purple-900",
       [ACTIVITY_TYPES.PRIORITY_CHANGED]: "bg-orange-100 text-orange-900",
       [ACTIVITY_TYPES.COMMENT_ADDED]: "bg-indigo-100 text-indigo-900",
-      [ACTIVITY_TYPES.ATTACHMENT_UPLOADED]: "bg-gray-100 text-gray-900",
+      [ACTIVITY_TYPES.ATTACHMENT_UPLOADED]: "bg-emerald-50 text-[#0d212c]",
       [ACTIVITY_TYPES.NOTE_ADDED]: "bg-yellow-100 text-yellow-900",
       [ACTIVITY_TYPES.CUSTOM_EVENT]: "bg-pink-100 text-pink-900",
     };
-    return colors[action] || "bg-gray-100 text-gray-900";
+    return colors[action] || "bg-emerald-50 text-[#0d212c]";
   };
 
   const getTitle = (action: string, details?: any) => {
@@ -261,10 +261,10 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex gap-4 animate-pulse">
-            <div className="w-10 h-10 rounded-full bg-gray-200 shrink-0" />
+            <div className="w-10 h-10 rounded-full bg-emerald-100 shrink-0" />
             <div className="flex-1 space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-1/3" />
-              <div className="h-3 bg-gray-100 rounded w-2/3" />
+              <div className="h-4 bg-emerald-100 rounded w-1/3" />
+              <div className="h-3 bg-emerald-50 rounded w-2/3" />
             </div>
           </div>
         ))}
@@ -276,11 +276,11 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
     <div>
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-base font-semibold text-gray-900">
+          <h2 className="text-base font-semibold text-[#0d212c]">
             Cronología del caso
           </h2>
           {isReportClosed && (
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-slate-400 mt-0.5">
               Caso cerrado — solo lectura
             </p>
           )}
@@ -311,8 +311,8 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
 
       {/* Add Activity Form */}
       {showAddForm && !isReportClosed && (
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl space-y-3">
-          <h3 className="text-sm font-semibold text-blue-900">
+        <div className="mb-6 p-4 bg-sky-50 border border-sky-200 rounded-xl space-y-3">
+          <h3 className="text-sm font-semibold text-sky-800">
             Nuevo evento de investigación
           </h3>
           <Input
@@ -363,18 +363,18 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
       <div className="relative">
         {/* Vertical line */}
         {activities.length > 0 && (
-          <div className="absolute left-5 top-5 bottom-5 w-px bg-gray-200" />
+          <div className="absolute left-5 top-5 bottom-5 w-px bg-emerald-100" />
         )}
 
         <div className="space-y-6">
           {activities.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <i className="icon-[lucide--clock] size-10 text-gray-300 mb-3" />
-              <p className="text-sm font-medium text-gray-500">
+              <i className="icon-[lucide--clock] size-10 text-slate-300 mb-3" />
+              <p className="text-sm font-medium text-slate-400">
                 Sin actividades registradas
               </p>
               {!isReportClosed && (
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Agrega eventos para documentar el progreso de la investigación.
                 </p>
               )}
@@ -395,23 +395,23 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                 </div>
 
                 {/* Card */}
-                <div className="flex-1 min-w-0 bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm">
+                <div className="flex-1 min-w-0 bg-emerald-50/40 border border-emerald-100 rounded-xl p-4 shadow-sm">
                   <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <h3 className="text-sm font-semibold text-gray-900">
+                    <h3 className="text-sm font-semibold text-[#0d212c]">
                       {getTitle(activity.action, activity.details)}
                     </h3>
                     <div className="text-right shrink-0">
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-slate-400">
                         {getTimeAgo(activity.createdAt)}
                       </span>
                     </div>
                   </div>
 
-                  <p className="text-sm text-gray-700 mb-2">
+                  <p className="text-sm text-slate-600 mb-2">
                     {getDescription(activity.action, activity.details)}
                   </p>
 
-                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                  <div className="flex items-center gap-3 text-xs text-slate-400">
                     <span className="flex items-center gap-1">
                       <i className="icon-[lucide--user] size-3" />
                       {activity.userName}
@@ -423,7 +423,7 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                   {activity.details?.taskId && (
                     <a
                       href={`?tab=tasks&task=${activity.details.taskId}`}
-                      className="mt-2 inline-flex items-center gap-1 text-xs text-blue-700 hover:underline"
+                      className="mt-2 inline-flex items-center gap-1 text-xs text-sky-700 hover:underline"
                     >
                       <i className="icon-[lucide--external-link] size-3" />
                       Ver {activity.details.parentTaskId ? "subtarea" : "tarea"}{" "}
@@ -436,7 +436,7 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                     typeof activity.details === "object" &&
                     Object.keys(activity.details).length > 0 &&
                     !activity.details.taskId && (
-                      <div className="mt-3 pt-3 border-t border-gray-200 grid grid-cols-2 gap-x-4 gap-y-1">
+                      <div className="mt-3 pt-3 border-t border-emerald-100 grid grid-cols-2 gap-x-4 gap-y-1">
                         {Object.entries(activity.details).map(([key, value]) => {
                           // Keys already shown in title/description or purely internal — skip
                           const SKIP_KEYS = new Set([
@@ -514,10 +514,10 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
 
                           return (
                             <div key={key} className="text-xs">
-                              <span className="font-medium text-gray-500 capitalize">
+                              <span className="font-medium text-slate-400 capitalize">
                                 {label}:
                               </span>{" "}
-                              <span className="text-gray-700">{display}</span>
+                              <span className="text-slate-600">{display}</span>
                             </div>
                           );
                         })}

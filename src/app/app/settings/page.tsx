@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/modules/core/utils/permissions";
 import { SystemSettingsContent } from "@/modules/app/components/settings/SystemSettingsContent";
 import { resolveOrgId } from "@/modules/core/utils/org-resolver";
+import { PageHero } from "@/modules/app/components/ui";
 
 export default async function SettingsPage() {
   const { userId } = await auth();
@@ -29,20 +30,14 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Configuración del Sistema
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Personaliza la apariencia y configuración de tu dashboard
-            organizacional
-          </p>
-        </div>
+    <div className="max-w-6xl mx-auto space-y-6">
+      <PageHero
+        kicker="Organización"
+        title="Configuración del Sistema"
+        description="Personaliza la apariencia y configuración de tu dashboard organizacional"
+      />
 
-        <SystemSettingsContent organizationId={orgId} />
-      </div>
+      <SystemSettingsContent organizationId={orgId} />
     </div>
   );
 }

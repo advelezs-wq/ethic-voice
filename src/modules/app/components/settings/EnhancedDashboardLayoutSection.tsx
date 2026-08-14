@@ -272,8 +272,8 @@ export function EnhancedDashboardLayoutSection({
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Cargando configuración...</p>
+          <div className="w-8 h-8 border-2 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-500">Cargando configuración...</p>
         </div>
       </div>
     );
@@ -287,10 +287,10 @@ export function EnhancedDashboardLayoutSection({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-[#0d212c]">
             Personalización del Dashboard
           </h3>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-slate-500 text-sm mt-1">
             Arrastra y suelta los elementos para cambiar su orden. Usa los
             controles para ajustar tamaño y visibilidad.
           </p>
@@ -319,7 +319,7 @@ export function EnhancedDashboardLayoutSection({
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <i className="icon-[lucide--eye] size-5 text-green-600" />
-          <h4 className="font-medium text-gray-900">
+          <h4 className="font-medium text-[#0d212c]">
             Elementos Visibles ({visibleElements.length})
           </h4>
         </div>
@@ -354,15 +354,15 @@ export function EnhancedDashboardLayoutSection({
                     <Card
                       className={`
                         cursor-move hover:shadow-md transition-all duration-200
-                        ${dragOverElement === element.id ? "bg-blue-50 border-blue-300 border-dashed" : ""}
-                        ${draggedElement === element.id ? "bg-gray-50" : ""}
+                        ${dragOverElement === element.id ? "bg-sky-50 border-sky-300 border-dashed" : ""}
+                        ${draggedElement === element.id ? "bg-[#f7faf9]" : ""}
                       `}
                     >
                       <CardBody className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4 flex-1">
                             {/* Drag Handle */}
-                            <div className="flex flex-col gap-0.5 text-gray-400 hover:text-gray-600 transition-colors">
+                            <div className="flex flex-col gap-0.5 text-slate-400 hover:text-slate-500 transition-colors">
                               <div className="w-1 h-1 bg-current rounded-full" />
                               <div className="w-1 h-1 bg-current rounded-full" />
                               <div className="w-1 h-1 bg-current rounded-full" />
@@ -380,14 +380,14 @@ export function EnhancedDashboardLayoutSection({
                             <div className="flex items-center gap-3 flex-1">
                               <div className="p-2 bg-secondary rounded-lg">
                                 <i
-                                  className={`${element.icon} size-5 text-gray-600`}
+                                  className={`${element.icon} size-5 text-slate-500`}
                                 />
                               </div>
                               <div>
-                                <h5 className="font-medium text-gray-900">
+                                <h5 className="font-medium text-[#0d212c]">
                                   {element.name}
                                 </h5>
-                                <p className="text-sm text-gray-600">
+                                <p className="text-sm text-slate-500">
                                   {element.description}
                                 </p>
                               </div>
@@ -398,7 +398,7 @@ export function EnhancedDashboardLayoutSection({
                           <div className="flex items-center gap-4">
                             {/* Size Controls */}
                             <div className="flex items-center gap-2">
-                              <span className="text-sm text-gray-600 font-medium">
+                              <span className="text-sm text-slate-500 font-medium">
                                 Tamaño:
                               </span>
                               <div className="flex gap-1">
@@ -467,8 +467,8 @@ export function EnhancedDashboardLayoutSection({
       {hiddenElements.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <i className="icon-[lucide--eye-off] size-5 text-gray-400" />
-            <h4 className="font-medium text-gray-600">
+            <i className="icon-[lucide--eye-off] size-5 text-slate-400" />
+            <h4 className="font-medium text-slate-500">
               Elementos Ocultos ({hiddenElements.length})
             </h4>
           </div>
@@ -493,10 +493,10 @@ export function EnhancedDashboardLayoutSection({
                             />
                           </div>
                           <div>
-                            <h6 className="font-medium text-gray-700 text-sm">
+                            <h6 className="font-medium text-slate-600 text-sm">
                               {element.name}
                             </h6>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-slate-400">
                               {element.description}
                             </p>
                           </div>
@@ -520,14 +520,14 @@ export function EnhancedDashboardLayoutSection({
       )}
 
       {/* Help Section */}
-      <Card className="bg-gradient-to-r from-accent to-secondary border-blue-200">
+      <Card className="bg-gradient-to-r from-accent to-secondary border-sky-200">
         <CardBody>
           <div className="flex items-center gap-8">
-            <div className="p-2 bg-blue-100 rounded-lg flex items-center justify-center">
-              <i className="icon-[lucide--info] size-5 text-blue-600" />
+            <div className="p-2 bg-sky-100 rounded-lg flex items-center justify-center">
+              <i className="icon-[lucide--info] size-5 text-sky-700" />
             </div>
             <div>
-              <h4 className="font-semibold text-blue-900 mb-2">
+              <h4 className="font-semibold text-sky-800 mb-2">
                 Guía de Personalización
               </h4>
               <ul className="text-primary text-sm space-y-1">

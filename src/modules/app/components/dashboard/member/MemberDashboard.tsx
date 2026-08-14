@@ -35,15 +35,15 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({
   );
 
   return (
-    <div className="md:p-6 space-y-6 bg-gray-50 min-h-screen">
+    <div className="md:p-6 space-y-6 bg-[#f7faf9] min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
+          <div className="bg-gradient-to-r from-sky-600 to-sky-700 rounded-lg p-6 text-white">
             <h1 className="text-2xl font-bold mb-2">
               Bienvenido a tu Panel de Trabajo
             </h1>
-            <p className="text-blue-100">
+            <p className="text-sky-100">
               Aquí puedes ver y gestionar los casos que te han sido asignados.
             </p>
           </div>

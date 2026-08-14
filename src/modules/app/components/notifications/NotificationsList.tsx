@@ -67,13 +67,13 @@ export const NotificationsList = ({ onClose }: NotificationsListProps) => {
       case "REPORT_URGENT":
         return "border-l-red-500 bg-red-50";
       case "REPORT_CREATED":
-        return "border-l-blue-500 bg-blue-50";
+        return "border-l-sky-500 bg-sky-50";
       case "REPORT_ASSIGNED":
         return "border-l-green-500 bg-green-50";
       case "SYSTEM_ALERT":
         return "border-l-yellow-500 bg-yellow-50";
       default:
-        return "border-l-gray-500 bg-gray-50";
+        return "border-l-slate-400 bg-[#f7faf9]";
     }
   };
 
@@ -81,7 +81,7 @@ export const NotificationsList = ({ onClose }: NotificationsListProps) => {
     return (
       <div className="flex items-center justify-center p-8">
         <Spinner size="md" color="primary" />
-        <span className="ml-2 text-sm text-gray-500">
+        <span className="ml-2 text-sm text-slate-400">
           Cargando notificaciones...
         </span>
       </div>
@@ -92,7 +92,7 @@ export const NotificationsList = ({ onClose }: NotificationsListProps) => {
   if (!notifications || !Array.isArray(notifications)) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
-        <p className="text-gray-500 text-sm mb-4">
+        <p className="text-slate-400 text-sm mb-4">
           No hay notificaciones disponibles
         </p>
         <Button size="sm" variant="light" onPress={onClose}>
@@ -105,7 +105,7 @@ export const NotificationsList = ({ onClose }: NotificationsListProps) => {
   if (notifications.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
-        <p className="text-gray-500 text-sm mb-4">
+        <p className="text-slate-400 text-sm mb-4">
           No tienes notificaciones nuevas
         </p>
         <Button size="sm" variant="light" onPress={onClose}>
@@ -117,12 +117,12 @@ export const NotificationsList = ({ onClose }: NotificationsListProps) => {
 
   return (
     <ScrollShadow className="max-h-96">
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-emerald-100">
         {notifications.slice(0, 10).map((notification) => (
           <div
             key={notification.id}
-            className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors border-l-4 ${
-              !notification.readAt ? "bg-blue-50" : "bg-white"
+            className={`p-4 cursor-pointer hover:bg-[#f7faf9] transition-colors border-l-4 ${
+              !notification.readAt ? "bg-sky-50" : "bg-white"
             } ${getPriorityColor(notification.type)}`}
             onClick={() => handleNotificationClick(notification)}
           >
@@ -135,26 +135,26 @@ export const NotificationsList = ({ onClose }: NotificationsListProps) => {
                 <div className="flex items-center justify-between">
                   <p
                     className={`text-sm font-medium ${
-                      !notification.readAt ? "text-gray-900" : "text-gray-700"
+                      !notification.readAt ? "text-[#0d212c]" : "text-slate-600"
                     }`}
                   >
                     {notification.title}
                   </p>
                   {!notification.readAt && (
-                    <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-sky-600 rounded-full flex-shrink-0"></div>
                   )}
                 </div>
 
                 <p
                   className={`text-sm mt-1 ${
-                    !notification.readAt ? "text-gray-700" : "text-gray-500"
+                    !notification.readAt ? "text-slate-600" : "text-slate-400"
                   }`}
                 >
                   {notification.message}
                 </p>
 
                 <div className="flex items-center justify-between mt-2">
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-slate-400">
                     {formatDistanceToNow(new Date(notification.createdAt), {
                       addSuffix: true,
                       locale: es,
@@ -162,7 +162,7 @@ export const NotificationsList = ({ onClose }: NotificationsListProps) => {
                   </p>
 
                   {notification.organization && (
-                    <p className="text-xs text-gray-400 truncate ml-2">
+                    <p className="text-xs text-slate-400 truncate ml-2">
                       {notification.organization.name}
                     </p>
                   )}

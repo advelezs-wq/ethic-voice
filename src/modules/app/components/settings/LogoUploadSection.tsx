@@ -145,7 +145,7 @@ export function LogoUploadSection({ organizationId }: LogoUploadSectionProps) {
     <div className="space-y-6">
       <div className="flex items-start gap-6">
         <div className="flex-1">
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+          <div className="border-2 border-dashed border-emerald-200 rounded-lg p-6 text-center hover:border-slate-400 transition-colors">
             {currentLogo ? (
               <div className="space-y-4">
                 <div className="max-w-xs mx-auto">
@@ -178,14 +178,14 @@ export function LogoUploadSection({ organizationId }: LogoUploadSectionProps) {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                  <i className="icon-[lucide--image] size-8 text-gray-400" />
+                <div className="mx-auto w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center">
+                  <i className="icon-[lucide--image] size-8 text-slate-400" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-medium text-gray-900">
+                  <h4 className="text-lg font-medium text-[#0d212c]">
                     Sube el logo de tu organización
                   </h4>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-slate-500 mt-1">
                     Formatos PNG, JPG o SVG hasta 5MB
                   </p>
                 </div>
@@ -204,8 +204,8 @@ export function LogoUploadSection({ organizationId }: LogoUploadSectionProps) {
           {uploading && (
             <div className="mt-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">Subiendo logo...</span>
-                <span className="text-sm text-gray-600">{uploadProgress}%</span>
+                <span className="text-sm text-slate-500">Subiendo logo...</span>
+                <span className="text-sm text-slate-500">{uploadProgress}%</span>
               </div>
               <Progress
                 value={uploadProgress}
@@ -227,11 +227,11 @@ export function LogoUploadSection({ organizationId }: LogoUploadSectionProps) {
 
         <div className="w-80">
           <div className="bg-secondary rounded-lg p-4">
-            <h5 className="font-medium text-gray-900 mb-3">
+            <h5 className="font-medium text-[#0d212c] mb-3">
               <i className="icon-[lucide--info] size-4 mr-2 inline" />
               Recomendaciones
             </h5>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <ul className="space-y-2 text-sm text-slate-500">
               <li className="flex items-start gap-2">
                 <i className="icon-[lucide--check] size-3 text-green-500 mt-1 flex-shrink-0" />
                 Tamaño recomendado: 200x60 píxeles

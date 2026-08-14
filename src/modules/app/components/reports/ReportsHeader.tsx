@@ -262,7 +262,7 @@ export function ReportsHeader({
                 ¿Estás seguro de que deseas archivar los {selectedCount}{" "}
                 reportes seleccionados?
               </p>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-slate-500 mt-2">
                 Los reportes archivados se moverán al archivo y no aparecerán en
                 la vista principal. Esta acción se puede revertir.
               </p>
@@ -277,7 +277,7 @@ export function ReportsHeader({
   return (
     <div className="mb-6 flex items-start sm:items-center justify-between gap-3 flex-wrap">
       <div className="flex items-center gap-2 sm:gap-3">
-        <h1 className="text-2xl font-bold text-gray-900">Denuncias</h1>
+        <h1 className="text-2xl font-bold text-[#0d212c]">Denuncias</h1>
         {(processingCount > 0 || pendingCount > 0) && (
           <Tooltip content="Procesamiento en curso (ETA aprox.)">
             <Chip size="sm" variant="solid" color="primary">
@@ -350,7 +350,7 @@ export function ReportsHeader({
           </Dropdown>
         )}
 
-        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+        <div className="flex items-center gap-1 bg-emerald-50 rounded-lg p-1">
           <Button
             size="sm"
             variant={viewMode === "table" ? "solid" : "light"}

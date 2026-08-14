@@ -26,12 +26,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   isSuperAdmin,
 }) => {
   return (
-    <div className="p-4 md:p-6 space-y-6 bg-gray-50 min-h-screen">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start sm:items-center justify-between gap-4 flex-wrap">
         <div>
           <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+            <h1 className="text-xl md:text-2xl font-bold text-[#0d212c]">
               {isSuperAdmin
                 ? "Panel de Super Administrador"
                 : "Panel de Control"}
@@ -47,7 +47,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </Chip>
             )}
           </div>
-          <p className="text-gray-600 text-sm md:text-base">
+          <p className="text-slate-500 text-sm md:text-base">
             {isSuperAdmin
               ? "Gestión global del sistema"
               : "Gestión de denuncias y reportes de tu organización"}
@@ -63,7 +63,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           >
             <i className="icon-[lucide--refresh-ccw] size-4" />
           </Button>
-          <Button variant="bordered" size="sm">
+          <Button variant="bordered" size="sm" className="border-emerald-200 text-[#0d212c]">
             <i className="icon-[lucide--filter] size-4 mr-2" />
             Filtrar
           </Button>

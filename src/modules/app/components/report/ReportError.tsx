@@ -12,9 +12,9 @@ export const ReportError: React.FC<ReportErrorProps> = ({
   onGoBack,
 }) => {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-emerald-50/40 flex items-center justify-center">
       <div className="max-w-md w-full mx-4">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+        <div className="bg-white rounded-lg shadow-sm border border-emerald-100 p-8 text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <i
               className="icon-[lucide--triangle-alert] size-8 text-red-600"
@@ -23,11 +23,11 @@ export const ReportError: React.FC<ReportErrorProps> = ({
             />
           </div>
 
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl font-semibold text-[#0d212c] mb-2">
             Error al cargar el reporte
           </h2>
 
-          <p className="text-gray-600 mb-6">
+          <p className="text-slate-500 mb-6">
             {error ||
               "Ha ocurrido un error inesperado al cargar la información del reporte."}
           </p>
@@ -36,7 +36,7 @@ export const ReportError: React.FC<ReportErrorProps> = ({
             {onRetry && (
               <button
                 onClick={onRetry}
-                className="flex items-center justify-center space-x-2 bg-blue-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-800 transition-colors"
+                className="flex items-center justify-center space-x-2 bg-[#0d212c] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#0d212c]/90 transition-colors"
               >
                 <i
                   className="icon-[lucide--refresh-cw] size-4"
@@ -50,7 +50,7 @@ export const ReportError: React.FC<ReportErrorProps> = ({
             {onGoBack && (
               <button
                 onClick={onGoBack}
-                className="flex items-center justify-center space-x-2 bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-400 transition-colors"
+                className="flex items-center justify-center space-x-2 bg-emerald-100 text-slate-600 px-6 py-2 rounded-lg font-medium hover:bg-emerald-200 transition-colors"
               >
                 <i
                   className="icon-[lucide--arrow-left] size-4"

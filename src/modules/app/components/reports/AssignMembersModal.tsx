@@ -181,7 +181,7 @@ export function AssignMembersModal({
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <h3 className="text-lg font-semibold">Gestionar Investigadores</h3>
-          <p className="text-sm text-gray-600 font-normal">
+          <p className="text-sm text-slate-500 font-normal">
             Asigna o remueve investigadores de este reporte
           </p>
         </ModalHeader>
@@ -195,14 +195,14 @@ export function AssignMembersModal({
               {/* Current Assignments */}
               {currentAssignments.length > 0 && (
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">
+                  <p className="text-sm font-medium text-slate-600 mb-2">
                     Investigadores actuales:
                   </p>
                   <div className="space-y-2">
                     {currentAssignments.map((assignment) => (
                       <div
                         key={assignment.userId}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-[#f7faf9] rounded-lg"
                       >
                         <User
                           name={assignment.userName}
@@ -237,7 +237,7 @@ export function AssignMembersModal({
               {availableMembers.length > 0 && (
                 <>
                   <div className="border-t pt-4">
-                    <p className="text-sm font-medium text-gray-700 mb-3">
+                    <p className="text-sm font-medium text-slate-600 mb-3">
                       Asignar nuevos investigadores:
                     </p>
                   </div>
@@ -288,7 +288,7 @@ export function AssignMembersModal({
                   {/* Members List */}
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {filteredMembers.length === 0 ? (
-                      <div className="text-center py-8 text-gray-500">
+                      <div className="text-center py-8 text-slate-400">
                         No hay más investigadores disponibles para asignar
                       </div>
                     ) : (
@@ -298,7 +298,7 @@ export function AssignMembersModal({
                           className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                             selectedMembers.includes(member.userId)
                               ? "border-primary bg-primary-50"
-                              : "border-gray-200 hover:bg-gray-50"
+                              : "border-emerald-100 hover:bg-[#f7faf9]"
                           }`}
                           onClick={() => toggleMember(member.userId)}
                         >
@@ -336,7 +336,7 @@ export function AssignMembersModal({
 
               {availableMembers.length === 0 &&
                 currentAssignments.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-slate-400">
                     No hay investigadores en la organización
                   </div>
                 )}

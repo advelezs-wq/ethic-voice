@@ -49,9 +49,9 @@ export function DepartmentReportsChart({ data }: DepartmentReportsChartProps) {
     if (props.active && props.payload && props.payload.length) {
       const data = props.payload[0].payload;
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{data.department}</p>
-          <p className="text-sm text-gray-600">
+        <div className="bg-white p-3 border border-emerald-100 rounded-lg shadow-lg">
+          <p className="font-medium text-[#0d212c]">{data.department}</p>
+          <p className="text-sm text-slate-500">
             Reportes: <span className="font-medium">{data.count}</span>
           </p>
         </div>
@@ -67,9 +67,9 @@ export function DepartmentReportsChart({ data }: DepartmentReportsChartProps) {
     <div className="space-y-6">
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-900">{data.length}</div>
-          <div className="text-sm text-blue-600">Departamentos</div>
+        <div className="bg-sky-50 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-sky-800">{data.length}</div>
+          <div className="text-sm text-sky-700">Departamentos</div>
         </div>
         <div className="bg-green-50 rounded-lg p-4 text-center">
           <div className="text-2xl font-bold text-green-900">{total}</div>
@@ -86,10 +86,10 @@ export function DepartmentReportsChart({ data }: DepartmentReportsChartProps) {
       {/* Bar Chart */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">
+          <h4 className="text-lg font-semibold text-[#0d212c]">
             Reportes por Departamento
           </h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Distribución de reportes por área organizacional
           </p>
         </div>
@@ -133,7 +133,7 @@ export function DepartmentReportsChart({ data }: DepartmentReportsChartProps) {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-slate-400">
             <i className="icon-[lucide--bar-chart-3] size-12 mx-auto mb-4" />
             <p className="text-lg font-medium">No hay datos disponibles</p>
             <p className="text-sm">
@@ -147,10 +147,10 @@ export function DepartmentReportsChart({ data }: DepartmentReportsChartProps) {
       {data.length > 0 && (
         <div className="bg-white border rounded-lg p-6">
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-900">
+            <h4 className="text-lg font-semibold text-[#0d212c]">
               Rendimiento por Departamento
             </h4>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-500">
               Tabla detallada de reportes por departamento
             </p>
           </div>
@@ -169,20 +169,20 @@ export function DepartmentReportsChart({ data }: DepartmentReportsChartProps) {
                         className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: color }}
                       />
-                      <span className="text-sm font-medium text-gray-900">
+                      <span className="text-sm font-medium text-[#0d212c]">
                         {item.department}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-sm font-bold text-gray-900">
+                      <span className="text-sm font-bold text-[#0d212c]">
                         {item.count}
                       </span>
-                      <span className="text-xs text-gray-500 ml-1">
+                      <span className="text-xs text-slate-400 ml-1">
                         ({((item.count / total) * 100).toFixed(1)}%)
                       </span>
                     </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-emerald-100 rounded-full h-2">
                     <div
                       className="h-2 rounded-full transition-all duration-500"
                       style={{
@@ -199,14 +199,14 @@ export function DepartmentReportsChart({ data }: DepartmentReportsChartProps) {
       )}
 
       {/* Insights */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <i className="icon-[lucide--building-2] size-5 text-blue-600 mt-0.5" />
+          <i className="icon-[lucide--building-2] size-5 text-sky-700 mt-0.5" />
           <div>
-            <h5 className="font-medium text-blue-800">
+            <h5 className="font-medium text-sky-700">
               Análisis de Departamentos
             </h5>
-            <p className="text-sm text-blue-700 mt-1">
+            <p className="text-sm text-sky-700 mt-1">
               {(() => {
                 if (data.length === 0) {
                   return "No hay datos de departamentos disponibles.";

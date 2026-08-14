@@ -35,7 +35,7 @@ export const AIQueueInlineStatus: React.FC<AIQueueInlineStatusProps> = ({
   return (
     <div className={`flex items-center gap-2 ${className || ""}`}>
       <Tooltip content="ETA aprox.">
-        <span className={`${textSize} text-blue-700`}>
+        <span className={`${textSize} text-sky-700`}>
           {loading && <Spinner size="sm" className="mr-1 inline" />}
           Análisis AI en cola{pos ? `: ${pos}` : ""} • {etaText}
           {info?.status === "active" && relativeMinutes ? ` (${relativeMinutes})` : ""}
@@ -44,7 +44,7 @@ export const AIQueueInlineStatus: React.FC<AIQueueInlineStatusProps> = ({
       <button
         type="button"
         onClick={() => refresh()}
-        className={`${textSize} underline text-blue-700 hover:text-blue-800`}
+        className={`${textSize} underline text-sky-700 hover:text-sky-700`}
       >
         Actualizar ahora
       </button>

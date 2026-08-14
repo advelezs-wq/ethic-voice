@@ -24,7 +24,7 @@ interface ReportContentProps {
 function SectionCard({
   icon,
   title,
-  colorClass = "bg-blue-600",
+  colorClass = "bg-sky-600",
   children,
 }: {
   icon: string;
@@ -39,7 +39,7 @@ function SectionCard({
           <div className={`p-1.5 ${colorClass} rounded-lg`}>
             <i className={`${icon} size-4 text-white`} />
           </div>
-          <h2 className="text-base font-semibold text-gray-900">{title}</h2>
+          <h2 className="text-base font-semibold text-[#0d212c]">{title}</h2>
         </div>
       </CardHeader>
       <CardBody className="pt-0">{children}</CardBody>
@@ -49,9 +49,9 @@ function SectionCard({
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="py-2.5 border-b border-gray-50 last:border-0">
-      <p className="text-xs font-medium text-gray-500 mb-0.5">{label}</p>
-      <p className="text-sm text-gray-900">{value}</p>
+    <div className="py-2.5 border-b border-emerald-50 last:border-0">
+      <p className="text-xs font-medium text-slate-400 mb-0.5">{label}</p>
+      <p className="text-sm text-[#0d212c]">{value}</p>
     </div>
   );
 }
@@ -70,7 +70,7 @@ function ActionList({
       {items.map((item: string, idx: number) => (
         <li key={idx} className="flex items-start gap-2 text-sm">
           <i className={`${icon} size-3.5 ${color} mt-0.5 shrink-0`} />
-          <span className="text-gray-700">{item}</span>
+          <span className="text-slate-600">{item}</span>
         </li>
       ))}
     </ul>
@@ -114,7 +114,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
   const renderQuestionnaire = (questionnaire: any) => {
     if (!questionnaire || typeof questionnaire !== "object") {
       return (
-        <p className="text-sm text-gray-400 italic">
+        <p className="text-sm text-slate-400 italic">
           No hay información del cuestionario disponible.
         </p>
       );
@@ -165,12 +165,12 @@ export const ReportContent: React.FC<ReportContentProps> = ({
           return (
             <div
               key={key}
-              className="pl-4 border-l-2 border-blue-200 hover:border-blue-400 transition-colors"
+              className="pl-4 border-l-2 border-sky-200 hover:border-sky-400 transition-colors"
             >
-              <p className="text-xs font-semibold text-gray-500 mb-0.5">
+              <p className="text-xs font-semibold text-slate-400 mb-0.5">
                 {label}
               </p>
-              <p className="text-sm text-gray-800 whitespace-pre-wrap">
+              <p className="text-sm text-[#0d212c] whitespace-pre-wrap">
                 {displayValue}
               </p>
             </div>
@@ -222,10 +222,10 @@ export const ReportContent: React.FC<ReportContentProps> = ({
               key={field.key}
               className="pl-4 border-l-2 border-green-200"
             >
-              <p className="text-xs font-semibold text-gray-500 mb-0.5">
+              <p className="text-xs font-semibold text-slate-400 mb-0.5">
                 {field.label}
               </p>
-              <p className="text-sm text-gray-800 whitespace-pre-wrap">
+              <p className="text-sm text-[#0d212c] whitespace-pre-wrap">
                 {field.value}
               </p>
             </div>
@@ -247,10 +247,10 @@ export const ReportContent: React.FC<ReportContentProps> = ({
               <i className="icon-[lucide--sparkles] size-5 text-white" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-900">
+              <h2 className="font-bold text-[#0d212c]">
                 Análisis de Inteligencia Artificial
               </h2>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-slate-400">
                 Procesado el{" "}
                 {formatDate(report.processedAt || report.createdAt)}
               </p>
@@ -278,7 +278,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
                 <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Resumen ejecutivo
                 </h3>
-                <p className="text-sm text-gray-800 leading-relaxed">
+                <p className="text-sm text-[#0d212c] leading-relaxed">
                   {aiAnalysis?.summary || report.aiSummary}
                 </p>
               </div>
@@ -288,10 +288,10 @@ export const ReportContent: React.FC<ReportContentProps> = ({
             {typeof aiAnalysis?.confidence === "number" && (
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-medium text-gray-500">
+                  <span className="text-xs font-medium text-slate-400">
                     Confianza del análisis
                   </span>
-                  <span className="text-xs font-bold text-gray-800">
+                  <span className="text-xs font-bold text-[#0d212c]">
                     {aiAnalysis.confidence}%
                   </span>
                 </div>
@@ -345,7 +345,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
             {/* Involved Parties */}
             {aiAnalysis?.involvedParties?.length > 0 && (
               <div>
-                <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3">
+                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
                   Partes involucradas
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -353,14 +353,14 @@ export const ReportContent: React.FC<ReportContentProps> = ({
                     (party: any, idx: number) => (
                       <div
                         key={idx}
-                        className="bg-white rounded-xl border border-gray-200 p-3"
+                        className="bg-white rounded-xl border border-emerald-100 p-3"
                       >
-                        <p className="text-sm font-semibold text-gray-900">
+                        <p className="text-sm font-semibold text-[#0d212c]">
                           {party.name}
                         </p>
-                        <p className="text-xs text-gray-500">{party.role}</p>
+                        <p className="text-xs text-slate-400">{party.role}</p>
                         {party.department && (
-                          <p className="text-xs text-gray-400 mt-0.5">
+                          <p className="text-xs text-slate-400 mt-0.5">
                             {party.department}
                           </p>
                         )}
@@ -374,7 +374,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
             {/* Evidence */}
             {aiAnalysis?.evidenceMentioned?.length > 0 && (
               <div>
-                <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                   Evidencia mencionada
                 </h4>
                 <ul className="space-y-1.5">
@@ -382,9 +382,9 @@ export const ReportContent: React.FC<ReportContentProps> = ({
                     (ev: string, idx: number) => (
                       <li
                         key={idx}
-                        className="flex items-center gap-2 text-sm text-gray-700"
+                        className="flex items-center gap-2 text-sm text-slate-600"
                       >
-                        <i className="icon-[lucide--file-search] size-3.5 text-gray-400 shrink-0" />
+                        <i className="icon-[lucide--file-search] size-3.5 text-slate-400 shrink-0" />
                         {ev}
                       </li>
                     )
@@ -418,7 +418,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
             {/* Recommended actions breakdown */}
             {aiAnalysis?.recommendedActions && (
               <div>
-                <h4 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3">
+                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
                   Plan de acción recomendado
                 </h4>
                 <div className="space-y-3">
@@ -450,14 +450,14 @@ export const ReportContent: React.FC<ReportContentProps> = ({
                   )}
                   {aiAnalysis.recommendedActions.investigation && (
                     <div>
-                      <p className="text-xs font-semibold text-blue-600 mb-1.5 flex items-center gap-1">
+                      <p className="text-xs font-semibold text-sky-700 mb-1.5 flex items-center gap-1">
                         <i className="icon-[lucide--search] size-3.5" />
                         Investigación
                       </p>
                       <ActionList
                         items={aiAnalysis.recommendedActions.investigation}
                         icon="icon-[lucide--search]"
-                        color="text-blue-500"
+                        color="text-sky-600"
                       />
                     </div>
                   )}
@@ -509,11 +509,11 @@ export const ReportContent: React.FC<ReportContentProps> = ({
       {/* ── No AI analysis state ── */}
       {!hasAiAnalysis && (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/35 py-10 text-center">
-          <i className="icon-[lucide--brain] size-10 text-gray-300 mb-3" />
-          <p className="text-sm font-semibold text-gray-500">
+          <i className="icon-[lucide--brain] size-10 text-slate-300 mb-3" />
+          <p className="text-sm font-semibold text-slate-400">
             Sin análisis de IA
           </p>
-          <p className="text-xs text-gray-400 mt-1 max-w-xs">
+          <p className="text-xs text-slate-400 mt-1 max-w-xs">
             Utiliza el botón &quot;Analizar con IA&quot; en la cabecera para generar un
             resumen y recomendaciones automáticas.
           </p>
@@ -524,16 +524,16 @@ export const ReportContent: React.FC<ReportContentProps> = ({
       <SectionCard
         icon="icon-[lucide--user]"
         title="Información del denunciante"
-        colorClass={parsedContent.isAnonymous ? "bg-gray-500" : "bg-blue-600"}
+        colorClass={parsedContent.isAnonymous ? "bg-slate-400" : "bg-emerald-600"}
       >
         {parsedContent.isAnonymous ? (
-          <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-4">
-            <i className="icon-[lucide--user-x] size-5 text-gray-400" />
+          <div className="flex items-center gap-3 bg-emerald-50/40 rounded-xl p-4">
+            <i className="icon-[lucide--user-x] size-5 text-slate-400" />
             <div>
-              <p className="text-sm font-semibold text-gray-700">
+              <p className="text-sm font-semibold text-slate-600">
                 Reporte anónimo
               </p>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-slate-400 mt-0.5">
                 El denunciante eligió mantener su identidad en el anonimato.
               </p>
             </div>
@@ -625,7 +625,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
       {report.attachments && report.attachments.length > 0 ? (
         <ReportAttachments attachments={report.attachments} />
       ) : (
-        <div className="flex items-center gap-2 p-4 rounded-xl border border-dashed border-gray-200 text-sm text-gray-400">
+        <div className="flex items-center gap-2 p-4 rounded-xl border border-dashed border-emerald-100 text-sm text-slate-400">
           <i className="icon-[lucide--paperclip] size-4" />
           Este reporte no tiene archivos adjuntos.
         </div>
@@ -636,10 +636,10 @@ export const ReportContent: React.FC<ReportContentProps> = ({
         <SectionCard
           icon="icon-[lucide--mail]"
           title="Contenido original del email"
-          colorClass="bg-blue-500"
+          colorClass="bg-sky-500"
         >
-          <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 overflow-auto max-h-72">
-            <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono leading-relaxed">
+          <div className="bg-emerald-50/40 rounded-xl border border-emerald-100 p-4 overflow-auto max-h-72">
+            <pre className="text-xs text-slate-600 whitespace-pre-wrap font-mono leading-relaxed">
               {(() => {
                 try {
                   const content = JSON.parse(report.content);

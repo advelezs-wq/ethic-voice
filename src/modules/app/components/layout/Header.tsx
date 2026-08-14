@@ -20,6 +20,7 @@ import { useUserRole } from "@/modules/core/hooks/useUserRole";
 import { useTheme } from "@/modules/core/providers/ThemeProvider";
 import { NotificationBell } from "../notifications/NotificationBell";
 import { CreateReportModal } from "../reports/CreateReportModal";
+import { Button as AppButton } from "@/modules/app/components/ui";
 
 export function Header() {
   const router = useRouter();
@@ -114,7 +115,7 @@ export function Header() {
         </Link>
 
         <div className="hidden lg:block">
-          <h1 className="text-xl font-semibold text-gray-900">
+          <h1 className="text-xl font-semibold text-[#0d212c]">
             {isSuperAdmin
               ? superAdminScope === "org"
                 ? "Workspace de Organización"
@@ -123,7 +124,7 @@ export function Header() {
                 ? "Panel de Control"
                 : "Mi Espacio de Trabajo"}
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-slate-400">
             {isSuperAdmin
               ? superAdminScope === "org"
                 ? "Operando dentro de la organización seleccionada"
@@ -144,9 +145,8 @@ export function Header() {
         )}
         {/* Create Report Button - Only for Admins */}
         {permissions.canManageOrganization && currentOrganization && (
-          <Button
-            color="primary"
-            variant="solid"
+          <AppButton
+            appVariant="primary"
             onPress={onOpen}
             startContent={
               <i
@@ -155,10 +155,9 @@ export function Header() {
                 aria-hidden="true"
               />
             }
-            className="font-medium"
           >
             Crear Reporte
-          </Button>
+          </AppButton>
         )}
 
         {isSuperAdmin && organizations?.length > 0 && (
@@ -277,7 +276,7 @@ export function Header() {
           </div>
         )}
         {isSuperAdmin && (!organizations || organizations.length === 0) && (
-          <span className="text-sm text-gray-500 truncate">
+          <span className="text-sm text-slate-400 truncate">
             Aún no hay organizaciones
           </span>
         )}

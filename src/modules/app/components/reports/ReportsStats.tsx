@@ -140,8 +140,8 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
         />
       ),
       color: "default",
-      bgColor: "bg-gray-100",
-      textColor: "text-gray-600",
+      bgColor: "bg-emerald-50",
+      textColor: "text-slate-500",
     },
   ];
 
@@ -193,13 +193,13 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
                 </div>
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-600 mb-1 whitespace-normal break-words text-pretty">
+                <p className="text-sm font-medium text-slate-500 mb-1 whitespace-normal break-words text-pretty">
                   {stat.title}
                 </p>
-                <p className="text-2xl font-bold text-gray-900 tabular-nums">
+                <p className="text-2xl font-bold text-[#0d212c] tabular-nums">
                   {stat.value}
                 </p>
-                <p className="text-xs text-gray-500 mt-1 whitespace-normal break-words text-pretty">
+                <p className="text-xs text-slate-400 mt-1 whitespace-normal break-words text-pretty">
                   {stat.subtitle}
                 </p>
                 {stat.showProgress && (
@@ -220,12 +220,12 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
       {/* KPI Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {kpiData.map((kpi, index) => (
-          <Card key={index} className="bg-gray-50">
+          <Card key={index} className="bg-emerald-50/40">
             <CardBody className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">{kpi.label}</p>
-                  <p className="text-xl font-bold text-gray-900 mt-1">
+                  <p className="text-sm text-slate-500">{kpi.label}</p>
+                  <p className="text-xl font-bold text-[#0d212c] mt-1">
                     {kpi.value}
                   </p>
                 </div>

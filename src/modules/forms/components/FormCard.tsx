@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export const FormCard = ({ form }: { form: Form }) => {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white">
+    <div className="rounded-xl border border-emerald-100 bg-white">
       <div className="flex-col items-start p-4">
         <div className="flex items-center gap-2 justify-between w-full">
           <span className="truncate font-bold">{form.title}</span>
@@ -14,25 +14,25 @@ export const FormCard = ({ form }: { form: Form }) => {
             </span>
           )}
           {!form.isPublished && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-slate-600">
               Draft
             </span>
           )}
         </div>
-        <div className="w-full flex flex-row items-center justify-between text-gray-700 text-sm flex-none">
+        <div className="w-full flex flex-row items-center justify-between text-slate-600 text-sm flex-none">
           {formatDistance(form.createdAt, new Date(), {
             addSuffix: true,
           })}
           {form.isPublished && (
             <span className="flex items-center gap-2">
               <i
-                className="icon-[lets-icons--view] text-gray-700"
+                className="icon-[lets-icons--view] text-slate-600"
                 role="img"
                 aria-hidden="true"
               />
               <span>{form.visits.toLocaleString()}</span>
               <i
-                className="icon-[lets-icons--form] text-gray-700"
+                className="icon-[lets-icons--form] text-slate-600"
                 role="img"
                 aria-hidden="true"
               />
@@ -41,7 +41,7 @@ export const FormCard = ({ form }: { form: Form }) => {
           )}
         </div>
       </div>
-      <div className="h-[20px] truncate text-sm text-gray-700 px-4">
+      <div className="h-[20px] truncate text-sm text-slate-600 px-4">
         {form.description || "No description"}
       </div>
       <div className="justify-center p-4 flex">

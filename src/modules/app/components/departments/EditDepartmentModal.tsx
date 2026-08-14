@@ -86,11 +86,11 @@ export function EditDepartmentModal({
               isRequired
             />
 
-            <div className="bg-gray-50 p-3 rounded-lg space-y-2">
-              <p className="text-sm font-medium text-gray-700">
+            <div className="bg-[#f7faf9] p-3 rounded-lg space-y-2">
+              <p className="text-sm font-medium text-slate-600">
                 Información del Departamento:
               </p>
-              <div className="text-sm text-gray-600 space-y-1">
+              <div className="text-sm text-slate-500 space-y-1">
                 <p>• {department.memberCount} miembros asignados</p>
                 <p>• {department.reportCount} reportes totales</p>
                 <p>• {department.pendingReports} reportes pendientes</p>

@@ -107,12 +107,12 @@ export function FinalStep({ context }: FinalStepProps) {
         <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-2xl">{organizationCreated ? "✅" : "🏢"}</span>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-[#0d212c] mb-2">
           {organizationCreated
             ? "¡Organización creada!"
             : "Crear tu organización"}
         </h2>
-        <p className="text-gray-600">
+        <p className="text-slate-500">
           {organizationCreated
             ? "Ahora configura tus notificaciones para finalizar"
             : "Último paso: crea tu organización y configura tus notificaciones"}
@@ -135,26 +135,26 @@ export function FinalStep({ context }: FinalStepProps) {
           <Card>
             <CardBody className="p-6">
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-[#0d212c] mb-2">
                   Información de tu organización
                 </h3>
                 {context.organizationData && (
-                  <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                    <p className="text-sm text-blue-700">
+                  <div className="bg-sky-50 rounded-lg p-4 mb-6">
+                    <p className="text-sm text-sky-700">
                       <span className="font-medium">Nombre:</span>{" "}
                       {context.organizationData.organizationName}
                     </p>
                     {context.organizationData.description && (
-                      <p className="text-sm text-blue-700 mt-1">
+                      <p className="text-sm text-sky-700 mt-1">
                         <span className="font-medium">Descripción:</span>{" "}
                         {context.organizationData.description}
                       </p>
                     )}
-                    <p className="text-sm text-blue-700 mt-1">
+                    <p className="text-sm text-sky-700 mt-1">
                       <span className="font-medium">Tipo:</span>{" "}
                       {context.organizationData.organizationType}
                     </p>
-                    <p className="text-sm text-blue-700 mt-1">
+                    <p className="text-sm text-sky-700 mt-1">
                       <span className="font-medium">Tamaño:</span>{" "}
                       {context.organizationData.teamSize}
                     </p>
@@ -194,17 +194,17 @@ export function FinalStep({ context }: FinalStepProps) {
             <CardBody className="p-6">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  <h3 className="text-lg font-semibold text-[#0d212c] mb-4">
                     Notificaciones por Email
                   </h3>
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-[#0d212c]">
                           Casos asignados
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-500">
                           Cuando te asignen un nuevo caso
                         </p>
                       </div>
@@ -219,10 +219,10 @@ export function FinalStep({ context }: FinalStepProps) {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-[#0d212c]">
                           Cambios de estado
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-500">
                           Cuando un caso cambie de estado
                         </p>
                       </div>
@@ -239,10 +239,10 @@ export function FinalStep({ context }: FinalStepProps) {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-[#0d212c]">
                           Nuevos comentarios
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-500">
                           Cuando alguien comente en un caso
                         </p>
                       </div>
@@ -258,17 +258,17 @@ export function FinalStep({ context }: FinalStepProps) {
 
                   <Divider className="my-6" />
 
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  <h3 className="text-lg font-semibold text-[#0d212c] mb-4">
                     Notificaciones en la Plataforma
                   </h3>
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-[#0d212c]">
                           Casos asignados
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-500">
                           Alertas dentro de la plataforma
                         </p>
                       </div>
@@ -283,10 +283,10 @@ export function FinalStep({ context }: FinalStepProps) {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-[#0d212c]">
                           Cambios de estado
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-500">
                           Alertas dentro de la plataforma
                         </p>
                       </div>
@@ -303,10 +303,10 @@ export function FinalStep({ context }: FinalStepProps) {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-[#0d212c]">
                           Nuevos comentarios
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-500">
                           Alertas dentro de la plataforma
                         </p>
                       </div>
@@ -322,17 +322,17 @@ export function FinalStep({ context }: FinalStepProps) {
 
                   <Divider className="my-6" />
 
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  <h3 className="text-lg font-semibold text-[#0d212c] mb-4">
                     Resúmenes
                   </h3>
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-[#0d212c]">
                           Resumen diario
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-500">
                           Email con actividad del día
                         </p>
                       </div>
@@ -347,10 +347,10 @@ export function FinalStep({ context }: FinalStepProps) {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-[#0d212c]">
                           Resumen semanal
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-500">
                           Email con actividad de la semana
                         </p>
                       </div>
@@ -366,7 +366,7 @@ export function FinalStep({ context }: FinalStepProps) {
                 </div>
 
                 {/* Finish Button in Notifications Tab */}
-                <div className="pt-6 border-t border-gray-200">
+                <div className="pt-6 border-t border-emerald-100">
                   <Button
                     color="primary"
                     size="lg"
@@ -378,7 +378,7 @@ export function FinalStep({ context }: FinalStepProps) {
                       ? "Finalizando..."
                       : "Finalizar Configuración"}
                   </Button>
-                  <p className="text-xs text-gray-500 text-center mt-2">
+                  <p className="text-xs text-slate-400 text-center mt-2">
                     Podrás cambiar estas configuraciones más tarde desde tu
                     perfil
                   </p>
@@ -398,7 +398,7 @@ export function FinalStep({ context }: FinalStepProps) {
           Anterior
         </Button>
 
-        <div className="text-sm text-gray-600 self-center">
+        <div className="text-sm text-slate-500 self-center">
           {organizationCreated
             ? "¡Excelente! Ahora configura tus notificaciones →"
             : "Crea tu organización para continuar →"}

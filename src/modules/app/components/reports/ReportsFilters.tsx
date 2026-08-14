@@ -144,7 +144,7 @@ export function ReportsFilters({
                 onValueChange={(value) => updateFilter("search", value)}
                 startContent={
                   <i
-                    className="icon-[lucide--search] size-4 text-gray-400"
+                    className="icon-[lucide--search] size-4 text-slate-400"
                     role="img"
                     aria-hidden="true"
                   />
@@ -197,8 +197,8 @@ export function ReportsFilters({
 
               {/* Archived view indicator */}
               {isArchivedView && (
-                <div className="flex items-center px-3 py-2 bg-gray-100 rounded-lg">
-                  <span className="text-sm text-gray-600">
+                <div className="flex items-center px-3 py-2 bg-emerald-50 rounded-lg">
+                  <span className="text-sm text-slate-500">
                     📁 Solo reportes archivados
                   </span>
                 </div>
@@ -339,7 +339,7 @@ export function ReportsFilters({
 
           {/* Advanced filters section */}
           {showAdvancedFilters && (
-            <div className="pt-4 border-t border-gray-200">
+            <div className="pt-4 border-t border-emerald-100">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Select
                   label="Prioridad"
@@ -490,7 +490,7 @@ export function ReportsFilters({
 
           {/* Active filters display */}
           {(filters.search || getActiveFiltersCount() > 0) && (
-            <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100">
+            <div className="flex flex-wrap gap-2 pt-4 border-t border-emerald-50">
               {filters.search && (
                 <Chip
                   variant="flat"
@@ -511,8 +511,8 @@ export function ReportsFilters({
                   variant="flat"
                   onClose={() => updateFilter("status", "all")}
                   classNames={{
-                    base: "bg-blue-100",
-                    closeButton: "text-blue-600",
+                    base: "bg-emerald-100",
+                    closeButton: "text-emerald-700",
                   }}
                 >
                   Estado:{" "}

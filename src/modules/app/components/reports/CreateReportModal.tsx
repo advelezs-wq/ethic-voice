@@ -169,9 +169,9 @@ export function CreateReportModal({
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col h-full min-h-0"
         >
-          <ModalHeader className="flex flex-col gap-1 shrink-0 border-b border-gray-200">
+          <ModalHeader className="flex flex-col gap-1 shrink-0 border-b border-emerald-100">
             <h2 className="text-lg font-semibold">Crear Reporte Manual</h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-slate-400">
               Registra denuncias recibidas por teléfono, WhatsApp u otros
               canales
             </p>
@@ -180,7 +180,7 @@ export function CreateReportModal({
           <ModalBody className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Canal de Recepción */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-gray-700">
+              <h3 className="text-sm font-medium text-slate-600">
                 Canal de Recepción
               </h3>
               <Controller
@@ -212,7 +212,7 @@ export function CreateReportModal({
             {/* Información del Reportante */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-medium text-gray-700">
+                <h3 className="text-sm font-medium text-slate-600">
                   Información del Reportante
                 </h3>
                 <Checkbox
@@ -261,7 +261,7 @@ export function CreateReportModal({
 
             {/* Información del Reporte */}
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-gray-700">
+              <h3 className="text-sm font-medium text-slate-600">
                 Detalles del Reporte
               </h3>
 
@@ -381,7 +381,7 @@ export function CreateReportModal({
 
             {/* Notas del Administrador */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-gray-700">
+              <h3 className="text-sm font-medium text-slate-600">
                 Notas Internas
               </h3>
               <Textarea
@@ -396,7 +396,7 @@ export function CreateReportModal({
             </div>
           </ModalBody>
 
-          <ModalFooter className="shrink-0 border-t border-gray-200 gap-3">
+          <ModalFooter className="shrink-0 border-t border-emerald-100 gap-3">
             <Button
               color="danger"
               variant="light"

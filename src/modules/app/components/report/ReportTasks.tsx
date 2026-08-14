@@ -59,8 +59,8 @@ const STATUS_CFG: Record<
   pending: {
     label: "Pendiente",
     icon: "icon-[lucide--circle]",
-    bg: "bg-gray-100",
-    text: "text-gray-500",
+    bg: "bg-emerald-50",
+    text: "text-slate-400",
     ring: "ring-gray-300",
     chipColor: "default",
   },
@@ -94,7 +94,7 @@ const PRIORITY_CFG: Record<
   TaskPriority,
   { label: string; icon: string; chipColor: "default" | "warning" | "danger"; dot: string }
 > = {
-  low: { label: "Baja", icon: "icon-[lucide--arrow-down]", chipColor: "default", dot: "bg-gray-400" },
+  low: { label: "Baja", icon: "icon-[lucide--arrow-down]", chipColor: "default", dot: "bg-slate-400" },
   medium: { label: "Media", icon: "icon-[lucide--arrow-right]", chipColor: "warning", dot: "bg-amber-400" },
   high: { label: "Alta", icon: "icon-[lucide--arrow-up]", chipColor: "danger", dot: "bg-red-400" },
 };
@@ -187,35 +187,35 @@ function TaskFormModal({
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="flex items-start gap-3 pb-0 border-b border-gray-100">
+            <ModalHeader className="flex items-start gap-3 pb-0 border-b border-emerald-50">
               <div
                 className={`p-2 rounded-xl mt-0.5 shrink-0 ${
                   isEdit
-                    ? "bg-blue-100"
+                    ? "bg-sky-100"
                     : parentTask
                       ? "bg-violet-100"
-                      : "bg-blue-100"
+                      : "bg-sky-100"
                 }`}
               >
                 <i
                   className={`size-4 ${
                     isEdit
-                      ? "icon-[lucide--pencil] text-blue-700"
+                      ? "icon-[lucide--pencil] text-sky-700"
                       : parentTask
                         ? "icon-[lucide--git-branch] text-violet-700"
-                        : "icon-[lucide--plus] text-blue-700"
+                        : "icon-[lucide--plus] text-sky-700"
                   }`}
                 />
               </div>
               <div className="min-w-0">
-                <p className="text-base font-semibold text-gray-900 leading-tight">
+                <p className="text-base font-semibold text-[#0d212c] leading-tight">
                   {isEdit
                     ? "Editar tarea"
                     : parentTask
                       ? "Nueva subtarea"
                       : "Nueva tarea de investigación"}
                 </p>
-                <p className="text-xs text-gray-400 font-normal mt-0.5 leading-snug">
+                <p className="text-xs text-slate-400 font-normal mt-0.5 leading-snug">
                   {isEdit
                     ? "Modifica los campos que necesites"
                     : parentTask
@@ -239,7 +239,7 @@ function TaskFormModal({
                 errorMessage={titleError}
                 isRequired
                 startContent={
-                  <i className="icon-[lucide--clipboard-list] size-4 text-gray-400 shrink-0" />
+                  <i className="icon-[lucide--clipboard-list] size-4 text-slate-400 shrink-0" />
                 }
               />
 
@@ -285,7 +285,7 @@ function TaskFormModal({
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
                   startContent={
-                    <i className="icon-[lucide--calendar] size-4 text-gray-400 shrink-0" />
+                    <i className="icon-[lucide--calendar] size-4 text-slate-400 shrink-0" />
                   }
                 />
               </div>
@@ -328,7 +328,7 @@ function TaskFormModal({
               />
             </ModalBody>
 
-            <ModalFooter className="border-t border-gray-100 pt-3">
+            <ModalFooter className="border-t border-emerald-50 pt-3">
               <Button variant="light" onPress={onClose} isDisabled={isSaving}>
                 Cancelar
               </Button>
@@ -389,8 +389,8 @@ function CompleteTaskModal({
                 <i className="icon-[lucide--circle-check] size-4 text-green-700" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">Cerrar tarea</p>
-                <p className="text-xs text-gray-400 font-normal">
+                <p className="text-sm font-semibold text-[#0d212c]">Cerrar tarea</p>
+                <p className="text-xs text-slate-400 font-normal">
                   Documenta los hallazgos antes de cerrar
                 </p>
               </div>
@@ -398,11 +398,11 @@ function CompleteTaskModal({
 
             <ModalBody className="gap-4">
               {/* Task card */}
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-3">
-                <p className="text-xs text-gray-400 mb-1">Tarea a cerrar</p>
-                <p className="text-sm font-semibold text-gray-900">{task?.title}</p>
+              <div className="bg-emerald-50/40 border border-emerald-100 rounded-xl p-3">
+                <p className="text-xs text-slate-400 mb-1">Tarea a cerrar</p>
+                <p className="text-sm font-semibold text-[#0d212c]">{task?.title}</p>
                 {task?.description && (
-                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task.description}</p>
+                  <p className="text-xs text-slate-400 mt-1 line-clamp-2">{task.description}</p>
                 )}
               </div>
 
@@ -489,7 +489,7 @@ function DeleteModal({
                   </p>
                 )}
               </div>
-              <p className="text-sm text-gray-500">Esta acción no se puede deshacer.</p>
+              <p className="text-sm text-slate-400">Esta acción no se puede deshacer.</p>
             </ModalBody>
             <ModalFooter>
               <Button variant="light" size="sm" onPress={onClose}>Cancelar</Button>
@@ -580,7 +580,7 @@ function TaskCard({
     <motion.div layout transition={{ duration: 0.15 }}>
       <div
         className={`group rounded-xl border bg-white shadow-sm transition-all hover:shadow-md ${
-          status === "completed" ? "border-green-200 bg-green-50/20" : "border-gray-200"
+          status === "completed" ? "border-green-200 bg-green-50/20" : "border-emerald-100"
         } ${depth > 0 ? "border-l-4 border-l-blue-200" : ""}`}
       >
         {/* Main row */}
@@ -602,12 +602,12 @@ function TaskCard({
               <div className="min-w-0 flex-1">
                 {/* Title row */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[10px] text-gray-400 font-mono shrink-0">
+                  <span className="text-[10px] text-slate-400 font-mono shrink-0">
                     #{task.id}
                   </span>
                   <span
                     className={`text-sm font-semibold leading-snug ${
-                      status === "completed" ? "line-through text-gray-400" : "text-gray-900"
+                      status === "completed" ? "line-through text-slate-400" : "text-[#0d212c]"
                     }`}
                   >
                     {task.title}
@@ -626,7 +626,7 @@ function TaskCard({
                   </Chip>
 
                   {task.assignedTo && (
-                    <span className="flex items-center gap-1 text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-0.5">
+                    <span className="flex items-center gap-1 text-xs text-slate-400 bg-emerald-50 rounded-full px-2 py-0.5">
                       <i className="icon-[lucide--user] size-3" />
                       {task.assignedTo}
                     </span>
@@ -639,7 +639,7 @@ function TaskCard({
                           ? "bg-red-100 text-red-700 font-semibold"
                           : isDueSoon
                             ? "bg-amber-100 text-amber-700"
-                            : "text-gray-500"
+                            : "text-slate-400"
                       }`}
                     >
                       <i className={`size-3 ${isOverdue ? "icon-[lucide--alert-circle]" : "icon-[lucide--calendar]"}`} />
@@ -653,10 +653,10 @@ function TaskCard({
                 {hasChildren && (
                   <div className="mt-2">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] text-gray-400">
+                      <span className="text-[10px] text-slate-400">
                         Subtareas: {completedChildren}/{totalChildren}
                       </span>
-                      <span className="text-[10px] text-gray-400">
+                      <span className="text-[10px] text-slate-400">
                         {Math.round(subtaskPct)}%
                       </span>
                     </div>
@@ -717,13 +717,13 @@ function TaskCard({
               className="overflow-hidden"
             >
               <Divider />
-              <div className="px-4 py-3 space-y-3 bg-gray-50/50 rounded-b-xl">
+              <div className="px-4 py-3 space-y-3 bg-emerald-50/40/50 rounded-b-xl">
                 {task.description && (
                   <div>
-                    <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1">
+                    <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">
                       Objetivo / Descripción
                     </p>
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{task.description}</p>
+                    <p className="text-sm text-slate-600 whitespace-pre-wrap">{task.description}</p>
                   </div>
                 )}
 
@@ -733,7 +733,7 @@ function TaskCard({
                       <i className="icon-[lucide--file-check] size-3.5" />
                       Conclusiones de cierre
                     </p>
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{task.completionNotes}</p>
+                    <p className="text-sm text-slate-600 whitespace-pre-wrap">{task.completionNotes}</p>
                     {task.completedAt && (
                       <p className="text-[11px] text-green-500 mt-1.5">
                         Cerrada el{" "}
@@ -748,7 +748,7 @@ function TaskCard({
                 )}
 
                 {!task.description && !task.completionNotes && (
-                  <p className="text-xs text-gray-400 italic">Sin descripción ni notas registradas.</p>
+                  <p className="text-xs text-slate-400 italic">Sin descripción ni notas registradas.</p>
                 )}
 
                 {/* Metadata grid */}
@@ -801,7 +801,7 @@ function TaskCard({
             transition={{ duration: 0.18 }}
             className="overflow-hidden"
           >
-            <div className="mt-2 ml-6 pl-4 border-l-2 border-blue-100 space-y-2">
+            <div className="mt-2 ml-6 pl-4 border-l-2 border-sky-100 space-y-2">
               {task.children!.map((child) => (
                 <TaskCard
                   key={child.id}
@@ -828,8 +828,8 @@ function TaskCard({
 function MetaCell({ label, value }: { label: string; value?: string | null }) {
   return (
     <div>
-      <p className="text-[10px] text-gray-400 uppercase tracking-wide">{label}</p>
-      <p className="text-xs text-gray-700 mt-0.5">{value || "—"}</p>
+      <p className="text-[10px] text-slate-400 uppercase tracking-wide">{label}</p>
+      <p className="text-xs text-slate-600 mt-0.5">{value || "—"}</p>
     </div>
   );
 }
@@ -852,7 +852,7 @@ function StatsBar({ tasks }: { tasks: UiTask[] }) {
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   const stats = [
-    { key: "pending", label: "Pendientes", cls: "bg-gray-200 text-gray-700" },
+    { key: "pending", label: "Pendientes", cls: "bg-emerald-100 text-slate-600" },
     { key: "in_progress", label: "En progreso", cls: "bg-amber-100 text-amber-800" },
     { key: "blocked", label: "Bloqueadas", cls: "bg-red-100 text-red-700" },
     { key: "completed", label: "Completadas", cls: "bg-green-100 text-green-700" },
@@ -869,7 +869,7 @@ function StatsBar({ tasks }: { tasks: UiTask[] }) {
           ) : null
         )}
         {total > 0 && (
-          <span className="ml-auto text-xs text-gray-400">
+          <span className="ml-auto text-xs text-slate-400">
             {done}/{total} completadas · {pct}%
           </span>
         )}
@@ -1074,11 +1074,11 @@ export const ReportTasks: React.FC<ReportTasksProps> = ({ reportId }) => {
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
-              <i className="icon-[lucide--check-square] size-4 text-blue-600" />
+            <h2 className="text-base font-semibold text-[#0d212c] flex items-center gap-2">
+              <i className="icon-[lucide--check-square] size-4 text-sky-700" />
               Tareas de investigación
             </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-slate-400 mt-0.5">
               Organiza, asigna y da seguimiento a cada acción del caso
             </p>
           </div>
@@ -1115,16 +1115,16 @@ export const ReportTasks: React.FC<ReportTasksProps> = ({ reportId }) => {
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 rounded-xl border border-gray-200 bg-gray-100 animate-pulse" />
+              <div key={i} className="h-16 rounded-xl border border-emerald-100 bg-emerald-50 animate-pulse" />
             ))}
           </div>
         ) : tasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 text-center">
-            <div className="p-4 bg-blue-50 rounded-2xl mb-4">
-              <i className="icon-[lucide--clipboard-list] size-10 text-blue-300" />
+          <div className="flex flex-col items-center justify-center py-16 rounded-xl border-2 border-dashed border-emerald-100 bg-emerald-50/40 text-center">
+            <div className="p-4 bg-sky-50 rounded-2xl mb-4">
+              <i className="icon-[lucide--clipboard-list] size-10 text-sky-400" />
             </div>
-            <p className="text-sm font-semibold text-gray-600">Sin tareas asignadas</p>
-            <p className="text-xs text-gray-400 mt-1.5 max-w-xs">
+            <p className="text-sm font-semibold text-slate-500">Sin tareas asignadas</p>
+            <p className="text-xs text-slate-400 mt-1.5 max-w-xs">
               Crea la primera tarea para organizar y dar seguimiento a las acciones de investigación.
             </p>
             <Button

@@ -217,15 +217,18 @@ Gracias,
                 variant="light"
                 size="sm"
                 onPress={handleLogout}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-slate-500 hover:text-[#0d212c]"
               >
                 Cerrar Sesión
               </Button>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <p className="mb-1 text-xs font-bold uppercase tracking-widest text-emerald-700">
+              Planes y precios
+            </p>
+            <h2 className="text-3xl font-extrabold text-[#0d212c] mb-2">
               ¡Elige tu plan ideal!
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
+            <p className="text-lg text-slate-500 max-w-2xl mx-auto mb-6">
               Selecciona entre los mejores planes, asegurando una combinación
               perfecta. ¿Necesitas más o menos? ¡Personaliza tu suscripción para
               un ajuste perfecto!
@@ -239,15 +242,14 @@ Gracias,
                   handleBillingToggle(key as BillingCycle)
                 }
                 variant="solid"
-                color="success"
                 size="lg"
                 className="w-auto"
                 classNames={{
-                  tabList: "bg-gray-100 rounded-full p-1",
-                  cursor: "bg-green-600 rounded-full shadow-lg",
+                  tabList: "bg-emerald-50 rounded-full p-1",
+                  cursor: "bg-[#0d212c] rounded-full shadow-lg",
                   tab: "px-6 py-2 text-sm font-medium rounded-full transition-all duration-300",
                   tabContent:
-                    "group-data-[selected=true]:text-white text-gray-600",
+                    "group-data-[selected=true]:text-white text-[#0d212c]",
                 }}
               >
                 <Tab key={BillingCycle.MONTHLY} title="Mensual" />
@@ -255,12 +257,12 @@ Gracias,
               </Tabs>
             </div>
 
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-blue-800 text-sm font-medium flex items-center justify-center">
+            <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/70 p-3">
+              <p className="text-emerald-800 text-sm font-medium flex items-center justify-center">
                 <i className="icon-[lucide--info] w-4 h-4 mr-2" />
                 Se requiere una suscripción para acceder a la plataforma
               </p>
-              <p className="text-blue-600 text-xs mt-1">
+              <p className="text-emerald-700/80 text-xs mt-1">
                 Puedes actualizar o cambiar tu plan en cualquier momento después
                 del registro
               </p>
@@ -268,7 +270,7 @@ Gracias,
           </ModalHeader>
 
           <ModalBody className="pb-6 px-6">
-            {/* Pricing Cards */}
+            {/* Pricing Cards — mirrors the landing page's PricingSection (LandingV3) */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {displayPlans.map((planType) => {
                 const config = PLAN_CONFIGS[planType];
@@ -279,33 +281,52 @@ Gracias,
                 return (
                   <motion.div
                     key={planType}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, transform: "translateY(20px)" }}
+                    animate={{ opacity: 1, transform: "translateY(0)" }}
                     transition={{
-                      duration: 0.6,
-                      delay: displayPlans.indexOf(planType) * 0.1,
+                      duration: 0.4,
+                      ease: [0.23, 1, 0.32, 1],
+                      delay: displayPlans.indexOf(planType) * 0.06,
                     }}
-                    className={`relative bg-white rounded-xl p-6 min-h-[450px] transition-all duration-300 hover:transform hover:-translate-y-1 ${
+                    className={`relative flex min-h-[450px] flex-col rounded-2xl p-6 transition-transform duration-300 hover:-translate-y-1 ${
                       isPopular
-                        ? "border-2 border-green-500 shadow-2xl"
-                        : "border border-gray-200 shadow-lg hover:shadow-xl"
+                        ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-lime-400"
+                        : "border border-slate-200 bg-white hover:border-emerald-200 hover:shadow-xl"
                     }`}
                   >
+                    {isPopular && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                        <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#052b24] shadow-[0_8px_18px_rgba(163,230,53,0.35)]">
+                          Más popular
+                        </span>
+                      </div>
+                    )}
+
                     {/* Title */}
                     <div className="mb-4">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      <h3
+                        className={`text-xl font-extrabold mb-2 ${isPopular ? "text-white" : "text-[#0d212c]"}`}
+                      >
                         {config.displayName}
                       </h3>
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                      <p
+                        className={`text-sm leading-relaxed ${isPopular ? "text-white/55" : "text-slate-500"}`}
+                      >
                         {config.description}
                       </p>
                     </div>
 
                     {/* Price */}
-                    <div className="mb-6">
-                      <div className="flex items-baseline flex-wrap">
+                    <div
+                      className={`mb-6 rounded-xl p-4 ${
+                        isPopular
+                          ? "bg-white/[0.08] ring-1 ring-white/10"
+                          : "border border-slate-200 bg-gradient-to-br from-white to-slate-50"
+                      }`}
+                    >
+                      <div className="flex items-baseline flex-wrap gap-1">
                         <span
-                          className={`font-extrabold text-gray-900 ${
+                          className={`font-black ${isPopular ? "text-white" : "text-[#0d212c]"} ${
                             priceDisplay.size === "large"
                               ? "text-2xl md:text-3xl"
                               : priceDisplay.size === "medium"
@@ -315,7 +336,9 @@ Gracias,
                         >
                           {priceDisplay.formatted}
                         </span>
-                        <span className="text-sm text-gray-600 ml-1 flex-shrink-0">
+                        <span
+                          className={`text-sm flex-shrink-0 ${isPopular ? "text-white/50" : "text-slate-400"}`}
+                        >
                           /
                           {billingCycle === BillingCycle.YEARLY ? "año" : "mes"}
                         </span>
@@ -325,9 +348,15 @@ Gracias,
                     {/* Features */}
                     <div className="space-y-3 mb-6 flex-1">
                       {config.features.highlights.map((feature, index) => (
-                        <div key={index} className="flex items-center gap-3">
-                          <i className="icon-[lucide--check] w-4 h-4 text-green-600 flex-shrink-0" />
-                          <span className="text-sm text-gray-700">
+                        <div key={index} className="flex items-start gap-2">
+                          <i
+                            className={`icon-[lucide--circle-check] mt-0.5 h-4 w-4 shrink-0 ${
+                              isPopular ? "text-lime-300" : "text-emerald-600"
+                            }`}
+                          />
+                          <span
+                            className={`text-sm ${isPopular ? "text-white/75" : "text-slate-600"}`}
+                          >
                             {feature}
                           </span>
                         </div>
@@ -341,10 +370,10 @@ Gracias,
                         disabled={
                           isCreatingSubscription && selectedPlan === planType
                         }
-                        className={`w-full py-3 px-6 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        className={`w-full rounded-xl py-3.5 px-6 text-sm font-bold transition-all duration-200 ${
                           isPopular
-                            ? "bg-green-600 text-white hover:bg-green-700 shadow-lg"
-                            : "border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                            ? "bg-lime-400 text-[#052b24] shadow-[0_6px_20px_rgba(163,230,53,0.3)] hover:bg-lime-300"
+                            : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
                         }`}
                       >
                         {isCreatingSubscription && selectedPlan === planType
@@ -357,30 +386,34 @@ Gracias,
               })}
             </div>
 
-            {/* Custom Plan Section */}
+            {/* Custom Plan Section — dark ink/emerald gradient, matching the landing's enterprise card */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
+              initial={{ opacity: 0, transform: "translateY(30px)" }}
+              animate={{ opacity: 1, transform: "translateY(0)" }}
+              transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1], delay: 0.2 }}
               className="mt-12 max-w-4xl mx-auto"
             >
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                <h3 className="text-2xl font-bold text-[#0d212c] mb-3">
                   ¿Necesitas algo más específico?
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-slate-500">
                   Creemos una solución personalizada para tu organización
                 </p>
               </div>
 
-              <div className="relative bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 rounded-xl p-6 shadow-xl border-2 border-purple-400 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f172a] to-[#0a1e14] p-6 shadow-xl">
+                <div
+                  className="pointer-events-none absolute right-0 top-0 h-64 w-64 opacity-20 blur-[80px]"
+                  style={{ background: "rgba(163,230,53,0.35)" }}
+                  aria-hidden
+                />
 
                 <div className="relative grid lg:grid-cols-2 gap-6 items-center">
                   {/* Left Column - Content */}
                   <div>
-                    <div className="inline-flex items-center px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full mb-4">
-                      <span className="text-white font-semibold text-xs">
+                    <div className="inline-flex items-center px-3 py-1.5 bg-white/10 rounded-full mb-4">
+                      <span className="text-emerald-200 font-black text-[11px] uppercase tracking-widest">
                         Plan Personalizado
                       </span>
                     </div>
@@ -389,7 +422,7 @@ Gracias,
                       Solución Empresarial Completa
                     </h4>
 
-                    <p className="text-purple-100 text-sm leading-relaxed mb-6">
+                    <p className="text-white/60 text-sm leading-relaxed mb-6">
                       Una plataforma de línea ética completamente adaptada a las
                       necesidades específicas de tu organización.
                     </p>
@@ -397,7 +430,7 @@ Gracias,
                     <Button
                       as="a"
                       href={generateCustomPlanEmail()}
-                      className="bg-white text-purple-700 hover:bg-purple-50 px-6 py-3 rounded-lg text-sm font-bold transition-all duration-200 shadow-lg"
+                      className="bg-lime-400 text-[#052b24] hover:bg-lime-300 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 shadow-[0_6px_20px_rgba(163,230,53,0.3)]"
                     >
                       <i className="icon-[lucide--calendar] w-4 h-4 mr-2" />
                       Consulta Gratuita
@@ -442,13 +475,13 @@ Gracias,
                     ].map((feature, index) => (
                       <div
                         key={index}
-                        className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20"
+                        className="bg-white/[0.05] rounded-xl p-3 border border-white/10"
                       >
                         <div className="flex items-center gap-2">
                           <i
-                            className={`${feature.iconClass} w-4 h-4 text-white flex-shrink-0`}
+                            className={`${feature.iconClass} w-4 h-4 text-emerald-300 flex-shrink-0`}
                           />
-                          <span className="text-white font-medium text-xs">
+                          <span className="text-white/85 font-medium text-xs">
                             {feature.title}
                           </span>
                         </div>
@@ -460,24 +493,24 @@ Gracias,
             </motion.div>
 
             <div className="text-center mt-8 space-y-3">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-500">
                 ✓ 14 días de prueba gratis • ✓ Sin costos de configuración • ✓
                 Cancela en cualquier momento
               </p>
 
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
                 <p className="text-amber-800 text-sm font-medium flex items-center justify-center">
                   <i className="icon-[lucide--alert-triangle] w-4 h-4 mr-2" />
                   Por favor selecciona un plan para continuar
                 </p>
               </div>
 
-              <div className="text-center mt-4 p-3 bg-gray-50 rounded-lg border">
-                <p className="text-gray-600 text-sm">
+              <div className="text-center mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50 p-3">
+                <p className="text-slate-600 text-sm">
                   ¿No deseas suscribirte ahora?{" "}
                   <button
                     onClick={handleLogout}
-                    className="text-blue-600 hover:text-blue-800 underline font-medium"
+                    className="text-emerald-700 hover:text-emerald-900 underline font-medium"
                   >
                     Cerrar sesión
                   </button>{" "}

@@ -174,7 +174,7 @@ export function ReportsContent({
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
             Contexto activo
           </p>
-          <p className="text-sm md:text-base text-gray-700 mt-1">
+          <p className="text-sm md:text-base text-slate-600 mt-1">
             {getPageDescription()}
           </p>
         </div>
@@ -209,9 +209,9 @@ export function ReportsContent({
       ) : (
         <div className="text-center py-8">
           {reportsStatsLoading ? (
-            <p className="text-gray-500">Cargando estadísticas...</p>
+            <p className="text-slate-400">Cargando estadísticas...</p>
           ) : (
-            <p className="text-gray-500">
+            <p className="text-slate-400">
               No se pudieron cargar las estadísticas
             </p>
           )}

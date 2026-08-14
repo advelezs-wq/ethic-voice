@@ -306,7 +306,7 @@ export const Sidebar: React.FC = () => {
     <aside
       className={`
       ${isCollapsed ? "w-20" : "w-[270px] 2xl:w-[283px]"} 
-      ev-sidebar-surface h-screen flex flex-col transition-all duration-300 ease-in-out overflow-hidden relative z-10
+      ev-sidebar-surface h-screen flex flex-col transition-[width] duration-300 ease-in-out overflow-hidden relative z-10
     `}
     >
       {/* Header */}
@@ -364,8 +364,8 @@ export const Sidebar: React.FC = () => {
             </Button>
           )}
           <p
-            className={`text-xs font-semibold text-emerald-700/70 uppercase mb-3 px-3 transition-all duration-300 ${
-              isCollapsed ? "opacity-0 h-0" : "opacity-100 h-auto"
+            className={`text-xs font-semibold text-emerald-700/70 uppercase mb-3 px-3 transition-opacity duration-200 ${
+              isCollapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto"
             }`}
           >
             Navegación por rol
@@ -387,14 +387,14 @@ export const Sidebar: React.FC = () => {
 
       {/* User Info & Logout */}
       <div
-        className={` border-t border-gray-200 p-4 ${
+        className={` border-t border-emerald-100 p-4 ${
           isCollapsed ? "" : "mt-auto"
         }`}
       >
         <SignedIn>
           <div
-            className={`mb-3 transition-all duration-300 ${
-              isCollapsed ? "hidden" : "opacity-100"
+            className={`mb-3 transition-opacity duration-200 ${
+              isCollapsed ? "opacity-0 h-0 overflow-hidden pointer-events-none" : "opacity-100 h-auto"
             }`}
           >
             <User
@@ -417,7 +417,7 @@ export const Sidebar: React.FC = () => {
           <SignOutButton redirectUrl={`/auth/sign-in`}>
             <Button
               variant="light"
-              className={`w-full text-gray-600 hover:text-gray-900 transition-all duration-300 px-0 min-w-0 ${
+              className={`w-full text-slate-500 hover:text-[#0d212c] transition-colors duration-200 px-0 min-w-0 ${
                 isCollapsed ? "justify-center" : "justify-start"
               }`}
               isLoading={isLoading}
@@ -432,8 +432,8 @@ export const Sidebar: React.FC = () => {
               }
             >
               <span
-                className={`transition-all duration-300 ${
-                  isCollapsed ? "hidden" : "w-auto opacity-100"
+                className={`transition-[opacity,width] duration-200 ${
+                  isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
                 } overflow-hidden whitespace-nowrap`}
               >
                 Cerrar Sesión

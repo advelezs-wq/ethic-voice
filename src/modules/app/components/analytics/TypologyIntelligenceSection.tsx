@@ -84,9 +84,9 @@ export function TypologyIntelligenceSection({
     if (props.active && props.payload && props.payload.length) {
       const d = props.payload[0].payload;
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{d.name}</p>
-          <p className="text-sm text-gray-600">
+        <div className="bg-white p-3 border border-emerald-100 rounded-lg shadow-lg">
+          <p className="font-medium text-[#0d212c]">{d.name}</p>
+          <p className="text-sm text-slate-500">
             Denuncias: <span className="font-medium">{d.value}</span> (
             {d.percentage}%)
           </p>
@@ -99,8 +99,8 @@ export function TypologyIntelligenceSection({
   if (distribution.length === 0) {
     return (
       <div className="bg-white border rounded-lg p-10 text-center">
-        <i className="icon-[lucide--shapes] mx-auto mb-3 size-8 text-gray-300" />
-        <p className="text-sm text-gray-500">
+        <i className="icon-[lucide--shapes] mx-auto mb-3 size-8 text-slate-300" />
+        <p className="text-sm text-slate-400">
           Aún no hay denuncias clasificadas para calcular tipologías.
         </p>
       </div>
@@ -115,7 +115,7 @@ export function TypologyIntelligenceSection({
           <div className="text-2xl font-bold">{data.activeTypologies}</div>
           <div className="text-sm font-medium">Tipologías activas</div>
         </div>
-        <div className="rounded-lg p-4 text-center bg-blue-50 text-blue-800">
+        <div className="rounded-lg p-4 text-center bg-sky-50 text-sky-700">
           <div className="text-2xl font-bold">{data.totalReports}</div>
           <div className="text-sm font-medium">Denuncias recibidas</div>
         </div>
@@ -135,10 +135,10 @@ export function TypologyIntelligenceSection({
         {/* Doughnut: distribución por tipología */}
         <div className="bg-white border rounded-lg p-6">
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-900">
+            <h4 className="text-lg font-semibold text-[#0d212c]">
               Distribución por Tipología
             </h4>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-500">
               Participación porcentual de cada categoría de denuncia
             </p>
           </div>
@@ -165,10 +165,10 @@ export function TypologyIntelligenceSection({
             </ResponsiveContainer>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
-                <div className="text-3xl font-bold text-gray-900">
+                <div className="text-3xl font-bold text-[#0d212c]">
                   {data.totalReports}
                 </div>
-                <div className="text-sm text-gray-600">Total</div>
+                <div className="text-sm text-slate-500">Total</div>
               </div>
             </div>
           </div>
@@ -179,7 +179,7 @@ export function TypologyIntelligenceSection({
                   className="w-2.5 h-2.5 rounded-full"
                   style={{ backgroundColor: entry.fill }}
                 />
-                <span className="text-xs text-gray-700">
+                <span className="text-xs text-slate-600">
                   {entry.name} · {entry.percentage}%
                 </span>
               </div>
@@ -190,10 +190,10 @@ export function TypologyIntelligenceSection({
         {/* Ranking de tipologías */}
         <div className="bg-white border rounded-lg p-6">
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-900">
+            <h4 className="text-lg font-semibold text-[#0d212c]">
               Ranking de Tipologías
             </h4>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-500">
               Categorías con mayor recurrencia
             </p>
           </div>
@@ -236,10 +236,10 @@ export function TypologyIntelligenceSection({
       {/* Tendencia mensual por tipología */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">
+          <h4 className="text-lg font-semibold text-[#0d212c]">
             Tendencia Mensual por Tipología
           </h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Evolución de las tipologías con mayor recurrencia (últimos 6 meses)
           </p>
         </div>

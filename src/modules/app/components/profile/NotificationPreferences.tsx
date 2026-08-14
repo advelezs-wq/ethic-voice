@@ -194,7 +194,7 @@ export function NotificationPreferences() {
             <i className="icon-[lucide--bell] size-5" />
             <h3 className="text-lg font-semibold">Preferencias de Notificaciones</h3>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Configura cómo y cuándo quieres recibir notificaciones sobre la actividad en la plataforma.
           </p>
         </div>

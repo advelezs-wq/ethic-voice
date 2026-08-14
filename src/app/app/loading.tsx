@@ -23,14 +23,14 @@ export default function Loading() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
       <div className="text-center">
-        <div className="mx-auto w-20 h-20 rounded-2xl bg-gray-200 text-gray-600 flex items-center justify-center">
+        <div className="mx-auto w-20 h-20 rounded-2xl bg-emerald-100 text-slate-500 flex items-center justify-center">
           <i className="icon-[lucide--layout-dashboard] size-8" />
         </div>
         <div className="mt-6 flex flex-col items-center gap-3">
           <Spinner color="primary" aria-label="Cargando" />
-          <p className="text-gray-600">{MESSAGES[index]}</p>
+          <p className="text-slate-500">{MESSAGES[index]}</p>
         </div>
       </div>
     </div>

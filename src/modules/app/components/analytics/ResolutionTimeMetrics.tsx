@@ -74,7 +74,7 @@ export function ResolutionTimeMetrics({
         bgColor: "bg-green-50",
       };
     if (avgTime <= 14)
-      return { level: "Bueno", color: "text-blue-600", bgColor: "bg-blue-50" };
+      return { level: "Bueno", color: "text-sky-700", bgColor: "bg-sky-50" };
     if (avgTime <= 21)
       return {
         level: "Regular",
@@ -93,23 +93,23 @@ export function ResolutionTimeMetrics({
     if (props.active && props.payload && props.payload.length) {
       const data = props.payload[0].payload;
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">
+        <div className="bg-white p-3 border border-emerald-100 rounded-lg shadow-lg">
+          <p className="font-medium text-[#0d212c]">
             {data.range || data.month}
           </p>
           {data.count && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-500">
               Casos: <span className="font-medium">{data.count}</span>
             </p>
           )}
           {data.percentage && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-500">
               Porcentaje:{" "}
               <span className="font-medium">{data.percentage}%</span>
             </p>
           )}
           {data.avgTime && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-500">
               Tiempo Promedio:{" "}
               <span className="font-medium">{data.avgTime} días</span>
             </p>
@@ -126,7 +126,7 @@ export function ResolutionTimeMetrics({
         <div className="animate-pulse">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-gray-200 rounded-lg h-20"></div>
+              <div key={i} className="bg-emerald-100 rounded-lg h-20"></div>
             ))}
           </div>
         </div>
@@ -136,7 +136,7 @@ export function ResolutionTimeMetrics({
 
   if (!data) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-slate-400">
         <i className="icon-[lucide--clock] size-12 mx-auto mb-2" />
         <p>No se pudieron cargar los datos de tiempo de resolución</p>
       </div>
@@ -153,7 +153,7 @@ export function ResolutionTimeMetrics({
           <div className={`text-2xl font-bold ${efficiency.color}`}>
             {data.averageTime}d
           </div>
-          <div className="text-sm font-medium text-gray-700">
+          <div className="text-sm font-medium text-slate-600">
             Tiempo Promedio
           </div>
           <div className={`text-xs ${efficiency.color}`}>
@@ -172,21 +172,21 @@ export function ResolutionTimeMetrics({
           </div>
           <div className="text-sm text-orange-600">Más Lento</div>
         </div>
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-900">
+        <div className="bg-sky-50 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-sky-800">
             {data.totalResolved}
           </div>
-          <div className="text-sm text-blue-600">Total Resueltos</div>
+          <div className="text-sm text-sky-700">Total Resueltos</div>
         </div>
       </div>
 
       {/* Time Distribution Bar Chart */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">
+          <h4 className="text-lg font-semibold text-[#0d212c]">
             Distribución por Tiempo de Resolución
           </h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Cantidad de casos resueltos por rango de tiempo
           </p>
         </div>
@@ -240,10 +240,10 @@ export function ResolutionTimeMetrics({
       {/* Monthly Trend Line Chart */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">
+          <h4 className="text-lg font-semibold text-[#0d212c]">
             Tendencia Mensual de Tiempo de Resolución
           </h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Evolución del tiempo promedio de resolución por mes
           </p>
         </div>
@@ -284,10 +284,10 @@ export function ResolutionTimeMetrics({
       {/* Detailed Distribution List */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">
+          <h4 className="text-lg font-semibold text-[#0d212c]">
             Análisis Detallado por Tiempo
           </h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Desglose detallado de la distribución de tiempos de resolución
           </p>
         </div>
@@ -300,7 +300,7 @@ export function ResolutionTimeMetrics({
                 text: "text-green-800",
                 bar: "bg-green-500",
               },
-              { bg: "bg-blue-100", text: "text-blue-800", bar: "bg-blue-500" },
+              { bg: "bg-sky-100", text: "text-sky-700", bar: "bg-sky-500" },
               {
                 bg: "bg-yellow-100",
                 text: "text-yellow-800",
@@ -326,9 +326,9 @@ export function ResolutionTimeMetrics({
                     <div className={`font-bold ${color.text}`}>
                       {item.count}
                     </div>
-                    <div className="text-xs text-gray-600">casos</div>
+                    <div className="text-xs text-slate-500">casos</div>
                   </div>
-                  <div className="w-24 bg-gray-200 rounded-full h-2">
+                  <div className="w-24 bg-emerald-100 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full ${color.bar}`}
                       style={{ width: `${item.percentage}%` }}
@@ -357,7 +357,7 @@ export function ResolutionTimeMetrics({
             <h5 className={`font-medium ${efficiency.color}`}>
               Análisis de Tiempo de Resolución
             </h5>
-            <p className="text-sm text-gray-700 mt-1">
+            <p className="text-sm text-slate-600 mt-1">
               {(() => {
                 if (data.averageTime <= 7) {
                   return `Excelente tiempo de resolución promedio de ${data.averageTime} días. El equipo está trabajando muy eficientemente.`;
@@ -372,7 +372,7 @@ export function ResolutionTimeMetrics({
             </p>
 
             {/* Quick recommendations */}
-            <div className="mt-2 text-xs text-gray-600">
+            <div className="mt-2 text-xs text-slate-500">
               <span className="font-medium">Recomendación: </span>
               {data.timeDistribution[0].percentage > 50
                 ? "Mantén la eficiencia actual en casos rápidos."

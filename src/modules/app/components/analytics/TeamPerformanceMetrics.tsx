@@ -112,18 +112,18 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
     if (props.active && props.payload && props.payload.length) {
       const data = props.payload[0].payload;
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900">{data.fullName}</p>
-          <p className="text-sm text-gray-600">Email: {data.email}</p>
-          <p className="text-sm text-gray-600">
+        <div className="bg-white p-3 border border-emerald-100 rounded-lg shadow-lg">
+          <p className="font-medium text-[#0d212c]">{data.fullName}</p>
+          <p className="text-sm text-slate-500">Email: {data.email}</p>
+          <p className="text-sm text-slate-500">
             Rol: {data.role === "ADMIN" ? "Administrador" : "Miembro"}
           </p>
-          <p className="text-sm text-gray-600">Asignados: {data.assigned}</p>
-          <p className="text-sm text-gray-600">Resueltos: {data.resolved}</p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">Asignados: {data.assigned}</p>
+          <p className="text-sm text-slate-500">Resueltos: {data.resolved}</p>
+          <p className="text-sm text-slate-500">
             Tiempo Promedio: {data.avgTime}d
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Productividad: {data.productivity}%
           </p>
         </div>
@@ -136,11 +136,11 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
     <div className="space-y-6">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-900">
+        <div className="bg-sky-50 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-sky-800">
             {activeInvestigators}
           </div>
-          <div className="text-sm text-blue-600">Investigadores Activos</div>
+          <div className="text-sm text-sky-700">Investigadores Activos</div>
         </div>
         <div className="bg-green-50 rounded-lg p-4 text-center">
           <div className="text-2xl font-bold text-green-900">
@@ -166,10 +166,10 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
           {/* Individual Performance Bar Chart */}
           <div className="bg-white border rounded-lg p-6">
             <div className="mb-4">
-              <h4 className="text-lg font-semibold text-gray-900">
+              <h4 className="text-lg font-semibold text-[#0d212c]">
                 Productividad Individual
               </h4>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-500">
                 Score de productividad por miembro del equipo
               </p>
             </div>
@@ -227,10 +227,10 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
           {/* Performance Distribution Pie Chart */}
           <div className="bg-white border rounded-lg p-6">
             <div className="mb-4">
-              <h4 className="text-lg font-semibold text-gray-900">
+              <h4 className="text-lg font-semibold text-[#0d212c]">
                 Distribución de Performance
               </h4>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-500">
                 Categorización del equipo por nivel de productividad
               </p>
             </div>
@@ -260,7 +260,7 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
                 </ResponsiveContainer>
               </div>
             ) : (
-              <div className="h-80 flex items-center justify-center text-gray-500">
+              <div className="h-80 flex items-center justify-center text-slate-400">
                 <div className="text-center">
                   <i className="icon-[lucide--pie-chart] size-12 mx-auto mb-2" />
                   <p>No hay datos de distribución</p>
@@ -277,10 +277,10 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
           {/* Role Distribution */}
           <div className="bg-white border rounded-lg p-6">
             <div className="mb-4">
-              <h4 className="text-lg font-semibold text-gray-900">
+              <h4 className="text-lg font-semibold text-[#0d212c]">
                 Distribución por Rol
               </h4>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-500">
                 Composición del equipo por tipo de rol
               </p>
             </div>
@@ -311,10 +311,10 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
           {/* Workload Distribution */}
           <div className="bg-white border rounded-lg p-6">
             <div className="mb-4">
-              <h4 className="text-lg font-semibold text-gray-900">
+              <h4 className="text-lg font-semibold text-[#0d212c]">
                 Distribución de Carga de Trabajo
               </h4>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-500">
                 Casos asignados vs resueltos por miembro
               </p>
             </div>
@@ -362,10 +362,10 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
       {assignments.length > 0 && (
         <div className="bg-white border rounded-lg p-6">
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-900">
+            <h4 className="text-lg font-semibold text-[#0d212c]">
               Rendimiento Individual Detallado
             </h4>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-500">
               Métricas detalladas por miembro del equipo
             </p>
           </div>
@@ -381,7 +381,7 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
                 member.productivityScore >= 80
                   ? "text-green-600"
                   : member.productivityScore >= 60
-                    ? "text-blue-600"
+                    ? "text-sky-700"
                     : member.productivityScore >= 40
                       ? "text-yellow-600"
                       : "text-red-600";
@@ -390,7 +390,7 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
                 member.productivityScore >= 80
                   ? "bg-green-50 border-green-200"
                   : member.productivityScore >= 60
-                    ? "bg-blue-50 border-blue-200"
+                    ? "bg-sky-50 border-sky-200"
                     : member.productivityScore >= 40
                       ? "bg-yellow-50 border-yellow-200"
                       : "bg-red-50 border-red-200";
@@ -411,10 +411,10 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
                         #{index + 1}
                       </div>
                       <div>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-[#0d212c]">
                           {member.investigator}
                         </span>
-                        <span className="ml-2 text-xs px-2 py-1 bg-gray-200 rounded-full">
+                        <span className="ml-2 text-xs px-2 py-1 bg-emerald-100 rounded-full">
                           {member.role === "ADMIN" ? "Admin" : "Miembro"}
                         </span>
                       </div>
@@ -423,40 +423,40 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
                       <div className={`text-lg font-bold ${performanceColor}`}>
                         {member.productivityScore}%
                       </div>
-                      <div className="text-xs text-gray-600">Productividad</div>
+                      <div className="text-xs text-slate-500">Productividad</div>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div className="text-center">
-                      <div className="font-semibold text-gray-900">
+                      <div className="font-semibold text-[#0d212c]">
                         {member.assignedCount}
                       </div>
-                      <div className="text-gray-600">Asignados</div>
+                      <div className="text-slate-500">Asignados</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-semibold text-gray-900">
+                      <div className="font-semibold text-[#0d212c]">
                         {member.resolvedCount}
                       </div>
-                      <div className="text-gray-600">Resueltos</div>
+                      <div className="text-slate-500">Resueltos</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-semibold text-gray-900">
+                      <div className="font-semibold text-[#0d212c]">
                         {member.avgTime}d
                       </div>
-                      <div className="text-gray-600">Tiempo Prom.</div>
+                      <div className="text-slate-500">Tiempo Prom.</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-semibold text-gray-900">
+                      <div className="font-semibold text-[#0d212c]">
                         {(efficiencyRate ?? 0).toFixed(1)}%
                       </div>
-                      <div className="text-gray-600">Eficiencia</div>
+                      <div className="text-slate-500">Eficiencia</div>
                     </div>
                   </div>
 
                   {/* Progress bar */}
                   <div className="mt-3">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-emerald-100 rounded-full h-2">
                       <div
                         className="h-2 rounded-full transition-all duration-500"
                         style={{
@@ -483,11 +483,11 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
       {/* No Data State */}
       {assignments.length === 0 && (
         <div className="bg-white border rounded-lg p-12 text-center">
-          <i className="icon-[lucide--users] size-16 mx-auto mb-4 text-gray-400" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <i className="icon-[lucide--users] size-16 mx-auto mb-4 text-slate-400" />
+          <h3 className="text-lg font-medium text-[#0d212c] mb-2">
             No hay datos de rendimiento disponibles
           </h3>
-          <p className="text-gray-600">
+          <p className="text-slate-500">
             Los datos de rendimiento aparecerán cuando haya miembros con
             reportes asignados.
           </p>
@@ -496,12 +496,12 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
 
       {/* Team Insights */}
       {assignments.length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <i className="icon-[lucide--users] size-5 text-blue-600 mt-0.5" />
+            <i className="icon-[lucide--users] size-5 text-sky-700 mt-0.5" />
             <div>
-              <h5 className="font-medium text-blue-800">Análisis del Equipo</h5>
-              <p className="text-sm text-blue-700 mt-1">
+              <h5 className="font-medium text-sky-700">Análisis del Equipo</h5>
+              <p className="text-sm text-sky-700 mt-1">
                 {(() => {
                   const topPerformer = assignments[0];
                   const averageProductivity =

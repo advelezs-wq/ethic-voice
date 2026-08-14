@@ -205,7 +205,7 @@ export function OrganizationLogoDropzone({
           {currentLogo ? (
             <div className="space-y-4">
               {/* Current Logo Preview */}
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
+              <div className="border-2 border-dashed border-emerald-200 rounded-lg p-6 bg-[#f7faf9]">
                 <div className="flex items-center justify-center">
                   <div className="max-w-xs mx-auto bg-white rounded-lg p-4 shadow-sm">
                     <Image
@@ -247,26 +247,26 @@ export function OrganizationLogoDropzone({
                 "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all",
                 isDragActive
                   ? "border-primary bg-primary-50 border-solid"
-                  : "border-gray-300 hover:border-gray-400 hover:bg-gray-50",
+                  : "border-emerald-200 hover:border-slate-400 hover:bg-[#f7faf9]",
                 uploading && "pointer-events-none opacity-50"
               )}
             >
               <input {...getInputProps()} />
               <div className="space-y-4">
-                <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                <div className="mx-auto w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center">
                   {isDragActive ? (
                     <i className="icon-[lucide--download] size-8 text-primary" />
                   ) : (
-                    <i className="icon-[lucide--image] size-8 text-gray-400" />
+                    <i className="icon-[lucide--image] size-8 text-slate-400" />
                   )}
                 </div>
                 <div>
-                  <h4 className="text-lg font-medium text-gray-900">
+                  <h4 className="text-lg font-medium text-[#0d212c]">
                     {isDragActive
                       ? "Suelta el archivo aquí"
                       : "Arrastra el logo aquí o haz clic para seleccionar"}
                   </h4>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-slate-500 mt-1">
                     PNG, JPG, JPEG, SVG o GIF hasta 5MB
                   </p>
                 </div>
@@ -289,8 +289,8 @@ export function OrganizationLogoDropzone({
           {uploading && (
             <div className="mt-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">Subiendo logo...</span>
-                <span className="text-sm text-gray-600">{uploadProgress}%</span>
+                <span className="text-sm text-slate-500">Subiendo logo...</span>
+                <span className="text-sm text-slate-500">{uploadProgress}%</span>
               </div>
               <Progress
                 value={uploadProgress}
@@ -318,12 +318,12 @@ export function OrganizationLogoDropzone({
 
         {/* Recommendations Panel */}
         <div className="w-80">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h5 className="font-medium text-blue-900 mb-3">
+          <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
+            <h5 className="font-medium text-sky-800 mb-3">
               <i className="icon-[lucide--info] size-4 mr-2 inline" />
               Recomendaciones para el Logo
             </h5>
-            <ul className="space-y-2 text-sm text-blue-800">
+            <ul className="space-y-2 text-sm text-sky-700">
               <li className="flex items-start gap-2">
                 <i className="icon-[lucide--check] size-3 text-green-600 mt-1 flex-shrink-0" />
                 Tamaño recomendado: 200x60 píxeles

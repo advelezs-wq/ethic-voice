@@ -32,7 +32,7 @@ export function TotalReportsChart({ data }: TotalReportsChartProps) {
   const getTrendColor = (change: number) => {
     if (change > 0) return "text-green-600";
     if (change < 0) return "text-red-600";
-    return "text-gray-600";
+    return "text-slate-500";
   };
 
   const getTrendIcon = (change: number) => {
@@ -45,16 +45,16 @@ export function TotalReportsChart({ data }: TotalReportsChartProps) {
     <div className="space-y-6">
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-blue-50 rounded-lg p-4 text-center">
-          <div className="text-3xl font-bold text-blue-900">{current}</div>
-          <div className="text-sm text-blue-600">Total de Reportes</div>
+        <div className="bg-sky-50 rounded-lg p-4 text-center">
+          <div className="text-3xl font-bold text-sky-800">{current}</div>
+          <div className="text-sm text-sky-700">Total de Reportes</div>
         </div>
-        <div className="bg-gray-50 rounded-lg p-4 text-center">
+        <div className="bg-emerald-50/40 rounded-lg p-4 text-center">
           <div className={`text-3xl font-bold ${getTrendColor(change ?? 0)}`}>
             {(change ?? 0) > 0 ? "+" : ""}
             {(change ?? 0).toFixed(1)}%
           </div>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-slate-500">
             Cambio vs Período Anterior
           </div>
         </div>
@@ -76,10 +76,10 @@ export function TotalReportsChart({ data }: TotalReportsChartProps) {
       {/* Bar Chart */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">
+          <h4 className="text-lg font-semibold text-[#0d212c]">
             Tendencia de Reportes (Últimos 12 Meses)
           </h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             Distribución mensual de reportes recibidos
           </p>
         </div>
@@ -128,7 +128,7 @@ export function TotalReportsChart({ data }: TotalReportsChartProps) {
       {/* Trend Analysis */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-gray-900">
+          <h4 className="text-lg font-semibold text-[#0d212c]">
             Análisis de Tendencia
           </h4>
         </div>
@@ -177,12 +177,12 @@ export function TotalReportsChart({ data }: TotalReportsChartProps) {
 
       {/* Additional Insights */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <i className="icon-[lucide--bar-chart-3] size-5 text-blue-600 mt-0.5" />
+            <i className="icon-[lucide--bar-chart-3] size-5 text-sky-700 mt-0.5" />
             <div>
-              <h5 className="font-medium text-blue-800">Pico de Actividad</h5>
-              <p className="text-sm text-blue-700 mt-1">
+              <h5 className="font-medium text-sky-700">Pico de Actividad</h5>
+              <p className="text-sm text-sky-700 mt-1">
                 {Math.max(...chartData.map((d) => d.reports)) > 0
                   ? `El mes con más reportes fue ${chartData.find((d) => d.reports === Math.max(...chartData.map((item) => item.reports)))?.name} con ${Math.max(...chartData.map((d) => d.reports))} reportes.`
                   : "No hay datos suficientes para determinar picos de actividad."}

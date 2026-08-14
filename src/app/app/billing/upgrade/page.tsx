@@ -99,7 +99,7 @@ export default function UpgradePage() {
 
   if (isProcessing) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
         <Spinner size="lg" color="primary" />
       </div>
     );
@@ -107,10 +107,10 @@ export default function UpgradePage() {
 
   if (!planInfo) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
         <Card>
           <CardBody>
-            <p className="text-center text-gray-500">
+            <p className="text-center text-slate-400">
               Unable to load plan information
             </p>
           </CardBody>
@@ -146,8 +146,11 @@ export default function UpgradePage() {
                 Volver a Configuración
               </Button>
               <div>
-                <h1 className="text-4xl font-bold text-gray-900">Plan</h1>
-                <p className="text-gray-600 mt-1">
+                <p className="mb-1 text-xs font-bold uppercase tracking-widest text-emerald-700">
+                  Planes y precios
+                </p>
+                <h1 className="text-4xl font-extrabold text-[#0d212c]">Plan</h1>
+                <p className="text-slate-500 mt-1">
                   {feature ? (
                     <>
                       Desbloquea <strong>{feature}</strong> y más con un plan
@@ -168,15 +171,14 @@ export default function UpgradePage() {
                   handleBillingToggle(key as BillingCycle)
                 }
                 variant="solid"
-                color="success"
                 size="lg"
                 className="w-auto"
                 classNames={{
-                  tabList: "bg-gray-100 rounded-full p-1",
-                  cursor: "bg-green-600 rounded-full shadow-lg",
+                  tabList: "bg-emerald-50 rounded-full p-1",
+                  cursor: "bg-[#0d212c] rounded-full shadow-lg",
                   tab: "px-6 py-2 text-sm font-medium rounded-full transition-all duration-300",
                   tabContent:
-                    "group-data-[selected=true]:text-white text-gray-600",
+                    "group-data-[selected=true]:text-white text-[#0d212c]",
                 }}
               >
                 <Tab key={BillingCycle.MONTHLY} title="Mensual" />
@@ -200,10 +202,10 @@ export default function UpgradePage() {
                     </CardHeader>
                     <CardBody>
                       <div className="flex items-center gap-2 mb-2">
-                        <i className="icon-[lucide--zap] w-4 h-4 text-purple-600" />
+                        <i className="icon-[lucide--zap] w-4 h-4 text-emerald-600" />
                         <span className="font-medium">{feature}</span>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-500">
                         Esta funcionalidad no está disponible en tu plan actual.
                         Actualiza para desbloquear esta y muchas otras
                         capacidades.
@@ -219,11 +221,11 @@ export default function UpgradePage() {
               {availablePlans.length === 0 ? (
                 <Card className="text-center py-12">
                   <CardBody>
-                    <i className="icon-[lucide--crown] w-16 h-16 text-yellow-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <i className="icon-[lucide--crown] w-16 h-16 text-lime-500 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-[#0d212c] mb-2">
                       ¡Ya estás en el nivel más alto!
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-slate-500 mb-6">
                       Tienes acceso a todas las funcionalidades disponibles en
                       nuestro plan Premium.
                     </p>
@@ -244,21 +246,29 @@ export default function UpgradePage() {
                       return (
                         <motion.div
                           key={plan.type}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.6, delay: index * 0.1 }}
-                          className={`relative bg-white rounded-xl p-8 min-h-[600px] transition-all duration-300 hover:transform hover:-translate-y-1 ${
+                          initial={{ opacity: 0, transform: "translateY(20px)" }}
+                          animate={{ opacity: 1, transform: "translateY(0)" }}
+                          transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1], delay: index * 0.06 }}
+                          className={`relative flex min-h-[600px] flex-col rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1 ${
                             isPopular
-                              ? "border-2 border-green-500 shadow-2xl"
-                              : "border border-gray-200 shadow-lg hover:shadow-xl"
+                              ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-lime-400"
+                              : "border border-slate-200 bg-white hover:border-emerald-200 hover:shadow-xl"
                           }`}
                         >
+                          {isPopular && (
+                            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                              <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#052b24] shadow-[0_8px_18px_rgba(163,230,53,0.35)]">
+                                Más popular
+                              </span>
+                            </div>
+                          )}
+
                           {/* Title */}
                           <div className="mb-6">
-                            <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                            <h3 className={`text-2xl font-extrabold mb-2 ${isPopular ? "text-white" : "text-[#0d212c]"}`}>
                               {plan.displayName}
                             </h3>
-                            <p className="text-sm text-gray-600 leading-relaxed">
+                            <p className={`text-sm leading-relaxed ${isPopular ? "text-white/55" : "text-slate-500"}`}>
                               {plan.description}
                             </p>
                           </div>
@@ -266,13 +276,13 @@ export default function UpgradePage() {
                           {/* Price */}
                           <div className="mb-6">
                             {plan.isEnterprise ? (
-                              <div className="text-3xl font-extrabold text-gray-900">
+                              <div className={`text-3xl font-black ${isPopular ? "text-white" : "text-[#0d212c]"}`}>
                                 Contactar
                               </div>
                             ) : (
                               <div className="flex items-baseline flex-wrap">
                                 <span
-                                  className={`font-extrabold text-gray-900 ${
+                                  className={`font-black ${isPopular ? "text-white" : "text-[#0d212c]"} ${
                                     priceDisplay.size === "large"
                                       ? "text-3xl md:text-4xl"
                                       : priceDisplay.size === "medium"
@@ -282,7 +292,7 @@ export default function UpgradePage() {
                                 >
                                   {priceDisplay.formatted}
                                 </span>
-                                <span className="text-sm text-gray-600 ml-1 flex-shrink-0">
+                                <span className={`text-sm ml-1 flex-shrink-0 ${isPopular ? "text-white/50" : "text-slate-400"}`}>
                                   /
                                   {billingCycle === BillingCycle.YEARLY
                                     ? "año"
@@ -293,15 +303,15 @@ export default function UpgradePage() {
                           </div>
 
                           {/* Features */}
-                          <div className="space-y-3 mb-8">
+                          <div className="space-y-3 mb-8 flex-1">
                             {plan.features.highlights.map(
                               (feature, featureIndex) => (
                                 <div
                                   key={featureIndex}
-                                  className="flex items-center gap-3"
+                                  className="flex items-start gap-2"
                                 >
-                                  <i className="icon-[lucide--check] w-4 h-4 text-green-600 flex-shrink-0" />
-                                  <span className="text-sm text-gray-700">
+                                  <i className={`icon-[lucide--circle-check] mt-0.5 w-4 h-4 flex-shrink-0 ${isPopular ? "text-lime-300" : "text-emerald-600"}`} />
+                                  <span className={`text-sm ${isPopular ? "text-white/75" : "text-slate-600"}`}>
                                     {feature}
                                   </span>
                                 </div>
@@ -311,12 +321,12 @@ export default function UpgradePage() {
 
                           {/* Price Comparison */}
                           {!plan.isEnterprise && planInfo && (
-                            <div className="bg-green-50 rounded-lg p-4 mb-6">
+                            <div className={`rounded-xl p-4 mb-6 ${isPopular ? "bg-white/[0.08] ring-1 ring-white/10" : "bg-emerald-50"}`}>
                               <div className="text-center">
-                                <p className="text-sm text-green-800">
+                                <p className={`text-sm ${isPopular ? "text-white/70" : "text-emerald-800"}`}>
                                   <strong>Ahorro vs Plan Actual</strong>
                                 </p>
-                                <p className="text-lg font-bold text-green-600">
+                                <p className={`text-lg font-bold ${isPopular ? "text-lime-300" : "text-emerald-600"}`}>
                                   Mejora por solo +
                                   {
                                     formatPriceForUI(
@@ -340,10 +350,10 @@ export default function UpgradePage() {
                               disabled={
                                 isProcessing && selectedPlan === plan.type
                               }
-                              className={`w-full py-3 px-6 rounded-lg text-sm font-medium transition-all duration-200 ${
+                              className={`w-full rounded-xl py-3.5 px-6 text-sm font-bold transition-all duration-200 ${
                                 isPopular
-                                  ? "bg-green-600 text-white hover:bg-green-700 shadow-lg"
-                                  : "border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                                  ? "bg-lime-400 text-[#052b24] shadow-[0_6px_20px_rgba(163,230,53,0.3)] hover:bg-lime-300"
+                                  : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
                               }`}
                             >
                               {isProcessing && selectedPlan === plan.type
@@ -354,7 +364,7 @@ export default function UpgradePage() {
                             </Button>
 
                             {!plan.isEnterprise && (
-                              <p className="text-xs text-gray-500 text-center mt-2">
+                              <p className={`text-xs text-center mt-2 ${isPopular ? "text-white/40" : "text-slate-400"}`}>
                                 Mejora instantánea • Facturación prorrateada
                               </p>
                             )}

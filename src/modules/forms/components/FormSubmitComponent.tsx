@@ -77,7 +77,7 @@ export const FormSubmitComponent = ({
       <div className="flex justify-center w-full h-full items-center p-8">
         <div className="max-w-[620px] flex flex-col gap-4 flex-grow bg-background w-full p-8 overflow-y-auto border shadow-xl rounded">
           <h1 className="text-2xl font-bold">Denuncia enviada</h1>
-          <p className="text-gray-600">
+          <p className="text-slate-500">
             Gracias por tu reporte, ya puedes cerrar esta página.
           </p>
         </div>

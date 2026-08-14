@@ -67,7 +67,7 @@ export function EditMessageForm({
         }}
         onKeyDown={handleKeyDown}
         disabled={isSaving}
-        className="w-full p-2 bg-transparent border border-blue-500 text-black bg-white rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full p-2 bg-transparent border border-sky-500 text-black bg-white rounded resize-none focus:outline-none focus:ring-2 focus:ring-sky-500"
         style={{ minHeight: "60px" }}
       />
       <div className="flex items-center gap-2 mt-2 text-xs">
@@ -76,7 +76,7 @@ export function EditMessageForm({
           disabled={isSaving || !content.trim() || content === initialContent}
           className={cn(
             "px-3 py-1 rounded font-medium transition-colors",
-            "bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:text-black disabled:cursor-not-allowed"
+            "bg-sky-600 text-white hover:bg-sky-700 disabled:bg-slate-300 disabled:text-black disabled:cursor-not-allowed"
           )}
         >
           {isSaving ? "Guardando..." : "Guardar"}
@@ -90,7 +90,7 @@ export function EditMessageForm({
         >
           Cancelar
         </Button>
-        <span className="text-gray-700 ml-2">
+        <span className="text-slate-600 ml-2">
           Escape para cancelar • Enter para guardar
         </span>
       </div>

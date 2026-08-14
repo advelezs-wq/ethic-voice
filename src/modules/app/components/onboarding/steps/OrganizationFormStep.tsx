@@ -105,10 +105,10 @@ export function OrganizationFormStep({ context }: OrganizationFormStepProps) {
         <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-2xl">🏢</span>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-[#0d212c] mb-2">
           Información de tu organización
         </h2>
-        <p className="text-gray-600">
+        <p className="text-slate-500">
           Cuéntanos sobre tu organización para personalizar tu experiencia
         </p>
       </div>
@@ -130,8 +130,8 @@ export function OrganizationFormStep({ context }: OrganizationFormStepProps) {
               variant="bordered"
               size="lg"
               classNames={{
-                input: "text-gray-900",
-                label: "text-gray-700 font-medium",
+                input: "text-[#0d212c]",
+                label: "text-slate-600 font-medium",
               }}
             />
           </div>
@@ -147,8 +147,8 @@ export function OrganizationFormStep({ context }: OrganizationFormStepProps) {
               minRows={3}
               maxRows={5}
               classNames={{
-                input: "text-gray-900",
-                label: "text-gray-700 font-medium",
+                input: "text-[#0d212c]",
+                label: "text-slate-600 font-medium",
               }}
             />
           </div>
@@ -170,8 +170,8 @@ export function OrganizationFormStep({ context }: OrganizationFormStepProps) {
               variant="bordered"
               size="lg"
               classNames={{
-                label: "text-gray-700 font-medium",
-                value: "text-gray-900",
+                label: "text-slate-600 font-medium",
+                value: "text-[#0d212c]",
               }}
             >
               {organizationTypes.map((type) => (
@@ -197,8 +197,8 @@ export function OrganizationFormStep({ context }: OrganizationFormStepProps) {
               variant="bordered"
               size="lg"
               classNames={{
-                label: "text-gray-700 font-medium",
-                value: "text-gray-900",
+                label: "text-slate-600 font-medium",
+                value: "text-[#0d212c]",
               }}
             >
               {teamSizes.map((size) => (

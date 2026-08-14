@@ -51,7 +51,7 @@ export function MainContent({ children }: MainContentProps) {
     })();
   }, []);
   return (
-    <div className="ev-app-shell flex-1 min-w-0 w-0 transition-all mb-16">
+    <div className="ev-app-shell flex-1 min-w-0 w-0 mb-16">
       <Header />
 
       <div className="overflow-auto w-full h-full max-h-[calc(100vh-102px)] overflow-y-auto p-3 sm:p-5 md:p-6 lg:p-8">

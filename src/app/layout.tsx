@@ -102,7 +102,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={publicBlogContext?.locale ?? "en"}>
+    <html lang={publicBlogContext?.locale ?? "en"} className="light">
       <head>
         <JsonLd />
         <Script

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getUserPermissions } from "@/modules/core/utils/permissions";
 import { AnalyticsContent } from "@/modules/app/components/analytics/AnalyticsContent";
 import { resolveOrgId } from "@/modules/core/utils/org-resolver";
+import { PageHero } from "@/modules/app/components/ui";
 
 export default async function AnalyticsPage() {
   const { userId } = await auth();
@@ -29,20 +30,14 @@ export default async function AnalyticsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Analíticas e Informes
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Visualiza métricas detalladas y descarga reportes personalizados
-            sobre las denuncias de tu organización
-          </p>
-        </div>
+    <div className="max-w-7xl mx-auto space-y-6">
+      <PageHero
+        kicker="Reportes"
+        title="Analíticas e Informes"
+        description="Visualiza métricas detalladas y descarga reportes personalizados sobre las denuncias de tu organización"
+      />
 
-        <AnalyticsContent organizationId={orgId} />
-      </div>
+      <AnalyticsContent organizationId={orgId} />
     </div>
   );
 }

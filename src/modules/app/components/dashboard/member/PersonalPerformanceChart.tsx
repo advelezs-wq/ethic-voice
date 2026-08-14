@@ -62,19 +62,19 @@ export const PersonalPerformanceChart: React.FC<
   return (
     <Card>
       <CardHeader className="flex flex-col items-start px-6 pt-6">
-        <h3 className="text-lg font-semibold text-gray-900">
+        <h3 className="text-lg font-semibold text-[#0d212c]">
           Mi Rendimiento Semanal
         </h3>
         <div className="flex items-center gap-4 mt-2">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-            <span className="text-sm text-gray-600">Asignados</span>
+            <div className="w-3 h-3 rounded-full bg-sky-600"></div>
+            <span className="text-sm text-slate-500">Asignados</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
-            <span className="text-sm text-gray-600">Completados</span>
+            <span className="text-sm text-slate-500">Completados</span>
           </div>
-          <div className="text-sm font-medium text-gray-900">
+          <div className="text-sm font-medium text-[#0d212c]">
             Tasa de éxito: {(completionRate ?? 0).toFixed(1)}%
           </div>
         </div>

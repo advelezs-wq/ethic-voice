@@ -187,7 +187,7 @@ export function IntelligentCaptcha({
         </div>
 
         {process.env.NODE_ENV === 'development' && (
-          <div className="text-xs text-gray-500 bg-gray-100 p-2 rounded">
+          <div className="text-xs text-slate-400 bg-emerald-50 p-2 rounded">
             <strong>Debug Info:</strong> 
             Suspicion Score: {metrics.suspiciousScore}/100 | 
             Time: {Math.round(metrics.timeOnPage / 1000)}s | 

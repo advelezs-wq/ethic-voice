@@ -18,7 +18,7 @@ export default function AppDashboard() {
       <div className="min-h-[70vh] flex items-center justify-center">
         <div className="text-center rounded-2xl border border-emerald-100 bg-white px-8 py-7 shadow-sm">
           <Spinner size="lg" color="primary" className="mb-4" />
-          <p className="text-gray-600">Preparando tu workspace...</p>
+          <p className="text-slate-500">Preparando tu workspace...</p>
         </div>
       </div>
     );

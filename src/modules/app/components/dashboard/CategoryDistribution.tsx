@@ -28,7 +28,7 @@ export const CategoryDistribution: React.FC<CategoryDistributionProps> = ({
         </CardHeader>
         <CardBody>
           <div className="flex items-center justify-center h-40">
-            <p className="text-gray-500 text-sm">No hay datos disponibles</p>
+            <p className="text-slate-400 text-sm">No hay datos disponibles</p>
           </div>
         </CardBody>
       </Card>
@@ -42,9 +42,9 @@ export const CategoryDistribution: React.FC<CategoryDistributionProps> = ({
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-2 shadow-lg rounded-lg border border-gray-200">
+        <div className="bg-white p-2 shadow-lg rounded-lg border border-emerald-100">
           <p className="text-sm font-medium">{payload[0].name}</p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-slate-500">
             {payload[0].value} reportes (
             {(payload[0]?.payload?.percentage ?? 0).toFixed(1)}%)
           </p>
@@ -91,7 +91,7 @@ export const CategoryDistribution: React.FC<CategoryDistributionProps> = ({
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: category.color }}
                     ></div>
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-slate-600">
                       {category.name}
                     </span>
                   </div>

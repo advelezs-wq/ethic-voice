@@ -67,7 +67,7 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
   return (
     <Card className="w-full">
       {/* Header - Always visible */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-emerald-100">
         <Button
           variant="light"
           className="w-full justify-between p-0 h-auto"
@@ -76,10 +76,10 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
           <div className="flex items-center gap-3">
             <span className="text-xl">📎</span>
             <div className="text-left">
-              <h3 className="font-semibold text-gray-900">
+              <h3 className="font-semibold text-[#0d212c]">
                 Archivos Adjuntos ({attachments.length})
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-slate-400">
                 {imageAttachments.length > 0 && `${imageAttachments.length} imagen${imageAttachments.length > 1 ? 'es' : ''}`}
                 {imageAttachments.length > 0 && (documentAttachments.length > 0 || mediaAttachments.length > 0) && ', '}
                 {documentAttachments.length > 0 && `${documentAttachments.length} documento${documentAttachments.length > 1 ? 's' : ''}`}
@@ -105,7 +105,7 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
           {/* Images Section */}
           {imageAttachments.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-medium text-gray-900 flex items-center gap-2">
+              <h4 className="font-medium text-[#0d212c] flex items-center gap-2">
                 <span>🖼️</span>
                 Imágenes ({imageAttachments.length})
               </h4>
@@ -129,11 +129,11 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-medium text-gray-700 truncate" title={attachment.filename}>
+                      <p className="text-xs font-medium text-slate-600 truncate" title={attachment.filename}>
                         {attachment.filename}
                       </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-slate-400">
                           {formatFileSize(attachment.fileSize)}
                         </span>
                         <Button
@@ -155,7 +155,7 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
           {/* Media Section (Audio/Video) */}
           {mediaAttachments.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-medium text-gray-900 flex items-center gap-2">
+              <h4 className="font-medium text-[#0d212c] flex items-center gap-2">
                 <span>🎬</span>
                 Multimedia ({mediaAttachments.length})
               </h4>
@@ -169,11 +169,11 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
                             {getFileIcon(attachment.mimeType)}
                           </span>
                           <div>
-                            <h5 className="font-medium text-gray-900">{attachment.filename}</h5>
-                            <p className="text-sm text-gray-500">
+                            <h5 className="font-medium text-[#0d212c]">{attachment.filename}</h5>
+                            <p className="text-sm text-slate-400">
                               {getFileTypeLabel(attachment.mimeType)} • {formatFileSize(attachment.fileSize)}
                             </p>
-                            <p className="text-xs text-gray-400 mt-1">
+                            <p className="text-xs text-slate-400 mt-1">
                               Subido por {attachment.uploadedByName} • {new Date(attachment.uploadedAt).toLocaleDateString('es-ES')}
                             </p>
                           </div>
@@ -228,24 +228,24 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
           {/* Documents Section */}
           {documentAttachments.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-medium text-gray-900 flex items-center gap-2">
+              <h4 className="font-medium text-[#0d212c] flex items-center gap-2">
                 <span>📄</span>
                 Documentos ({documentAttachments.length})
               </h4>
               <div className="space-y-2">
                 {documentAttachments.map((attachment) => (
-                  <Card key={attachment.id} className="p-4 hover:bg-gray-50 transition-colors">
+                  <Card key={attachment.id} className="p-4 hover:bg-emerald-50/40 transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">
                           {getFileIcon(attachment.mimeType)}
                         </span>
                         <div>
-                          <h5 className="font-medium text-gray-900">{attachment.filename}</h5>
-                          <p className="text-sm text-gray-500">
+                          <h5 className="font-medium text-[#0d212c]">{attachment.filename}</h5>
+                          <p className="text-sm text-slate-400">
                             {getFileTypeLabel(attachment.mimeType)} • {formatFileSize(attachment.fileSize)}
                           </p>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-slate-400">
                             Subido por {attachment.uploadedByName} • {new Date(attachment.uploadedAt).toLocaleDateString('es-ES')}
                           </p>
                         </div>
@@ -274,9 +274,9 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
           )}
 
           {/* Quick actions */}
-          <div className="pt-4 border-t border-gray-200">
+          <div className="pt-4 border-t border-emerald-100">
             <div className="flex justify-between items-center">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-slate-400">
                 💡 Haz clic en los archivos para ver o descargar
               </p>
               <Button

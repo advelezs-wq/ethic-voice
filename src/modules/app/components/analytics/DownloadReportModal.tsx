@@ -153,12 +153,12 @@ export function DownloadReportModal({
       <ModalContent>
         <ModalHeader>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <i className="icon-[lucide--download] size-5 text-blue-600" />
+            <div className="p-2 bg-sky-100 rounded-lg">
+              <i className="icon-[lucide--download] size-5 text-sky-700" />
             </div>
             <div>
               <h3 className="text-lg font-semibold">Descargar Reporte</h3>
-              <p className="text-sm text-gray-600">{reportTitle}</p>
+              <p className="text-sm text-slate-500">{reportTitle}</p>
             </div>
           </div>
         </ModalHeader>
@@ -166,7 +166,7 @@ export function DownloadReportModal({
         <ModalBody className="space-y-6">
           {/* Quick Date Range Buttons */}
           <div>
-            <label className="text-sm font-medium text-gray-900 block mb-3">
+            <label className="text-sm font-medium text-[#0d212c] block mb-3">
               Rangos rápidos
             </label>
             <div className="flex flex-wrap gap-2">
@@ -210,7 +210,7 @@ export function DownloadReportModal({
               isRequired
               variant="bordered"
               startContent={
-                <i className="icon-[lucide--calendar] size-4 text-gray-400" />
+                <i className="icon-[lucide--calendar] size-4 text-slate-400" />
               }
             />
             <DateInput
@@ -220,14 +220,14 @@ export function DownloadReportModal({
               isRequired
               variant="bordered"
               startContent={
-                <i className="icon-[lucide--calendar] size-4 text-gray-400" />
+                <i className="icon-[lucide--calendar] size-4 text-slate-400" />
               }
             />
           </div>
 
           {/* Format Selection */}
           <div>
-            <label className="text-sm font-medium text-gray-900 block mb-3">
+            <label className="text-sm font-medium text-[#0d212c] block mb-3">
               Formato de descarga
             </label>
             <RadioGroup
@@ -252,8 +252,8 @@ export function DownloadReportModal({
 
           {/* Preview filename */}
           {dateFrom && dateTo && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-sm text-gray-600 mb-1">
+            <div className="bg-emerald-50/40 rounded-lg p-3">
+              <p className="text-sm text-slate-500 mb-1">
                 El archivo se descargará como:
               </p>
               <p className="text-sm font-mono bg-white px-2 py-1 rounded border">
@@ -263,12 +263,12 @@ export function DownloadReportModal({
           )}
 
           {/* Info */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <i className="icon-[lucide--info] size-4 text-blue-600 mt-0.5" />
-              <div className="text-sm text-blue-800">
+              <i className="icon-[lucide--info] size-4 text-sky-700 mt-0.5" />
+              <div className="text-sm text-sky-700">
                 <p className="font-medium mb-1">Información del reporte</p>
-                <ul className="space-y-1 text-blue-700">
+                <ul className="space-y-1 text-sky-700">
                   <li>
                     • Los datos se filtrarán según el rango de fechas
                     seleccionado

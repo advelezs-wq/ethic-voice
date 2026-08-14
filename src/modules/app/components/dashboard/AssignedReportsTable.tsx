@@ -18,6 +18,7 @@ import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
 import { useSafeToast } from "../../hooks/useSafeToast";
 import { useAiQueue } from "../../hooks/useAiQueue";
 import { Spinner } from "@heroui/react";
+import { EmptyState } from "@/modules/app/components/ui";
 import { useSubmissionQueueInfo } from "../../hooks/useSubmissionQueueInfo";
 import { formatEtaShort } from "../../utils/date.utils";
 import { AIQueueInlineStatus } from "../../components/ai/AIQueueInlineStatus";
@@ -112,13 +113,13 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
   const getSourceIcon = (source: string) => {
     switch (source) {
       case "EMAIL":
-        return <i className="icon-[lucide--mail] size-4 text-blue-500" />;
+        return <i className="icon-[lucide--mail] size-4 text-sky-600" />;
       case "ETHIC_LINE":
         return (
           <i className="icon-[lucide--shield-check] size-4 text-green-500" />
         );
       default:
-        return <i className="icon-[lucide--file-text] size-4 text-gray-500" />;
+        return <i className="icon-[lucide--file-text] size-4 text-slate-400" />;
     }
   };
 
@@ -375,12 +376,12 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
                       </div>
 
                       {/* Title and Summary */}
-                      <h4 className="font-medium text-gray-900 mb-1 line-clamp-1 text-base">
+                      <h4 className="font-medium text-[#0d212c] mb-1 line-clamp-1 text-base">
                         {reportInfo.title}
                       </h4>
 
                       {reportInfo.description && (
-                        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                        <p className="text-sm text-slate-500 mb-2 line-clamp-2">
                           {reportInfo.description}
                         </p>
                       )}
@@ -388,10 +389,10 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
                       {/* Key Findings - Show only if AI analysis exists */}
                       {reportInfo.keyFindings.length > 0 && (
                         <div className="mb-2 rounded-md border border-emerald-100 bg-emerald-50/50 p-2">
-                          <p className="text-xs font-semibold text-gray-700 mb-1">
+                          <p className="text-xs font-semibold text-slate-600 mb-1">
                             Hallazgos clave:
                           </p>
-                          <ul className="text-xs text-gray-600 space-y-0.5">
+                          <ul className="text-xs text-slate-500 space-y-0.5">
                             {reportInfo.keyFindings
                               .slice(0, 2)
                               .map((finding, idx) => (
@@ -406,7 +407,7 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
                                 </li>
                               ))}
                             {reportInfo.keyFindings.length > 2 && (
-                              <li className="text-gray-500 italic">
+                              <li className="text-slate-400 italic">
                                 +{reportInfo.keyFindings.length - 2} más...
                               </li>
                             )}
@@ -440,7 +441,7 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
                         )}
 
                       {/* Meta Information */}
-                      <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm text-gray-600">
+                      <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm text-slate-500">
                         <span>
                           <i className="icon-[lucide--tag] size-3 mr-1 inline" />
                           {getReportTypeLabel(report.category)}
@@ -527,10 +528,10 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
           })}
 
           {reports.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <i className="icon-[lucide--inbox] size-12 mx-auto mb-2" />
-              <p>No hay reportes recientes</p>
-            </div>
+            <EmptyState
+              icon={<i className="icon-[lucide--inbox] size-6" />}
+              title="No hay reportes recientes"
+            />
           )}
         </div>
       </CardBody>

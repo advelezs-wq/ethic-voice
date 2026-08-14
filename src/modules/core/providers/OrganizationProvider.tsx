@@ -306,10 +306,10 @@ export function OrganizationProvider({
   // Show loading spinner while checking user and organization status
   if (!userLoaded || !orgLoaded || subscriptionLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" color="primary" className="mb-4" />
-          <p className="text-gray-600">Cargando...</p>
+          <p className="text-slate-500">Cargando...</p>
         </div>
       </div>
     );

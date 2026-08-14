@@ -74,13 +74,13 @@ export const SeverityIndicator: React.FC<SeverityIndicatorProps> = ({
       color: "default",
       icon: (
         <i
-          className="icon-[lucide--circle-help] size-5 text-gray-600"
+          className="icon-[lucide--circle-help] size-5 text-slate-500"
           role="img"
           aria-hidden="true"
         />
       ),
-      bgColor: "bg-gray-100",
-      iconColor: "text-gray-600",
+      bgColor: "bg-emerald-50",
+      iconColor: "text-slate-500",
     },
   ];
 
@@ -100,7 +100,7 @@ export const SeverityIndicator: React.FC<SeverityIndicatorProps> = ({
                 <div>
                   <p className="text-sm font-medium">{level.name}</p>
                   <p className="text-2xl font-bold">{level.value}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-slate-400">
                     {(level.percentage ?? 0).toFixed(1)}%
                   </p>
                 </div>

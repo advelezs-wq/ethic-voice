@@ -14,22 +14,22 @@ export function ChatLoadingSkeleton() {
             index % 2 === 1 && "flex-row-reverse"
           )}
         >
-          <div className="w-8 h-8 bg-gray-200 rounded-full" />
+          <div className="w-8 h-8 bg-emerald-100 rounded-full" />
           <div className="flex-1 max-w-[70%]">
             <div className="flex items-center gap-2 mb-1">
-              <div className="h-4 w-24 bg-gray-200 rounded" />
-              <div className="h-3 w-16 bg-gray-200 rounded" />
+              <div className="h-4 w-24 bg-emerald-100 rounded" />
+              <div className="h-3 w-16 bg-emerald-100 rounded" />
             </div>
             <div
               className={cn(
                 "rounded-2xl p-4",
-                index % 2 === 1 ? "bg-blue-100" : "bg-gray-100"
+                index % 2 === 1 ? "bg-sky-100" : "bg-emerald-50"
               )}
             >
               <div className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-full" />
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-4 bg-gray-200 rounded w-1/2" />
+                <div className="h-4 bg-emerald-100 rounded w-full" />
+                <div className="h-4 bg-emerald-100 rounded w-3/4" />
+                <div className="h-4 bg-emerald-100 rounded w-1/2" />
               </div>
             </div>
           </div>

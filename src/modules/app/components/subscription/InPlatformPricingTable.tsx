@@ -103,8 +103,8 @@ export default function InPlatformPricingTable() {
     <div className="container mx-auto px-4 py-12">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold text-gray-900 mb-4">Plan</h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+        <h2 className="text-4xl font-bold text-[#0d212c] mb-4">Plan</h2>
+        <p className="text-lg text-slate-500 max-w-2xl mx-auto mb-8">
           {planInfo?.isTrialActive
             ? "Tu período de prueba está activo. Elige un plan para continuar cuando termine."
             : "Para continuar usando EthicVoice, selecciona el plan que mejor se adapte a tus necesidades."}
@@ -122,10 +122,10 @@ export default function InPlatformPricingTable() {
             size="lg"
             className="w-auto"
             classNames={{
-              tabList: "bg-gray-100 rounded-full p-1",
+              tabList: "bg-emerald-50 rounded-full p-1",
               cursor: "bg-green-600 rounded-full shadow-lg",
               tab: "px-8 py-3 text-sm font-medium rounded-full transition-all duration-300",
-              tabContent: "group-data-[selected=true]:text-white text-gray-600",
+              tabContent: "group-data-[selected=true]:text-white text-slate-500",
             }}
           >
             <Tab key={BillingCycle.MONTHLY} title="Mensual" />
@@ -155,7 +155,7 @@ export default function InPlatformPricingTable() {
               className={`relative bg-white rounded-xl p-6 min-h-[500px] transition-all duration-300 hover:transform hover:-translate-y-1 ${
                 isPopular
                   ? "border-2 border-green-500 shadow-2xl"
-                  : "border border-gray-200 shadow-lg hover:shadow-xl"
+                  : "border border-emerald-100 shadow-lg hover:shadow-xl"
               }`}
             >
               {/* Recommended Chip */}
@@ -169,7 +169,7 @@ export default function InPlatformPricingTable() {
               {/* Current Plan Badge */}
               {isCurrent && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-blue-500 text-white text-xs px-3 py-1 rounded-full font-medium">
+                  <div className="bg-sky-600 text-white text-xs px-3 py-1 rounded-full font-medium">
                     Plan Actual
                   </div>
                 </div>
@@ -177,15 +177,15 @@ export default function InPlatformPricingTable() {
 
               {/* Title */}
               <div className="mb-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold text-[#0d212c] mb-2">
                   {config.displayName}
                 </h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-sm text-slate-500 leading-relaxed">
                   {config.description}
                 </p>
               </div>
               {price && (
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-slate-400">
                   {rates?.USD
                     ? `≈ $${(price * rates.USD).toFixed(2)} USD/${
                         billingCycle === BillingCycle.YEARLY ? "year" : "mo"
@@ -198,7 +198,7 @@ export default function InPlatformPricingTable() {
               <div className="mb-6">
                 <div className="flex items-baseline flex-wrap">
                   <span
-                    className={`font-extrabold text-gray-900 ${
+                    className={`font-extrabold text-[#0d212c] ${
                       priceDisplay.size === "large"
                         ? "text-2xl md:text-3xl"
                         : priceDisplay.size === "medium"
@@ -208,12 +208,12 @@ export default function InPlatformPricingTable() {
                   >
                     {priceDisplay.formatted}
                   </span>
-                  <span className="text-sm text-gray-600 ml-1 flex-shrink-0">
+                  <span className="text-sm text-slate-500 ml-1 flex-shrink-0">
                     /{billingCycle === BillingCycle.YEARLY ? "año" : "mes"}
                   </span>
                 </div>
                 {price && (
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-slate-400 mt-1">
                     {rates?.COP
                       ? (() => {
                           const monthlyUsd =
@@ -233,7 +233,7 @@ export default function InPlatformPricingTable() {
                 {config.features.highlights.map((feature, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <i className="icon-[lucide--check] w-4 h-4 text-green-600 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">{feature}</span>
+                    <span className="text-sm text-slate-600">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -245,7 +245,7 @@ export default function InPlatformPricingTable() {
                   disabled={isProcessing && selectedPlan === planType}
                   className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isCurrent
-                      ? "bg-blue-600 text-white hover:bg-blue-700"
+                      ? "bg-sky-600 text-white hover:bg-sky-700"
                       : isPopular
                         ? "bg-green-600 text-white hover:bg-green-700 shadow-lg"
                         : "border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
@@ -264,7 +264,7 @@ export default function InPlatformPricingTable() {
       </div>
 
       <div className="text-center mt-8">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-slate-500">
           🔒 Pagos seguros procesados por Rebill
         </p>
       </div>

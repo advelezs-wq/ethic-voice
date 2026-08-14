@@ -135,16 +135,16 @@ export function PlanRestrictionBanner({
         };
       case "feature_disabled":
         return {
-          bg: "bg-blue-50 border-blue-200",
-          text: "text-blue-800",
-          icon: "text-blue-600",
+          bg: "bg-sky-50 border-sky-200",
+          text: "text-sky-700",
+          icon: "text-sky-700",
           button: "primary",
         };
       default:
         return {
-          bg: "bg-gray-50 border-gray-200",
-          text: "text-gray-800",
-          icon: "text-gray-600",
+          bg: "bg-[#f7faf9] border-emerald-100",
+          text: "text-[#0d212c]",
+          icon: "text-slate-500",
           button: "default",
         };
     }
@@ -191,7 +191,7 @@ export function PlanRestrictionBanner({
                   <span>Usage</span>
                   <span>{Math.round(reason.usageCount)}%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-emerald-100 rounded-full h-2">
                   <div
                     className="bg-current h-2 rounded-full transition-all"
                     style={{
@@ -323,8 +323,8 @@ export function DisabledFeatureWrapper({
       <div className="opacity-50 pointer-events-none">{children}</div>
       <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 rounded-lg">
         <div className="text-center p-4">
-          <i className="icon-[lucide--lock] w-8 h-8 text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-600 mb-2">{featureName} Locked</p>
+          <i className="icon-[lucide--lock] w-8 h-8 text-slate-400 mx-auto mb-2" />
+          <p className="text-sm text-slate-500 mb-2">{featureName} Locked</p>
           <Button
             as={Link}
             href={restriction.upgradeUrl}

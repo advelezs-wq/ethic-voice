@@ -40,10 +40,10 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-[#0d212c]">
             No authenticated
           </h2>
-          <p className="text-gray-600">Please sign in to access reports.</p>
+          <p className="text-slate-500">Please sign in to access reports.</p>
         </div>
       </div>
     );
@@ -62,10 +62,10 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-[#0d212c]">
             No organization selected
           </h2>
-          <p className="text-gray-600">
+          <p className="text-slate-500">
             Please select an organization to continue.
           </p>
         </div>

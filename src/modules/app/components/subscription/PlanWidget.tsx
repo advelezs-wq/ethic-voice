@@ -15,7 +15,7 @@ export function PlanWidget() {
   const getPlanIcon = (planType: string) => {
     switch (planType) {
       case "STARTER":
-        return <i className="icon-[lucide--rocket] w-5 h-5 text-blue-500" />;
+        return <i className="icon-[lucide--rocket] w-5 h-5 text-sky-600" />;
       case "GROW":
         return <i className="icon-[lucide--target] w-5 h-5 text-green-500" />;
       case "GROW_PRO":
@@ -23,7 +23,7 @@ export function PlanWidget() {
       case "PREMIUM":
         return <i className="icon-[lucide--crown] w-5 h-5 text-yellow-500" />;
       default:
-        return <i className="icon-[lucide--package] w-5 h-5 text-gray-500" />;
+        return <i className="icon-[lucide--package] w-5 h-5 text-slate-400" />;
     }
   };
 
@@ -96,7 +96,7 @@ export function PlanWidget() {
             {planInfo.maxUsers > 0 && (
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-gray-600 flex items-center gap-1">
+                  <span className="text-slate-500 flex items-center gap-1">
                     <i className="icon-[lucide--users] w-3 h-3" />
                     Users
                   </span>
@@ -117,7 +117,7 @@ export function PlanWidget() {
             )}
 
             {planInfo.maxUsers === -1 && (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-slate-500">
                 <span className="font-medium">Usuarios:</span> {planInfo.currentUsers}/∞
               </div>
             )}
@@ -125,7 +125,7 @@ export function PlanWidget() {
             {planInfo.maxInvestigators > 0 && (
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-gray-600 flex items-center gap-1">
+                  <span className="text-slate-500 flex items-center gap-1">
                     <i className="icon-[lucide--user-check] w-3 h-3" />
                     Investigators
                   </span>
@@ -150,7 +150,7 @@ export function PlanWidget() {
             )}
 
             {planInfo.maxInvestigators === -1 && (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-slate-500">
                 <span className="font-medium">Investigadores:</span>{" "}
                 {planInfo.currentInvestigators}/∞
               </div>
@@ -161,7 +161,7 @@ export function PlanWidget() {
         {/* Usage Warnings */}
         {usageWarnings.length > 0 && (
           <div className="space-y-2 mb-4">
-            <h4 className="text-sm font-medium text-gray-700 flex items-center gap-1">
+            <h4 className="text-sm font-medium text-slate-600 flex items-center gap-1">
               <i className="icon-[lucide--alert-triangle] w-4 h-4" />
               Attention Required
             </h4>
@@ -194,7 +194,7 @@ export function PlanWidget() {
             href="/pricing"
             variant="light"
             size="sm"
-            className="text-xs text-gray-500"
+            className="text-xs text-slate-400"
           >
             Compare all plans
           </Button>

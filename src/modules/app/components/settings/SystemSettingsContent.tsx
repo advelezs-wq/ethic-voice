@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Card, CardBody, CardHeader, Tabs, Tab } from "@heroui/react";
 import { LogoUploadSection } from "./LogoUploadSection";
-import { EnhancedThemeSelector } from "./EnhancedThemeSelector";
 import { EnhancedDashboardLayoutSection } from "./EnhancedDashboardLayoutSection";
 import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
 import { Button, Card as UiCard } from "@heroui/react";
@@ -20,7 +19,7 @@ export function SystemSettingsContent({
 
   const UpgradeBlock = ({ message }: { message: string }) => (
     <div className="text-center py-8">
-      <p className="text-gray-600 mb-4">{message}</p>
+      <p className="text-slate-500 mb-4">{message}</p>
       <Button
         color="primary"
         onPress={() => (window.location.href = "/app/billing")}
@@ -47,36 +46,16 @@ export function SystemSettingsContent({
             <Card>
               <CardHeader>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">
+                  <h3 className="text-xl font-semibold text-[#0d212c]">
                     Logo de la Organización
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-slate-500 text-sm">
                     Personaliza el logo que aparece en el header del dashboard
                   </p>
                 </div>
               </CardHeader>
               <CardBody>
                 <LogoUploadSection organizationId={organizationId} />
-              </CardBody>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Esquema de Colores
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    Selecciona el tema de colores para tu dashboard
-                  </p>
-                </div>
-              </CardHeader>
-              <CardBody>
-                {permissions?.canCustomizeColors ? (
-                  <EnhancedThemeSelector />
-                ) : (
-                  <UpgradeBlock message="Tu plan no permite personalizar colores. Disponible en GROW o superior." />
-                )}
               </CardBody>
             </Card>
           </div>
@@ -87,10 +66,10 @@ export function SystemSettingsContent({
             <Card>
               <CardHeader>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">
+                  <h3 className="text-xl font-semibold text-[#0d212c]">
                     Configuración de Elementos
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-slate-500 text-sm">
                     Personaliza la disposición y orden de los elementos del
                     dashboard
                   </p>
@@ -114,18 +93,18 @@ export function SystemSettingsContent({
             <Card>
               <CardHeader>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">
+                  <h3 className="text-xl font-semibold text-[#0d212c]">
                     Configuraciones Adicionales
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-slate-500 text-sm">
                     Opciones avanzadas de personalización
                   </p>
                 </div>
               </CardHeader>
               <CardBody>
                 <div className="text-center py-8">
-                  <i className="icon-[lucide--settings] size-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">
+                  <i className="icon-[lucide--settings] size-12 text-slate-400 mx-auto mb-4" />
+                  <p className="text-slate-400">
                     Configuraciones avanzadas próximamente
                   </p>
                 </div>

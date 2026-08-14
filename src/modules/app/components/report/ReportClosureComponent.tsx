@@ -100,7 +100,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
         <Card className="border-l-4 border-l-orange-500">
           <CardHeader>
             <div className="flex items-center justify-between w-full">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-[#0d212c]">
                 Estado del Caso
               </h3>
               <Chip color="warning" variant="flat">
@@ -111,14 +111,14 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
           <CardBody className="space-y-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="font-medium text-gray-600">Días abierto</p>
+                <p className="font-medium text-slate-500">Días abierto</p>
                 <p className="text-2xl font-bold text-orange-600">
                   {caseStats.daysOpen}
                 </p>
               </div>
               <div>
-                <p className="font-medium text-gray-600">Estado</p>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="font-medium text-slate-500">Estado</p>
+                <p className="text-lg font-semibold text-[#0d212c]">
                   {getDashboardStatusLabel(report.status)}
                 </p>
               </div>
@@ -167,18 +167,18 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4 p-4 bg-emerald-50/40 rounded-lg">
                       <div className="text-center">
-                        <p className="text-2xl font-bold text-blue-600">
+                        <p className="text-2xl font-bold text-sky-700">
                           {caseStats.daysOpen}
                         </p>
-                        <p className="text-sm text-gray-600">Días abierto</p>
+                        <p className="text-sm text-slate-500">Días abierto</p>
                       </div>
                       <div className="text-center">
                         <p className="text-2xl font-bold text-green-600">
                           {caseStats.totalComments}
                         </p>
-                        <p className="text-sm text-gray-600">Comentarios</p>
+                        <p className="text-sm text-slate-500">Comentarios</p>
                       </div>
                     </div>
 
@@ -218,7 +218,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
       <Card className="border-l-4 border-l-green-500">
         <CardHeader>
           <div className="flex items-center justify-between w-full">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-[#0d212c]">
               Caso Cerrado
             </h3>
             <Chip color="success" variant="flat">
@@ -229,29 +229,29 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
         <CardBody className="space-y-4">
           {/* Case Summary Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="text-center p-3 bg-emerald-50/40 rounded-lg">
+              <p className="text-2xl font-bold text-[#0d212c]">
                 {caseStats.daysOpen}
               </p>
-              <p className="text-gray-600">Días totales</p>
+              <p className="text-slate-500">Días totales</p>
             </div>
-            <div className="text-center p-3 bg-blue-50 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">
+            <div className="text-center p-3 bg-sky-50 rounded-lg">
+              <p className="text-2xl font-bold text-sky-700">
                 {caseStats.totalComments}
               </p>
-              <p className="text-gray-600">Comentarios</p>
+              <p className="text-slate-500">Comentarios</p>
             </div>
             <div className="text-center p-3 bg-purple-50 rounded-lg">
               <p className="text-2xl font-bold text-purple-600">
                 {caseStats.totalAttachments}
               </p>
-              <p className="text-gray-600">Archivos</p>
+              <p className="text-slate-500">Archivos</p>
             </div>
             <div className="text-center p-3 bg-green-50 rounded-lg">
               <p className="text-2xl font-bold text-green-600">
                 {caseStats.totalAssignments}
               </p>
-              <p className="text-gray-600">Asignaciones</p>
+              <p className="text-slate-500">Asignaciones</p>
             </div>
           </div>
 
@@ -273,10 +273,10 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
                 </p>
                 {report.internalNotes && (
                   <div className="mt-3 p-3 bg-white rounded border">
-                    <p className="text-sm font-medium text-gray-700">
+                    <p className="text-sm font-medium text-slate-600">
                       Resumen de cierre:
                     </p>
-                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">
+                    <p className="text-sm text-slate-500 mt-1 whitespace-pre-wrap">
                       {report.internalNotes}
                     </p>
                   </div>
@@ -286,12 +286,12 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
           </div>
 
           {/* Chat Status */}
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div className="bg-emerald-50/40 border border-emerald-100 rounded-lg p-4">
             <div className="flex items-center">
-              <i className="icon-[lucide--message-square-off] size-5 text-gray-500 mr-3" />
+              <i className="icon-[lucide--message-square-off] size-5 text-slate-400 mr-3" />
               <div>
-                <p className="font-medium text-gray-700">Chat bloqueado</p>
-                <p className="text-sm text-gray-600">
+                <p className="font-medium text-slate-600">Chat bloqueado</p>
+                <p className="text-sm text-slate-500">
                   No se pueden agregar más comentarios a este caso cerrado.
                 </p>
               </div>

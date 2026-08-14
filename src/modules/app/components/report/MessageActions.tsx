@@ -47,19 +47,19 @@ export function MessageActions({
           <button
             key={emoji}
             onClick={() => onReact(emoji)}
-            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            className="p-1 hover:bg-emerald-50 rounded transition-colors"
             title={`React with ${emoji}`}
           >
             <span className="text-sm">{emoji}</span>
           </button>
         ))}
 
-      <div className="w-px h-4 bg-gray-200 mx-1" />
+      <div className="w-px h-4 bg-emerald-100 mx-1" />
 
       {canUserReply && (
         <button
           onClick={onReply}
-          className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+          className="p-1 text-slate-400 hover:text-slate-600 hover:bg-emerald-50 rounded transition-colors"
           title="Responder"
         >
           <svg
@@ -80,7 +80,7 @@ export function MessageActions({
 
       <Dropdown>
         <DropdownTrigger asChild>
-          <button className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors">
+          <button className="p-1 text-slate-400 hover:text-slate-600 hover:bg-emerald-50 rounded transition-colors">
             <svg
               className="w-4 h-4"
               fill="none"
@@ -160,7 +160,7 @@ export function MessageActions({
           ) : null}
 
           {!canUserEdit && !canUserDelete ? (
-            <DropdownItem key="no-permissions" className="text-gray-500">
+            <DropdownItem key="no-permissions" className="text-slate-400">
               <svg
                 className="w-4 h-4 mr-2"
                 fill="none"

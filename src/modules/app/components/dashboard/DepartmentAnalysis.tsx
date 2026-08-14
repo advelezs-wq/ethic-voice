@@ -15,7 +15,7 @@ export const DepartmentAnalysis: React.FC<DepartmentAnalysisProps> = ({
       <CardHeader>
         <div className="flex items-center gap-2">
           <i
-            className="icon-[lucide--building-2] size-5 text-gray-600"
+            className="icon-[lucide--building-2] size-5 text-slate-500"
             role="img"
             aria-hidden="true"
           />
@@ -25,18 +25,18 @@ export const DepartmentAnalysis: React.FC<DepartmentAnalysisProps> = ({
       <CardBody>
         <div className="space-y-4">
           {departments.length === 0 ? (
-            <p className="text-sm text-gray-500 text-center py-4">
+            <p className="text-sm text-slate-400 text-center py-4">
               No hay datos de departamentos disponibles
             </p>
           ) : (
             departments.map((dept, index) => (
               <div key={dept.name}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-slate-600">
                     {dept.name}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-slate-500">
                       {dept.count} reportes
                     </span>
                     <span className="text-sm font-medium">

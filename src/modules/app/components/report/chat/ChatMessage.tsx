@@ -63,7 +63,7 @@ export function ChatMessage({
       const withTasks = content.replace(
         /#t(\d+)/g,
         (_m, id) =>
-          `<a href="?tab=tasks&task=${id}" class="text-blue-700 underline">#t${id}</a>`
+          `<a href="?tab=tasks&task=${id}" class="text-sky-700 underline">#t${id}</a>`
       );
       return withTasks;
     }
@@ -73,7 +73,7 @@ export function ChatMessage({
       const mentionRegex = new RegExp(`@${mention.userName}`, "g");
       renderedContent = renderedContent.replace(
         mentionRegex,
-        `<span class="bg-blue-100 text-blue-800 px-1 rounded">@${mention.userName}</span>`
+        `<span class="bg-sky-100 text-sky-700 px-1 rounded">@${mention.userName}</span>`
       );
     });
 
@@ -81,7 +81,7 @@ export function ChatMessage({
     renderedContent = renderedContent.replace(
       /#t(\d+)/g,
       (_m, id) =>
-        `<a href="?tab=tasks&task=${id}" class="text-blue-700 underline">#t${id}</a>`
+        `<a href="?tab=tasks&task=${id}" class="text-sky-700 underline">#t${id}</a>`
     );
 
     return <div dangerouslySetInnerHTML={{ __html: renderedContent }} />;
@@ -101,7 +101,7 @@ export function ChatMessage({
       onMouseLeave={() => setShowActions(false)}
     >
       {isFirstInGroup && (
-        <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0 flex items-center justify-center text-sm font-medium overflow-hidden">
+        <div className="w-8 h-8 rounded-full bg-slate-300 flex-shrink-0 flex items-center justify-center text-sm font-medium overflow-hidden">
           {message.authorAvatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={message.authorAvatarUrl} alt={message.authorName} className="w-full h-full object-cover" />
@@ -125,17 +125,17 @@ export function ChatMessage({
               isOwnMessage && "flex-row-reverse"
             )}
           >
-            <span className="font-medium text-sm text-gray-900">
+            <span className="font-medium text-sm text-[#0d212c]">
               {message.authorName}
             </span>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-slate-400">
               {formatDistanceToNow(new Date(message.createdAt), {
                 addSuffix: true,
                 locale: es,
               })}
             </span>
             {message.isEdited && (
-              <span className="text-xs text-gray-400">(editado)</span>
+              <span className="text-xs text-slate-400">(editado)</span>
             )}
             {message.isInternal && (
               <span className="inline-flex items-center gap-1 text-xs text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full border border-yellow-200">
@@ -158,10 +158,10 @@ export function ChatMessage({
             isOwnMessage
               ? message.isInternal
                 ? "bg-yellow-100 text-yellow-900"
-                : "bg-blue-400 text-white"
-              : "bg-gray-100 text-gray-900",
+                : "bg-sky-500 text-white"
+              : "bg-emerald-50 text-[#0d212c]",
             !isFirstInGroup && "mt-0.5",
-            message.parentId && "ml-4 border-l-2 border-gray-300"
+            message.parentId && "ml-4 border-l-2 border-emerald-200"
           )}
         >
           {message.parentId && (
@@ -196,7 +196,7 @@ export function ChatMessage({
 
           {message.isOptimistic && !message.error && (
             <div className="absolute inset-0 bg-white/20 rounded-2xl flex items-center justify-center">
-              <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <div className="w-4 h-4 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
             </div>
           )}
         </div>
@@ -234,7 +234,7 @@ export function ChatMessage({
                     <div
                       key={`${r.userId}-${r.readAt}`}
                       title={`${r.userName} vio a las ${new Date(r.readAt).toLocaleTimeString("es-CO")}`}
-                      className="w-4 h-4 rounded-full bg-gray-300 flex items-center justify-center text-[10px] text-gray-700 border border-white overflow-hidden"
+                      className="w-4 h-4 rounded-full bg-slate-300 flex items-center justify-center text-[10px] text-slate-600 border border-white overflow-hidden"
                     >
                       {r.avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -245,7 +245,7 @@ export function ChatMessage({
                     </div>
                   ))}
                   {extra > 0 && (
-                    <div className="px-1 h-4 rounded-full bg-gray-200 text-[10px] text-gray-700 flex items-center justify-center border border-white">
+                    <div className="px-1 h-4 rounded-full bg-emerald-100 text-[10px] text-slate-600 flex items-center justify-center border border-white">
                       +{extra}
                     </div>
                   )}

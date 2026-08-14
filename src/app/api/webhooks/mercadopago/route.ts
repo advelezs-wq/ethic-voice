@@ -83,6 +83,51 @@ async function markWebhookProcessed(eventId: string) {
   });
 }
 
+// MercadoPago is the source of truth for whether a preapproval can still be charged. When it
+// reports the preapproval as paused/cancelled (declined card, exhausted retries, MP-side
+// cancellation), revoke org access — unless the org is still inside an explicit grace period
+// (organization.planExpiresAt in the future) set by our own cancel flow. Without this sync,
+// Organization.hasActivePlan — the field feature-gating actually reads — never goes false on
+// its own, and a churned/payment-failed org keeps every paid feature indefinitely.
+async function syncOrganizationAccessForSubscriptionStatus(
+  orgId: string,
+  subscriptionStatus: string,
+) {
+  const org = await prisma.organization.findUnique({
+    where: { id: orgId },
+    select: { hasActivePlan: true, planExpiresAt: true },
+  });
+  if (!org) return;
+
+  if (subscriptionStatus === "ACTIVE") {
+    if (!org.hasActivePlan) {
+      await prisma.organization.update({
+        where: { id: orgId },
+        data: { hasActivePlan: true, planExpiresAt: null },
+      });
+    }
+    return;
+  }
+
+  if (subscriptionStatus === "PAST_DUE" || subscriptionStatus === "CANCELED") {
+    const stillInGracePeriod =
+      !!org.planExpiresAt && new Date(org.planExpiresAt).getTime() > Date.now();
+    if (stillInGracePeriod) return;
+    if (org.hasActivePlan) {
+      await prisma.organization.update({
+        where: { id: orgId },
+        data: {
+          hasActivePlan: false,
+          isEmailChannelActive: false,
+          isAiProcessingActive: false,
+          isChatbotActive: false,
+          isPhoneChannelActive: false,
+        },
+      });
+    }
+  }
+}
+
 async function markWebhookFailed(eventId: string, errorMessage: string) {
   await prisma.webhookEvent.updateMany({
     where: { provider: WEBHOOK_PROVIDER, eventId },
@@ -348,19 +393,61 @@ export async function POST(req: NextRequest) {
         if (!isProration && status === "approved") updates.status = "ACTIVE";
         if (status === "rejected") updates.status = "PAST_DUE";
 
-        // If this is a proration payment and was approved, apply the pending change atomically
+        // If this is a proration payment and was approved, apply the pending change atomically.
+        // The read-check-clear of `pendingChange` runs inside a transaction with a row lock so
+        // that two near-simultaneous webhook deliveries for the same approved proration payment
+        // can't both see the pending change and both apply it: the second delivery blocks on the
+        // lock, then finds pendingChange already cleared by the first and skips.
         if (isProration && status === "approved") {
-          const subscription = await prisma.subscription.findUnique({
-            where: { id: internalSubscriptionId },
-          });
-          const m = (subscription?.metadata as any) || {};
-          const pending = m?.pendingChange;
-          if (pending?.type === "upgrade") {
-            const newPlanType = pending.newPlanType as string;
-            const newPlanConfig = PLAN_CONFIGS[newPlanType as PlanType];
-            const billingCycleToUse = pending.newBillingCycle as
+          const claimed = await prisma.$transaction(async (tx) => {
+            await tx.$queryRawUnsafe(
+              `SELECT id FROM "Subscription" WHERE id = $1 FOR UPDATE`,
+              internalSubscriptionId,
+            );
+            const locked = await tx.subscription.findUnique({
+              where: { id: internalSubscriptionId },
+            });
+            const lockedMeta = (locked?.metadata as any) || {};
+            const lockedPending = lockedMeta?.pendingChange;
+            if (lockedPending?.type !== "upgrade") {
+              return null;
+            }
+            const billingCycleToUse = lockedPending.newBillingCycle as
               | "MONTHLY"
               | "YEARLY";
+            await tx.subscription.update({
+              where: { id: internalSubscriptionId },
+              data: {
+                planType: lockedPending.newPlanType,
+                planName: lockedPending.newPlanName,
+                billingCycle: billingCycleToUse,
+                monthlyPrice:
+                  billingCycleToUse === "MONTHLY"
+                    ? lockedPending.newMonthlyPrice
+                    : null,
+                yearlyPrice:
+                  billingCycleToUse === "YEARLY"
+                    ? lockedPending.newYearlyPrice
+                    : null,
+                metadata: {
+                  ...lockedMeta,
+                  pendingPayment: false,
+                  pendingChange: null,
+                } as any,
+                updatedAt: new Date(),
+              },
+            });
+            return {
+              subscription: locked,
+              pending: lockedPending,
+              billingCycleToUse,
+            };
+          });
+
+          if (claimed) {
+            const { subscription, pending, billingCycleToUse } = claimed;
+            const newPlanType = pending.newPlanType as string;
+            const newPlanConfig = PLAN_CONFIGS[newPlanType as PlanType];
             if (debug) {
               console.log(
                 `⬆️ [MP-WEBHOOK][${reqId}] Applying pending upgrade`,
@@ -405,28 +492,9 @@ export async function POST(req: NextRequest) {
                   );
                 }
               }
-              await prisma.subscription.update({
-                where: { id: internalSubscriptionId },
-                data: {
-                  planType: pending.newPlanType,
-                  planName: pending.newPlanName,
-                  billingCycle: billingCycleToUse,
-                  monthlyPrice:
-                    billingCycleToUse === "MONTHLY"
-                      ? pending.newMonthlyPrice
-                      : null,
-                  yearlyPrice:
-                    billingCycleToUse === "YEARLY"
-                      ? pending.newYearlyPrice
-                      : null,
-                  metadata: {
-                    ...(subscription?.metadata as any),
-                    pendingPayment: false,
-                    pendingChange: null,
-                  } as any,
-                  updatedAt: new Date(),
-                },
-              });
+              // Subscription plan/price/metadata were already written atomically inside the
+              // transaction above (that's what "claimed" the pending change) — only the
+              // provider call and org feature sync remain to run out here.
               // Also update organization limits/features immediately
               if (subscription?.orgId) {
                 const cfg = PLAN_CONFIGS[newPlanType as PlanType];
@@ -461,6 +529,12 @@ export async function POST(req: NextRequest) {
           data: updates,
         });
         if (updatedSubscription.orgId) {
+          if (typeof updates.status === "string") {
+            await syncOrganizationAccessForSubscriptionStatus(
+              updatedSubscription.orgId,
+              updates.status,
+            );
+          }
           await emailAccountService.enforceEmailChannelPlanCompliance(
             updatedSubscription.orgId,
           );
@@ -550,6 +624,12 @@ export async function POST(req: NextRequest) {
         data: updates,
       });
       if (updatedSubscription.orgId) {
+        if (typeof updates.status === "string") {
+          await syncOrganizationAccessForSubscriptionStatus(
+            updatedSubscription.orgId,
+            updates.status,
+          );
+        }
         await emailAccountService.enforceEmailChannelPlanCompliance(
           updatedSubscription.orgId,
         );

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import mercadoPagoService from "@/modules/app/services/mercadopago.service";
+import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,18 +13,10 @@ export async function POST(req: NextRequest) {
     const {
       subscriptionId,
       providerSubscriptionId,
-      amount,
-      currency = "COP",
     }: {
       subscriptionId?: number | string;
       providerSubscriptionId?: string;
-      amount: number;
-      currency?: string;
     } = body || {};
-
-    if (!amount || Number(amount) <= 0) {
-      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
-    }
 
     // Resolve subscription
     let sub = null as any;
@@ -56,6 +49,27 @@ export async function POST(req: NextRequest) {
     if (!sub.providerSubscriptionId) {
       return NextResponse.json(
         { error: "No provider subscription linked" },
+        { status: 400 }
+      );
+    }
+
+    // SECURITY: the recurring amount is ALWAYS resolved server-side from PLAN_CONFIGS for the
+    // subscription's own planType/billingCycle — never from the client. Trusting a client-supplied
+    // amount let the subscription owner drop their own recurring charge to any value (e.g. 1 COP)
+    // while keeping full access to their plan's features, since feature gating is keyed on
+    // planType, not on what MercadoPago is actually charging.
+    const planConfig = PLAN_CONFIGS[sub.planType as PlanType];
+    if (!planConfig) {
+      return NextResponse.json({ error: "Invalid plan type" }, { status: 400 });
+    }
+    const currency = planConfig.price.currency;
+    const amount =
+      sub.billingCycle === "YEARLY"
+        ? planConfig.price.yearly
+        : planConfig.price.monthly;
+    if (!amount || Number(amount) <= 0) {
+      return NextResponse.json(
+        { error: "Price not available for this plan/billing cycle" },
         { status: 400 }
       );
     }

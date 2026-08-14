@@ -593,38 +593,90 @@ class SubscriptionManagerService {
   }
 
   // ✅ Private helper methods
+
+  // Finds the [cycleStart, cycleEnd) window that "now" falls in, stepping forward from
+  // subscription.startDate by the billing cycle length. Mirrors the local-calc fallback already
+  // used in /api/subscriptions/change-plan (the MercadoPago path) so both gateways derive
+  // remaining-days the same way.
+  private computeCurrentCycleBounds(subscription: any): {
+    cycleStart: Date;
+    cycleEnd: Date;
+  } {
+    const now = new Date();
+    const stepMonths = subscription.billingCycle === "YEARLY" ? 12 : 1;
+    let cycleStart = new Date(subscription.startDate || now);
+    let cycleEnd: Date | undefined;
+
+    while (cycleStart.getTime() <= now.getTime()) {
+      const next = new Date(cycleStart);
+      next.setMonth(next.getMonth() + stepMonths);
+      if (next.getTime() > now.getTime()) {
+        cycleEnd = next;
+        break;
+      }
+      cycleStart = next;
+    }
+
+    if (!cycleEnd) {
+      const fallbackStart = new Date(now);
+      fallbackStart.setMonth(fallbackStart.getMonth() - stepMonths);
+      cycleStart = fallbackStart;
+      cycleEnd = new Date(now);
+    }
+
+    return { cycleStart, cycleEnd };
+  }
+
+  // Remaining-days proration: credits the unused portion of the current plan and charges the
+  // same portion of the new plan, instead of a flat price difference. Positive = amount to
+  // charge (upgrade), negative = credit (downgrade) — matches the sign convention callers rely on.
   private async calculateProration(
     currentSubscription: any,
     newPlanConfig: any,
     newBillingCycle: BillingCycle
   ): Promise<number> {
-    const currentPrice =
+    const currentPrice = Number(
       currentSubscription.billingCycle === "YEARLY"
         ? currentSubscription.yearlyPrice
-        : currentSubscription.monthlyPrice;
-
-    const newPrice =
+        : currentSubscription.monthlyPrice
+    );
+    const newPrice = Number(
       newBillingCycle === "YEARLY"
         ? newPlanConfig.price.yearly
-        : newPlanConfig.price.monthly;
+        : newPlanConfig.price.monthly
+    );
 
-    // Simple proration: difference in price
-    // In a real implementation, this would consider the remaining days in the current period
-    return Number(newPrice) - Number(currentPrice);
+    const { cycleStart, cycleEnd } =
+      this.computeCurrentCycleBounds(currentSubscription);
+    const now = new Date();
+    const totalMs = Math.max(1, cycleEnd.getTime() - cycleStart.getTime());
+    const remainingMs = Math.max(0, cycleEnd.getTime() - now.getTime());
+    const remainingRatio = Math.min(1, Math.max(0, remainingMs / totalMs));
+
+    const remainingValueCurrent = currentPrice * remainingRatio;
+    const remainingValueNew = newPrice * remainingRatio;
+    return Math.round(remainingValueNew - remainingValueCurrent);
   }
 
+  // Refunds the unused portion of the current billing period (remaining days / total days of the
+  // cycle), instead of a flat 50%.
   private async calculateCancellationRefund(
     subscription: any
   ): Promise<number> {
-    // Simple refund calculation - in a real implementation, this would be more complex
-    // considering the remaining days in the current billing period
-    const currentPrice =
+    const currentPrice = Number(
       subscription.billingCycle === "YEARLY"
         ? subscription.yearlyPrice
-        : subscription.monthlyPrice;
+        : subscription.monthlyPrice
+    );
+    if (!currentPrice || currentPrice <= 0) return 0;
 
-    // For demo purposes, refund 50% if cancelled immediately
-    return Number(currentPrice) * 0.5;
+    const { cycleStart, cycleEnd } = this.computeCurrentCycleBounds(subscription);
+    const now = new Date();
+    const totalMs = Math.max(1, cycleEnd.getTime() - cycleStart.getTime());
+    const remainingMs = Math.max(0, cycleEnd.getTime() - now.getTime());
+    const remainingRatio = Math.min(1, Math.max(0, remainingMs / totalMs));
+
+    return Math.round(currentPrice * remainingRatio);
   }
 
   private async sendPlanChangeNotification(

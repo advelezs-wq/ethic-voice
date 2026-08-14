@@ -14,6 +14,48 @@ async function updateOrganizationPlanFeatures(orgId: string, planType: string) {
   console.log(`Updating organization ${orgId} with plan ${planType} features`);
 }
 
+// Mirrors the sync in the MP webhook: MercadoPago's live preapproval status is the source of
+// truth for whether access should continue. Revoke when it's paused/cancelled (unless the org is
+// still inside an explicit grace period), and restore when it comes back to authorized.
+async function syncOrganizationAccessForSubscriptionStatus(
+  orgId: string,
+  subscriptionStatus: string,
+) {
+  const org = await prisma.organization.findUnique({
+    where: { id: orgId },
+    select: { hasActivePlan: true, planExpiresAt: true },
+  });
+  if (!org) return;
+
+  if (subscriptionStatus === "ACTIVE") {
+    if (!org.hasActivePlan) {
+      await prisma.organization.update({
+        where: { id: orgId },
+        data: { hasActivePlan: true, planExpiresAt: null },
+      });
+    }
+    return;
+  }
+
+  if (subscriptionStatus === "PAST_DUE" || subscriptionStatus === "CANCELED") {
+    const stillInGracePeriod =
+      !!org.planExpiresAt && new Date(org.planExpiresAt).getTime() > Date.now();
+    if (stillInGracePeriod) return;
+    if (org.hasActivePlan) {
+      await prisma.organization.update({
+        where: { id: orgId },
+        data: {
+          hasActivePlan: false,
+          isEmailChannelActive: false,
+          isAiProcessingActive: false,
+          isChatbotActive: false,
+          isPhoneChannelActive: false,
+        },
+      });
+    }
+  }
+}
+
 export async function POST(req: NextRequest) {
   console.log("🔍 Verifying subscription...");
 
@@ -132,6 +174,12 @@ export async function POST(req: NextRequest) {
               updated.planType,
             );
           } catch {}
+          if (typeof updates.status === "string") {
+            await syncOrganizationAccessForSubscriptionStatus(
+              updated.organization.id,
+              updates.status,
+            );
+          }
         }
 
         return NextResponse.json({
@@ -262,6 +310,13 @@ export async function POST(req: NextRequest) {
           data: updates,
           include: { organization: true },
         });
+
+        if (updated.orgId && typeof updates.status === "string") {
+          await syncOrganizationAccessForSubscriptionStatus(
+            updated.orgId,
+            updates.status,
+          );
+        }
 
         return NextResponse.json({
           success: true,

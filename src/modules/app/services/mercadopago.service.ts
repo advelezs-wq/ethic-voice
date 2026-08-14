@@ -184,6 +184,15 @@ class MercadoPagoService {
         const message = (data?.message || data?.error || "Failed to create subscription") as string;
         // Fallback: some accounts require card_token_id on API, but allow hosted checkout URL
         if (/card_token_id/i.test(message)) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            "⚠️ MercadoPago rejected preapproval creation, falling back to hosted checkout URL",
+            {
+              status: response.status,
+              mpError: message,
+              preapprovalPlanId: req.preapprovalPlanId,
+            },
+          );
           const overrideBase = process.env.NEXT_PUBLIC_MP_CHECKOUT_BASE || process.env.MP_CHECKOUT_BASE;
           const fallbackBase = overrideBase || "https://www.mercadopago.com.co";
           const url = `${fallbackBase}/subscriptions/checkout?preapproval_plan_id=${encodeURIComponent(
@@ -193,6 +202,12 @@ class MercadoPagoService {
           )}&auto_return=approved`;
           return { success: true, initPoint: url };
         }
+        // eslint-disable-next-line no-console
+        console.error("❌ MercadoPago rejected preapproval creation", {
+          status: response.status,
+          mpError: message,
+          preapprovalPlanId: req.preapprovalPlanId,
+        });
         return { success: false, error: message };
       }
       return {

@@ -11,12 +11,27 @@ interface UpdatePaymentRequest {
   organizationId?: string;
 }
 
+// Verifies the caller owns the subscription directly, or is an ADMIN of the org it belongs to.
+async function assertOwnsSubscription(sub: { userId: string | null; orgId: string | null }, userId: string) {
+  if (sub.userId === userId) return true;
+  if (sub.orgId) {
+    const membership = await prisma.organizationMembership.findFirst({
+      where: { userId, orgId: sub.orgId, role: "ADMIN" },
+    });
+    if (membership) return true;
+  }
+  return false;
+}
+
 export async function POST(req: NextRequest) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { subscriptionId: bodySubscriptionId, paymentData, status, action, organizationId }: UpdatePaymentRequest =
       await req.json();
-
-    const { userId } = await auth();
 
     console.log("🔄 Updating subscription payment status:", {
       subscriptionId: bodySubscriptionId,
@@ -37,7 +52,7 @@ export async function POST(req: NextRequest) {
           where: { orgId: organizationId },
           orderBy: { updatedAt: "desc" },
         });
-      } else if (userId) {
+      } else {
         target = await prisma.subscription.findFirst({
           where: { userId },
           orderBy: { updatedAt: "desc" },
@@ -46,6 +61,12 @@ export async function POST(req: NextRequest) {
 
       if (!target) {
         return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+      }
+
+      // Whenever the caller supplied an explicit subscriptionId/organizationId, the lookup above
+      // could resolve to a subscription that isn't theirs — verify ownership before mutating it.
+      if (!(await assertOwnsSubscription(target, userId))) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
 
       let requiresAuthorization = false;
@@ -158,17 +179,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const existingSubscription = await prisma.subscription.findUnique({
+      where: { id: bodySubscriptionId },
+    });
+    if (!existingSubscription) {
+      return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+    }
+    if (!(await assertOwnsSubscription(existingSubscription, userId))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const updatedSubscription = await prisma.subscription.update({
       where: { id: bodySubscriptionId },
       data: {
         status: status || "ACTIVE",
         providerSubscriptionId: paymentData?.id || paymentData?.subscription_id,
         metadata: {
-          ...((
-            (await prisma.subscription.findUnique({
-              where: { id: bodySubscriptionId },
-            }))?.metadata as Record<string, unknown> | null
-          ) ?? {}),
+          ...((existingSubscription.metadata as Record<string, unknown> | null) ?? {}),
           paymentData,
           paidAt: new Date().toISOString(),
           rebillPaymentId: paymentData?.id,

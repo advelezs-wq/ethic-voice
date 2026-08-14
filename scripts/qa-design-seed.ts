@@ -3,7 +3,7 @@
  * organization so the redesign work can be visually verified against the real
  * authenticated dashboard shell. Not for production use.
  *
- * Usage: bunx tsx scripts/qa-design-seed.ts
+ * Usage: bunx tsx scripts/qa-design-seed.ts [ADMIN|MEMBER]
  */
 // dotenv isn't a project dependency; Node 20.6+ can load .env natively.
 try {
@@ -17,6 +17,10 @@ import { PLAN_CONFIGS, PlanType } from "../src/types/subscription.types";
 import { OrganizationRole } from "@prisma/client";
 
 async function main() {
+  const roleArg = (process.argv[2] || "ADMIN").toUpperCase();
+  const role =
+    roleArg === "MEMBER" ? OrganizationRole.MEMBER : OrganizationRole.ADMIN;
+
   const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY! });
 
   const email = `ev-design-qa+${Date.now()}@example.com`;
@@ -49,8 +53,9 @@ async function main() {
   console.log("Organization:", org.id);
 
   await prisma.organizationMembership.create({
-    data: { userId: user.id, orgId: org.id, role: OrganizationRole.ADMIN },
+    data: { userId: user.id, orgId: org.id, role },
   });
+  console.log("Role:", role);
 
   const planConfig = PLAN_CONFIGS[PlanType.GROW_PRO];
   const subscription = await prisma.subscription.create({

@@ -21,10 +21,12 @@ export interface StatTileProps {
   icon?: ReactNode;
   tone?: StatTileTone;
   className?: string;
+  /** Optional content below the value/icon row — a caption or a progress bar. */
+  footer?: ReactNode;
 }
 
 /** Metric card: soft pastel icon chip + big number + label — used in stat rows across the dashboard. */
-export function StatTile({ label, value, icon, tone = "emerald", className }: StatTileProps) {
+export function StatTile({ label, value, icon, tone = "emerald", className, footer }: StatTileProps) {
   return (
     <Card className={cn("p-4", className)}>
       <div className="flex items-center justify-between gap-3">
@@ -38,6 +40,7 @@ export function StatTile({ label, value, icon, tone = "emerald", className }: St
           </div>
         ) : null}
       </div>
+      {footer}
     </Card>
   );
 }

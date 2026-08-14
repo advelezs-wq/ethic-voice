@@ -8,6 +8,7 @@ import { MemberStatsCards } from "./MemberStatsCards";
 import { TaskProgress } from "../TaskProgress";
 import { PersonalPerformanceChart } from "../PersonalPerformanceChart";
 import { DownloadPDFButton } from "../../analytics/DownloadPDFButton";
+import { PageHero } from "@/modules/app/components/ui";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -36,44 +37,37 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({
 
   return (
     <div className="md:p-6 space-y-6 bg-[#f7faf9] min-h-screen">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <div className="bg-gradient-to-r from-sky-600 to-sky-700 rounded-lg p-6 text-white">
-            <h1 className="text-2xl font-bold mb-2">
-              Bienvenido a tu Panel de Trabajo
-            </h1>
-            <p className="text-sky-100">
-              Aquí puedes ver y gestionar los casos que te han sido asignados.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <DownloadPDFButton
-            reportType="member"
-            data={{
-              dashboardData: data,
-              userId,
-              organization: { name: 'Mi Organización' }, // This would need organization data
-              averageResolutionTime: 0 // This would need to be calculated
-            }}
-            filename={`mi-reporte-${format(new Date(), 'yyyy-MM-dd', { locale: es })}`}
-            buttonText="Mi Reporte PDF"
-            size="sm"
-            memberName="Mi Usuario" // This would need actual user name
-          />
-        <Button
-          variant="light"
-          size="sm"
-          isIconOnly
-          onPress={onRefresh}
-          isLoading={refreshing}
-        >
-          <i className="icon-[lucide--refresh-ccw] size-4" />
-        </Button>
-        </div>
-      </div>
+      <PageHero
+        kicker="Panel de trabajo"
+        title="Bienvenido a tu Panel de Trabajo"
+        description="Aquí puedes ver y gestionar los casos que te han sido asignados."
+        actions={
+          <>
+            <DownloadPDFButton
+              reportType="member"
+              data={{
+                dashboardData: data,
+                userId,
+                organization: { name: 'Mi Organización' }, // This would need organization data
+                averageResolutionTime: 0 // This would need to be calculated
+              }}
+              filename={`mi-reporte-${format(new Date(), 'yyyy-MM-dd', { locale: es })}`}
+              buttonText="Mi Reporte PDF"
+              size="sm"
+              memberName="Mi Usuario" // This would need actual user name
+            />
+            <Button
+              variant="light"
+              size="sm"
+              isIconOnly
+              onPress={onRefresh}
+              isLoading={refreshing}
+            >
+              <i className="icon-[lucide--refresh-ccw] size-4" />
+            </Button>
+          </>
+        }
+      />
 
       {/* Member-specific stats */}
       <MemberStatsCards

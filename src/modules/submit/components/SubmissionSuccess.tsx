@@ -27,7 +27,7 @@ export function SubmissionSuccess({
 
   return (
     <div className="container max-w-2xl mx-auto px-4 py-20">
-      <Card>
+      <Card className="rounded-3xl border border-[#0a1e14]/10 shadow-[0_20px_60px_rgba(10,30,20,0.1)]">
         <CardBody className="p-8 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <i
@@ -37,20 +37,20 @@ export function SubmissionSuccess({
             />
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl font-bold text-[#0a1e14] mb-4">
             ¡Reporte Enviado Exitosamente!
           </h2>
 
-          <p className="text-gray-600 mb-8">
+          <p className="text-[#273c46] mb-8">
             Tu reporte ha sido recibido y será procesado de manera confidencial.
             {!isAnonymous && " Te enviaremos una confirmación por email."}
           </p>
 
-          <div className="bg-gray-50 rounded-lg p-6 mb-8">
-            <h3 className="font-semibold text-gray-900 mb-3">
+          <div className="rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-6 mb-8">
+            <h3 className="font-semibold text-[#0a1e14] mb-3">
               Tu Código de Seguimiento
             </h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-[#273c46] mb-4">
               Guarda este código para dar seguimiento a tu denuncia:
             </p>
 
@@ -64,13 +64,13 @@ export function SubmissionSuccess({
             </Snippet>
 
             {copied && (
-              <p className="text-sm text-green-600 mt-2">¡Código copiado!</p>
+              <p className="text-sm text-emerald-700 mt-2">¡Código copiado!</p>
             )}
           </div>
 
           <div className="space-y-4 mb-8">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
-              <h4 className="font-medium text-blue-900 mb-1 flex items-center gap-2">
+            <div className="rounded-2xl border border-lime-200 bg-lime-50/80 p-4 text-left">
+              <h4 className="mb-1 flex items-center gap-2 font-medium text-[#0a1e14]">
                 <i
                   className="icon-[lucide--info] size-4"
                   role="img"
@@ -78,7 +78,7 @@ export function SubmissionSuccess({
                 />
                 Importante
               </h4>
-              <p className="text-sm text-blue-800">
+              <p className="text-sm text-[#1f3d31]">
                 {isAnonymous ? (
                   <>
                     Como enviaste tu denuncia de forma anónima,{" "}
@@ -101,17 +101,21 @@ export function SubmissionSuccess({
               Ver Estado del Reporte
             </Button>
 
-            <Button variant="bordered" onPress={() => router.push("/")}>
+            <Button
+              variant="bordered"
+              onPress={() => router.push("/")}
+              className="border-[#0a1e14]/30 text-[#0d212c]"
+            >
               Volver al Inicio
             </Button>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <h4 className="font-medium text-gray-900 mb-2">¿Qué sigue?</h4>
-            <ul className="text-sm text-gray-600 space-y-2 text-left max-w-md mx-auto">
+          <div className="mt-8 border-t border-[#0a1e14]/10 pt-8">
+            <h4 className="mb-2 font-medium text-[#0a1e14]">¿Qué sigue?</h4>
+            <ul className="mx-auto max-w-md space-y-2 text-left text-sm text-[#273c46]">
               <li className="flex items-start gap-2">
                 <i
-                  className="icon-[lucide--check] size-4 text-green-600 mt-0.5 flex-shrink-0"
+                  className="icon-[lucide--check] size-4 text-emerald-600 mt-0.5 flex-shrink-0"
                   role="img"
                   aria-hidden="true"
                 />
@@ -121,7 +125,7 @@ export function SubmissionSuccess({
               </li>
               <li className="flex items-start gap-2">
                 <i
-                  className="icon-[lucide--check] size-4 text-green-600 mt-0.5 flex-shrink-0"
+                  className="icon-[lucide--check] size-4 text-emerald-600 mt-0.5 flex-shrink-0"
                   role="img"
                   aria-hidden="true"
                 />
@@ -129,7 +133,7 @@ export function SubmissionSuccess({
               </li>
               <li className="flex items-start gap-2">
                 <i
-                  className="icon-[lucide--check] size-4 text-green-600 mt-0.5 flex-shrink-0"
+                  className="icon-[lucide--check] size-4 text-emerald-600 mt-0.5 flex-shrink-0"
                   role="img"
                   aria-hidden="true"
                 />

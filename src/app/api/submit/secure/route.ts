@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     // Basic request-size hard limit (JSON)
     if (contentLength > 1_500_000) {
       return NextResponse.json(
-        { error: 'Payload too large' },
+        { error: 'El contenido enviado es demasiado grande.' },
         { status: 413 }
       );
     }
@@ -29,13 +29,13 @@ export async function POST(request: NextRequest) {
         if (originHost !== host) {
           securityManager.logAttack(clientIP, 'Origin Mismatch', `origin=${originHost}, host=${host}`);
           return NextResponse.json(
-            { error: 'Invalid request origin' },
+            { error: 'Origen de la solicitud no válido.' },
             { status: 403 }
           );
         }
       } catch {
         return NextResponse.json(
-          { error: 'Invalid origin header' },
+          { error: 'Encabezado de origen no válido.' },
           { status: 400 }
         );
       }
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
           securityManager.logAttack(clientIP, 'Rate Limit', rateLimitResult.reason || 'Form submission rate limit exceeded');
           return NextResponse.json(
             { 
-              error: 'Too many requests. Please wait before trying again.',
+              error: 'Demasiadas solicitudes. Por favor espera un momento antes de intentar de nuevo.',
               details: rateLimitResult.reason,
               resetTime: rateLimitResult.resetTime,
             },
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     if ((body?.idempotencyKey || request.headers.get('x-idempotency-key')) && !idempotencyKey) {
       await securityManager.updateIdempotencyStats('invalid');
       return NextResponse.json(
-        { error: 'Invalid idempotency key format' },
+        { error: 'Formato de clave de idempotencia no válido.' },
         { status: 400 }
       );
     }
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     // Verify required fields
     if (!organizationId || typeof organizationId !== 'string') {
       return NextResponse.json(
-        { error: 'Organization ID is required' },
+        { error: 'Se requiere el ID de la organización.' },
         { status: 400 }
       );
     }
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       if (!lockAcquired) {
         await securityManager.updateIdempotencyStats('collisions');
         return NextResponse.json(
-          { error: 'Duplicate submission in progress. Please wait a moment.' },
+          { error: 'Ya hay un envío en curso. Por favor espera un momento.' },
           { status: 409 }
         );
       }
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
             securityManager.logAttack(clientIP, 'Captcha Required', 'Security verification required but not provided');
             return NextResponse.json(
               { 
-                error: 'Security verification required. Please complete the captcha.',
+                error: 'Se requiere verificación de seguridad. Por favor completa el captcha.',
                 requiresCaptcha: true,
               },
               { status: 400 }
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
             
             return NextResponse.json(
               { 
-                error: 'Captcha verification failed. Please try again.',
+                error: 'La verificación de seguridad falló. Por favor intenta de nuevo.',
                 requiresCaptcha: true,
               },
               { status: 400 }
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
             // Additional security checks
         if (!formData || typeof formData !== 'object') {
           return NextResponse.json(
-            { error: 'Invalid form data' },
+            { error: 'Datos del formulario no válidos.' },
             { status: 400 }
           );
         }
@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
           securityManager.blockIP(clientIP, 1800000); // 30 minutes
           
           return NextResponse.json(
-            { error: 'Submission contains invalid content' },
+            { error: 'El envío contiene contenido no permitido.' },
             { status: 400 }
           );
         }
@@ -187,7 +187,7 @@ export async function POST(request: NextRequest) {
 
       if (!result.success) {
         return NextResponse.json(
-          { error: result.error || 'Submission failed' },
+          { error: result.error || 'No se pudo enviar el reporte.' },
           { status: 400 }
         );
       }
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
     console.error(`[SECURITY] Error processing submission from IP: ${clientIP}:`, error);
     
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Error interno del servidor. Por favor intenta nuevamente.' },
       { status: 500 }
     );
   }

@@ -174,7 +174,7 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
       case 3:
         return <Step3Questions />;
       case 4:
-        return <Step4Evidence />;
+        return <Step4Evidence organizationId={organization.id} />;
       default:
         return null;
     }

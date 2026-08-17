@@ -4,12 +4,14 @@ import { useFormContext, Controller } from "react-hook-form";
 import { Checkbox } from "@heroui/checkbox";
 import { CompleteFormData } from "../../lib/schemas/ethicline.schema";
 import { AttachmentUploader, UploadedAttachment } from "../AttachmentUploader";
-import { useOrganization } from "@clerk/nextjs";
 import Link from "next/link";
 
-export function Step4Evidence() {
+interface Step4EvidenceProps {
+  organizationId: string;
+}
+
+export function Step4Evidence({ organizationId }: Step4EvidenceProps) {
   const { control, setValue } = useFormContext<CompleteFormData>();
-  const { organization } = useOrganization();
 
   const handleAttachmentsChange = (newAttachments: UploadedAttachment[]) => {
     setValue("uploadedFiles", newAttachments);
@@ -33,7 +35,7 @@ export function Step4Evidence() {
       <AttachmentUploader
         onAttachmentsChange={handleAttachmentsChange}
         maxFiles={10}
-        orgId={organization?.id || 'default'}
+        orgId={organizationId}
       />
 
       <Controller

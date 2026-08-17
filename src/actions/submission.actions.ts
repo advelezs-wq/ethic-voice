@@ -574,7 +574,7 @@ export async function submitEthicLineReport(
     });
 
     if (!organization) {
-      return { success: false, error: "Organization not found" };
+      return { success: false, error: "Organización no encontrada" };
     }
 
     const content = JSON.stringify(sanitizedFormData);
@@ -713,12 +713,12 @@ export async function submitEthicLineReport(
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        error: "Invalid form data",
+        error: "Datos del formulario no válidos",
       };
     }
     return {
       success: false,
-      error: "Failed to submit report",
+      error: "No se pudo enviar el reporte",
     };
   }
 }

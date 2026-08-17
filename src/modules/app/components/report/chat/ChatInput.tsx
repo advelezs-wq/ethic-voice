@@ -268,9 +268,14 @@ export function ChatInput({
             )}
           />
         </label>
-        {isInternal && (
+        {isInternal ? (
           <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
             Solo visible para el equipo
+          </span>
+        ) : (
+          <span className="text-xs text-sky-700 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+            <i className="icon-[lucide--eye] size-3" />
+            Visible para quien denunció
           </span>
         )}
       </div>

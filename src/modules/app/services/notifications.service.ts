@@ -759,6 +759,31 @@ export class NotificationsService {
     });
   }
 
+  // Notify a non-anonymous reporter by email that the team replied on their
+  // report's public chat. Anonymous reporters have no email on file, so the
+  // "new message" signal for them lives entirely on the /track/[code] page.
+  async notifyReporterOfNewMessage(params: {
+    reporterEmail: string;
+    trackingCode: string;
+    orgName: string;
+    messagePreview: string;
+  }): Promise<void> {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const html = this.getGenericTemplate({
+      title: "Tienes un nuevo mensaje del equipo",
+      message: `El equipo de ${params.orgName} respondió en tu denuncia (${params.trackingCode}): "${params.messagePreview}". Ingresa a tu enlace de seguimiento para leer el mensaje completo y responder.`,
+      orgName: params.orgName,
+      actionUrl: `${baseUrl}/track/${params.trackingCode}`,
+    });
+
+    await resend.emails.send({
+      from: this.fromEmail,
+      to: params.reporterEmail,
+      subject: `Nuevo mensaje sobre tu denuncia ${params.trackingCode}`,
+      html,
+    });
+  }
+
   // Report created notification for admins
   async notifyReportCreated(reportId: number, orgId: string): Promise<void> {
     const admins = await prisma.organizationMembership.findMany({

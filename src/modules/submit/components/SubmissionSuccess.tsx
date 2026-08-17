@@ -93,6 +93,14 @@ export function SubmissionSuccess({
                   </>
                 )}
               </p>
+              <p className="text-sm text-[#1f3d31] mt-2">
+                El equipo puede escribirte preguntas o novedades sobre tu caso.{" "}
+                <strong>
+                  Guarda o marca como favorito este enlace de seguimiento
+                </strong>{" "}
+                y vuelve a visitarlo para leer sus mensajes y responder
+                directamente.
+              </p>
             </div>
           </div>
 

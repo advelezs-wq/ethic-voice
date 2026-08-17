@@ -4,6 +4,7 @@ import prisma from "@/modules/prisma/lib/prisma";
 
 export interface PublicReportData {
   id: string;
+  reportId: number;
   status: string;
   submissionDate: string;
   organizationName: string;
@@ -78,16 +79,22 @@ export async function getReportByTrackingCode(
           case "report_closed":
             publicAction = "Caso cerrado";
             break;
-          default:
-            // Hide internal actions
+          default: {
+            // Hide internal actions — case-insensitive, since internal team
+            // activity is logged in UPPER_SNAKE_CASE (e.g. "COMMENT_ADDED",
+            // "ADMIN_NOTES_ADDED") while this switch's named cases above are
+            // lower_snake_case. A case-sensitive check here let every team
+            // comment (internal AND external) leak a generic timeline entry.
+            const lowerAction = activity.action.toLowerCase();
             if (
-              activity.action.includes("internal") ||
-              activity.action.includes("comment") ||
-              activity.action.includes("note")
+              lowerAction.includes("internal") ||
+              lowerAction.includes("comment") ||
+              lowerAction.includes("note")
             ) {
               return null;
             }
             publicAction = "Actualización del caso";
+          }
         }
 
         return {
@@ -125,6 +132,7 @@ export async function getReportByTrackingCode(
 
     return {
       id: trackingCode,
+      reportId: submission.id,
       status: submission.status.toLowerCase(),
       submissionDate: submission.submittedAt.toISOString(),
       organizationName: submission.organization.name,

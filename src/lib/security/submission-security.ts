@@ -17,6 +17,31 @@ const INJECTION_MARKERS = [
 
 const IDEMPOTENCY_KEY_RE = /^[a-zA-Z0-9:_-]{8,128}$/;
 
+// Shared allowlist for any public, unauthenticated file upload (submission
+// evidence, reporter chat replies) — one source of truth so every public
+// upload path gets the same validation.
+export const MAX_ATTACHMENT_SIZE_BYTES = 50 * 1024 * 1024;
+
+export const ALLOWED_ATTACHMENT_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/plain",
+  "audio/mpeg",
+  "audio/wav",
+  "audio/mp4",
+  "video/mp4",
+  "video/avi",
+  "video/quicktime",
+  "video/webm",
+]);
+
 function stripControlChars(value: string): string {
   return value.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "");
 }

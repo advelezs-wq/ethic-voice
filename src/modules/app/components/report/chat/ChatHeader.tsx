@@ -26,7 +26,9 @@ export function ChatHeader({
           <h2 className="text-sm font-semibold text-[#0d212c] leading-tight">
             Comunicación del caso #{reportId}
           </h2>
-          <p className="text-xs text-slate-400">Canal seguro y confidencial</p>
+          <p className="text-xs text-slate-400">
+            Los mensajes no internos los ve también quien denunció
+          </p>
         </div>
       </div>
 
@@ -34,8 +36,8 @@ export function ChatHeader({
         <Tooltip
           content={
             showInternal
-              ? "Mostrando mensajes internos y externos. Clic para ocultar internos."
-              : "Solo mensajes externos. Clic para ver también los internos."
+              ? "Mostrando notas internas del equipo y mensajes visibles al denunciante. Clic para ocultar las internas."
+              : "Solo mensajes visibles al denunciante. Clic para ver también las notas internas del equipo."
           }
           placement="bottom"
         >
@@ -52,7 +54,7 @@ export function ChatHeader({
               />
             }
           >
-            {showInternal ? "Todos" : "Solo externos"}
+            {showInternal ? "Todos" : "Solo visibles al denunciante"}
           </Button>
         </Tooltip>
 

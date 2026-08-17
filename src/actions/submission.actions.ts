@@ -12,32 +12,13 @@ import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils
 import {
   normalizeIdempotencyKey,
   sanitizeEthicLineFormData,
+  MAX_ATTACHMENT_SIZE_BYTES,
+  ALLOWED_ATTACHMENT_MIME_TYPES,
 } from "@/lib/security/submission-security";
 
 const MAX_TEXT_FIELD_LENGTH = 5000;
 const MAX_QUESTIONNAIRE_KEYS = 120;
 const MAX_ATTACHMENTS = 10;
-const MAX_ATTACHMENT_SIZE_BYTES = 50 * 1024 * 1024;
-
-const ALLOWED_ATTACHMENT_MIME_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-  "application/pdf",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "application/vnd.ms-excel",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "text/plain",
-  "audio/mpeg",
-  "audio/wav",
-  "audio/mp4",
-  "video/mp4",
-  "video/avi",
-  "video/quicktime",
-  "video/webm",
-]);
 
 function isTrustedAttachmentUrl(fileUrl: string): boolean {
   try {
@@ -324,6 +305,7 @@ function processQuestionnaire(questionnaire: Record<string, any>): string {
 
 export interface PublicReportData {
   id: string;
+  reportId: number;
   status: string;
   submissionDate: string;
   organizationName: string;

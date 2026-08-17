@@ -6,6 +6,7 @@ import { Chip } from "@heroui/chip";
 import { Progress } from "@heroui/progress";
 import { PublicReportData } from "@/actions/submission.actions";
 import { PublicTimeline } from "./PublicTimeline";
+import { PublicReportChat } from "./PublicReportChat";
 
 interface ReportStatusProps {
   report: PublicReportData;
@@ -185,6 +186,9 @@ export function ReportStatus({ report }: ReportStatusProps) {
           </div>
         </CardBody>
       </Card>
+
+      {/* Chat with the team */}
+      <PublicReportChat reportId={report.reportId} trackingCode={report.id} />
 
       {/* Timeline */}
       <PublicTimeline activities={report.activities} />

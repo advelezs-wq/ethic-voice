@@ -325,7 +325,13 @@ export async function sendMessage(
   try {
     const report = await prisma.formSubmission.findUnique({
       where: { id: reportId },
-      select: { orgId: true, assignments: { select: { userId: true } } },
+      select: {
+        orgId: true,
+        isAnonymous: true,
+        reporterEmail: true,
+        organization: { select: { name: true } },
+        assignments: { select: { userId: true } },
+      },
     });
 
     if (report && report.assignments.length > 0) {
@@ -350,6 +356,23 @@ export async function sendMessage(
           });
         }
       }
+    }
+
+    // Public (non-internal) messages reach the reporter on /track/[code].
+    // Only non-anonymous reporters have an email on file to be pushed to —
+    // anonymous reporters rely on the "new message" indicator on that page.
+    if (
+      !(options?.isInternal || false) &&
+      report &&
+      !report.isAnonymous &&
+      report.reporterEmail
+    ) {
+      await notificationsService.notifyReporterOfNewMessage({
+        reporterEmail: report.reporterEmail,
+        trackingCode: `REP-${String(reportId).padStart(6, "0")}`,
+        orgName: report.organization.name,
+        messagePreview: content.substring(0, 150),
+      });
     }
   } catch (notificationError) {
     console.error("Error sending comment notifications:", notificationError);

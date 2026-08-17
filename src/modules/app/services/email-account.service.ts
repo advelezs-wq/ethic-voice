@@ -8,6 +8,22 @@ import { SubmissionSource } from "@/types/submission.types";
 import { userHasPermission } from "@/modules/core/utils/permissions";
 import type { Prisma } from "@prisma/client";
 
+/**
+ * ImprovMX sends `timestamp` as Unix seconds. A millisecond epoch for any
+ * date after 2001 exceeds 1e12, so anything below that threshold is seconds
+ * and needs to be scaled up before Date() can parse it correctly.
+ */
+function parseImprovMxTimestamp(timestamp: unknown): Date {
+  if (typeof timestamp === "number") {
+    return new Date(timestamp < 1e12 ? timestamp * 1000 : timestamp);
+  }
+  if (typeof timestamp === "string" && /^\d+$/.test(timestamp)) {
+    return parseImprovMxTimestamp(Number(timestamp));
+  }
+  const parsed = timestamp ? new Date(timestamp as string) : new Date();
+  return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
 export class EmailAccountService {
   private async appendEmailAuditEvent(
     orgId: string,
@@ -545,7 +561,7 @@ export class EmailWebhookService {
       to: data.recipient,
       subject: data.subject,
       body: data.text || data.html,
-      date: new Date(data.timestamp),
+      date: parseImprovMxTimestamp(data.timestamp),
       messageId: data["message-id"] || data.messageId || null,
       attachments: data.attachments || [],
     };

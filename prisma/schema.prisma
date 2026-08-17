@@ -222,6 +222,15 @@ model Organization {
   isChatbotActive      Boolean @default(false)
   isPhoneChannelActive Boolean @default(false)
 
+  // Case-level data retention (separate from the existing org-wide
+  // deletion-after-lapsed-subscription policy in maintenance/route.ts).
+  // Null caseRetentionDays = keep closed cases indefinitely (safe default).
+  // autoDeleteOnRetentionExpiry defaults to false: expired cases are queued
+  // for admin review, not silently deleted, unless the org explicitly
+  // opts into full automation.
+  caseRetentionDays           Int?
+  autoDeleteOnRetentionExpiry Boolean @default(false)
+
   // Relations
   forms                Form[]
   complaints           FormSubmission[]
@@ -403,6 +412,19 @@ model FormSubmission {
   closureApprovedByName  String?
   closureRejectionReason String?
 
+  // Data retention / legal hold. retentionExpiresAt is computed when a case
+  // closes, from the org's caseRetentionDays policy (see Organization) —
+  // null means "no policy configured, keep indefinitely". legalHold, when
+  // true, unconditionally blocks the retention cron from ever touching this
+  // case regardless of retentionExpiresAt, for cases under litigation or
+  // regulatory inquiry.
+  retentionExpiresAt DateTime?
+  legalHold          Boolean   @default(false)
+  legalHoldReason    String?
+  legalHoldSetAt     DateTime?
+  legalHoldSetById   String?
+  legalHoldSetByName String?
+
   // Opaque public tracking token used by /track/[code] — deliberately NOT
   // derived from `id`, which is a global autoincrement shared across every
   // organization on the platform and would otherwise let anyone enumerate
@@ -429,6 +451,7 @@ model FormSubmission {
   @@index([aiSeverity])
   @@index([submittedAt])
   @@index([departmentId])
+  @@index([retentionExpiresAt])
 }
 
 model ReportAttachment {

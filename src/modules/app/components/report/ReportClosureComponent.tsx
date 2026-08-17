@@ -30,6 +30,7 @@ import { getStatusLabel as getDashboardStatusLabel } from "../../utils/dashboard
 import { formatFileSize } from "../../utils/reports";
 import { useSafeToast } from "../../hooks/useSafeToast";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
+import { LegalHoldModal } from "./LegalHoldModal";
 
 interface ReportClosureComponentProps {
   report: FormSubmission;
@@ -84,6 +85,11 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
     isOpen: isRejectModalOpen,
     onOpen: onRejectModalOpen,
     onOpenChange: onRejectModalOpenChange,
+  } = useDisclosure();
+  const {
+    isOpen: isLegalHoldOpen,
+    onOpen: onLegalHoldOpen,
+    onClose: onLegalHoldClose,
   } = useDisclosure();
 
   const isClosed = report.status === "CLOSED" || report.status === "RESOLVED";
@@ -269,6 +275,50 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
     </div>
   );
 
+  // Shown in every state — legal hold matters most on already-closed cases
+  // (it's what stops the retention cron from deleting them), but can be set
+  // proactively before closure too.
+  const legalHoldControl = report.legalHold ? (
+    <div className="flex items-start justify-between gap-3 bg-red-50 border border-red-200 rounded-xl p-3.5">
+      <div className="flex items-start gap-2.5">
+        <i className="icon-[lucide--scale] size-4 text-red-600 mt-0.5 shrink-0" />
+        <div>
+          <p className="text-sm font-semibold text-red-800">
+            Legal hold activo
+          </p>
+          <p className="text-xs text-red-600 mt-0.5">
+            {report.legalHoldReason}
+            {report.legalHoldSetByName && ` — activado por ${report.legalHoldSetByName}`}
+          </p>
+        </div>
+      </div>
+      {isAdmin && (
+        <Button size="sm" variant="light" color="danger" onPress={onLegalHoldOpen}>
+          Retirar
+        </Button>
+      )}
+    </div>
+  ) : isAdmin ? (
+    <Button
+      size="sm"
+      variant="bordered"
+      onPress={onLegalHoldOpen}
+      startContent={<i className="icon-[lucide--scale] size-3.5" />}
+    >
+      Activar legal hold
+    </Button>
+  ) : null;
+
+  const legalHoldModal = (
+    <LegalHoldModal
+      isOpen={isLegalHoldOpen}
+      onClose={onLegalHoldClose}
+      reportId={reportId}
+      currentlyOnHold={report.legalHold}
+      onSuccess={() => onStatusChange?.()}
+    />
+  );
+
   // ── Pending closure request: reviewer (admin) or requester waiting ──
   if (hasPendingRequest && !isClosed) {
     const requestedDate = report.closureRequestedAt
@@ -291,6 +341,8 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
             </div>
           </CardHeader>
           <CardBody className="space-y-4">
+            {legalHoldControl}
+
             <p className="text-sm text-slate-500">
               <strong>{report.closureRequestedByName}</strong> solicitó cerrar
               este caso el {requestedDate}.
@@ -406,6 +458,8 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
             )}
           </ModalContent>
         </Modal>
+
+        {legalHoldModal}
       </>
     );
   }
@@ -426,6 +480,8 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
             </div>
           </CardHeader>
           <CardBody className="space-y-4">
+            {legalHoldControl}
+
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="font-medium text-slate-500">Días abierto</p>
@@ -527,6 +583,8 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
             )}
           </ModalContent>
         </Modal>
+
+        {legalHoldModal}
       </>
     );
   }
@@ -546,6 +604,26 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
           </div>
         </CardHeader>
         <CardBody className="space-y-4">
+          {legalHoldControl}
+
+          {!report.legalHold && report.retentionExpiresAt && (
+            <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-xl p-3">
+              <i className="icon-[lucide--calendar-clock] size-4 text-slate-400 shrink-0" />
+              <p className="text-xs text-slate-500">
+                Este caso está sujeto a la política de retención de la
+                organización — programado para{" "}
+                {new Date(report.retentionExpiresAt) < new Date()
+                  ? "revisión de eliminación"
+                  : "eliminación"}{" "}
+                el{" "}
+                {format(new Date(report.retentionExpiresAt), "dd/MM/yyyy", {
+                  locale: es,
+                })}
+                .
+              </p>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div className="text-center p-3 bg-emerald-50/40 rounded-lg">
               <p className="text-2xl font-bold text-[#0d212c]">
@@ -714,6 +792,8 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
           )}
         </ModalContent>
       </Modal>
+
+      {legalHoldModal}
     </>
   );
 };

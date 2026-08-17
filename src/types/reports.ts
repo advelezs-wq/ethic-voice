@@ -152,6 +152,11 @@ export interface FormSubmission {
   closureApprovedById: string | null;
   closureApprovedByName: string | null;
   closureRejectionReason: string | null;
+  retentionExpiresAt: string | null;
+  legalHold: boolean;
+  legalHoldReason: string | null;
+  legalHoldSetAt: string | null;
+  legalHoldSetByName: string | null;
   createdAt: string;
   updatedAt: string;
   // Relations

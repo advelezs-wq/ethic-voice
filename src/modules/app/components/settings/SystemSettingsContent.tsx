@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, CardBody, CardHeader, Tabs, Tab } from "@heroui/react";
 import { LogoUploadSection } from "./LogoUploadSection";
 import { EnhancedDashboardLayoutSection } from "./EnhancedDashboardLayoutSection";
+import { CaseRetentionSection } from "./CaseRetentionSection";
 import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
 import { Button, Card as UiCard } from "@heroui/react";
 
@@ -83,6 +84,27 @@ export function SystemSettingsContent({
                 ) : (
                   <UpgradeBlock message="Tu plan no permite cambiar el diseño del dashboard. Disponible en GROW o superior." />
                 )}
+              </CardBody>
+            </Card>
+          </div>
+        </Tab>
+
+        <Tab key="retention" title="Retención y Cumplimiento">
+          <div className="space-y-6 pt-6">
+            <Card>
+              <CardHeader>
+                <div>
+                  <h3 className="text-xl font-semibold text-[#0d212c]">
+                    Retención de casos
+                  </h3>
+                  <p className="text-slate-500 text-sm">
+                    Define cuánto tiempo se conservan los casos cerrados y
+                    revisa los que ya vencieron su período de retención
+                  </p>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <CaseRetentionSection />
               </CardBody>
             </Card>
           </div>

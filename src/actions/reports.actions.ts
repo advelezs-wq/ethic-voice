@@ -735,6 +735,23 @@ const CLOSURE_OUTCOMES: ClosureOutcome[] = [
 
 const RETALIATION_FOLLOWUP_DAYS = 30;
 
+// Null when the org hasn't configured a retention policy — cases are then
+// kept indefinitely, which is the safe default (see Organization.caseRetentionDays).
+async function computeRetentionExpiresAt(
+  orgId: string,
+  from: Date
+): Promise<Date | null> {
+  const org = await prisma.organization.findUnique({
+    where: { id: orgId },
+    select: { caseRetentionDays: true },
+  });
+  if (!org?.caseRetentionDays || org.caseRetentionDays <= 0) return null;
+
+  const expires = new Date(from);
+  expires.setDate(expires.getDate() + org.caseRetentionDays);
+  return expires;
+}
+
 /**
  * Anti-retaliation check-in: standard practice on the platforms this was
  * modeled on (NAVEX, Case IQ) is a scheduled follow-up after closure to
@@ -832,6 +849,8 @@ export async function requestReportClosure(
   const reportCode = `REP-${String(reportId).padStart(6, "0")}`;
 
   if (isAdmin) {
+    const retentionExpiresAt = await computeRetentionExpiresAt(orgId, now);
+
     await prisma.formSubmission.update({
       where: { id: reportId },
       data: {
@@ -846,6 +865,7 @@ export async function requestReportClosure(
         closureApprovedById: userId,
         closureApprovedByName: requesterName,
         closureRejectionReason: null,
+        retentionExpiresAt,
       },
     });
 
@@ -967,6 +987,7 @@ export async function approveReportClosure(reportId: number): Promise<void> {
 
   const approverName = user.fullName || "Usuario";
   const now = new Date();
+  const retentionExpiresAt = await computeRetentionExpiresAt(orgId, now);
 
   await prisma.formSubmission.update({
     where: { id: reportId },
@@ -977,6 +998,7 @@ export async function approveReportClosure(reportId: number): Promise<void> {
       closureApprovedById: userId,
       closureApprovedByName: approverName,
       closureRejectionReason: null,
+      retentionExpiresAt,
     },
   });
 
@@ -1149,6 +1171,7 @@ export async function reopenReportCase(reportId: number): Promise<void> {
       closureApprovedById: null,
       closureApprovedByName: null,
       closureRejectionReason: null,
+      retentionExpiresAt: null,
     },
   });
 
@@ -1164,6 +1187,79 @@ export async function reopenReportCase(reportId: number): Promise<void> {
 
   revalidatePath(`/app/reports/${reportId}`);
   revalidatePath("/app/reports");
+}
+
+/**
+ * Legal hold unconditionally blocks the retention cron from ever deleting
+ * this case, regardless of retentionExpiresAt — for cases under litigation,
+ * regulatory inquiry, or any reason legal counsel needs the record kept.
+ * Admin-only: this overrides an automated compliance policy, not a
+ * day-to-day case-management action.
+ */
+export async function setLegalHold(
+  reportId: number,
+  hold: boolean,
+  reason?: string
+): Promise<void> {
+  const { userId } = await auth();
+  const orgId = await resolveOrgId();
+  const user = await currentUser();
+  if (!userId || !orgId || !user) throw new Error("No autorizado");
+
+  const userEmail = user.primaryEmailAddress?.emailAddress;
+  const isAdmin = await userHasPermission(
+    userId,
+    orgId,
+    "canManageOrganization",
+    userEmail
+  );
+  if (!isAdmin) {
+    throw new Error("Solo un administrador puede activar o quitar el legal hold");
+  }
+
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId, orgId },
+    select: { legalHold: true },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+
+  const actorName = user.fullName || "Usuario";
+  const cleanReason = reason?.trim() || null;
+
+  if (hold && !cleanReason) {
+    throw new Error("Indica el motivo del legal hold");
+  }
+
+  await prisma.formSubmission.update({
+    where: { id: reportId },
+    data: hold
+      ? {
+          legalHold: true,
+          legalHoldReason: cleanReason,
+          legalHoldSetAt: new Date(),
+          legalHoldSetById: userId,
+          legalHoldSetByName: actorName,
+        }
+      : {
+          legalHold: false,
+          legalHoldReason: null,
+          legalHoldSetAt: null,
+          legalHoldSetById: null,
+          legalHoldSetByName: null,
+        },
+  });
+
+  await prisma.reportActivity.create({
+    data: {
+      submissionId: reportId,
+      action: hold ? "LEGAL_HOLD_ENABLED" : "LEGAL_HOLD_DISABLED",
+      details: { reason: cleanReason },
+      userId,
+      userName: actorName,
+    },
+  });
+
+  revalidatePath(`/app/reports/${reportId}`);
 }
 
 export async function deleteReport(reportId: number): Promise<void> {
@@ -1376,6 +1472,8 @@ export async function getReport(reportId: number): Promise<FormSubmission> {
     closureOutcome: report.closureOutcome as FormSubmission["closureOutcome"],
     closureRequestedAt: report.closureRequestedAt?.toISOString() || null,
     closureApprovedAt: report.closureApprovedAt?.toISOString() || null,
+    retentionExpiresAt: report.retentionExpiresAt?.toISOString() || null,
+    legalHoldSetAt: report.legalHoldSetAt?.toISOString() || null,
     // Return sanitized metadata to the UI (no IP, userAgent, etc.)
     metadata: ((): any => {
       const m = report.metadata as Record<string, any> | null;

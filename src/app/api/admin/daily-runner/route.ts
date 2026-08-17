@@ -84,5 +84,14 @@ export async function GET(request: NextRequest) {
     }
   );
 
+  // 6) Case-level data retention enforcement (per-org policy, legal hold aware)
+  results.caseRetention = await callJson(
+    new URL("/api/admin/case-retention", base).toString(),
+    {
+      method: "POST",
+      headers: { "x-vercel-cron": "1" },
+    }
+  );
+
   return NextResponse.json({ ok: true, results });
 }

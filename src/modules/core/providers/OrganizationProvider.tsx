@@ -135,6 +135,8 @@ export function OrganizationProvider({
         userId: user?.id ?? "",
         organizationId: String(org.id),
         ethicLineSubmissions: 0,
+        caseRetentionDays: null,
+        autoDeleteOnRetentionExpiry: false,
       }));
 
       setOrganizations(transformedOrgs);

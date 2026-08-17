@@ -3,7 +3,31 @@ import prisma from "@/modules/prisma/lib/prisma";
 import { NotificationsService } from "@/modules/app/services/notifications.service";
 import { NotificationType } from "@prisma/client";
 
-export async function GET(_request: NextRequest) {
+function verifyAdminApiKey(request: NextRequest): boolean {
+  const apiKey =
+    request.headers.get("x-admin-api-key") ||
+    request.headers.get("authorization")?.replace("Bearer ", "");
+  const expectedApiKey = process.env.ADMIN_API_KEY;
+  if (!expectedApiKey) return false;
+  return apiKey === expectedApiKey;
+}
+
+export async function GET(request: NextRequest) {
+  // This route notifies orgs of pending deletion and hard-deletes (with
+  // billing cancellation) orgs expired 90+ days — it has no UI caller and is
+  // meant to run only via Vercel Cron or an admin script. Being under
+  // /api/admin(.*) lets the platform middleware bypass Clerk for a valid
+  // cron header or API key, but *any* logged-in user would otherwise fall
+  // through and reach this handler — so it needs its own explicit check
+  // rather than relying on "some session exists".
+  const isCron = request.headers.get("x-vercel-cron");
+  if (!isCron && !verifyAdminApiKey(request)) {
+    return NextResponse.json(
+      { error: "Unauthorized - Invalid or missing API key" },
+      { status: 401 }
+    );
+  }
+
   try {
     const threeMonthsMs = 90 * 24 * 60 * 60 * 1000;
     const now = Date.now();
@@ -39,6 +63,32 @@ export async function GET(_request: NextRequest) {
       }
 
       if (expiredSince >= threeMonthsMs) {
+        // Cancel any active provider subscription before deleting — the org
+        // and its Subscription rows are gone after this, so this is the last
+        // chance to stop the org from continuing to be billed.
+        try {
+          const subs = await prisma.subscription.findMany({
+            where: { orgId: org.id },
+          });
+          for (const s of subs) {
+            if (s.providerSubscriptionId) {
+              await fetch(
+                "https://api.mercadopago.com/preapproval/" + s.providerSubscriptionId,
+                {
+                  method: "PUT",
+                  headers: {
+                    Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN || ""}`,
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ status: "cancelled" }),
+                }
+              );
+            }
+          }
+        } catch (cancelError) {
+          console.warn(`⚠️ [maintenance] Failed to cancel provider subscription for org ${org.id}:`, cancelError);
+        }
+
         await prisma.organization.delete({ where: { id: org.id } });
         deleted += 1;
       }

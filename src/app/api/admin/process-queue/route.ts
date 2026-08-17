@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { testRedisConnections } from "@/modules/app/lib/queue/redis-config";
+
+// A single AI analysis call routinely takes 40-100s+ (see
+// compliance-ai-processor.ts). The previous 5s wait below closed the worker
+// long before any real job could finish, so this fallback never actually
+// processed anything — it just promoted jobs to "active" and abandoned them.
+export const maxDuration = 60;
 import {
   getQueueStats,
   createSubmissionWorker,
   createEmailWorker,
   submissionQueue,
 } from "@/modules/app/lib/queue/queue-manager";
-import prisma from "@/modules/prisma/lib/prisma";
-import { NotificationsService } from "@/modules/app/services/notifications.service";
-import { NotificationType } from "@prisma/client";
-import { submissionProcessor } from "@/modules/app/services/submission-processor.service";
 // Removed env gating; always process queues
 
 // Function to verify admin API key
@@ -95,84 +97,16 @@ export async function POST(request: NextRequest) {
       console.warn("⚠️ Job promotion skipped:", scanErr);
     }
 
-    // Wait briefly to allow background workers to pick up any remaining jobs
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    // Wait long enough for at least one real AI analysis to complete, rather
+    // than closing the worker (and abandoning any in-flight job) after a
+    // handful of seconds.
+    await new Promise((resolve) => setTimeout(resolve, 50000));
 
-    // Maintenance task: data deletion scheduler (soft cron)
-    try {
-      const threeMonthsMs = 90 * 24 * 60 * 60 * 1000;
-      const now = Date.now();
-      const soonMs = 7 * 24 * 60 * 60 * 1000; // 7 days reminder
-
-      const orgs = await prisma.organization.findMany({
-        where: {
-          isActive: true,
-          planExpiresAt: { not: null },
-        },
-        select: {
-          id: true,
-          planExpiresAt: true,
-          memberships: { select: { userId: true } },
-        },
-      });
-
-      const notifier = new NotificationsService();
-      for (const org of orgs) {
-        const expiresAt = org.planExpiresAt as unknown as Date | null;
-        if (!expiresAt) continue;
-        const expiredSince = now - new Date(expiresAt).getTime();
-
-        // Send reminder near 3 months mark
-        if (
-          expiredSince > 0 &&
-          expiredSince < threeMonthsMs &&
-          threeMonthsMs - expiredSince <= soonMs
-        ) {
-          for (const m of org.memberships) {
-            await notifier.createNotification({
-              userId: m.userId,
-              orgId: org.id,
-              type: NotificationType.SYSTEM_ALERT,
-              title: "Aviso de eliminación de datos",
-              message:
-                "Tu organización está inactiva. Eliminaremos los datos de forma permanente si no reactivas tu suscripción.",
-              actionUrl: "/pricing",
-              metadata: { kind: "data_deletion_warning" },
-            });
-          }
-        }
-
-        // Hard delete after 3 months: cancel provider preapproval before deleting
-        if (expiredSince >= threeMonthsMs) {
-          try {
-            const subs = await prisma.subscription.findMany({
-              where: { orgId: org.id },
-            });
-            for (const s of subs) {
-              if (s.providerSubscriptionId) {
-                // Set preapproval to cancelled on provider
-                await fetch(
-                  "https://api.mercadopago.com/preapproval/" +
-                    s.providerSubscriptionId,
-                  {
-                    method: "PUT",
-                    headers: {
-                      Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN || ""}`,
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ status: "cancelled" }),
-                  }
-                );
-              }
-            }
-          } catch {}
-          // Delete organization cascade via Prisma relations where configured
-          await prisma.organization.delete({ where: { id: org.id } });
-        }
-      }
-    } catch (maintenanceError) {
-      console.warn("⚠️ Maintenance job failed:", maintenanceError);
-    }
+    // Org expiry notices + hard deletion live in /api/admin/maintenance,
+    // which daily-runner already calls earlier in its sequence — this used
+    // to duplicate that logic (without the provider-cancellation step), so
+    // any org past the 90-day mark was deleted here first and maintenance's
+    // safer version never got a chance to cancel its MercadoPago preapproval.
 
     // Get final stats
     const finalStats = await getQueueStats();

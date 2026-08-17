@@ -1,14 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { backgroundProcessor } from "@/modules/app/lib/background-processor";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
-export async function POST() {
+function verifyAdminApiKey(request: NextRequest): boolean {
+  const apiKey =
+    request.headers.get("x-admin-api-key") ||
+    request.headers.get("authorization")?.replace("Bearer ", "");
+  const expectedApiKey = process.env.ADMIN_API_KEY;
+  if (!expectedApiKey) return false;
+  return apiKey === expectedApiKey;
+}
+
+export async function POST(request: NextRequest) {
   try {
-    // Optional: Add authentication check
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // This retries failed AI jobs across every organization on the
+    // platform, not just the caller's — "any logged-in user" was not
+    // nearly strict enough. Require the admin key/cron header, or an
+    // actual platform superadmin.
+    const isCron = request.headers.get("x-vercel-cron");
+    if (!isCron && !verifyAdminApiKey(request)) {
+      const clerkUser = await currentUser();
+      const userEmail = clerkUser?.primaryEmailAddress?.emailAddress;
+      if (!userEmail || !isSuperAdmin(userEmail)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
     }
 
     console.log("🎯 Manual background processor trigger requested");

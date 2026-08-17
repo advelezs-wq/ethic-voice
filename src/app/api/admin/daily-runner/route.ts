@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// Runs 5 downstream tasks sequentially, including process-queue which now
+// waits up to 50s for AI jobs to complete — give the chain room to finish.
+export const maxDuration = 120;
+
 function getBaseUrl(reqUrl?: string): string {
   const appBase = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL;
   if (appBase) return appBase;

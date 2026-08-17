@@ -1,40 +1,38 @@
-import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   validatePlanCompliance,
   enforceCompliance,
   logPlanSecurityEvent,
 } from "@/modules/core/utils/plan-security.utils";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import prisma from "@/modules/prisma/lib/prisma";
 
 /**
  * Admin endpoint for running security validation on all organizations
  * This should be called periodically (e.g., daily) via cron job
  */
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    // Allow Vercel Cron to call this directly (daily-runner already does).
+    const isCron = request.headers.get("x-vercel-cron");
+    if (!isCron) {
+      const { userId } = await auth();
+      if (!userId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
 
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Verify admin access (super admin only)
-    // Fallback to find by externalId stored in email or id fields depending on schema
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [{ id: userId }, { email: userId }],
-      },
-      include: { memberships: true },
-    });
-
-    const isSuperAdmin = Boolean(user?.memberships.some((m) => m.role === "ADMIN"));
-
-    if (!isSuperAdmin) {
-      return NextResponse.json(
-        { error: "Super admin access required" },
-        { status: 403 }
-      );
+      // This was previously checking "is ADMIN of any of their own orgs",
+      // which is true for a large share of paying customers — not a
+      // platform superadmin. Use the actual superadmin email allowlist.
+      const clerkUser = await currentUser();
+      const userEmail = clerkUser?.primaryEmailAddress?.emailAddress;
+      if (!userEmail || !isSuperAdmin(userEmail)) {
+        return NextResponse.json(
+          { error: "Super admin access required" },
+          { status: 403 }
+        );
+      }
     }
 
     // Get all active organizations

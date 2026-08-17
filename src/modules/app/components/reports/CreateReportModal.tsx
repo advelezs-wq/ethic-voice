@@ -122,14 +122,15 @@ export function CreateReportModal({
 
     startTransition(async () => {
       try {
-        await createManualReport(organizationId, data);
+        const result = await createManualReport(organizationId, data);
         await invalidateAfterReportCreate(organizationId);
         router.refresh();
         window.dispatchEvent(new CustomEvent("manual-report-created"));
         addToast({
           title: "Reporte creado exitosamente",
-          description: "El reporte ha sido registrado en el sistema",
+          description: `Código de seguimiento: ${result.trackingCode} — compártelo con quien reportó para que pueda consultar el estado del caso.`,
           color: "success",
+          duration: 15000,
         });
         reset();
         onClose();

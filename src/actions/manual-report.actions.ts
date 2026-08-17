@@ -3,24 +3,15 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { randomBytes } from "crypto";
 import { addSubmissionToQueue } from "@/modules/app/lib/queue/queue-manager";
 import { SubmissionSource } from "@/types/submission.types";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
+import { createTrackingCode } from "@/actions/tracking.actions";
 import {
   createManualReportSchema,
   type CreateManualReportData,
 } from "@/modules/app/lib/schemas/manual-report";
 import { userHasPermission } from "@/modules/core/utils/permissions";
-
-/**
- * Generate a unique tracking code for the report
- */
-function generateTrackingCode(): string {
-  const timestamp = Date.now().toString(36);
-  const randomPart = randomBytes(4).toString("hex").toUpperCase();
-  return `MR-${timestamp}-${randomPart}`;
-}
 
 /**
  * Create a manual report from dashboard (phone, WhatsApp, etc.)
@@ -49,7 +40,6 @@ export async function createManualReport(
 
   try {
     const data = createManualReportSchema.parse(rawData);
-    const trackingCode = generateTrackingCode();
 
     // Build form data object to match ETHIC_LINE structure exactly
     const formData = {
@@ -127,7 +117,6 @@ export async function createManualReport(
           location: data.location,
           internalNotes: data.adminNotes,
           metadata: {
-            trackingCode,
             channelType: data.channelType,
             createdManually: true,
             createdBy: userId,
@@ -251,10 +240,14 @@ Fecha de envío: ${new Date().toLocaleString()}`;
     revalidatePath("/app/reports");
     revalidatePath("/app");
 
+    // Same REP-000123 format every other channel uses — /track/[code] only
+    // recognizes that format, so a custom one here would never resolve.
+    const trackingCode = await createTrackingCode(submission.id);
+
     return {
       success: true,
       submissionId: submission.id,
-      trackingCode: trackingCode,
+      trackingCode,
     };
   } catch (error) {
     console.error("[MANUAL] Error creating manual report:", {

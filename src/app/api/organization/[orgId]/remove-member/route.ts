@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient, createClerkClient } from "@clerk/nextjs/server";
+import { auth, currentUser, clerkClient, createClerkClient } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import { recalculateOrganizationSeatUsage } from "@/modules/core/utils/subscription.utils";
@@ -57,6 +57,28 @@ export async function POST(
       memberId,
       removedBy: userId,
     });
+
+    // This handler previously never checked that the caller has any
+    // relationship to `orgId` at all — any authenticated user could remove
+    // any member from any organization by supplying its orgId + a
+    // membership id. Require the caller to actually be an ADMIN of the
+    // target org — or a superadmin, since this is also called from the
+    // superadmin org-detail panel, where the caller has no membership in
+    // the org being managed.
+    const [requesterMembership, requesterClerkUser] = await Promise.all([
+      prisma.organizationMembership.findUnique({
+        where: { userId_orgId: { userId, orgId } },
+      }),
+      currentUser(),
+    ]);
+    const requesterEmail = requesterClerkUser?.primaryEmailAddress?.emailAddress;
+    const requesterIsSuperAdmin = Boolean(requesterEmail && isSuperAdmin(requesterEmail));
+    if (!requesterIsSuperAdmin && (!requesterMembership || requesterMembership.role !== "ADMIN")) {
+      return NextResponse.json(
+        { error: "No tienes permisos para remover miembros de esta organización" },
+        { status: 403 }
+      );
+    }
 
     // Get the membership to remove
     const membership = await prisma.organizationMembership.findUnique({

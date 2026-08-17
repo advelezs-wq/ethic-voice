@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient, createClerkClient } from "@clerk/nextjs/server";
+import { auth, currentUser, clerkClient, createClerkClient } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 // ✅ Helper function to get Clerk client safely
 async function getClerkClient() {
@@ -55,6 +56,25 @@ export async function POST(
       return NextResponse.json(
         { error: "Organization ID is required" },
         { status: 400 }
+      );
+    }
+
+    // This route can rename the org and replace its logo — without an
+    // admin check, any signed-in user could deface any organization on the
+    // platform by knowing/guessing its orgId. Superadmin bypass: this is
+    // also called from the superadmin org-management panel.
+    const [requesterMembership, requesterClerkUser] = await Promise.all([
+      prisma.organizationMembership.findUnique({
+        where: { userId_orgId: { userId, orgId } },
+      }),
+      currentUser(),
+    ]);
+    const requesterEmail = requesterClerkUser?.primaryEmailAddress?.emailAddress;
+    const requesterIsSuperAdmin = Boolean(requesterEmail && isSuperAdmin(requesterEmail));
+    if (!requesterIsSuperAdmin && (!requesterMembership || requesterMembership.role !== "ADMIN")) {
+      return NextResponse.json(
+        { error: "No tienes permisos para actualizar esta organización" },
+        { status: 403 }
       );
     }
 

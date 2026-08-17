@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import { getAvailableMembersForAssignment } from "@/actions/report-assignments.actions";
@@ -25,6 +25,24 @@ export async function GET(
         { error: "Organization ID is required" },
         { status: 400 }
       );
+    }
+
+    // Without this, any signed-in user could list any other org's full
+    // roster (names, emails, roles) just by knowing/guessing its orgId.
+    // Superadmin status is checked independently of membership — a
+    // superadmin legitimately has no membership row in most orgs.
+    const [requesterMembership, requesterClerkUser] = await Promise.all([
+      prisma.organizationMembership.findUnique({
+        where: { userId_orgId: { userId, orgId } },
+      }),
+      currentUser(),
+    ]);
+    const requesterEmail = requesterClerkUser?.primaryEmailAddress?.emailAddress;
+    const requesterIsSuperAdmin = Boolean(
+      requesterEmail && isSuperAdmin(requesterEmail)
+    );
+    if (!requesterMembership && !requesterIsSuperAdmin) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
     // Get organization members from database
@@ -107,25 +125,23 @@ export async function PATCH(
       );
     }
 
-    const requesterMembership = await prisma.organizationMembership.findUnique({
-      where: {
-        userId_orgId: { userId, orgId },
-      },
-      include: {
-        user: {
-          select: {
-            email: true,
-          },
-        },
-      },
-    });
+    const [requesterMembership, requesterClerkUser] = await Promise.all([
+      prisma.organizationMembership.findUnique({
+        where: { userId_orgId: { userId, orgId } },
+      }),
+      currentUser(),
+    ]);
 
+    // Checked independently of membership — a superadmin legitimately has
+    // no membership row in most orgs, so gating this behind
+    // requesterMembership existing (as before) locked superadmins out of
+    // orgs they don't personally belong to.
+    const requesterEmail = requesterClerkUser?.primaryEmailAddress?.emailAddress;
     const requesterIsSuperAdmin = Boolean(
-      requesterMembership?.user?.email &&
-        isSuperAdmin(requesterMembership.user.email)
+      requesterEmail && isSuperAdmin(requesterEmail)
     );
 
-    if (!requesterMembership || (!requesterIsSuperAdmin && requesterMembership.role !== "ADMIN")) {
+    if (!requesterIsSuperAdmin && (!requesterMembership || requesterMembership.role !== "ADMIN")) {
       return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 

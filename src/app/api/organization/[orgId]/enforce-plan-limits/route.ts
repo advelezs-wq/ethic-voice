@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { enforcePlanLimits } from "@/modules/core/utils/plan-enforcement.utils";
+import prisma from "@/modules/prisma/lib/prisma";
 
 export async function POST(
   req: NextRequest,
@@ -20,6 +21,15 @@ export async function POST(
         { error: "Organization ID is required" },
         { status: 400 }
       );
+    }
+
+    // This can block/unblock member seats — without an admin check, any
+    // signed-in user could trigger it against any org by orgId alone.
+    const requesterMembership = await prisma.organizationMembership.findUnique({
+      where: { userId_orgId: { userId, orgId } },
+    });
+    if (!requesterMembership || requesterMembership.role !== "ADMIN") {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
     console.log("🛡️ [ENFORCE-PLAN-LIMITS] Manual enforcement requested:", {

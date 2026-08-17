@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import {
   Department,
@@ -10,6 +10,7 @@ import {
 } from "@/types/department.types";
 import { revalidatePath } from "next/cache";
 import { resolveOrgId } from "@/modules/core/utils/org-resolver";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 export async function createDepartment(
   orgId: string,
@@ -66,13 +67,32 @@ export async function createDepartment(
   }
 }
 
+// getDepartments/getDepartmentsWithStats take orgId as a plain argument, so
+// (like team.actions.ts's getTeamMembers) they need their own membership
+// check rather than trusting the caller-supplied orgId — otherwise any
+// signed-in user could read any other org's department list by UUID.
+async function assertOrgMembership(orgId: string): Promise<string> {
+  const { userId } = await auth();
+  if (!userId) throw new Error("No autorizado");
+
+  const [membership, user] = await Promise.all([
+    prisma.organizationMembership.findUnique({
+      where: { userId_orgId: { userId, orgId } },
+    }),
+    currentUser(),
+  ]);
+
+  const userEmail = user?.primaryEmailAddress?.emailAddress;
+  const isSuper = Boolean(userEmail && isSuperAdmin(userEmail));
+
+  if (!membership && !isSuper) throw new Error("No autorizado");
+
+  return userId;
+}
+
 // Get all departments for an organization
 export async function getDepartments(orgId: string): Promise<Department[]> {
-  const { userId } = await auth();
-
-  if (!userId) {
-    throw new Error("No autorizado");
-  }
+  await assertOrgMembership(orgId);
 
   const departments = await prisma.department.findMany({
     where: { orgId },
@@ -94,11 +114,7 @@ export async function getDepartments(orgId: string): Promise<Department[]> {
 export async function getDepartmentsWithStats(
   orgId: string
 ): Promise<DepartmentWithStats[]> {
-  const { userId } = await auth();
-
-  if (!userId) {
-    throw new Error("No autorizado");
-  }
+  await assertOrgMembership(orgId);
 
   const departments = await prisma.department.findMany({
     where: { orgId },
@@ -177,6 +193,16 @@ export async function updateDepartment(
     throw new Error("No tienes permisos para actualizar departamentos");
   }
 
+  // department.update's `where` only accepts a unique key (id), which on
+  // its own doesn't prove this department belongs to the admin's org —
+  // without this check, an admin of org A could pass a department id
+  // belonging to org B and edit it directly.
+  const owned = await prisma.department.findFirst({
+    where: { id: departmentId, orgId },
+    select: { id: true },
+  });
+  if (!owned) throw new Error("Departamento no encontrado");
+
   const department = await prisma.department.update({
     where: { id: departmentId },
     data: input,
@@ -211,9 +237,11 @@ export async function deleteDepartment(departmentId: string): Promise<void> {
     throw new Error("No tienes permisos para eliminar departamentos");
   }
 
-  // Check if it's the default department
-  const department = await prisma.department.findUnique({
-    where: { id: departmentId },
+  // Check if it's the default department — scoped by orgId, not just id:
+  // without this, an admin of org A could pass a department id belonging
+  // to org B and delete it (findUnique on id alone can't prove ownership).
+  const department = await prisma.department.findFirst({
+    where: { id: departmentId, orgId },
   });
 
   if (!department) {
@@ -278,22 +306,6 @@ export async function deleteDepartment(departmentId: string): Promise<void> {
   revalidatePath("/app/departments");
 }
 
-// Create default department for an organization
-export async function createDefaultDepartment(
-  orgId: string
-): Promise<Department> {
-  const department = await prisma.department.create({
-    data: {
-      name: "General",
-      slug: "general",
-      orgId,
-      isDefault: true,
-    },
-  });
-
-  return department;
-}
-
 // Assign member to department
 export async function assignMemberToDepartment(
   userId: string,
@@ -318,6 +330,17 @@ export async function assignMemberToDepartment(
 
   if (!adminMembership || adminMembership.role !== "ADMIN") {
     throw new Error("No tienes permisos para asignar miembros a departamentos");
+  }
+
+  // Department.id is globally unique, not scoped to an org — without this
+  // check an admin could point a member's departmentId at another org's
+  // department (it would still satisfy the FK, just silently cross tenants).
+  const targetDepartment = await prisma.department.findFirst({
+    where: { id: departmentId, orgId },
+    select: { id: true },
+  });
+  if (!targetDepartment) {
+    throw new Error("Departamento no encontrado");
   }
 
   // Update member's department

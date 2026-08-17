@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 
 export async function GET(req: NextRequest) {
@@ -30,7 +30,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/app?invite=invalid", req.url));
   }
 
-  // Ensure user in DB (email may differ; we trust logged-in user)
+  // The invite is only valid for the email it was sent to — without this,
+  // anyone who gets hold of the (unguessable, but forwardable) link could
+  // accept it under a completely different Clerk account and join with
+  // whatever role — including ADMIN — the invite carried.
+  const clerkUser = await currentUser();
+  const signedInEmail = clerkUser?.primaryEmailAddress?.emailAddress?.toLowerCase();
+  if (!signedInEmail || signedInEmail !== invite.email.toLowerCase()) {
+    const mismatch = new URL("/app?invite=email_mismatch", req.url);
+    return NextResponse.redirect(mismatch);
+  }
+
+  // Ensure user in DB
   await prisma.user.upsert({
     where: { id: userId },
     update: {},

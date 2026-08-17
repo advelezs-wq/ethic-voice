@@ -47,6 +47,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Owning the subscription isn't enough — without this, a user could
+    // link their own subscription onto ANY organization by id, silently
+    // overwriting that org's plan/feature flags with theirs.
+    const requesterMembership = await prisma.organizationMembership.findUnique({
+      where: { userId_orgId: { userId, orgId: organizationId } },
+    });
+    if (!requesterMembership) {
+      return NextResponse.json(
+        { error: "No perteneces a esta organización" },
+        { status: 403 }
+      );
+    }
+
     // Check if subscription is already linked to another organization
     if (subscription.orgId && subscription.orgId !== organizationId) {
       return NextResponse.json(

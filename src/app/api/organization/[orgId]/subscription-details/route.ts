@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import rebillService from "@/modules/app/services/rebill.service";
 import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 export async function GET(
   req: NextRequest,
@@ -22,6 +23,23 @@ export async function GET(
         { error: "Organization ID is required" },
         { status: 400 }
       );
+    }
+
+    // Without this, any signed-in user could read any org's billing/plan
+    // details (prices, Rebill customer id, feature limits) by orgId alone.
+    // Superadmin bypass matters here: this route is also called from the
+    // superadmin org-detail panel, where the caller usually has no
+    // membership in the org they're inspecting.
+    const [requesterMembership, requesterClerkUser] = await Promise.all([
+      prisma.organizationMembership.findUnique({
+        where: { userId_orgId: { userId, orgId } },
+      }),
+      currentUser(),
+    ]);
+    const requesterEmail = requesterClerkUser?.primaryEmailAddress?.emailAddress;
+    const requesterIsSuperAdmin = Boolean(requesterEmail && isSuperAdmin(requesterEmail));
+    if (!requesterMembership && !requesterIsSuperAdmin) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
     console.log(

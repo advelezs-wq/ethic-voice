@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import mercadoPagoService from "@/modules/app/services/mercadopago.service";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 export async function GET(
   req: NextRequest,
@@ -21,6 +22,21 @@ export async function GET(
         { error: "Organization ID is required" },
         { status: 400 }
       );
+    }
+
+    // Without this, any signed-in user could read any org's payment
+    // transaction history (amounts, dates) by orgId alone. Superadmin
+    // bypass: this is also called from the superadmin org-detail panel.
+    const [requesterMembership, requesterClerkUser] = await Promise.all([
+      prisma.organizationMembership.findUnique({
+        where: { userId_orgId: { userId, orgId } },
+      }),
+      currentUser(),
+    ]);
+    const requesterEmail = requesterClerkUser?.primaryEmailAddress?.emailAddress;
+    const requesterIsSuperAdmin = Boolean(requesterEmail && isSuperAdmin(requesterEmail));
+    if (!requesterMembership && !requesterIsSuperAdmin) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
     console.log("📋 [BILLING-HISTORY] Getting billing history for org:", orgId);

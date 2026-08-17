@@ -1,15 +1,41 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { differenceInDays } from "date-fns";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
+
+// getTeamPerformance/getTeamMembers take orgId as a plain argument (called
+// from client components with whatever org is on screen), which means
+// nothing stops a signed-in user from calling either directly with an
+// arbitrary org's UUID and pulling that org's full team roster —
+// names, emails, roles, departments, performance data. Every other
+// org-scoped action in this codebase derives orgId from the session
+// (resolveOrgId()) instead of trusting a caller-supplied one; these two
+// need their own explicit membership check since they take orgId as input.
+async function assertCanViewOrgTeam(orgId: string): Promise<string> {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
+  const [membership, user] = await Promise.all([
+    prisma.organizationMembership.findUnique({
+      where: { userId_orgId: { userId, orgId } },
+    }),
+    currentUser(),
+  ]);
+
+  const userEmail = user?.primaryEmailAddress?.emailAddress;
+  const isSuper = Boolean(userEmail && isSuperAdmin(userEmail));
+
+  if (!membership && !isSuper) {
+    throw new Error("Forbidden");
+  }
+
+  return userId;
+}
 
 export async function getTeamPerformance(orgId: string) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    throw new Error("Unauthorized");
-  }
+  await assertCanViewOrgTeam(orgId);
 
   try {
     // Get all organization members
@@ -101,125 +127,8 @@ export async function getTeamPerformance(orgId: string) {
   }
 }
 
-export async function getMemberDashboardStats(userId: string, orgId: string) {
-  try {
-    const [
-      totalAssigned,
-      pendingReports,
-      inProgressReports,
-      resolvedReports,
-      highPriorityAssigned,
-      overdueReports,
-    ] = await Promise.all([
-      prisma.formSubmission.count({
-        where: {
-          orgId,
-          assignments: {
-            some: {
-              userId: userId,
-            },
-          },
-        },
-      }),
-      prisma.formSubmission.count({
-        where: {
-          orgId,
-          assignments: {
-            some: {
-              userId: userId,
-            },
-          },
-          status: "PENDING",
-        },
-      }),
-      prisma.formSubmission.count({
-        where: {
-          orgId,
-          assignments: {
-            some: {
-              userId: userId,
-            },
-          },
-          status: "IN_PROGRESS",
-        },
-      }),
-      prisma.formSubmission.count({
-        where: {
-          orgId,
-          assignments: {
-            some: {
-              userId: userId,
-            },
-          },
-          status: { in: ["RESOLVED", "CLOSED"] },
-        },
-      }),
-      prisma.formSubmission.count({
-        where: {
-          orgId,
-          assignments: {
-            some: {
-              userId: userId,
-            },
-          },
-          priority: { in: ["URGENT", "HIGH"] },
-        },
-      }),
-      prisma.formSubmission.count({
-        where: {
-          orgId,
-          assignments: {
-            some: {
-              userId: userId,
-            },
-          },
-          status: "PENDING",
-          OR: [
-            {
-              aiSeverity: "HIGH",
-              submittedAt: {
-                lt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-              },
-            },
-            {
-              aiSeverity: "MEDIUM",
-              submittedAt: {
-                lt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-              },
-            },
-            {
-              aiSeverity: "LOW",
-              submittedAt: {
-                lt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-              },
-            },
-          ],
-        },
-      }),
-    ]);
-
-    return {
-      totalAssigned,
-      pendingReports,
-      inProgressReports,
-      resolvedReports,
-      highPriorityAssigned,
-      overdueReports,
-      completionRate:
-        totalAssigned > 0 ? (resolvedReports / totalAssigned) * 100 : 0,
-    };
-  } catch (error) {
-    console.error("Error fetching member dashboard stats:", error);
-    throw error;
-  }
-}
-
 export async function getTeamMembers(orgId: string) {
-  const { userId } = await auth();
-
-  if (!userId) {
-    throw new Error("Unauthorized");
-  }
+  await assertCanViewOrgTeam(orgId);
 
   try {
     const members = await prisma.organizationMembership.findMany({

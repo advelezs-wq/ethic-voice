@@ -64,7 +64,13 @@ const isUnrestrictedRoute = createRouteMatcher([
 ]);
 
 // Admin routes that can use API key authentication
-const isAdminRoute = createRouteMatcher(["/api/admin(.*)"]);
+const isAdminRoute = createRouteMatcher([
+  "/api/admin(.*)",
+  // /api/ai/requeue implements its own verifyAdminApiKey check, but without
+  // being listed here the global Clerk guard below rejects it with 401
+  // before that check ever runs — the API-key path was unreachable.
+  "/api/ai/requeue(.*)",
+]);
 
 // Function to verify admin API key
 function verifyAdminApiKey(req: Request): boolean {

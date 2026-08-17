@@ -329,6 +329,7 @@ export async function sendMessage(
         orgId: true,
         isAnonymous: true,
         reporterEmail: true,
+        trackingToken: true,
         organization: { select: { name: true } },
         assignments: { select: { userId: true } },
       },
@@ -369,7 +370,9 @@ export async function sendMessage(
     ) {
       await notificationsService.notifyReporterOfNewMessage({
         reporterEmail: report.reporterEmail,
-        trackingCode: `REP-${String(reportId).padStart(6, "0")}`,
+        // Must be the opaque trackingToken, not the sequential id — this
+        // becomes the /track/[code] link the reporter actually clicks.
+        trackingCode: `REP-${report.trackingToken}`,
         orgName: report.organization.name,
         messagePreview: content.substring(0, 150),
       });

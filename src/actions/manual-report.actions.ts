@@ -240,8 +240,8 @@ Fecha de envío: ${new Date().toLocaleString()}`;
     revalidatePath("/app/reports");
     revalidatePath("/app");
 
-    // Same REP-000123 format every other channel uses — /track/[code] only
-    // recognizes that format, so a custom one here would never resolve.
+    // Same trackingToken-based code every other channel uses via
+    // createTrackingCode — a custom one here would never resolve on /track/[code].
     const trackingCode = await createTrackingCode(submission.id);
 
     return {

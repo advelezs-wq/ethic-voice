@@ -384,6 +384,13 @@ model FormSubmission {
   // Internal notes
   internalNotes String?
 
+  // Opaque public tracking token used by /track/[code] — deliberately NOT
+  // derived from `id`, which is a global autoincrement shared across every
+  // organization on the platform and would otherwise let anyone enumerate
+  // REP-000001, REP-000002... and read any org's report status, timeline,
+  // and reporter chat. DB-generated so every insert path gets one for free.
+  trackingToken String @unique @default(dbgenerated("upper(substring(replace(gen_random_uuid()::text, '-', '') from 1 for 12))"))
+
   // Relations
   form          Form?              @relation(fields: [formId], references: [id], onDelete: Cascade)
   organization  Organization       @relation(fields: [orgId], references: [id])

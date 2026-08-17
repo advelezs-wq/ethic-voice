@@ -535,7 +535,8 @@ export async function submitEthicLineReport(
       }
     }
 
-    // Create submission first to get the numeric ID and build canonical code like REP-000001
+    // Create submission first, then build its public tracking code from the
+    // opaque trackingToken (createTrackingCode looks it up by submission.id)
 
     const reporterInfo = {
       name: sanitizedFormData.isAnonymous

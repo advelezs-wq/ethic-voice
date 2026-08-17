@@ -21,9 +21,9 @@ export function TrackingSearch({
   // Only set initial code once on mount, don't update when initialCode changes
   useEffect(() => {
     if (initialCode && !code) {
-      // Extract just the numbers from initialCode if it has REP- prefix
-      const numbers = initialCode.replace(/[^0-9]/g, "");
-      setCode(numbers);
+      // Strip the REP- prefix if present, keep the opaque token as-is
+      const token = initialCode.replace(/^REP-/i, "");
+      setCode(token);
     }
   }, []); // Empty dependency array to only run on mount
 
@@ -31,14 +31,15 @@ export function TrackingSearch({
     e.preventDefault();
     if (!code.trim()) return;
 
-    // Format the final code when submitting
-    const finalCode = code.trim().padStart(6, "0");
-    onSearch(`REP-${finalCode}`);
+    onSearch(`REP-${code.trim().toUpperCase()}`);
   };
 
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only allow numbers and limit to 6 digits
-    const value = e.target.value.replace(/[^0-9]/g, "").slice(0, 6);
+    // Alphanumeric token, 12 chars (see FormSubmission.trackingToken)
+    const value = e.target.value
+      .replace(/[^A-Za-z0-9]/g, "")
+      .slice(0, 12)
+      .toUpperCase();
     setCode(value);
   };
 
@@ -56,12 +57,12 @@ export function TrackingSearch({
             <Input
               id="tracking-code"
               type="text"
-              placeholder="000001"
+              placeholder="A1B2C3D4E5F6"
               value={code}
               onChange={handleCodeChange}
               className="flex-1"
               size="lg"
-              maxLength={6}
+              maxLength={12}
               isDisabled={isLoading}
               startContent={
                 <span className="text-gray-500 font-mono text-sm">REP-</span>
@@ -85,7 +86,7 @@ export function TrackingSearch({
             </Button>
           </div>
           <p className="text-xs text-gray-500 mt-2">
-            Formato: REP-NNNNNN (ejemplo: REP-000001)
+            Formato: REP- seguido de 12 letras/números (ejemplo: REP-A1B2C3D4E5F6)
           </p>
         </div>
       </form>

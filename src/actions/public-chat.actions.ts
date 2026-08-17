@@ -45,18 +45,20 @@ async function getClientIP(): Promise<string> {
   return "unknown";
 }
 
-function parseTrackingCode(code: string): number | null {
-  const match = code.match(/REP-(\d{6})/);
+function parseTrackingToken(code: string): string | null {
+  // "REP-" + the opaque trackingToken (see FormSubmission.trackingToken) —
+  // never the sequential id, which is guessable/enumerable platform-wide.
+  const match = code.match(/REP-([A-Za-z0-9]{12})/);
   if (!match) return null;
-  return parseInt(match[1], 10);
+  return match[1].toUpperCase();
 }
 
 async function resolveOpenReport(code: string) {
-  const reportId = parseTrackingCode(code);
-  if (!reportId) throw new Error("Código de seguimiento no válido");
+  const token = parseTrackingToken(code);
+  if (!token) throw new Error("Código de seguimiento no válido");
 
   const submission = await prisma.formSubmission.findUnique({
-    where: { id: reportId },
+    where: { trackingToken: token },
     select: {
       id: true,
       orgId: true,

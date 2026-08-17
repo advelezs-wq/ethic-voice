@@ -46,14 +46,16 @@ export async function getReportByTrackingCode(
   code: string
 ): Promise<PublicReportData | null> {
   try {
-    // Extract the numeric ID from the tracking code (e.g., "REP-000001" -> 1)
-    const match = code.match(/REP-(\d{6})/);
+    // "REP-" + a 12-char opaque token (see trackingToken on FormSubmission)
+    // — not the sequential id, which would make every report on the
+    // platform enumerable by guessing REP-000001, REP-000002...
+    const match = code.match(/REP-([A-Za-z0-9]{12})/);
     if (!match) return null;
 
-    const reportId = parseInt(match[1], 10);
+    const token = match[1].toUpperCase();
 
     const submission = await prisma.formSubmission.findUnique({
-      where: { id: reportId },
+      where: { trackingToken: token },
       include: {
         organization: true,
         activities: {
@@ -73,8 +75,7 @@ export async function getReportByTrackingCode(
 
     if (!submission) return null;
 
-    // Format the tracking code
-    const trackingCode = await createTrackingCode(submission.id);
+    const trackingCode = `REP-${submission.trackingToken}`;
 
     // Only forward activities on the public allowlist above — and even for
     // those, only forward `details` for report_submitted's static system
@@ -148,9 +149,22 @@ export async function getReportByTrackingCode(
   }
 }
 
+// Builds the code reporters use at /track/[code] — every caller of this
+// hands it to the actual reporter (submission success screen, manual-report
+// creation, confirmation emails), so it must be the opaque trackingToken,
+// never the sequential id. Internal dashboard displays (REP-000123 labels in
+// the team UI, PDFs, notification titles) intentionally build that sequential
+// format inline elsewhere — those are authenticated-only, so enumeration
+// doesn't apply, and there's no reason to touch every one of those call sites.
 export async function createTrackingCode(
   submissionId: number
 ): Promise<string> {
-  // Using the same format as generateReportReference
-  return `REP-${String(submissionId).padStart(6, "0")}`;
+  const submission = await prisma.formSubmission.findUnique({
+    where: { id: submissionId },
+    select: { trackingToken: true },
+  });
+  if (!submission) {
+    throw new Error(`Cannot build tracking code: submission ${submissionId} not found`);
+  }
+  return `REP-${submission.trackingToken}`;
 }

@@ -720,6 +720,386 @@ export async function updateReportStatus(
   }
 }
 
+export type ClosureOutcome =
+  | "SUBSTANTIATED"
+  | "PARTIALLY_SUBSTANTIATED"
+  | "UNSUBSTANTIATED"
+  | "INCONCLUSIVE";
+
+const CLOSURE_OUTCOMES: ClosureOutcome[] = [
+  "SUBSTANTIATED",
+  "PARTIALLY_SUBSTANTIATED",
+  "UNSUBSTANTIATED",
+  "INCONCLUSIVE",
+];
+
+/**
+ * Two-stage case closure. An org admin closing their own investigation
+ * closes immediately (status -> CLOSED). Anyone else with edit access
+ * submits a request that an admin must separately approve — report.status
+ * doesn't change until then, so the reporter-facing tracking page stays
+ * accurate ("En investigación") while the request is pending review.
+ */
+export async function requestReportClosure(
+  reportId: number,
+  data: { summary: string; outcome: ClosureOutcome }
+): Promise<{ finalized: boolean }> {
+  const { userId } = await auth();
+  const orgId = await resolveOrgId();
+  const user = await currentUser();
+  if (!userId || !orgId || !user) throw new Error("No autorizado");
+
+  if (!CLOSURE_OUTCOMES.includes(data.outcome)) {
+    throw new Error("Resultado de cierre no válido");
+  }
+  const summary = data.summary?.trim();
+  if (!summary || summary.length < 10) {
+    throw new Error(
+      "Describe brevemente lo que se hizo en el caso (mínimo 10 caracteres)"
+    );
+  }
+
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId, orgId },
+    select: { status: true, closureRequestedAt: true, closureApprovedAt: true },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+  if (report.status === "CLOSED") throw new Error("El caso ya está cerrado");
+  if (report.closureRequestedAt && !report.closureApprovedAt) {
+    throw new Error("Ya hay una solicitud de cierre pendiente de aprobación");
+  }
+
+  const userEmail = user.primaryEmailAddress?.emailAddress;
+  const isAdmin = await userHasPermission(
+    userId,
+    orgId,
+    "canManageOrganization",
+    userEmail
+  );
+  const requesterName = user.fullName || "Usuario";
+  const now = new Date();
+  const reportCode = `REP-${String(reportId).padStart(6, "0")}`;
+
+  if (isAdmin) {
+    await prisma.formSubmission.update({
+      where: { id: reportId },
+      data: {
+        status: "CLOSED",
+        processedAt: now,
+        closureSummary: summary,
+        closureOutcome: data.outcome,
+        closureRequestedAt: now,
+        closureRequestedById: userId,
+        closureRequestedByName: requesterName,
+        closureApprovedAt: now,
+        closureApprovedById: userId,
+        closureApprovedByName: requesterName,
+        closureRejectionReason: null,
+      },
+    });
+
+    await prisma.reportActivity.createMany({
+      data: [
+        {
+          submissionId: reportId,
+          action: "STATUS_CHANGED",
+          details: { oldStatus: report.status, newStatus: "CLOSED" },
+          userId,
+          userName: requesterName,
+        },
+        {
+          submissionId: reportId,
+          action: "CLOSURE_APPROVED",
+          details: { outcome: data.outcome, selfClosed: true },
+          userId,
+          userName: requesterName,
+        },
+      ],
+    });
+
+    revalidatePath(`/app/reports/${reportId}`);
+    revalidatePath("/app/reports");
+    return { finalized: true };
+  }
+
+  await prisma.formSubmission.update({
+    where: { id: reportId },
+    data: {
+      closureSummary: summary,
+      closureOutcome: data.outcome,
+      closureRequestedAt: now,
+      closureRequestedById: userId,
+      closureRequestedByName: requesterName,
+      closureApprovedAt: null,
+      closureApprovedById: null,
+      closureApprovedByName: null,
+      closureRejectionReason: null,
+    },
+  });
+
+  await prisma.reportActivity.create({
+    data: {
+      submissionId: reportId,
+      action: "CLOSURE_REQUESTED",
+      details: { outcome: data.outcome },
+      userId,
+      userName: requesterName,
+    },
+  });
+
+  // Notify org admins that a closure request awaits their review.
+  try {
+    const admins = await prisma.organizationMembership.findMany({
+      where: { orgId, role: "ADMIN" },
+      select: { userId: true },
+    });
+    for (const admin of admins) {
+      await notificationsService.createNotification({
+        userId: admin.userId,
+        orgId,
+        type: "SYSTEM_ALERT" as any,
+        title: "Solicitud de cierre pendiente",
+        message: `${requesterName} solicitó cerrar el caso ${reportCode} — requiere tu aprobación`,
+        actionUrl: `/app/reports/${reportId}`,
+        reportId,
+        channel: "BOTH" as any,
+        metadata: { kind: "closure_requested", outcome: data.outcome },
+      });
+    }
+  } catch (e) {
+    console.error("Error notifying admins of closure request:", e);
+  }
+
+  revalidatePath(`/app/reports/${reportId}`);
+  revalidatePath("/app/reports");
+  return { finalized: false };
+}
+
+export async function approveReportClosure(reportId: number): Promise<void> {
+  const { userId } = await auth();
+  const orgId = await resolveOrgId();
+  const user = await currentUser();
+  if (!userId || !orgId || !user) throw new Error("No autorizado");
+
+  const userEmail = user.primaryEmailAddress?.emailAddress;
+  const isAdmin = await userHasPermission(
+    userId,
+    orgId,
+    "canManageOrganization",
+    userEmail
+  );
+  if (!isAdmin) {
+    throw new Error("Solo un administrador puede aprobar el cierre del caso");
+  }
+
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId, orgId },
+    select: {
+      status: true,
+      closureRequestedAt: true,
+      closureApprovedAt: true,
+      closureRequestedById: true,
+    },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+  if (!report.closureRequestedAt || report.closureApprovedAt) {
+    throw new Error("No hay una solicitud de cierre pendiente");
+  }
+
+  const approverName = user.fullName || "Usuario";
+  const now = new Date();
+
+  await prisma.formSubmission.update({
+    where: { id: reportId },
+    data: {
+      status: "CLOSED",
+      processedAt: now,
+      closureApprovedAt: now,
+      closureApprovedById: userId,
+      closureApprovedByName: approverName,
+      closureRejectionReason: null,
+    },
+  });
+
+  await prisma.reportActivity.createMany({
+    data: [
+      {
+        submissionId: reportId,
+        action: "STATUS_CHANGED",
+        details: { oldStatus: report.status, newStatus: "CLOSED" },
+        userId,
+        userName: approverName,
+      },
+      {
+        submissionId: reportId,
+        action: "CLOSURE_APPROVED",
+        details: {},
+        userId,
+        userName: approverName,
+      },
+    ],
+  });
+
+  try {
+    if (
+      report.closureRequestedById &&
+      report.closureRequestedById !== userId
+    ) {
+      await notificationsService.createNotification({
+        userId: report.closureRequestedById,
+        orgId,
+        type: "SYSTEM_ALERT" as any,
+        title: "Cierre de caso aprobado",
+        message: `${approverName} aprobó el cierre del caso REP-${String(reportId).padStart(6, "0")}`,
+        actionUrl: `/app/reports/${reportId}`,
+        reportId,
+        channel: "IN_APP" as any,
+        metadata: { kind: "closure_approved" },
+      });
+    }
+  } catch (e) {
+    console.error("Error notifying requester of closure approval:", e);
+  }
+
+  revalidatePath(`/app/reports/${reportId}`);
+  revalidatePath("/app/reports");
+}
+
+export async function rejectReportClosure(
+  reportId: number,
+  reason?: string
+): Promise<void> {
+  const { userId } = await auth();
+  const orgId = await resolveOrgId();
+  const user = await currentUser();
+  if (!userId || !orgId || !user) throw new Error("No autorizado");
+
+  const userEmail = user.primaryEmailAddress?.emailAddress;
+  const isAdmin = await userHasPermission(
+    userId,
+    orgId,
+    "canManageOrganization",
+    userEmail
+  );
+  if (!isAdmin) {
+    throw new Error(
+      "Solo un administrador puede rechazar una solicitud de cierre"
+    );
+  }
+
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId, orgId },
+    select: {
+      closureRequestedAt: true,
+      closureApprovedAt: true,
+      closureRequestedById: true,
+    },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+  if (!report.closureRequestedAt || report.closureApprovedAt) {
+    throw new Error("No hay una solicitud de cierre pendiente");
+  }
+
+  const reviewerName = user.fullName || "Usuario";
+  const cleanReason = reason?.trim() || null;
+
+  await prisma.formSubmission.update({
+    where: { id: reportId },
+    data: {
+      closureRequestedAt: null,
+      closureRequestedById: null,
+      closureRequestedByName: null,
+      closureRejectionReason: cleanReason,
+    },
+  });
+
+  await prisma.reportActivity.create({
+    data: {
+      submissionId: reportId,
+      action: "CLOSURE_REJECTED",
+      details: { reason: cleanReason },
+      userId,
+      userName: reviewerName,
+    },
+  });
+
+  try {
+    if (report.closureRequestedById && report.closureRequestedById !== userId) {
+      const reportCode = `REP-${String(reportId).padStart(6, "0")}`;
+      await notificationsService.createNotification({
+        userId: report.closureRequestedById,
+        orgId,
+        type: "SYSTEM_ALERT" as any,
+        title: "Solicitud de cierre rechazada",
+        message: cleanReason
+          ? `${reviewerName} rechazó el cierre del caso ${reportCode}: ${cleanReason}`
+          : `${reviewerName} rechazó el cierre del caso ${reportCode}`,
+        actionUrl: `/app/reports/${reportId}`,
+        reportId,
+        channel: "BOTH" as any,
+        metadata: { kind: "closure_rejected", reason: cleanReason },
+      });
+    }
+  } catch (e) {
+    console.error("Error notifying requester of closure rejection:", e);
+  }
+
+  revalidatePath(`/app/reports/${reportId}`);
+  revalidatePath("/app/reports");
+}
+
+export async function reopenReportCase(reportId: number): Promise<void> {
+  const { userId } = await auth();
+  const orgId = await resolveOrgId();
+  const user = await currentUser();
+  if (!userId || !orgId || !user) throw new Error("No autorizado");
+
+  const userEmail = user.primaryEmailAddress?.emailAddress;
+  const isAdmin = await userHasPermission(
+    userId,
+    orgId,
+    "canManageOrganization",
+    userEmail
+  );
+  if (!isAdmin) {
+    throw new Error("Solo un administrador puede reabrir un caso cerrado");
+  }
+
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId, orgId },
+    select: { status: true },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+
+  await prisma.formSubmission.update({
+    where: { id: reportId },
+    data: {
+      status: "IN_PROGRESS",
+      processedAt: null,
+      closureRequestedAt: null,
+      closureRequestedById: null,
+      closureRequestedByName: null,
+      closureApprovedAt: null,
+      closureApprovedById: null,
+      closureApprovedByName: null,
+      closureRejectionReason: null,
+    },
+  });
+
+  await prisma.reportActivity.create({
+    data: {
+      submissionId: reportId,
+      action: "STATUS_CHANGED",
+      details: { oldStatus: report.status, newStatus: "IN_PROGRESS" },
+      userId,
+      userName: user.fullName || "Usuario",
+    },
+  });
+
+  revalidatePath(`/app/reports/${reportId}`);
+  revalidatePath("/app/reports");
+}
+
 export async function deleteReport(reportId: number): Promise<void> {
   const { userId } = await auth();
   const orgId = await resolveOrgId();
@@ -927,6 +1307,9 @@ export async function getReport(reportId: number): Promise<FormSubmission> {
     updatedAt: report.updatedAt.toISOString(),
     submittedAt: report.submittedAt.toISOString(),
     processedAt: report.processedAt?.toISOString() || null,
+    closureOutcome: report.closureOutcome as FormSubmission["closureOutcome"],
+    closureRequestedAt: report.closureRequestedAt?.toISOString() || null,
+    closureApprovedAt: report.closureApprovedAt?.toISOString() || null,
     // Return sanitized metadata to the UI (no IP, userAgent, etc.)
     metadata: ((): any => {
       const m = report.metadata as Record<string, any> | null;

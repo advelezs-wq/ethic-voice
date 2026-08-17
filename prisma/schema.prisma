@@ -384,6 +384,25 @@ model FormSubmission {
   // Internal notes
   internalNotes String?
 
+  // Two-stage closure workflow: an investigator (or admin) submits a
+  // closure request with findings/outcome + evidence (reuses ReportAttachment,
+  // uploaded before the request). If the requester lacks org-admin
+  // permissions the report stays open (status unchanged) until an admin
+  // approves — closureApprovedAt/By are only set on the actual final close,
+  // which is the only path that sets status to CLOSED. closureOutcome is
+  // one of SUBSTANTIATED | PARTIALLY_SUBSTANTIATED | UNSUBSTANTIATED |
+  // INCONCLUSIVE, validated in application code (not a DB enum, to avoid an
+  // ALTER TYPE on a shared prod database for four string values).
+  closureSummary         String?
+  closureOutcome         String?
+  closureRequestedAt     DateTime?
+  closureRequestedById   String?
+  closureRequestedByName String?
+  closureApprovedAt      DateTime?
+  closureApprovedById    String?
+  closureApprovedByName  String?
+  closureRejectionReason String?
+
   // Opaque public tracking token used by /track/[code] — deliberately NOT
   // derived from `id`, which is a global autoincrement shared across every
   // organization on the platform and would otherwise let anyone enumerate

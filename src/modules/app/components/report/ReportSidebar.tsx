@@ -297,8 +297,13 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
   return (
     <div className="space-y-4">
 
-      {/* ── 1. Closure / Status of case ── */}
-      {permissions.canEditReports && (
+      {/* ── 1. Closure / Status of case ──
+          Gated on canViewAssignedReports (true for members and admins
+          alike), not canEditReports (admin-only) — the whole point of the
+          two-stage closure flow is that a regular investigator (ORG_MEMBER)
+          can submit a closure request; only approving it is admin-only,
+          and that's enforced separately inside the component itself. */}
+      {permissions.canViewAssignedReports && (
         <ReportClosureComponent
           report={report}
           reportId={reportId}
@@ -328,7 +333,11 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
           }
         >
           <div className="space-y-3">
-            {/* Estado */}
+            {/* Estado — CLOSED is deliberately excluded here: closing a
+                case always goes through the closure card below, which
+                requires a findings summary, an outcome, and (for
+                non-admins) admin approval. This dropdown skipping straight
+                to "Cerrado" would bypass all of that. */}
             <Select
               label="Estado"
               size="sm"
@@ -338,10 +347,15 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
               isDisabled={statusLoading}
               aria-label="Estado del reporte"
             >
-              {Object.values(REPORT_STATUS).map((s) => (
-                <SelectItem key={s}>{getStatusLabel(s)}</SelectItem>
-              ))}
+              {Object.values(REPORT_STATUS)
+                .filter((s) => s !== "CLOSED")
+                .map((s) => (
+                  <SelectItem key={s}>{getStatusLabel(s)}</SelectItem>
+                ))}
             </Select>
+            <p className="text-xs text-slate-400">
+              Para cerrar el caso, usa la sección de cierre más arriba.
+            </p>
 
             {/* Prioridad */}
             <Select

@@ -138,6 +138,20 @@ export interface FormSubmission {
   reporterEmail: string | null;
   reporterPhone: string | null;
   internalNotes: string | null;
+  closureSummary: string | null;
+  closureOutcome:
+    | "SUBSTANTIATED"
+    | "PARTIALLY_SUBSTANTIATED"
+    | "UNSUBSTANTIATED"
+    | "INCONCLUSIVE"
+    | null;
+  closureRequestedAt: string | null;
+  closureRequestedById: string | null;
+  closureRequestedByName: string | null;
+  closureApprovedAt: string | null;
+  closureApprovedById: string | null;
+  closureApprovedByName: string | null;
+  closureRejectionReason: string | null;
   createdAt: string;
   updatedAt: string;
   // Relations

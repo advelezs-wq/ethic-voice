@@ -226,6 +226,16 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
               >
                 {getStatusLabel(report.status)}
               </Chip>
+              {report.closureRequestedAt && !report.closureApprovedAt && (
+                <Chip
+                  color="primary"
+                  size="sm"
+                  variant="flat"
+                  startContent={<i className="icon-[lucide--clock] size-3" />}
+                >
+                  Cierre pendiente de aprobación
+                </Chip>
+              )}
               {report.aiSeverity && (
                 <Chip
                   color={getSeverityColor(report.aiSeverity)}

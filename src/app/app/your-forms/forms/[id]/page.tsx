@@ -3,6 +3,7 @@ import { FormLinkShare } from "@/modules/forms/components/FormLinkShare";
 import { CardStats } from "@/modules/forms/components/forms-stats/CardStats";
 import { SubmissionsTable } from "@/modules/forms/components/SubmissionsTable";
 import { VisitBtn } from "@/modules/forms/components/VisitBtn";
+import Link from "next/link";
 import React from "react";
 
 const FormDetailPage = async ({
@@ -39,6 +40,13 @@ const FormDetailPage = async ({
       <div className="py-4 border-b border-emerald-100">
         <div className="container flex gap-2 items-center justify-between">
           <FormLinkShare shareUrl={form.shareURL} />
+          <Link
+            href={`/app/your-forms/forms/${form.id}/poster`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm text-emerald-900 hover:bg-emerald-50 transition-all shrink-0"
+          >
+            <i className="icon-[lucide--qr-code] size-4" />
+            Póster QR
+          </Link>
         </div>
       </div>
       <div className="w-full pt-8 gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 container">

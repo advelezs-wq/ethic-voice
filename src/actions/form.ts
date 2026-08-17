@@ -3,8 +3,44 @@
 import { formSchema, formSchemaType } from "@/modules/forms/lib/schemas/form";
 import prisma from "@/modules/prisma/lib/prisma";
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { resolveOrgId } from "@/modules/core/utils/org-resolver";
 
 class UserNotFoundErr extends Error {}
+
+export interface FormPosterData {
+  title: string;
+  shareURL: string;
+  orgName: string;
+  orgLogoUrl: string | null;
+}
+
+// Org-scoped (not userId-scoped like the rest of this file) since any team
+// member should be able to print the poster for the org's reporting form,
+// not just whoever originally created it.
+export async function getFormPosterData(
+  formId: number
+): Promise<FormPosterData | null> {
+  const { userId } = await auth();
+  const orgId = await resolveOrgId();
+  if (!userId || !orgId) throw new Error("No autorizado");
+
+  const form = await prisma.form.findFirst({
+    where: { id: formId, orgId },
+    select: {
+      title: true,
+      shareURL: true,
+      organization: { select: { name: true, logoUrl: true } },
+    },
+  });
+  if (!form) return null;
+
+  return {
+    title: form.title,
+    shareURL: form.shareURL,
+    orgName: form.organization.name,
+    orgLogoUrl: form.organization.logoUrl,
+  };
+}
 
 export async function GetFormStats() {
   const user = await currentUser();

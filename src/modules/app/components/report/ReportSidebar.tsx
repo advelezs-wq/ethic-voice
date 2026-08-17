@@ -44,6 +44,7 @@ import {
 import { useOrganization } from "@/modules/app/hooks/useOrganization";
 import { AssignMembersModal } from "../reports/AssignMembersModal";
 import { ReportClosureComponent } from "./ReportClosureComponent";
+import { EscalateCaseModal } from "./EscalateCaseModal";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
 import { useSafeToast } from "../../hooks/useSafeToast";
 import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
@@ -143,6 +144,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
   /* modals */
   const { isOpen: isAssignOpen, onOpen: onAssignOpen, onOpenChange: onAssignOpenChange } = useDisclosure();
   const { isOpen: isNotesOpen, onOpen: onNotesOpen, onOpenChange: onNotesOpenChange } = useDisclosure();
+  const { isOpen: isEscalateOpen, onOpen: onEscalateOpen, onClose: onEscalateClose } = useDisclosure();
 
   /* derived */
   const isClosed = report.status === "CLOSED" || report.status === "RESOLVED";
@@ -318,17 +320,30 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
           icon="icon-[lucide--settings]"
           action={
             permissions.canAssignReports ? (
-              <Button
-                size="sm"
-                variant="flat"
-                color="primary"
-                onPress={onAssignOpen}
-                startContent={
-                  <i className="icon-[lucide--user-round-plus] size-3.5" />
-                }
-              >
-                Asignar
-              </Button>
+              <div className="flex items-center gap-1.5">
+                <Button
+                  size="sm"
+                  variant="flat"
+                  color="warning"
+                  onPress={onEscalateOpen}
+                  startContent={
+                    <i className="icon-[lucide--arrow-up-circle] size-3.5" />
+                  }
+                >
+                  Escalar
+                </Button>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  color="primary"
+                  onPress={onAssignOpen}
+                  startContent={
+                    <i className="icon-[lucide--user-round-plus] size-3.5" />
+                  }
+                >
+                  Asignar
+                </Button>
+              </div>
             ) : undefined
           }
         >
@@ -740,6 +755,15 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
             router.refresh();
           }}
           organizationId={currentOrganization.id}
+        />
+      )}
+
+      {permissions.canAssignReports && (
+        <EscalateCaseModal
+          isOpen={isEscalateOpen}
+          onClose={onEscalateClose}
+          reportId={reportId}
+          onSuccess={() => router.refresh()}
         />
       )}
 

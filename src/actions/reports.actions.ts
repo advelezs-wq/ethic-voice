@@ -733,6 +733,52 @@ const CLOSURE_OUTCOMES: ClosureOutcome[] = [
   "INCONCLUSIVE",
 ];
 
+const RETALIATION_FOLLOWUP_DAYS = 30;
+
+/**
+ * Anti-retaliation check-in: standard practice on the platforms this was
+ * modeled on (NAVEX, Case IQ) is a scheduled follow-up after closure to
+ * confirm the reporter hasn't faced retaliation. Reuses the existing
+ * task/ReportUpdate infrastructure instead of a new schema — it's just a
+ * task due in 30 days, assigned to whoever closed the case.
+ */
+async function scheduleRetaliationFollowUp(params: {
+  reportId: number;
+  isAnonymous: boolean;
+  closerId: string;
+  closerName: string;
+}) {
+  const { reportId, isAnonymous, closerId, closerName } = params;
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + RETALIATION_FOLLOWUP_DAYS);
+
+  try {
+    const siblingMax = await prisma.reportUpdate.aggregate({
+      where: { submissionId: reportId, parentId: null },
+      _max: { order: true },
+    });
+
+    await prisma.reportUpdate.create({
+      data: {
+        submissionId: reportId,
+        title: "Seguimiento anti-represalias",
+        description: isAnonymous
+          ? "El caso está cerrado. Publica un mensaje en el chat del caso (visible para el denunciante) preguntando si ha sufrido algún tipo de represalia desde el cierre."
+          : "El caso está cerrado. Contacta directamente al denunciante para confirmar que no ha sufrido ningún tipo de represalia.",
+        priority: "medium",
+        status: "pending",
+        dueDate,
+        assignedTo: closerName,
+        order: (siblingMax._max.order ?? 0) + 1,
+        createdById: closerId,
+        createdByName: closerName,
+      },
+    });
+  } catch (e) {
+    console.error("Error scheduling retaliation follow-up:", e);
+  }
+}
+
 /**
  * Two-stage case closure. An org admin closing their own investigation
  * closes immediately (status -> CLOSED). Anyone else with edit access
@@ -761,7 +807,12 @@ export async function requestReportClosure(
 
   const report = await prisma.formSubmission.findFirst({
     where: { id: reportId, orgId },
-    select: { status: true, closureRequestedAt: true, closureApprovedAt: true },
+    select: {
+      status: true,
+      closureRequestedAt: true,
+      closureApprovedAt: true,
+      isAnonymous: true,
+    },
   });
   if (!report) throw new Error("Reporte no encontrado o sin acceso");
   if (report.status === "CLOSED") throw new Error("El caso ya está cerrado");
@@ -815,6 +866,13 @@ export async function requestReportClosure(
           userName: requesterName,
         },
       ],
+    });
+
+    await scheduleRetaliationFollowUp({
+      reportId,
+      isAnonymous: report.isAnonymous,
+      closerId: userId,
+      closerName: requesterName,
     });
 
     revalidatePath(`/app/reports/${reportId}`);
@@ -899,6 +957,7 @@ export async function approveReportClosure(reportId: number): Promise<void> {
       closureRequestedAt: true,
       closureApprovedAt: true,
       closureRequestedById: true,
+      isAnonymous: true,
     },
   });
   if (!report) throw new Error("Reporte no encontrado o sin acceso");
@@ -938,6 +997,13 @@ export async function approveReportClosure(reportId: number): Promise<void> {
         userName: approverName,
       },
     ],
+  });
+
+  await scheduleRetaliationFollowUp({
+    reportId,
+    isAnonymous: report.isAnonymous,
+    closerId: userId,
+    closerName: approverName,
   });
 
   try {

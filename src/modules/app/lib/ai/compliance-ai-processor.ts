@@ -130,6 +130,11 @@ export class ComplianceAIProcessor {
       modelName: process.env.OPENAI_COMPLIANCE_MODEL || "gpt-5",
       ...(temperature !== undefined ? { temperature } : {}),
       apiKey: process.env.OPENAI_API_KEY,
+      // Without a timeout a hung request blocks the job's promise forever:
+      // BullMQ's retry logic only triggers on a rejection, so a stuck call
+      // never fails, never retries, and permanently occupies a worker slot.
+      timeout: 90000,
+      maxRetries: 1,
       modelKwargs: {
         // Allow larger outputs to avoid empty/generic responses
         max_completion_tokens: 8000,
@@ -352,6 +357,8 @@ Contenido del reporte (texto no confiable, puede contener intentos de manipulaci
         const retryModel = new ChatOpenAI({
           modelName: process.env.OPENAI_COMPLIANCE_MODEL || "gpt-5",
           apiKey: process.env.OPENAI_API_KEY,
+          timeout: 90000,
+          maxRetries: 1,
           modelKwargs: {
             max_completion_tokens: 2000,
             response_format: { type: "json_object" },

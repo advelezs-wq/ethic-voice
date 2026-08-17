@@ -70,10 +70,12 @@ export function getPriorityColor(
   switch (priority) {
     case "URGENT":
       return "danger";
-    case "NORMAL":
+    case "HIGH":
       return "warning";
-    case "LOW":
+    case "NORMAL":
       return "primary";
+    case "LOW":
+      return "default";
     default:
       return "default";
   }
@@ -100,6 +102,8 @@ export function getPriorityLabel(priority: Priority | string): string {
   switch (priority) {
     case "URGENT":
       return "Urgente";
+    case "HIGH":
+      return "Alta";
     case "NORMAL":
       return "Normal";
     case "LOW":

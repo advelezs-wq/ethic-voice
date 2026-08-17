@@ -104,6 +104,9 @@ export default function AISystemDebugPage() {
                   <StatusBadge
                     status={health.workersRunning ? "ok" : "error"}
                   />
+                  <p className="text-xs text-gray-400 mt-1">
+                    {health.connectedWorkerCount ?? 0} conectado(s)
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">OpenAI</p>

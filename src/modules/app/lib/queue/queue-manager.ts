@@ -146,6 +146,17 @@ export function createSubmissionWorker() {
 
   worker.on("failed", (job, err) => {
     console.error(`❌ [QUEUE] Submission job ${job?.id} failed:`, err);
+
+    // Only alert admins once retries are exhausted — otherwise every
+    // intermediate retry would page them for something that may still
+    // self-heal on the next attempt.
+    const attemptsMade = job?.attemptsMade ?? 0;
+    const maxAttempts = job?.opts?.attempts ?? 1;
+    if (job?.data?.orgId && attemptsMade >= maxAttempts) {
+      notifyAdminsOfPermanentFailure(job.data.orgId, job.data.metadata?.submissionId, err.message).catch(
+        (notifyErr) => console.error("Failed to notify admins of AI failure:", notifyErr)
+      );
+    }
   });
 
   worker.on("stalled", (jobId) => {
@@ -153,6 +164,38 @@ export function createSubmissionWorker() {
   });
 
   return worker;
+}
+
+async function notifyAdminsOfPermanentFailure(
+  orgId: string,
+  submissionId: number | undefined,
+  errorMessage: string
+) {
+  const { notificationsService } = await import(
+    "@/modules/app/services/notifications.service"
+  );
+  const prisma = (await import("@/modules/prisma/lib/prisma")).default;
+  const { NotificationType, NotificationChannel } = await import("@prisma/client");
+
+  const admins = await prisma.organizationMembership.findMany({
+    where: { orgId, role: "ADMIN" },
+  });
+
+  for (const admin of admins) {
+    await notificationsService.createNotification({
+      userId: admin.userId,
+      orgId,
+      type: NotificationType.SYSTEM_ALERT,
+      title: "Análisis de IA no se pudo completar",
+      message: submissionId
+        ? `El análisis automático del reporte REP-${String(submissionId).padStart(6, "0")} falló tras varios intentos. El reporte sigue disponible; usa el botón "Analizar con IA" para reintentarlo manualmente.`
+        : `El análisis automático de un reporte falló tras varios intentos y necesita revisión manual.`,
+      actionUrl: submissionId ? `/app/reports/${submissionId}` : "/app/reports",
+      reportId: submissionId,
+      channel: NotificationChannel.IN_APP,
+      metadata: { kind: "ai_processing_failed", errorMessage: errorMessage.slice(0, 300) },
+    });
+  }
 }
 
 // Enhanced submission queue function with better error handling and deduplication

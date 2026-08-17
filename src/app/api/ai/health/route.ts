@@ -1,4 +1,4 @@
-import { getQueueStats } from "@/modules/app/lib/queue/queue-manager";
+import { getQueueStats, submissionQueue, emailQueue } from "@/modules/app/lib/queue/queue-manager";
 import prisma from "@/modules/prisma/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import IORedis from "ioredis";
@@ -55,8 +55,20 @@ export async function GET() {
       },
     });
 
-    // 5. Check if workers are running
-    const workersRunning = queueStats;
+    // 5. Check if workers are running — count Redis clients actually
+    // connected as BullMQ workers on these queues (queueStats being a
+    // truthy object here previously always reported "running").
+    let connectedWorkerCount = 0;
+    try {
+      const [submissionWorkers, emailWorkers] = await Promise.all([
+        submissionQueue.getWorkers(),
+        emailQueue.getWorkers(),
+      ]);
+      connectedWorkerCount = submissionWorkers.length + emailWorkers.length;
+    } catch {
+      connectedWorkerCount = 0;
+    }
+    const workersRunning = connectedWorkerCount > 0;
 
     return NextResponse.json({
       status: "ok",
@@ -72,6 +84,7 @@ export async function GET() {
         : "No configurado",
       recentJobs,
       workersRunning,
+      connectedWorkerCount,
       env: {
         hasOpenAI: !!process.env.OPENAI_API_KEY,
         hasRedis: !!process.env.REDIS_URL,

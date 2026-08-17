@@ -22,6 +22,26 @@ interface PublicActivity {
   details?: any;
 }
 
+// Allowlist, not a denylist: every OTHER ReportActivity action in this
+// codebase (task/update create-edit-delete, custom investigator notes,
+// attachment uploads with their Cloudinary URL, priority/category/subject
+// edits, admin notes, comments...) carries investigator-internal content —
+// sometimes literal free-text notes about the accused — in its `details`.
+// getReportByTrackingCode is unauthenticated and reachable by guessing a
+// sequential 6-digit code, so anything not named here must never reach the
+// public payload, full stop. Keys are matched case-insensitively since
+// callers are inconsistent about UPPER_SNAKE_CASE vs lower_snake_case.
+const PUBLIC_ACTIVITY_LABELS: Record<string, string> = {
+  report_submitted: "Denuncia recibida",
+  created_manually: "Denuncia recibida",
+  status_changed: "Estado actualizado",
+  investigator_assigned: "Investigador asignado",
+  investigation_started: "Investigación iniciada",
+  evidence_reviewed: "Evidencia revisada",
+  report_resolved: "Caso resuelto",
+  report_closed: "Caso cerrado",
+};
+
 export async function getReportByTrackingCode(
   code: string
 ): Promise<PublicReportData | null> {
@@ -38,7 +58,12 @@ export async function getReportByTrackingCode(
         organization: true,
         activities: {
           orderBy: { createdAt: "desc" },
-          take: 50, // Limit activities for performance
+          // Most ReportActivity rows are investigator-internal (tasks,
+          // custom notes, comments, attachments) and get filtered out below
+          // by PUBLIC_ACTIVITY_LABELS — an active investigation can easily
+          // log 50+ internal entries between two genuinely public ones, so
+          // this needs real headroom or the public timeline goes stale.
+          take: 200,
         },
         assignments: {
           orderBy: { createdAt: "desc" },
@@ -51,49 +76,24 @@ export async function getReportByTrackingCode(
     // Format the tracking code
     const trackingCode = await createTrackingCode(submission.id);
 
-    // Filter activities to only show public-safe information
+    // Only forward activities on the public allowlist above — and even for
+    // those, only forward `details` for report_submitted's static system
+    // message (never user/investigator-authored free text).
     const publicActivities = submission.activities
       .map((activity) => {
-        let publicAction = activity.action;
+        const normalizedAction = activity.action.toLowerCase();
+        const publicAction = PUBLIC_ACTIVITY_LABELS[normalizedAction];
+        if (!publicAction) return null;
 
-        // Sanitize action descriptions
-        switch (activity.action) {
-          case "report_submitted":
-            publicAction = "Denuncia recibida";
-            break;
-          case "status_changed":
-            publicAction = "Estado actualizado";
-            break;
-          case "investigator_assigned":
-            publicAction = "Investigador asignado";
-            break;
-          case "investigation_started":
-            publicAction = "Investigación iniciada";
-            break;
-          case "evidence_reviewed":
-            publicAction = "Evidencia revisada";
-            break;
-          case "report_resolved":
-            publicAction = "Caso resuelto";
-            break;
-          case "report_closed":
-            publicAction = "Caso cerrado";
-            break;
-          default: {
-            // Hide internal actions — case-insensitive, since internal team
-            // activity is logged in UPPER_SNAKE_CASE (e.g. "COMMENT_ADDED",
-            // "ADMIN_NOTES_ADDED") while this switch's named cases above are
-            // lower_snake_case. A case-sensitive check here let every team
-            // comment (internal AND external) leak a generic timeline entry.
-            const lowerAction = activity.action.toLowerCase();
-            if (
-              lowerAction.includes("internal") ||
-              lowerAction.includes("comment") ||
-              lowerAction.includes("note")
-            ) {
-              return null;
-            }
-            publicAction = "Actualización del caso";
+        let details: PublicActivity["details"] = null;
+        if (
+          normalizedAction === "report_submitted" &&
+          activity.details &&
+          typeof activity.details === "object"
+        ) {
+          const raw = activity.details as Record<string, unknown>;
+          if (typeof raw.description === "string") {
+            details = { description: raw.description };
           }
         }
 
@@ -101,7 +101,7 @@ export async function getReportByTrackingCode(
           id: activity.id,
           action: publicAction,
           createdAt: activity.createdAt.toISOString(),
-          details: activity.details,
+          details,
         };
       })
       .filter(Boolean) as PublicActivity[];

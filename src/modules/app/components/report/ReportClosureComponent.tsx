@@ -69,7 +69,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
   const handleCloseCase = async () => {
     try {
       setIsClosing(true);
-      await updateReportStatus(reportId, "CLOSED");
+      await updateReportStatus(reportId, "CLOSED", closureSummary);
       showSuccess("Caso cerrado exitosamente");
       onStatusChange?.();
       onCloseModalOpenChange();

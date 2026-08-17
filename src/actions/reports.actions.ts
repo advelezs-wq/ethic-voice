@@ -666,7 +666,8 @@ export async function getReportsWithFilters(
 
 export async function updateReportStatus(
   reportId: number,
-  status: ReportStatus
+  status: ReportStatus,
+  closureSummary?: string
 ): Promise<void> {
   const { userId } = await auth();
   const orgId = await resolveOrgId();
@@ -692,6 +693,12 @@ export async function updateReportStatus(
         processedAt:
           status === "CLOSED" || status === "RESOLVED" ? new Date() : null,
         updatedAt: new Date(),
+        // ReportClosureComponent's "Resumen de cierre" textarea used to be
+        // collected and then silently discarded — it was never passed to
+        // this function, so it never reached the DB. internalNotes is what
+        // that same component later reads back and displays as the closure
+        // summary once the case shows as closed.
+        ...(closureSummary?.trim() ? { internalNotes: closureSummary.trim() } : {}),
       },
     });
 

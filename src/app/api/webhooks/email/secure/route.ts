@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { securityManager, getClientIP } from '@/modules/app/lib/security/rate-limiter';
+import { EmailWebhookService } from '@/modules/app/services/email-account.service';
+import {
+  normalizeImprovMxPayload,
+  type NormalizedInboundEmail,
+} from '@/lib/security/email-webhook-normalize';
+import { timingSafeEqual } from 'crypto';
+
+// This is the canonical inbound-email webhook: it layers the spam/rate-limit
+// checks below on top of the same persistence path used by /api/webhooks/email/improvmx.
+// Register this URL (not the other two email webhook routes) as the ImprovMX
+// forwarding webhook, with IMPROVMX_WEBHOOK_SECRET (or EMAIL_WEBHOOK_SHARED_SECRET)
+// set to the same value on both sides.
 
 // Email rate limiting - more restrictive for emails
 const emailRateLimits = {
@@ -43,21 +55,12 @@ const spamPatterns = {
 // Email tracking for rate limiting
 const emailCounts = new Map<string, { count: number; lastReset: number; subjects: string[] }>();
 
-interface EmailData {
-  from: { email: string; name: string };
-  to: string;
-  subject: string;
-  text?: string;
-  html?: string;
-  attachments?: Array<{ filename: string; size: number }>;
-}
-
-function calculateSpamScore(emailData: EmailData): number {
+function calculateSpamScore(email: NormalizedInboundEmail): number {
   let score = 0;
-  const { from, subject, text = '', html = '', attachments = [] } = emailData;
+  const { sender, sender_name, subject, text, html, attachments } = email;
 
   // Check sender patterns
-  if (spamPatterns.senders.some(pattern => pattern.test(from.email))) {
+  if (spamPatterns.senders.some(pattern => pattern.test(sender))) {
     score += 30;
   }
 
@@ -87,7 +90,7 @@ function calculateSpamScore(emailData: EmailData): number {
   }
 
   // Check for suspicious sender name patterns
-  if (from.name.length < 2 || /[0-9]{5,}/.test(from.name)) {
+  if (sender_name.length < 2 || /[0-9]{5,}/.test(sender_name)) {
     score += 15;
   }
 
@@ -102,7 +105,7 @@ function isValidEmailFormat(email: string): boolean {
 function trackEmailSubmission(senderEmail: string, subject: string): boolean {
   const now = Date.now();
   const hourInMs = 60 * 60 * 1000;
-  
+
   // Clean old entries
   for (const [email, data] of emailCounts.entries()) {
     if (now - data.lastReset > hourInMs) {
@@ -111,7 +114,7 @@ function trackEmailSubmission(senderEmail: string, subject: string): boolean {
   }
 
   const existing = emailCounts.get(senderEmail);
-  
+
   if (!existing) {
     emailCounts.set(senderEmail, {
       count: 1,
@@ -127,25 +130,47 @@ function trackEmailSubmission(senderEmail: string, subject: string): boolean {
   }
 
   // Check for similar subjects (possible spam)
-  const similarSubjects = existing.subjects.filter(s => 
-    s.toLowerCase().includes(subject.toLowerCase()) || 
+  const similarSubjects = existing.subjects.filter(s =>
+    s.toLowerCase().includes(subject.toLowerCase()) ||
     subject.toLowerCase().includes(s.toLowerCase())
   ).length;
 
-      if (similarSubjects >= emailRateLimits.perSubject) {
-      return false;
-    }
+  if (similarSubjects >= emailRateLimits.perSubject) {
+    return false;
+  }
 
   existing.count++;
   existing.subjects.push(subject);
   return true;
 }
 
+function verifyWebhookSecret(req: NextRequest): boolean {
+  const expectedSecret =
+    process.env.IMPROVMX_WEBHOOK_SECRET || process.env.EMAIL_WEBHOOK_SHARED_SECRET;
+  // ImprovMX's webhook config UI may not offer custom headers, so accept the
+  // secret as a query param (?secret=...) too — whichever the dashboard allows.
+  const providedSecret =
+    req.headers.get('x-improvmx-webhook-secret') ||
+    req.headers.get('x-webhook-secret') ||
+    req.nextUrl.searchParams.get('secret');
+
+  if (!expectedSecret) return false;
+
+  const expected = Buffer.from(expectedSecret);
+  const provided = Buffer.from(providedSecret || '');
+  return expected.length === provided.length && timingSafeEqual(expected, provided);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const clientIP = getClientIP(request);
     const userAgent = request.headers.get('user-agent') || '';
-    
+
+    if (!verifyWebhookSecret(request)) {
+      securityManager.logAttack(clientIP, 'Invalid Signature', 'Invalid or missing email webhook secret');
+      return NextResponse.json({ error: 'Unauthorized webhook' }, { status: 401 });
+    }
+
     // Rate limiting for webhook endpoint
     const rateLimitResult = await securityManager.checkRateLimit({
       type: 'email',
@@ -167,11 +192,11 @@ export async function POST(request: NextRequest) {
     securityManager.updateStats('email');
     securityManager.trackIPRequest(clientIP, 'email');
 
-    // Parse email data
-    const emailData: EmailData = await request.json();
-    
+    const rawPayload = await request.json();
+    const emailData = normalizeImprovMxPayload(rawPayload);
+
     // Validate required fields
-    if (!emailData.from?.email || !emailData.subject || !emailData.to) {
+    if (!emailData.sender || !emailData.subject || !emailData.recipient) {
       return NextResponse.json(
         { error: 'Invalid email data' },
         { status: 400 }
@@ -179,7 +204,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate email format
-    if (!isValidEmailFormat(emailData.from.email)) {
+    if (!isValidEmailFormat(emailData.sender)) {
       return NextResponse.json(
         { error: 'Invalid email format' },
         { status: 400 }
@@ -188,13 +213,13 @@ export async function POST(request: NextRequest) {
 
     // Calculate spam score
     const spamScore = calculateSpamScore(emailData);
-    
+
     if (spamScore >= 70) {
-      securityManager.logAttack(clientIP, 'Spam Detection', `High spam score (${spamScore}) from ${emailData.from.email}`);
-      
+      securityManager.logAttack(clientIP, 'Spam Detection', `High spam score (${spamScore}) from ${emailData.sender}`);
+
       // Block the IP for repeated spam attempts
       securityManager.blockIP(clientIP, 3600000); // 1 hour
-      
+
       return NextResponse.json(
         { error: 'Email rejected due to spam indicators' },
         { status: 400 }
@@ -202,8 +227,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Track email submissions for rate limiting
-    const withinLimits = trackEmailSubmission(emailData.from.email, emailData.subject);
-    
+    const withinLimits = trackEmailSubmission(emailData.sender, emailData.subject);
+
     if (!withinLimits) {
       return NextResponse.json(
         { error: 'Too many emails from this sender' },
@@ -211,26 +236,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const webhookService = new EmailWebhookService();
+    const result = await webhookService.processInboundEmail(emailData, 'improvmx');
+
     // Log successful email processing activity
     securityManager.logActivity(
-      clientIP, 
-      'Email Received', 
-      `Email from ${emailData.from.email}: "${emailData.subject}"`
+      clientIP,
+      'Email Received',
+      `Email from ${emailData.sender}: "${emailData.subject}"`
     );
 
-    // Here you would process the email using your existing email processing logic
-    // For now, we'll just return success
     return NextResponse.json({
-      success: true,
-      processed: true,
+      success: Boolean(result?.success),
+      submissionId: result?.submissionId,
+      queued: result?.queued,
+      skipped: result?.skipped,
+      duplicate: result?.duplicate,
+      reason: result?.reason,
       spamScore,
-      message: 'Email processed successfully',
+      timestamp: new Date().toISOString(),
     });
 
   } catch (error) {
     const clientIP = getClientIP(request);
     console.error(`[SECURITY] Error processing email webhook from IP: ${clientIP}:`, error);
-    
+
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -244,4 +274,4 @@ export async function GET() {
     status: 'healthy',
     timestamp: new Date().toISOString(),
   });
-} 
+}

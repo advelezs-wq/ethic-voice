@@ -4,8 +4,12 @@ import {
   getClientIP,
 } from "@/modules/app/lib/security/rate-limiter";
 import { EmailWebhookService } from "@/modules/app/services/email-account.service";
+import { normalizeImprovMxPayload } from "@/lib/security/email-webhook-normalize";
 import { timingSafeEqual } from "crypto";
 
+// Prefer /api/webhooks/email/secure as the ImprovMX forwarding target — it
+// does everything this route does plus spam scoring and per-sender rate
+// limiting. This route is kept for direct/manual testing.
 export async function POST(req: NextRequest) {
   try {
     const clientIP = getClientIP(req);
@@ -15,7 +19,8 @@ export async function POST(req: NextRequest) {
       process.env.EMAIL_WEBHOOK_SHARED_SECRET;
     const providedWebhookSecret =
       req.headers.get("x-improvmx-webhook-secret") ||
-      req.headers.get("x-webhook-secret");
+      req.headers.get("x-webhook-secret") ||
+      req.nextUrl.searchParams.get("secret");
 
     if (expectedWebhookSecret) {
       const expected = Buffer.from(expectedWebhookSecret);
@@ -103,24 +108,3 @@ export async function GET() {
   );
 }
 
-function normalizeImprovMxPayload(data: Record<string, unknown>) {
-  const from = (data.from || {}) as { email?: string; name?: string };
-  const toEntry = Array.isArray(data.to) ? data.to[0] : null;
-  const toEmail =
-    (toEntry && typeof toEntry === "object" && "email" in toEntry
-      ? String((toEntry as { email?: string }).email || "")
-      : "") ||
-    String(((data.envelope || {}) as { recipient?: string }).recipient || "");
-
-  return {
-    sender: from.email || String(data.sender || ""),
-    sender_name: from.name || String(data.sender_name || ""),
-    recipient: toEmail,
-    subject: String(data.subject || ""),
-    text: String(data.text || ""),
-    html: typeof data.html === "string" ? data.html : "",
-    timestamp: data.timestamp || Date.now(),
-    "message-id": String(data["message-id"] || data.messageId || ""),
-    attachments: Array.isArray(data.attachments) ? data.attachments : [],
-  };
-}

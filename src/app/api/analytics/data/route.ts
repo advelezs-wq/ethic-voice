@@ -60,15 +60,15 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Get organization members (excluding admin)
+    // Get organization members. Includes admins: in smaller orgs the admin
+    // is often the one actually working cases, and excluding that role here
+    // used to zero out Total Miembros/Miembros Activos/Top Performance for
+    // any org whose only active investigator is its admin.
     const organizationMembers = await prisma.user.findMany({
       where: {
         memberships: {
           some: {
             orgId: orgId,
-            role: {
-              not: "ADMIN",
-            },
           },
         },
       },

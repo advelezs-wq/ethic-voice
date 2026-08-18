@@ -18,6 +18,11 @@ enum Severity {
 enum OrganizationRole {
   ADMIN
   MEMBER
+  // Read-only oversight role (external auditor, board/compliance viewer):
+  // sees every report and its full activity/chat/task history org-wide,
+  // same as ADMIN, but cannot edit, assign, close, escalate, invite, manage
+  // settings, or write into a case's investigation record (chat/tasks/notes).
+  VIEWER
 }
 
 /// Current status of a subscription

@@ -42,6 +42,24 @@ export const getRolePermissions = (role: UserRole): UserPermissions => {
         canViewOrganizationStats: false,
         canViewTeamStats: true,
       };
+    case UserRole.ORG_VIEWER:
+      // Read-only oversight: sees everything org-wide like an admin, but
+      // every write/manage flag is false. Callers that need to gate
+      // participation in a case's record (chat, tasks, notes) check the
+      // raw role directly rather than a permission flag here, since no
+      // other role needs to be blocked from those.
+      return {
+        canViewAllOrganizations: false,
+        canCreateOrganization: false,
+        canViewAllReports: true,
+        canAssignReports: false,
+        canEditReports: false,
+        canViewAssignedReports: true,
+        canManageOrganization: false,
+        canInviteMembers: false,
+        canViewOrganizationStats: true,
+        canViewTeamStats: true,
+      };
     default:
       return {
         canViewAllOrganizations: false,
@@ -111,6 +129,8 @@ export async function getUserRole(
         return UserRole.ORG_ADMIN;
       case "MEMBER":
         return UserRole.ORG_MEMBER;
+      case "VIEWER":
+        return UserRole.ORG_VIEWER;
       default:
         return UserRole.ORG_MEMBER;
     }
@@ -181,6 +201,24 @@ export async function resolveReportScopeUserId(
 ): Promise<string | undefined> {
   const role = await getUserRoleWithSuperAdmin(userId, orgId, userEmail);
   return role === UserRole.ORG_MEMBER ? userId : undefined;
+}
+
+/**
+ * Blocks the VIEWER role from write actions that don't otherwise go
+ * through userHasPermission (task/comment/note creation on a report) — a
+ * read-only oversight account shouldn't be able to write into the record
+ * it's meant to be auditing. Throws if blocked; no-op otherwise.
+ */
+export async function assertRoleCanWrite(
+  userId: string,
+  orgId: string
+): Promise<void> {
+  const membership = await prisma.organizationMembership.findUnique({
+    where: { userId_orgId: { userId, orgId } },
+  });
+  if (membership?.role === "VIEWER") {
+    throw new Error("Tu rol es de solo lectura — no puedes realizar esta acción");
+  }
 }
 
 // Utility function to check if user has specific permission

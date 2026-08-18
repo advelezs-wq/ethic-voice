@@ -34,6 +34,7 @@ import { SubmissionSource } from "@/types/submission.types";
 import {
   userHasPermission,
   isSuperAdmin as isSuperAdminByEmail,
+  assertRoleCanWrite,
 } from "@/modules/core/utils/permissions";
 import { cookies } from "next/headers";
 
@@ -2063,6 +2064,7 @@ export async function addReportNote(
   if (!report) {
     throw new Error("Report not found");
   }
+  await assertRoleCanWrite(authUserId, orgId);
 
   await prisma.$transaction([
     prisma.formSubmission.update({
@@ -2137,6 +2139,7 @@ export async function createReportUpdate(
     if (!report) {
       throw new Error("Report not found or access denied");
     }
+    await assertRoleCanWrite(userId, orgId);
 
     // Check if report is closed
     if (report.status === "CLOSED" || report.status === "RESOLVED") {
@@ -2243,6 +2246,7 @@ export async function updateReportUpdate(
     if (!existingUpdate) {
       throw new Error("Update not found or access denied");
     }
+    await assertRoleCanWrite(userId, orgId);
 
     // Check if report is closed
     if (
@@ -2315,6 +2319,7 @@ export async function deleteReportUpdate(updateId: number) {
     if (!existingUpdate) {
       throw new Error("Update not found or access denied");
     }
+    await assertRoleCanWrite(userId, orgId);
 
     // Check if report is closed
     if (
@@ -2442,6 +2447,7 @@ export async function createCustomReportActivity(
     if (!report) {
       throw new Error("Report not found or access denied");
     }
+    await assertRoleCanWrite(userId, orgId);
 
     // Idempotency: avoid duplicates created within 10s with same title/description by same user
     const tenSecondsAgo = new Date(Date.now() - 10_000);
@@ -2835,6 +2841,7 @@ export async function createReportTask(
     where: { id: reportId, orgId },
   });
   if (!report) throw new Error("Report not found or access denied");
+  await assertRoleCanWrite(userId, orgId);
 
   if (report.status === "CLOSED" || report.status === "RESOLVED") {
     throw new Error("No se pueden agregar tareas a un caso cerrado");
@@ -2915,6 +2922,7 @@ export async function updateReportTask(
     where: { id: taskId, submission: { orgId } },
   });
   if (!existing) throw new Error("Task not found or access denied");
+  await assertRoleCanWrite(userId, orgId);
 
   const isCompleting = data.status === "completed" && existing.status !== "completed";
 
@@ -2989,6 +2997,7 @@ export async function deleteReportTask(taskId: number) {
     where: { id: taskId, submission: { orgId } },
   });
   if (!existing) throw new Error("Task not found or access denied");
+  await assertRoleCanWrite(userId, orgId);
 
   // Delete children first to avoid FK constraint violations, then parent
   await prisma.$transaction(async (tx) => {

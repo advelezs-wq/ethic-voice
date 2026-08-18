@@ -23,7 +23,7 @@ interface TeamMember {
   userId: string;
   userName: string;
   email: string;
-  role: "ADMIN" | "MEMBER";
+  role: "ADMIN" | "MEMBER" | "VIEWER";
   departmentId?: string;
   departmentName?: string;
   assignedReports: number;
@@ -109,6 +109,7 @@ export function TeamMembersView({
 
   const admins = members.filter((m) => m.role === "ADMIN");
   const regularMembers = members.filter((m) => m.role === "MEMBER");
+  const viewers = members.filter((m) => m.role === "VIEWER");
 
   return (
     <div className="p-6 space-y-6">
@@ -122,7 +123,7 @@ export function TeamMembersView({
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <Card>
           <CardBody className="text-center">
             <p className="text-2xl font-bold">{members.length}</p>
@@ -141,6 +142,14 @@ export function TeamMembersView({
               {regularMembers.length}
             </p>
             <p className="text-sm text-slate-500">Investigadores</p>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody className="text-center">
+            <p className="text-2xl font-bold text-slate-500">
+              {viewers.length}
+            </p>
+            <p className="text-sm text-slate-500">Observadores</p>
           </CardBody>
         </Card>
         <Card>
@@ -314,6 +323,50 @@ export function TeamMembersView({
                         </Button>
                       </div>
                     </div>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Viewers (read-only oversight) */}
+        {viewers.length > 0 && (
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Observadores</h2>
+            <p className="text-sm text-slate-500 -mt-2 mb-4">
+              Acceso de solo lectura a todos los casos — sin permisos de edición
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {viewers.map((member) => (
+                <Card
+                  key={member.userId}
+                  className="hover:shadow-lg transition-shadow"
+                >
+                  <CardBody className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <User
+                        name={member.userName}
+                        description={member.email}
+                        avatarProps={{
+                          name: member.userName[0],
+                          size: "lg",
+                        }}
+                      />
+                      <Chip color="default" size="sm" variant="flat">
+                        Solo lectura
+                      </Chip>
+                    </div>
+                    <Button
+                      as={Link}
+                      href={`/app/team/${member.userId}`}
+                      variant="flat"
+                      color="primary"
+                      size="sm"
+                      className="w-full"
+                    >
+                      Ver Detalles
+                    </Button>
                   </CardBody>
                 </Card>
               ))}

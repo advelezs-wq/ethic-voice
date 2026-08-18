@@ -116,7 +116,14 @@ export async function PATCH(
     const { orgId } = await context.params;
     const body = await req.json();
     const memberId = String(body?.memberId || "").trim();
-    const role = body?.role === "ADMIN" ? "ADMIN" : body?.role === "MEMBER" ? "MEMBER" : null;
+    const role =
+      body?.role === "ADMIN"
+        ? "ADMIN"
+        : body?.role === "VIEWER"
+          ? "VIEWER"
+          : body?.role === "MEMBER"
+            ? "MEMBER"
+            : null;
 
     if (!orgId || !memberId || !role) {
       return NextResponse.json(
@@ -188,7 +195,7 @@ export async function PATCH(
       }
     }
 
-    if (targetMembership.role === "ADMIN" && role === "MEMBER") {
+    if (targetMembership.role === "ADMIN" && role !== "ADMIN") {
       const adminCount = await prisma.organizationMembership.count({
         where: { orgId, role: "ADMIN" },
       });
@@ -217,7 +224,7 @@ export async function PATCH(
         }
       } else {
         const memberCount = await prisma.organizationMembership.count({
-          where: { orgId, role: "MEMBER" },
+          where: { orgId, role: { in: ["MEMBER", "VIEWER"] } },
         });
         if (
           config.features.maxInvestigators >= 0 &&

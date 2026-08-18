@@ -88,3 +88,46 @@ export async function assertUserCanAccessReport(
 
   return submission;
 }
+
+/**
+ * Same access check as assertUserCanAccessReport, plus a block on the
+ * VIEWER role — for any action that writes into a case's investigation
+ * record (chat messages, attachments, tasks, notes). A read-only oversight
+ * account shouldn't be able to insert itself into the record it's meant to
+ * be auditing.
+ */
+export async function assertUserCanWriteToReport(
+  reportId: number
+): Promise<Pick<FormSubmission, "orgId" | "status">> {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error("No autorizado");
+  }
+
+  const submission = await prisma.formSubmission.findUnique({
+    where: { id: reportId },
+    select: { orgId: true, status: true },
+  });
+
+  if (!submission) {
+    throw new Error("Report not found");
+  }
+
+  const membership = await prisma.organizationMembership.findUnique({
+    where: {
+      userId_orgId: { userId, orgId: submission.orgId },
+    },
+  });
+
+  if (!membership) {
+    throw new Error("No autorizado");
+  }
+
+  if (membership.role === "VIEWER") {
+    throw new Error(
+      "Tu rol es de solo lectura — no puedes escribir en este caso"
+    );
+  }
+
+  return submission;
+}

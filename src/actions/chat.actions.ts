@@ -225,7 +225,7 @@ export async function sendMessage(
 
   const submission = await (
     await import("@/modules/core/utils/org-resolver")
-  ).assertUserCanAccessReport(reportId);
+  ).assertUserCanWriteToReport(reportId);
 
   if (submission.status === "ARCHIVED") {
     throw new Error("Cannot send messages to archived reports");
@@ -411,7 +411,7 @@ export async function editMessage(
 
   await (
     await import("@/modules/core/utils/org-resolver")
-  ).assertUserCanAccessReport(message.submissionId);
+  ).assertUserCanWriteToReport(message.submissionId);
 
   const updatedMessage = await prisma.reportComment.update({
     where: { id: messageId },
@@ -492,7 +492,7 @@ export async function deleteMessage(messageId: number): Promise<void> {
 
   await (
     await import("@/modules/core/utils/org-resolver")
-  ).assertUserCanAccessReport(message.submissionId);
+  ).assertUserCanWriteToReport(message.submissionId);
 
   const submissionId = message.submissionId;
 
@@ -529,7 +529,7 @@ export async function toggleReaction(
 
   await (
     await import("@/modules/core/utils/org-resolver")
-  ).assertUserCanAccessReport(message.submissionId);
+  ).assertUserCanWriteToReport(message.submissionId);
 
   const existingReaction = await prisma.commentReaction.findUnique({
     where: {

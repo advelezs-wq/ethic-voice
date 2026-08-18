@@ -4,6 +4,8 @@ export enum UserRole {
   SUPER_ADMIN = "SUPER_ADMIN",
   ORG_ADMIN = "ORG_ADMIN",
   ORG_MEMBER = "ORG_MEMBER",
+  // Read-only oversight (external auditor / board / compliance viewer).
+  ORG_VIEWER = "ORG_VIEWER",
 }
 
 export interface UserPermissions {
@@ -23,7 +25,7 @@ export interface OrganizationMember {
   id: string;
   userId: string;
   orgId: string;
-  role: "ADMIN" | "MEMBER";
+  role: "ADMIN" | "MEMBER" | "VIEWER";
   isBlocked?: boolean;
   user: {
     id: string;
@@ -36,7 +38,7 @@ export interface OrganizationMember {
 export interface RoleContext {
   role: UserRole;
   permissions: UserPermissions;
-  organizationRole?: "ADMIN" | "MEMBER";
+  organizationRole?: "ADMIN" | "MEMBER" | "VIEWER";
   isSuperAdmin: boolean;
 }
 

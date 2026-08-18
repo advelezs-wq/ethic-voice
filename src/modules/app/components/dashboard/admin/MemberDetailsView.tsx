@@ -65,7 +65,11 @@ export function MemberDetailsView({ data }: MemberDetailsViewProps) {
               color={member.role === "ADMIN" ? "primary" : "default"}
               variant="flat"
             >
-              {member.role === "ADMIN" ? "Administrador" : "Investigador"}
+              {member.role === "ADMIN"
+                ? "Administrador"
+                : member.role === "VIEWER"
+                  ? "Observador (solo lectura)"
+                  : "Investigador"}
             </Chip>
           </div>
         </CardBody>

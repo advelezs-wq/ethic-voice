@@ -43,8 +43,12 @@ export async function POST(
     const activeAdminCount = visibleMemberships.filter(
       (membership) => membership.role === "ADMIN"
     ).length;
+    // VIEWER seats count against the same maxInvestigators bucket as
+    // MEMBER — a read-only role is still a seat, and counting it separately
+    // (or not at all) would let orgs invite unlimited "viewers" to sidestep
+    // seat limits for what's effectively free collaborative access.
     const activeMemberCount = visibleMemberships.filter(
-      (membership) => membership.role === "MEMBER"
+      (membership) => membership.role === "MEMBER" || membership.role === "VIEWER"
     ).length;
 
     const now = new Date();
@@ -59,7 +63,7 @@ export async function POST(
     const pendingMemberInvites = await prisma.organizationInvitation.count({
       where: {
         orgId,
-        role: "MEMBER",
+        role: { in: ["MEMBER", "VIEWER"] },
         status: "pending",
         expiresAt: { gt: now },
       },
@@ -94,13 +98,15 @@ export async function POST(
   }
 
   // Create invitation
+  const invitedRole =
+    role === "ADMIN" ? "ADMIN" : role === "VIEWER" ? "VIEWER" : "MEMBER";
   const token = crypto.randomUUID();
   const invitation = await prisma.organizationInvitation.create({
     data: {
       orgId,
       email,
       invitedById: userId,
-      role: role === "ADMIN" ? "ADMIN" : "MEMBER",
+      role: invitedRole,
       token,
       status: "pending",
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 days
@@ -119,7 +125,7 @@ export async function POST(
     <img src="${appUrl}/brand/logo-nobg.png" alt="EthicVoice" width="120" style="display:inline-block;" />
   </div>
   <h2 style="margin:16px 0;">Invitación a unirte a ${org?.name || "una organización"}</h2>
-  <p>Has sido invitado(a) a unirte como ${invitation.role === "ADMIN" ? "Administrador" : "Miembro"} a la organización <strong>${org?.name}</strong> en EthicVoice.</p>
+  <p>Has sido invitado(a) a unirte como ${invitation.role === "ADMIN" ? "Administrador" : invitation.role === "VIEWER" ? "Observador (solo lectura)" : "Miembro"} a la organización <strong>${org?.name}</strong> en EthicVoice.</p>
   <p>Para aceptar la invitación, haz clic en el siguiente botón:</p>
   <p style="text-align:center; margin:24px 0;">
     <a href="${acceptUrl}" style="background:#111827; color:#fff; padding:12px 20px; text-decoration:none; border-radius:8px; display:inline-block;">Aceptar invitación</a>

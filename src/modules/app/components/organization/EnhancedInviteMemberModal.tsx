@@ -28,8 +28,14 @@ interface EnhancedInviteMemberModalProps {
 
 interface InviteMemberForm {
   email: string;
-  role: "ADMIN" | "MEMBER";
+  role: "ADMIN" | "MEMBER" | "VIEWER";
 }
+
+const ROLE_NAME: Record<InviteMemberForm["role"], string> = {
+  ADMIN: "Administrador",
+  MEMBER: "Investigador",
+  VIEWER: "Observador (solo lectura)",
+};
 
 export function EnhancedInviteMemberModal({
   isOpen,
@@ -74,7 +80,7 @@ export function EnhancedInviteMemberModal({
     return true;
   };
 
-  const checkPlanLimits = (role: "ADMIN" | "MEMBER"): boolean => {
+  const checkPlanLimits = (role: "ADMIN" | "MEMBER" | "VIEWER"): boolean => {
     if (role === "ADMIN") {
       const adminUnlimited = maxUsers === -1;
       if (!adminUnlimited && currentAdminsCount >= maxUsers) {
@@ -86,7 +92,8 @@ export function EnhancedInviteMemberModal({
         return false;
       }
     } else {
-      // -1 means unlimited investigators
+      // -1 means unlimited investigators. VIEWER shares this same bucket
+      // with MEMBER — a read-only seat is still a seat.
       if (maxInvestigators !== -1 && currentMembersCount >= maxInvestigators) {
         addToast({
           title: "Límite de investigadores alcanzado",
@@ -159,7 +166,7 @@ export function EnhancedInviteMemberModal({
 
       addToast({
         title: "¡Invitación enviada exitosamente!",
-        description: `Se ha enviado una invitación a ${form.email} como ${form.role === "ADMIN" ? "Administrador" : "Investigador"}. Recibirá un correo con las instrucciones para unirse.`,
+        description: `Se ha enviado una invitación a ${form.email} como ${ROLE_NAME[form.role]}. Recibirá un correo con las instrucciones para unirse.`,
         color: "success",
       });
 
@@ -187,19 +194,21 @@ export function EnhancedInviteMemberModal({
     onClose();
   };
 
-  const getRoleDescription = (role: "ADMIN" | "MEMBER") => {
-    return role === "ADMIN"
-      ? "Puede gestionar la organización, miembros, configuraciones y ver todos los reportes"
-      : "Puede ver y gestionar reportes asignados, pero no puede gestionar la organización";
+  const getRoleDescription = (role: InviteMemberForm["role"]) => {
+    if (role === "ADMIN")
+      return "Puede gestionar la organización, miembros, configuraciones y ver todos los reportes";
+    if (role === "VIEWER")
+      return "Ve todos los reportes y su historial completo, pero no puede editar, asignar, cerrar casos ni escribir en el chat o las tareas";
+    return "Puede ver y gestionar reportes asignados, pero no puede gestionar la organización";
   };
 
-  const getAvailableSlots = (role: "ADMIN" | "MEMBER") => {
+  const getAvailableSlots = (role: InviteMemberForm["role"]) => {
     if (role === "ADMIN") {
       if (maxUsers === -1) return "∞";
       const remaining = Math.max(maxUsers - currentAdminsCount, 0);
       return remaining;
     }
-    // Investigators
+    // Investigators and viewers share the same seat bucket.
     if (maxInvestigators === -1) return "∞";
     const remaining = Math.max(maxInvestigators - currentMembersCount, 0);
     return remaining;
@@ -262,7 +271,7 @@ export function EnhancedInviteMemberModal({
               <label className="text-sm font-medium text-slate-600">
                 Rol del usuario
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div
                   className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
                     form.role === "ADMIN"
@@ -312,6 +321,31 @@ export function EnhancedInviteMemberModal({
                     {getRoleDescription("MEMBER")}
                   </p>
                 </div>
+
+                <div
+                  className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                    form.role === "VIEWER"
+                      ? "border-primary bg-primary-50"
+                      : "border-emerald-100 hover:border-emerald-200"
+                  }`}
+                  onClick={() =>
+                    setForm((prev) => ({ ...prev, role: "VIEWER" }))
+                  }
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">Observador</span>
+                    <Chip
+                      color="default"
+                      size="sm"
+                      variant={form.role === "VIEWER" ? "solid" : "flat"}
+                    >
+                      {getAvailableSlots("VIEWER")} disponibles
+                    </Chip>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    {getRoleDescription("VIEWER")}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -321,9 +355,7 @@ export function EnhancedInviteMemberModal({
                 <i className="icon-[lucide--user-check] size-4 text-slate-500" />
                 <span className="text-sm text-slate-600">
                   Se enviará invitación como{" "}
-                  <span className="font-medium">
-                    {form.role === "ADMIN" ? "Administrador" : "Investigador"}
-                  </span>
+                  <span className="font-medium">{ROLE_NAME[form.role]}</span>
                 </span>
               </div>
             </div>

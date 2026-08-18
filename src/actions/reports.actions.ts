@@ -1331,6 +1331,111 @@ export async function setReportConfidential(
   revalidatePath("/app/reports");
 }
 
+/**
+ * Right to erasure / "derecho al olvido": scrubs the identified reporter's
+ * name, email, and phone from the case (and from any reporter-authored
+ * chat messages, whose authorName/authorEmail were captured verbatim at
+ * send time) on a data-subject erasure request. The substantive
+ * investigation record — the report content, findings, chat message text
+ * itself — is deliberately left intact: most data-protection regimes
+ * (GDPR Art. 17(3) and LATAM habeas-data equivalents) exempt compliance
+ * investigation records from full erasure while still requiring identity
+ * to be removable on request. Irreversible and admin-only; blocked while
+ * legalHold is active since a litigation hold requires identity to stay
+ * unmodified.
+ */
+export async function anonymizeReporterData(
+  reportId: number,
+  reason?: string
+): Promise<void> {
+  const { userId } = await auth();
+  const orgId = await resolveOrgId();
+  const user = await currentUser();
+  if (!userId || !orgId || !user) throw new Error("No autorizado");
+
+  const userEmail = user.primaryEmailAddress?.emailAddress;
+  const isAdmin = await userHasPermission(
+    userId,
+    orgId,
+    "canManageOrganization",
+    userEmail
+  );
+  if (!isAdmin) {
+    throw new Error(
+      "Solo un administrador puede anonimizar los datos del denunciante"
+    );
+  }
+
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId, orgId },
+    select: {
+      isAnonymous: true,
+      legalHold: true,
+      reporterName: true,
+      reporterEmail: true,
+      reporterPhone: true,
+      reporterDataAnonymized: true,
+    },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+
+  if (report.legalHold) {
+    throw new Error(
+      "No se puede anonimizar mientras el caso está en legal hold — quita el legal hold primero"
+    );
+  }
+
+  if (report.reporterDataAnonymized) {
+    throw new Error("Los datos del denunciante ya fueron anonimizados");
+  }
+
+  if (
+    report.isAnonymous &&
+    !report.reporterName &&
+    !report.reporterEmail &&
+    !report.reporterPhone
+  ) {
+    throw new Error("Este caso ya es anónimo — no hay datos que anonimizar");
+  }
+
+  const actorName = user.fullName || "Usuario";
+  const cleanReason = reason?.trim() || null;
+
+  await prisma.$transaction(async (tx) => {
+    await tx.formSubmission.update({
+      where: { id: reportId },
+      data: {
+        reporterName: null,
+        reporterEmail: null,
+        reporterPhone: null,
+        isAnonymous: true,
+        reporterDataAnonymized: true,
+        reporterDataAnonymizedAt: new Date(),
+        reporterDataAnonymizedById: userId,
+        reporterDataAnonymizedByName: actorName,
+      },
+    });
+
+    await tx.reportComment.updateMany({
+      where: { submissionId: reportId, authorId: "reporter" },
+      data: { authorName: "Denunciante", authorEmail: null },
+    });
+
+    await tx.reportActivity.create({
+      data: {
+        submissionId: reportId,
+        action: "REPORTER_DATA_ANONYMIZED",
+        details: { reason: cleanReason },
+        userId,
+        userName: actorName,
+      },
+    });
+  });
+
+  revalidatePath(`/app/reports/${reportId}`);
+  revalidatePath("/app/reports");
+}
+
 export async function deleteReport(reportId: number): Promise<void> {
   const { userId } = await auth();
   const orgId = await resolveOrgId();
@@ -1565,6 +1670,8 @@ export async function getReport(reportId: number): Promise<FormSubmission> {
     closureApprovedAt: report.closureApprovedAt?.toISOString() || null,
     retentionExpiresAt: report.retentionExpiresAt?.toISOString() || null,
     legalHoldSetAt: report.legalHoldSetAt?.toISOString() || null,
+    reporterDataAnonymizedAt:
+      report.reporterDataAnonymizedAt?.toISOString() || null,
     // Return sanitized metadata to the UI (no IP, userAgent, etc.)
     metadata: ((): any => {
       const m = report.metadata as Record<string, any> | null;

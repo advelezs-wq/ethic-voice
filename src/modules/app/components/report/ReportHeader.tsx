@@ -236,6 +236,18 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
                   Confidencial
                 </Chip>
               )}
+              {report.reporterDataAnonymized && (
+                <Chip
+                  color="default"
+                  size="sm"
+                  variant="flat"
+                  startContent={
+                    <i className="icon-[lucide--user-round-x] size-3" />
+                  }
+                >
+                  Datos anonimizados
+                </Chip>
+              )}
               {report.closureRequestedAt && !report.closureApprovedAt && (
                 <Chip
                   color="primary"

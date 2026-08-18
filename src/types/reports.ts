@@ -159,6 +159,9 @@ export interface FormSubmission {
   legalHoldSetByName: string | null;
   isConfidential: boolean;
   confidentialSetByName: string | null;
+  reporterDataAnonymized: boolean;
+  reporterDataAnonymizedAt: string | null;
+  reporterDataAnonymizedByName: string | null;
   createdAt: string;
   updatedAt: string;
   // Relations

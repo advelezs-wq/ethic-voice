@@ -438,6 +438,19 @@ model FormSubmission {
   confidentialSetById     String?
   confidentialSetByName   String?
 
+  // Right-to-erasure / "derecho al olvido": scrubs the identified
+  // reporter's name/email/phone (and matching reporter chat messages) on
+  // an admin's request, without touching the substantive case record —
+  // most data-protection regimes (GDPR Art. 17(3), LATAM equivalents)
+  // exempt investigation records from full erasure but still require
+  // identity to be removable on request. Irreversible; see
+  // anonymizeReporterData. Blocked while legalHold is active, since a
+  // litigation hold requires identity to stay intact.
+  reporterDataAnonymized     Boolean   @default(false)
+  reporterDataAnonymizedAt   DateTime?
+  reporterDataAnonymizedById String?
+  reporterDataAnonymizedByName String?
+
   // Opaque public tracking token used by /track/[code] — deliberately NOT
   // derived from `id`, which is a global autoincrement shared across every
   // organization on the platform and would otherwise let anyone enumerate

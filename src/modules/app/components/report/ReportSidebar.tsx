@@ -53,6 +53,7 @@ import {
   updateReportMetadata,
   updateReportSubject,
   setReportConfidential,
+  anonymizeReporterData,
 } from "@/actions/reports.actions";
 import { DownloadPDFButton } from "../analytics/DownloadPDFButton";
 import { format } from "date-fns";
@@ -133,6 +134,8 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
   const [priorityLoading, setPriorityLoading] = useState(false);
   const [confidentialLoading, setConfidentialLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [anonymizeReason, setAnonymizeReason] = useState("");
+  const [anonymizeLoading, setAnonymizeLoading] = useState(false);
 
   React.useEffect(() => {
     if (!currentOrganization?.id) return;
@@ -147,6 +150,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
   const { isOpen: isAssignOpen, onOpen: onAssignOpen, onOpenChange: onAssignOpenChange } = useDisclosure();
   const { isOpen: isNotesOpen, onOpen: onNotesOpen, onOpenChange: onNotesOpenChange } = useDisclosure();
   const { isOpen: isEscalateOpen, onOpen: onEscalateOpen, onClose: onEscalateClose } = useDisclosure();
+  const { isOpen: isAnonymizeOpen, onOpen: onAnonymizeOpen, onOpenChange: onAnonymizeOpenChange, onClose: onAnonymizeClose } = useDisclosure();
 
   /* derived */
   const isClosed = report.status === "CLOSED" || report.status === "RESOLVED";
@@ -223,6 +227,22 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
       );
     } finally {
       setConfidentialLoading(false);
+    }
+  };
+
+  const handleAnonymizeReporter = async () => {
+    setAnonymizeLoading(true);
+    try {
+      await anonymizeReporterData(reportId, anonymizeReason.trim() || undefined);
+      showSuccess("Datos del denunciante anonimizados");
+      onAnonymizeClose();
+      router.refresh();
+    } catch (e) {
+      showError(
+        e instanceof Error ? e.message : "No se pudieron anonimizar los datos"
+      );
+    } finally {
+      setAnonymizeLoading(false);
     }
   };
 
@@ -496,6 +516,52 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
                 )
               )}
             </Select>
+
+            {/* Derecho al olvido — anonimizar datos del denunciante */}
+            {permissions.canAssignReports &&
+              (report.reporterName ||
+                report.reporterEmail ||
+                report.reporterPhone ||
+                report.reporterDataAnonymized) && (
+              <>
+                {report.reporterDataAnonymized ? (
+                  <p className="text-xs text-slate-400 flex items-start gap-1.5">
+                    <i className="icon-[lucide--user-round-x] size-3.5 mt-0.5 shrink-0" />
+                    Datos del denunciante anonimizados
+                    {report.reporterDataAnonymizedByName
+                      ? ` por ${report.reporterDataAnonymizedByName}`
+                      : ""}
+                    {report.reporterDataAnonymizedAt
+                      ? ` el ${formatDate(report.reporterDataAnonymizedAt)}`
+                      : ""}
+                  </p>
+                ) : (
+                  <Tooltip
+                    content={
+                      report.legalHold
+                        ? "No se puede anonimizar mientras el caso esté en legal hold"
+                        : "Elimina permanentemente el nombre, correo y teléfono del denunciante identificado. No se puede deshacer."
+                    }
+                  >
+                    <span className="inline-block w-full">
+                      <Button
+                        size="sm"
+                        variant="flat"
+                        color="default"
+                        fullWidth
+                        isDisabled={report.legalHold}
+                        onPress={onAnonymizeOpen}
+                        startContent={
+                          <i className="icon-[lucide--user-round-x] size-3.5" />
+                        }
+                      >
+                        Anonimizar datos del denunciante
+                      </Button>
+                    </span>
+                  </Tooltip>
+                )}
+              </>
+            )}
 
             {/* AI analysis button */}
             {hasAi && !hasAiAnalysis && (
@@ -802,6 +868,54 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
           reportId={reportId}
           onSuccess={() => router.refresh()}
         />
+      )}
+
+      {permissions.canAssignReports && (
+        <Modal isOpen={isAnonymizeOpen} onOpenChange={onAnonymizeOpenChange} size="lg">
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex items-center gap-2">
+                  <i className="icon-[lucide--user-round-x] size-5 text-red-500" />
+                  Anonimizar datos del denunciante
+                </ModalHeader>
+                <ModalBody>
+                  <p className="text-sm text-slate-600">
+                    Esto elimina permanentemente el nombre, correo y teléfono
+                    del denunciante de este caso, y de sus mensajes en el chat.
+                    El contenido de la denuncia y la investigación se mantienen
+                    intactos. <strong>Esta acción no se puede deshacer.</strong>
+                  </p>
+                  <Textarea
+                    label="Motivo (opcional)"
+                    placeholder="Ej. solicitud de derecho al olvido del denunciante"
+                    value={anonymizeReason}
+                    onValueChange={setAnonymizeReason}
+                    minRows={2}
+                    maxRows={4}
+                  />
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="default" variant="light" onPress={onClose}>
+                    Cancelar
+                  </Button>
+                  <Button
+                    color="danger"
+                    onPress={handleAnonymizeReporter}
+                    isLoading={anonymizeLoading}
+                    startContent={
+                      !anonymizeLoading && (
+                        <i className="icon-[lucide--user-round-x] size-4" />
+                      )
+                    }
+                  >
+                    Anonimizar permanentemente
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       )}
 
       {permissions.canEditReports && (

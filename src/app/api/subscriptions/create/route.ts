@@ -15,6 +15,10 @@ const createSubscriptionBody = z.object({
   billingCycle: z.nativeEnum(BillingCycle).default(BillingCycle.MONTHLY),
   returnUrl: z.string().max(500).optional(),
   openSidebar: z.boolean().optional().default(false),
+  // Only the public marketing pricing page sets this. In-app billing/upgrade
+  // flows intentionally create a new subscription while one is already
+  // active (that's how a plan change happens) and must not be redirected.
+  fromLanding: z.boolean().optional().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -33,7 +37,8 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
-    const { planType, billingCycle, returnUrl, openSidebar } = parsed.data;
+    const { planType, billingCycle, returnUrl, openSidebar, fromLanding } =
+      parsed.data;
 
     // Get plan configuration
     const planConfig = PLAN_CONFIGS[planType as PlanType];
@@ -85,7 +90,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({
           alreadyActive: true,
-          redirectUrl: "/app",
+          redirectUrl: "/app/billing",
           subscription: {
             id: samePlanSubscription.id,
             planName: samePlanSubscription.planName,
@@ -96,6 +101,24 @@ export async function POST(req: NextRequest) {
           message: "La suscripción ya está activa para este plan",
         });
       }
+    }
+
+    // A user with any other active/trialing subscription shouldn't start a
+    // brand-new checkout from the marketing pricing page (that would create a
+    // second, parallel subscription) — send them to in-app billing to change
+    // plan instead. In-app upgrade/downgrade flows use this same endpoint
+    // while a subscription is active by design, so this only applies when
+    // the request came from the landing page.
+    const otherActiveSubscription = existingSubscriptions.find(
+      (sub) => sub.status === "ACTIVE" || sub.status === "TRIALING",
+    );
+    if (fromLanding && otherActiveSubscription && !samePlanSubscription) {
+      return NextResponse.json({
+        alreadyActive: true,
+        redirectUrl: "/app/billing",
+        message:
+          "Ya tienes una suscripción activa. Cambia de plan desde Facturación.",
+      });
     }
 
     // Create new subscription with PENDING status (wait for payment confirmation)

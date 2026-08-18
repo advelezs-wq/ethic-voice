@@ -87,6 +87,7 @@ export default function PricingPlans({ billingCycle }: PricingPlansProps) {
           billingCycle: cycle,
           returnUrl: "/app",
           openSidebar: true,
+          fromLanding: true,
         }),
       });
 

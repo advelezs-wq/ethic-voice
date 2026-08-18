@@ -443,6 +443,27 @@ async function handleSubscriptionUpdated(event: any) {
       });
 
       if (subscription.orgId) {
+        // Keep the Organization's plan/feature flags in sync with the
+        // Subscription record. Without this, a plan change (e.g. via
+        // changeSubscriptionPlan, which already updates Subscription before
+        // Rebill calls back here) never reaches Organization.currentPlan /
+        // isEmailChannelActive / etc., so the UI and feature gates that read
+        // those Organization fields keep showing the old plan indefinitely.
+        await prisma.organization.update({
+          where: { id: subscription.orgId },
+          data: {
+            currentPlan: subscription.planType,
+            hasActivePlan:
+              mapRebillStatusToInternal(subscriptionData.status) ===
+                "ACTIVE" || subscription.status === "ACTIVE",
+            isEmailChannelActive: subscription.hasEmailChannel,
+            isAiProcessingActive: subscription.hasAiProcessing,
+            isChatbotActive: subscription.hasChatbotChannel,
+            isPhoneChannelActive: subscription.hasPhoneChannel,
+          },
+        });
+        await recalculateOrganizationSeatUsage(subscription.orgId);
+
         await emailAccountService.enforceEmailChannelPlanCompliance(
           subscription.orgId
         );

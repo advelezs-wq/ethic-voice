@@ -225,6 +225,27 @@ class SubscriptionManagerService {
       );
 
       if (updatedSubscription.orgId) {
+        // Keep Organization's plan/feature flags in sync with the just-updated
+        // Subscription — without this, currentPlan/isEmailChannelActive/etc.
+        // stay stuck at whatever they were when the org first subscribed, so
+        // upgrades never visibly take effect outside the Subscription record.
+        await prisma.organization.update({
+          where: { id: updatedSubscription.orgId },
+          data: {
+            currentPlan: updatedSubscription.planType,
+            hasActivePlan: true,
+            isEmailChannelActive: updatedSubscription.hasEmailChannel,
+            isAiProcessingActive: updatedSubscription.hasAiProcessing,
+            isChatbotActive: updatedSubscription.hasChatbotChannel,
+            isPhoneChannelActive: updatedSubscription.hasPhoneChannel,
+          },
+        });
+
+        const { recalculateOrganizationSeatUsage } = await import(
+          "@/modules/core/utils/subscription.utils"
+        );
+        await recalculateOrganizationSeatUsage(updatedSubscription.orgId);
+
         await this.emailAccountService.enforceEmailChannelPlanCompliance(
           updatedSubscription.orgId
         );

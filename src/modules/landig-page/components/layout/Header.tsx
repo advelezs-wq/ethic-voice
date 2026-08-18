@@ -77,12 +77,6 @@ export const Header = () => {
       links: [{ href: "/privacidad", label: "Privacidad y Seguridad" }],
     },
     {
-      id: "recursos",
-      label: "Recursos",
-      icon: "icon-[lucide--library]",
-      links: [{ href: "/blog", label: "Blog" }],
-    },
-    {
       id: "nosotros",
       label: "Nosotros",
       icon: "icon-[lucide--users-round]",

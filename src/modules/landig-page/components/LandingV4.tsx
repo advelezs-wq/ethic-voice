@@ -16,6 +16,7 @@ import {
   type LandingVariant,
 } from "@/modules/landig-page/lib/landingConversion";
 import { LandingNav } from "@/modules/landig-page/components/LandingNavBar";
+import { ClientLogos } from "@/modules/landig-page/components/ClientLogos";
 import { FooterDemoCtaBand } from "@/modules/landig-page/components/FooterDemoCtaBand";
 import { LandingMinimalFooter } from "@/modules/landig-page/components/LandingMinimalFooter";
 import { VideoModal } from "@/modules/landig-page/components/VideoModal";
@@ -1380,6 +1381,7 @@ export function LandingV4() {
 
       <main className="pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] pt-[calc(4rem+env(safe-area-inset-top,0px))] sm:pb-12 sm:pt-[calc(4.5rem+env(safe-area-inset-top,0px))] md:pb-10">
         <HeroSection variant={variant} />
+        <ClientLogos />
         <ImpactStatsSection />
         <PainComparisonSection />
         <InteractiveDemoSection />

@@ -157,6 +157,8 @@ export interface FormSubmission {
   legalHoldReason: string | null;
   legalHoldSetAt: string | null;
   legalHoldSetByName: string | null;
+  isConfidential: boolean;
+  confidentialSetByName: string | null;
   createdAt: string;
   updatedAt: string;
   // Relations

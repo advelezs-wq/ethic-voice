@@ -226,6 +226,16 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
               >
                 {getStatusLabel(report.status)}
               </Chip>
+              {report.isConfidential && (
+                <Chip
+                  color="danger"
+                  size="sm"
+                  variant="flat"
+                  startContent={<i className="icon-[lucide--lock] size-3" />}
+                >
+                  Confidencial
+                </Chip>
+              )}
               {report.closureRequestedAt && !report.closureApprovedAt && (
                 <Chip
                   color="primary"

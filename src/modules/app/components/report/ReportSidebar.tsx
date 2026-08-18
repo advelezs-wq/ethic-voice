@@ -52,6 +52,7 @@ import { getDepartments } from "@/actions/department.actions";
 import {
   updateReportMetadata,
   updateReportSubject,
+  setReportConfidential,
 } from "@/actions/reports.actions";
 import { DownloadPDFButton } from "../analytics/DownloadPDFButton";
 import { format } from "date-fns";
@@ -130,6 +131,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
   );
   const [statusLoading, setStatusLoading] = useState(false);
   const [priorityLoading, setPriorityLoading] = useState(false);
+  const [confidentialLoading, setConfidentialLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
 
   React.useEffect(() => {
@@ -202,6 +204,25 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
       showError("No se pudo cambiar la prioridad");
     } finally {
       setPriorityLoading(false);
+    }
+  };
+
+  const handleToggleConfidential = async () => {
+    setConfidentialLoading(true);
+    try {
+      await setReportConfidential(reportId, !report.isConfidential);
+      showSuccess(
+        report.isConfidential
+          ? "Caso ya no es confidencial — visible para todo el equipo"
+          : "Caso marcado como confidencial — solo investigadores asignados y admins pueden verlo"
+      );
+      router.refresh();
+    } catch (e) {
+      showError(
+        e instanceof Error ? e.message : "No se pudo cambiar la confidencialidad"
+      );
+    } finally {
+      setConfidentialLoading(false);
     }
   };
 
@@ -321,6 +342,22 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
           action={
             permissions.canAssignReports ? (
               <div className="flex items-center gap-1.5">
+                <Button
+                  size="sm"
+                  variant="flat"
+                  color={report.isConfidential ? "default" : "danger"}
+                  onPress={handleToggleConfidential}
+                  isLoading={confidentialLoading}
+                  startContent={
+                    !confidentialLoading && (
+                      <i
+                        className={`${report.isConfidential ? "icon-[lucide--lock-open]" : "icon-[lucide--lock]"} size-3.5`}
+                      />
+                    )
+                  }
+                >
+                  {report.isConfidential ? "Quitar confidencial" : "Confidencial"}
+                </Button>
                 <Button
                   size="sm"
                   variant="flat"

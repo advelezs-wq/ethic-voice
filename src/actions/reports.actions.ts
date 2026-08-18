@@ -1263,6 +1263,74 @@ export async function setLegalHold(
   revalidatePath(`/app/reports/${reportId}`);
 }
 
+/**
+ * Restricts (or unrestricts) a case to assigned investigators + admins/
+ * viewers only. Admin-only: it's the mechanism a case gets *hidden* from
+ * the rest of the org, so only an admin should be able to flip it — and
+ * an admin should assign the right investigators before or right after
+ * restricting it, since an unassigned confidential case is invisible to
+ * every non-admin/non-viewer member, including the admin's own team who
+ * might otherwise have picked it up.
+ */
+export async function setReportConfidential(
+  reportId: number,
+  isConfidential: boolean
+): Promise<void> {
+  const { userId } = await auth();
+  const orgId = await resolveOrgId();
+  const user = await currentUser();
+  if (!userId || !orgId || !user) throw new Error("No autorizado");
+
+  const userEmail = user.primaryEmailAddress?.emailAddress;
+  const isAdmin = await userHasPermission(
+    userId,
+    orgId,
+    "canManageOrganization",
+    userEmail
+  );
+  if (!isAdmin) {
+    throw new Error(
+      "Solo un administrador puede marcar un caso como confidencial"
+    );
+  }
+
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId, orgId },
+    select: { isConfidential: true },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+
+  const actorName = user.fullName || "Usuario";
+
+  await prisma.formSubmission.update({
+    where: { id: reportId },
+    data: isConfidential
+      ? {
+          isConfidential: true,
+          confidentialSetById: userId,
+          confidentialSetByName: actorName,
+        }
+      : {
+          isConfidential: false,
+          confidentialSetById: null,
+          confidentialSetByName: null,
+        },
+  });
+
+  await prisma.reportActivity.create({
+    data: {
+      submissionId: reportId,
+      action: isConfidential ? "MARKED_CONFIDENTIAL" : "UNMARKED_CONFIDENTIAL",
+      details: {},
+      userId,
+      userName: actorName,
+    },
+  });
+
+  revalidatePath(`/app/reports/${reportId}`);
+  revalidatePath("/app/reports");
+}
+
 export async function deleteReport(reportId: number): Promise<void> {
   const { userId } = await auth();
   const orgId = await resolveOrgId();
@@ -1454,6 +1522,28 @@ export async function getReport(reportId: number): Promise<FormSubmission> {
 
   if (!report) {
     throw new Error("Report not found");
+  }
+
+  if (report.isConfidential) {
+    const isAssigned = report.assignments.some((a) => a.userId === userId);
+    if (!isAssigned) {
+      const user = await currentUser();
+      const userEmail = user?.primaryEmailAddress?.emailAddress;
+      // canViewAllReports is true for ADMIN, VIEWER (oversight), and
+      // SUPER_ADMIN alike — false for a MEMBER who isn't assigned, which
+      // is exactly who a confidential case needs to be hidden from.
+      const canBypass = await userHasPermission(
+        userId,
+        orgId,
+        "canViewAllReports",
+        userEmail
+      );
+      if (!canBypass) {
+        throw new Error(
+          "Este caso es confidencial — solo los investigadores asignados y administradores pueden verlo"
+        );
+      }
+    }
   }
 
   // Convert Date objects to strings and handle JsonValue types

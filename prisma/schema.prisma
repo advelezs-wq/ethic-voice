@@ -430,6 +430,14 @@ model FormSubmission {
   legalHoldSetById   String?
   legalHoldSetByName String?
 
+  // Restricts this case to assigned investigators + admins/viewers only
+  // (see getReport, assertUserCanAccessReport, getReportsWithFilters) — for
+  // sensitive cases (e.g. against an executive) that shouldn't be visible
+  // to every org member the way a normal case is.
+  isConfidential          Boolean @default(false)
+  confidentialSetById     String?
+  confidentialSetByName   String?
+
   // Opaque public tracking token used by /track/[code] — deliberately NOT
   // derived from `id`, which is a global autoincrement shared across every
   // organization on the platform and would otherwise let anyone enumerate
@@ -457,6 +465,7 @@ model FormSubmission {
   @@index([submittedAt])
   @@index([departmentId])
   @@index([retentionExpiresAt])
+  @@index([isConfidential])
 }
 
 model ReportAttachment {

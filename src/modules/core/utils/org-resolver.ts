@@ -59,6 +59,35 @@ export async function resolveOrgId(): Promise<string | null> {
  * submission row and checks membership, so a mismatched `ev_org` cookie cannot
  * make the action think the report does not exist while the user is viewing it.
  */
+// Confidential cases are hidden from ordinary MEMBER accounts that aren't
+// assigned to them — ADMIN and VIEWER (oversight) still see everything, as
+// does an assigned investigator. Shared by both assert functions below so
+// chat, edits, and reads all respect the same restriction.
+async function assertConfidentialityAllows(
+  reportId: number,
+  userId: string,
+  role: string
+): Promise<void> {
+  const submission = await prisma.formSubmission.findUnique({
+    where: { id: reportId },
+    select: {
+      isConfidential: true,
+      assignments: { select: { userId: true } },
+    },
+  });
+  if (!submission?.isConfidential) return;
+  if (role === "ADMIN" || role === "VIEWER") return;
+
+  const isAssigned = submission.assignments.some((a) => a.userId === userId);
+  if (!isAssigned) {
+    const userEmail = (await currentUser())?.primaryEmailAddress?.emailAddress;
+    if (userEmail && isSuperAdmin(userEmail)) return;
+    throw new Error(
+      "Este caso es confidencial — solo los investigadores asignados y administradores pueden verlo"
+    );
+  }
+}
+
 export async function assertUserCanAccessReport(
   reportId: number
 ): Promise<Pick<FormSubmission, "orgId" | "status">> {
@@ -85,6 +114,8 @@ export async function assertUserCanAccessReport(
   if (!membership) {
     throw new Error("No autorizado");
   }
+
+  await assertConfidentialityAllows(reportId, userId, membership.role);
 
   return submission;
 }
@@ -128,6 +159,8 @@ export async function assertUserCanWriteToReport(
       "Tu rol es de solo lectura — no puedes escribir en este caso"
     );
   }
+
+  await assertConfidentialityAllows(reportId, userId, membership.role);
 
   return submission;
 }

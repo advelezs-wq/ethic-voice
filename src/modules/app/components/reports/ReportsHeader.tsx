@@ -171,7 +171,7 @@ export function ReportsHeader({
               <Select
                 label="Investigador"
                 placeholder="Selecciona un investigador"
-                value={selectedAssignee}
+                selectedKeys={selectedAssignee ? [selectedAssignee] : []}
                 onSelectionChange={(keys) =>
                   setSelectedAssignee(Array.from(keys)[0] as string)
                 }
@@ -204,7 +204,7 @@ export function ReportsHeader({
               <Select
                 label="Nuevo estado"
                 placeholder="Selecciona un estado"
-                value={selectedStatus}
+                selectedKeys={selectedStatus ? [selectedStatus] : []}
                 onSelectionChange={(keys) =>
                   setSelectedStatus(Array.from(keys)[0] as string)
                 }
@@ -230,7 +230,7 @@ export function ReportsHeader({
               <Select
                 label="Nueva prioridad"
                 placeholder="Selecciona una prioridad"
-                value={selectedPriority}
+                selectedKeys={selectedPriority ? [selectedPriority] : []}
                 onSelectionChange={(keys) =>
                   setSelectedPriority(Array.from(keys)[0] as string)
                 }

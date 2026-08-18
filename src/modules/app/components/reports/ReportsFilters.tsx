@@ -205,7 +205,7 @@ export function ReportsFilters({
               )}
 
               <Select
-                value={filters.severity}
+                selectedKeys={filters.severity ? [filters.severity] : []}
                 onSelectionChange={(keys) =>
                   updateFilter("severity", Array.from(keys)[0] as string)
                 }
@@ -231,7 +231,7 @@ export function ReportsFilters({
               </Select>
 
               <Select
-                value={filters.source}
+                selectedKeys={filters.source ? [filters.source] : []}
                 onSelectionChange={(keys) =>
                   updateFilter("source", Array.from(keys)[0] as string)
                 }
@@ -255,7 +255,7 @@ export function ReportsFilters({
               </Select>
 
               <Select
-                value={filters.dateRange}
+                selectedKeys={filters.dateRange ? [filters.dateRange] : []}
                 onSelectionChange={(keys) =>
                   handleDateRangeChange(Array.from(keys)[0] as string)
                 }
@@ -268,7 +268,7 @@ export function ReportsFilters({
               </Select>
 
               <Select
-                value={filters.assignee}
+                selectedKeys={filters.assignee ? [filters.assignee] : []}
                 onSelectionChange={(keys) =>
                   updateFilter("assignee", Array.from(keys)[0] as string)
                 }

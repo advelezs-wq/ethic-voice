@@ -86,8 +86,10 @@ export function AssignDepartmentModal({
             <Select
               label="Departamento"
               placeholder="Selecciona un departamento"
-              value={selectedDepartment}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
+              selectedKeys={selectedDepartment ? [selectedDepartment] : []}
+              onSelectionChange={(keys) =>
+                setSelectedDepartment(Array.from(keys)[0] as string)
+              }
               description="Los reportes del departamento serán visibles para este miembro"
             >
               {departments.map((dept) => (

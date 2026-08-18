@@ -16,7 +16,7 @@ const SERVICES = [
     tag: "Canal ético",
     title: "Línea de Denuncia",
     desc: "Canal seguro y anónimo para reportes internos y externos. Incluye seguimiento en tiempo real.",
-    href: "/servicios/linea-de-denuncia",
+    href: "/services?category=canales-y-programas",
     featured: true,
   },
   {
@@ -24,7 +24,7 @@ const SERVICES = [
     tag: "Inteligencia artificial",
     title: "MentorIA",
     desc: "Análisis predictivo con IA para identificar tendencias y prevenir incidentes éticos antes de que escalen.",
-    href: "/servicios/mentoria",
+    href: "/services?category=desarrollo-software",
     featured: false,
   },
   {
@@ -32,7 +32,7 @@ const SERVICES = [
     tag: "Auditoría",
     title: "Mystery Shopper Ético",
     desc: "Evaluaciones encubiertas para medir tu cumplimiento ético en puntos de contacto críticos.",
-    href: "/servicios/mystery-shopper",
+    href: "/services?category=investigacion-y-casos",
     featured: false,
   },
 ] as const;
@@ -194,7 +194,7 @@ export const ServicesSection = () => {
           {SERVICES.map((s) => {
             const mdPlacement = s.featured
               ? "md:col-start-2 md:row-start-1 md:row-span-2"
-              : s.href === "/servicios/mentoria"
+              : s.href === "/services?category=desarrollo-software"
                 ? "md:col-start-1 md:row-start-1"
                 : "md:col-start-1 md:row-start-2";
             return (

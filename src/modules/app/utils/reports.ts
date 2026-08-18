@@ -207,6 +207,14 @@ export const formatFileSize = (bytes: number) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
+// Cloudinary serves attachment URLs inline by default (browsers open images/PDFs
+// in a new tab instead of downloading them). Inserting the `fl_attachment` flag
+// right after `/upload/` makes Cloudinary respond with a Content-Disposition:
+// attachment header, forcing a real download even though the URL is cross-origin.
+export const getAttachmentDownloadUrl = (fileUrl: string) => {
+  return fileUrl.replace(/\/upload\//, "/upload/fl_attachment/");
+};
+
 export const isImageFile = (mimeType: string) => {
   return mimeType.startsWith("image/");
 };

@@ -5,7 +5,7 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/input";
 import { addToast } from "@/modules/core/utils/safe-toast";
-import { formatFileSize } from "@/modules/app/utils/reports";
+import { formatFileSize, getAttachmentDownloadUrl } from "@/modules/app/utils/reports";
 import { pusherClient } from "@/modules/app/lib/pusher";
 import {
   getPublicReportMessages,
@@ -241,9 +241,8 @@ export function PublicReportChat({ reportId, trackingCode }: PublicReportChatPro
                       {m.attachments.map((att) => (
                         <a
                           key={att.id}
-                          href={att.fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          href={getAttachmentDownloadUrl(att.fileUrl)}
+                          download={att.filename}
                           className={`flex items-center gap-1.5 text-xs underline ${
                             m.fromReporter ? "text-emerald-50" : "text-emerald-700"
                           }`}

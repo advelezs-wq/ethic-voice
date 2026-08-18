@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { formatFileSize } from "@/modules/app/utils/reports";
+import { formatFileSize, getAttachmentDownloadUrl } from "@/modules/app/utils/reports";
 import { cn, Image } from "@heroui/react";
 
 interface MessageAttachmentsProps {
@@ -39,9 +39,8 @@ export function MessageAttachments({
         <div key={attachment.id}>
           {isImage(attachment.mimeType) ? (
             <a
-              href={attachment.fileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={getAttachmentDownloadUrl(attachment.fileUrl)}
+              download={attachment.filename}
               className="block max-w-xs rounded-lg overflow-hidden hover:opacity-90 transition-opacity"
             >
               <Image
@@ -56,9 +55,8 @@ export function MessageAttachments({
             </a>
           ) : (
             <a
-              href={attachment.fileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={getAttachmentDownloadUrl(attachment.fileUrl)}
+              download={attachment.filename}
               className="inline-flex items-center gap-2 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors"
             >
               <span className="text-lg">

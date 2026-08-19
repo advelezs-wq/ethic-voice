@@ -233,13 +233,6 @@ export function SubscriptionGuard({ children }: SubscriptionGuardProps) {
             paymentVerificationStatus,
           });
 
-          // Show access deactivated screen if org/user is inactive due to cancellation expiry
-          if (data?.orgIsActive === false) {
-            setShowPricingModal(true);
-            setIsCheckingSubscription(false);
-            return;
-          }
-
           // ✅ PRIORITY 1: Super admin bypass - they don't need subscriptions
           if (data.isSuperAdmin) {
             console.log(
@@ -249,6 +242,13 @@ export function SubscriptionGuard({ children }: SubscriptionGuardProps) {
             setIsCheckingSubscription(false);
 
             // Let super admins continue to their intended route (no automatic redirect)
+            return;
+          }
+
+          // Show access deactivated screen if org/user is inactive due to cancellation expiry
+          if (data?.orgIsActive === false) {
+            setShowPricingModal(true);
+            setIsCheckingSubscription(false);
             return;
           }
 

@@ -1,36 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useOrganization } from "@/modules/app/hooks/useOrganization";
 import { Spinner } from "@heroui/react";
 import { ReportsDashboard } from "@/modules/app/components/dashboard/ReportsDashboard";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
 import { SuperAdminDashboard } from "@/modules/app/components/dashboard/super-admin/SuperAdminDashboard";
-import { useSafeToast } from "@/modules/app/hooks/useSafeToast";
-
-const INVITE_ERROR_MESSAGES: Record<string, string> = {
-  invalid: "Esa invitación ya no es válida o ya expiró.",
-  email_mismatch:
-    "Esa invitación fue enviada a otro correo. Inicia sesión con la cuenta que la recibió.",
-};
 
 export default function AppDashboard() {
   const { isLoaded, user } = useUser();
   const { organizationId: storeOrgId } = useOrganization();
   const { isLoading: roleLoading, isSuperAdmin } = useUserRole();
-  const { showError } = useSafeToast();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const invite = searchParams.get("invite");
-    if (!invite) return;
-    showError(INVITE_ERROR_MESSAGES[invite] || "No se pudo procesar la invitación.");
-    router.replace("/app");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
 
   // Show loading while auth or role is loading
   if (!isLoaded || !user || roleLoading) {
@@ -59,12 +39,22 @@ export default function AppDashboard() {
 
   // Fallback for non-superadmin without org
   return (
-    <div className="min-h-[70vh] flex items-center justify-center">
-      <div className="text-center rounded-2xl border border-amber-200 bg-amber-50 px-8 py-7">
-        <Spinner size="lg" color="primary" className="mb-4" />
-        <p className="text-amber-900">
+    <div className="min-h-[70vh] flex items-center justify-center px-4">
+      <div className="text-center max-w-md rounded-2xl border border-amber-200 bg-amber-50 px-8 py-7">
+        <p className="text-amber-900 font-medium">
           Aún no tienes una organización configurada.
         </p>
+        <p className="mt-2 text-sm text-amber-800">
+          Si te invitaron a un equipo, pide a tu administrador que te reenvíe
+          la invitación desde Organización → Invitaciones Pendientes. Si
+          quieres crear tu propia organización, continúa con el registro.
+        </p>
+        <a
+          href="/app/onboarding"
+          className="mt-4 inline-block rounded-full bg-[#0d212c] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0d212c]/90"
+        >
+          Crear mi organización
+        </a>
       </div>
     </div>
   );

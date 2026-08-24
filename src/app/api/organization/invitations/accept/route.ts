@@ -3,31 +3,44 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 
 export async function GET(req: NextRequest) {
-  const { userId } = await auth();
   const url = new URL(req.url);
   const token = url.searchParams.get("token");
 
+  if (!token) return NextResponse.redirect(new URL("/app", req.url));
+
+  // Validate the invite BEFORE sending anyone through sign-up — otherwise a
+  // brand-new visitor with an already-expired/used link ends up creating a
+  // Clerk account (and an orphan DB user with no membership) only to be
+  // told afterward that the link was never valid.
+  const invite = await prisma.organizationInvitation.findUnique({
+    where: { token },
+  });
+  const invalidReason = !invite
+    ? "invalid"
+    : invite.status === "accepted"
+      ? "already_accepted"
+      : invite.status !== "pending"
+        ? "revoked"
+        : invite.expiresAt && invite.expiresAt < new Date()
+          ? "expired"
+          : null;
+
+  if (invalidReason || !invite) {
+    return NextResponse.redirect(
+      new URL(`/auth/invite-status?reason=${invalidReason || "invalid"}`, req.url)
+    );
+  }
+
+  const { userId } = await auth();
+
   if (!userId) {
     const acceptUrl = new URL("/api/organization/invitations/accept", req.url);
-    if (token) acceptUrl.searchParams.set("token", token);
+    acceptUrl.searchParams.set("token", token);
 
     // Prefer sign-up so new users are created and then returned here
     const signUp = new URL("/auth/sign-up", req.url);
     signUp.searchParams.set("redirect_url", acceptUrl.toString());
     return NextResponse.redirect(signUp);
-  }
-
-  if (!token) return NextResponse.redirect(new URL("/app", req.url));
-
-  const invite = await prisma.organizationInvitation.findUnique({
-    where: { token },
-  });
-  if (
-    !invite ||
-    invite.status !== "pending" ||
-    (invite.expiresAt && invite.expiresAt < new Date())
-  ) {
-    return NextResponse.redirect(new URL("/app?invite=invalid", req.url));
   }
 
   // The invite is only valid for the email it was sent to — without this,
@@ -37,7 +50,7 @@ export async function GET(req: NextRequest) {
   const clerkUser = await currentUser();
   const signedInEmail = clerkUser?.primaryEmailAddress?.emailAddress?.toLowerCase();
   if (!signedInEmail || signedInEmail !== invite.email.toLowerCase()) {
-    const mismatch = new URL("/app?invite=email_mismatch", req.url);
+    const mismatch = new URL("/auth/invite-status?reason=email_mismatch", req.url);
     return NextResponse.redirect(mismatch);
   }
 

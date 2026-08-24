@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
       openSidebar,
     });
 
-    // Check for existing active subscriptions
+    // Check for existing active subscriptions tied directly to this user
     const existingSubscriptions = await prisma.subscription.findMany({
       where: {
         userId,
@@ -71,8 +71,36 @@ export async function POST(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
+    // A user invited into an org (e.g. as an ADMIN or MEMBER) has no personal
+    // Subscription row of their own — the org's subscription was created by
+    // whoever activated it — so the check above alone misses them entirely
+    // and they could start a second, unrelated checkout from the landing
+    // page for an org they already belong to. Pull in org-level
+    // subscriptions for every org this user is a member of as well.
+    const membershipOrgIds = (
+      await prisma.organizationMembership.findMany({
+        where: { userId },
+        select: { orgId: true },
+      })
+    ).map((m) => m.orgId);
+
+    const orgSubscriptions = membershipOrgIds.length
+      ? await prisma.subscription.findMany({
+          where: {
+            orgId: { in: membershipOrgIds },
+            status: { in: ["ACTIVE", "TRIALING"] },
+          },
+          orderBy: { createdAt: "desc" },
+        })
+      : [];
+
+    const allRelevantSubscriptions = [
+      ...existingSubscriptions,
+      ...orgSubscriptions,
+    ];
+
     // Check if user already has the same plan in active status
-    const samePlanSubscription = existingSubscriptions.find(
+    const samePlanSubscription = allRelevantSubscriptions.find(
       (sub) =>
         sub.status === "ACTIVE" &&
         sub.planType === planType &&
@@ -109,7 +137,7 @@ export async function POST(req: NextRequest) {
     // plan instead. In-app upgrade/downgrade flows use this same endpoint
     // while a subscription is active by design, so this only applies when
     // the request came from the landing page.
-    const otherActiveSubscription = existingSubscriptions.find(
+    const otherActiveSubscription = allRelevantSubscriptions.find(
       (sub) => sub.status === "ACTIVE" || sub.status === "TRIALING",
     );
     if (fromLanding && otherActiveSubscription && !samePlanSubscription) {

@@ -31,6 +31,15 @@ interface CustomOrganizationManagementProps {
   className?: string;
 }
 
+interface PendingInvitation {
+  id: string;
+  email: string;
+  role: "ADMIN" | "MEMBER" | "VIEWER";
+  createdAt: string;
+  expiresAt: string | null;
+  isExpired: boolean;
+}
+
 export function CustomOrganizationManagement({
   className,
 }: CustomOrganizationManagementProps) {
@@ -49,6 +58,11 @@ export function CustomOrganizationManagement({
   const [updatingRoleMemberId, setUpdatingRoleMemberId] = useState<string | null>(
     null
   );
+  const [invitations, setInvitations] = useState<PendingInvitation[]>([]);
+  const [invitationsLoading, setInvitationsLoading] = useState(true);
+  const [resendingInvitationId, setResendingInvitationId] = useState<
+    string | null
+  >(null);
 
   // Modals
   const {
@@ -72,6 +86,7 @@ export function CustomOrganizationManagement({
   useEffect(() => {
     if (currentOrganization?.id) {
       loadMembers();
+      loadInvitations();
       setOrgForm({
         name: currentOrganization.name || "",
         logoUrl: currentOrganization.logoUrl || "",
@@ -79,6 +94,62 @@ export function CustomOrganizationManagement({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentOrganization?.id]);
+
+  const loadInvitations = async () => {
+    if (!currentOrganization?.id) return;
+
+    try {
+      setInvitationsLoading(true);
+      const response = await fetch(
+        `/api/organization/${currentOrganization.id}/invitations`
+      );
+      if (!response.ok) throw new Error("Failed to load invitations");
+      const data = await response.json();
+      setInvitations(data.invitations || []);
+    } catch (error) {
+      console.error("Error loading invitations:", error);
+    } finally {
+      setInvitationsLoading(false);
+    }
+  };
+
+  const handleResendInvitation = async (invitationId: string, email: string) => {
+    if (!currentOrganization?.id) return;
+
+    try {
+      setResendingInvitationId(invitationId);
+      const response = await fetch(
+        `/api/organization/${currentOrganization.id}/invitations/${invitationId}/resend`,
+        { method: "POST" }
+      );
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data?.error || "No se pudo reenviar la invitación");
+      }
+
+      addToast({
+        title: "Invitación reenviada",
+        description: `Se envió un nuevo enlace de invitación a ${email}`,
+        color: "success",
+      });
+      setInvitations((prev) =>
+        prev.map((invite) =>
+          invite.id === invitationId ? data.invitation : invite
+        )
+      );
+    } catch (error) {
+      addToast({
+        title: "Error al reenviar invitación",
+        description:
+          error instanceof Error
+            ? error.message
+            : "No se pudo reenviar la invitación",
+        color: "danger",
+      });
+    } finally {
+      setResendingInvitationId(null);
+    }
+  };
 
   const loadMembers = async () => {
     if (!currentOrganization?.id) return;
@@ -117,7 +188,10 @@ export function CustomOrganizationManagement({
 
   const handleInviteSuccess = () => {
     // Reload members after successful invitation
-    setTimeout(() => loadMembers(), 1000);
+    setTimeout(() => {
+      loadMembers();
+      loadInvitations();
+    }, 1000);
   };
 
   const handleLogoUpdated = (logoUrl: string) => {
@@ -456,6 +530,70 @@ export function CustomOrganizationManagement({
                   )}
                 </CardBody>
               </Card>
+
+              {/* Pending Invitations */}
+              {rolePermissions.canInviteMembers &&
+                (invitationsLoading || invitations.length > 0) && (
+                  <Card>
+                    <CardHeader>
+                      <h3 className="text-base sm:text-lg font-semibold">
+                        Invitaciones Pendientes
+                      </h3>
+                    </CardHeader>
+                    <CardBody className="p-4 sm:p-6">
+                      {invitationsLoading ? (
+                        <div className="flex justify-center py-8">
+                          <Spinner color="primary" />
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {invitations.map((invite) => (
+                            <div
+                              key={invite.id}
+                              className="flex items-center justify-between p-3 border rounded-lg gap-2 flex-wrap"
+                            >
+                              <div>
+                                <p className="font-medium">{invite.email}</p>
+                                <p className="text-sm text-slate-500">
+                                  {invite.role === "ADMIN"
+                                    ? "Administrador"
+                                    : invite.role === "VIEWER"
+                                      ? "Observador"
+                                      : "Investigador"}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Chip
+                                  color={invite.isExpired ? "warning" : "default"}
+                                  size="sm"
+                                  variant="flat"
+                                >
+                                  {invite.isExpired ? "Vencida" : "Pendiente"}
+                                </Chip>
+                                <Button
+                                  size="sm"
+                                  variant="flat"
+                                  color="primary"
+                                  isLoading={resendingInvitationId === invite.id}
+                                  onPress={() =>
+                                    handleResendInvitation(invite.id, invite.email)
+                                  }
+                                  startContent={
+                                    resendingInvitationId === invite.id ? undefined : (
+                                      <i className="icon-[lucide--send] size-4" />
+                                    )
+                                  }
+                                >
+                                  Reenviar
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardBody>
+                  </Card>
+                )}
             </div>
           </Tab>
 

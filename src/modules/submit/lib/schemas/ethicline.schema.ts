@@ -30,14 +30,9 @@ const questionnaireSchema = z
     additionalDetails: z.string().default(""),
     freeReport: z.string().default(""),
 
-    // Boolean fields for checkboxes - whatHappened options
-    "whatHappened_Uso indebido de recursos": z.boolean().default(false),
-    "whatHappened_Conflicto de intereses": z.boolean().default(false),
-    "whatHappened_Manipulación de información": z.boolean().default(false),
-    "whatHappened_Abuso de autoridad": z.boolean().default(false),
-    "whatHappened_Incumplimiento de políticas": z.boolean().default(false),
-    "whatHappened_Conducta inapropiada": z.boolean().default(false),
-    "whatHappened_Otro (especificar en detalles)": z.boolean().default(false),
+    // whatHappened_* boolean fields are dynamic (they vary per tipología —
+    // see FACT_OPTIONS_BY_CATEGORY) and are validated generically via the
+    // catchall below plus the prefix-scan in step3Schema's superRefine.
 
     // Boolean fields for checkboxes - howItHappened options
     "howItHappened_De forma recurrente": z.boolean().default(false),

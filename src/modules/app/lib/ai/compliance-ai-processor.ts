@@ -9,17 +9,22 @@ import prisma from "@/modules/prisma/lib/prisma";
 // Schema para análisis de compliance
 const ComplianceAnalysisSchema = z.object({
   // Categorización principal
-  irregularityType: z.enum([
-    "acoso",
-    "corrupcion",
-    "fraude",
-    "mal_uso_bienes",
-    "robo-info",
-    "conflicto-interes",
-    "discriminacion",
-    "seguridad",
-    "otro",
-  ]),
+  irregularityType: z
+    .enum([
+      "corrupcion",
+      "mal-uso",
+      "robo-adulteracion",
+      "laft-aml",
+      "fraude",
+      "mejora",
+      "acoso",
+      "abuso-poder",
+      "reporte-libre",
+      "otro",
+    ])
+    .describe(
+      "Tipología del reporte. 'laft-aml' es para lavado de activos, financiación del terrorismo u operaciones sospechosas. 'otro' solo si ninguna tipología aplica claramente."
+    ),
 
   severity: z.enum(["HIGH", "MEDIUM", "LOW"]),
   priority: z.enum(["URGENT", "HIGH", "NORMAL", "LOW"]),

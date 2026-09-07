@@ -20,6 +20,7 @@ import {
   getSeverityColor,
 } from "../../utils/dashboard.utils";
 import { REPORT_PRIORITY, REPORT_STATUS } from "../../constants/reports";
+import { IRREGULARITY_TYPES as CATEGORY_OPTIONS } from "@/modules/submit/constants/ethicline.constants";
 import { ReportStatus } from "@prisma/client";
 import {
   Button,
@@ -484,15 +485,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
             >
               {[
                 { key: "", label: "Sin categorizar" },
-                { key: "corrupcion", label: "Corrupción" },
-                { key: "mal_uso_bienes", label: "Mal uso de bienes" },
-                { key: "robo_informacion", label: "Robo de información" },
-                { key: "mejora_procesos", label: "Mejora de procesos" },
-                { key: "fraude", label: "Fraude" },
-                { key: "adulteracion", label: "Adulteración" },
-                { key: "acoso", label: "Acoso" },
-                { key: "mal_desempeno", label: "Mal desempeño" },
-                { key: "reporte_libre", label: "Reporte libre" },
+                ...CATEGORY_OPTIONS.map((c) => ({ key: c.id, label: c.title })),
               ].map((opt) => (
                 <SelectItem key={opt.key}>{opt.label}</SelectItem>
               ))}

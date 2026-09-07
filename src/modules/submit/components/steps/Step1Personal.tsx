@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
@@ -11,12 +12,42 @@ import {
   WORK_RELATIONSHIPS,
   YES_NO_OPTIONS,
 } from "../../constants/ethicline.constants";
+import {
+  getPublicAreaOptions,
+  getPublicPositionOptions,
+} from "@/actions/org-structure.actions";
 import { Switch, RadioGroup, Radio, Textarea } from "@heroui/react";
 
-export function Step1Personal() {
+interface Step1PersonalProps {
+  organizationId: string;
+}
+
+export function Step1Personal({ organizationId }: Step1PersonalProps) {
   const { control, watch } = useFormContext<CompleteFormData>();
   const isAnonymous = watch("isAnonymous");
   const consultedBefore = watch("consultedBefore");
+
+  // Áreas y cargos son configurables por organización (Grow/Grow Pro); si la
+  // organización no tiene catálogo propio, el server action ya devuelve la
+  // lista global por defecto (DEPARTMENTS/POSITIONS), usada aquí como
+  // estado inicial para no bloquear el render mientras carga.
+  const [departments, setDepartments] = useState<string[]>(DEPARTMENTS);
+  const [positions, setPositions] = useState<string[]>(POSITIONS);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      getPublicAreaOptions(organizationId),
+      getPublicPositionOptions(organizationId),
+    ]).then(([areas, posts]) => {
+      if (!active) return;
+      setDepartments(areas);
+      setPositions(posts);
+    });
+    return () => {
+      active = false;
+    };
+  }, [organizationId]);
 
   return (
     <div className="space-y-6">
@@ -201,7 +232,7 @@ export function Step1Personal() {
                 errorMessage={fieldState.error?.message}
                 isRequired
               >
-                {DEPARTMENTS.map((dept) => (
+                {departments.map((dept) => (
                   <SelectItem key={dept}>{dept}</SelectItem>
                 ))}
               </Select>
@@ -223,7 +254,7 @@ export function Step1Personal() {
                 errorMessage={fieldState.error?.message}
                 isRequired
               >
-                {POSITIONS.map((pos) => (
+                {positions.map((pos) => (
                   <SelectItem key={pos}>{pos}</SelectItem>
                 ))}
               </Select>

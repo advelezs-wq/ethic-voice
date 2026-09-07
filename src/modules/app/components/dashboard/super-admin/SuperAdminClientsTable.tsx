@@ -116,7 +116,13 @@ export default function SuperAdminClientsTable() {
   };
 
   const getRiskLevel = (row: OrgRow) => {
-    if (!row.subscriptionId || row.status === "PAUSED" || row.status === "CANCELED") {
+    // Nunca tuvo una suscripción: es un registro sin completar (onboarding
+    // propio sin checkout), no un cliente en riesgo — no lo marcamos "Alto".
+    if (!row.subscriptionId) {
+      return { label: "Pendiente", color: "default" as const };
+    }
+    // Sí tuvo una suscripción y ya no está activa: esto sí es churn real.
+    if (row.status === "PAUSED" || row.status === "CANCELED") {
       return { label: "Alto", color: "danger" as const };
     }
     if (row.reports > 120 || row.members > 50) {
@@ -196,6 +202,21 @@ export default function SuperAdminClientsTable() {
                   <td className="py-2 pr-4">{r.reports}</td>
                   <td className="py-2 pr-4">
                     <div className="flex flex-wrap gap-2">
+                      <Tooltip content="Copiar link del canal de denuncias">
+                        <Button
+                          size="sm"
+                          variant="light"
+                          onPress={() => {
+                            navigator.clipboard.writeText(
+                              `${window.location.origin}/submit/${r.slug}`
+                            );
+                            showSuccess("Link copiado al portapapeles");
+                          }}
+                          startContent={<i className="icon-[lucide--link] size-4" />}
+                        >
+                          Link
+                        </Button>
+                      </Tooltip>
                       <Tooltip content="Pausar suscripción">
                         <Button
                           size="sm"

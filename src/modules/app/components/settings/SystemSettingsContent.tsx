@@ -6,6 +6,7 @@ import { LogoUploadSection } from "./LogoUploadSection";
 import { EnhancedDashboardLayoutSection } from "./EnhancedDashboardLayoutSection";
 import { CaseRetentionSection } from "./CaseRetentionSection";
 import { EthicsContextSection } from "./EthicsContextSection";
+import { OrganizationStructureSection } from "./OrganizationStructureSection";
 import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
 import { Button, Card as UiCard, Chip } from "@heroui/react";
 
@@ -152,20 +153,20 @@ export function SystemSettingsContent({
               <CardHeader>
                 <div>
                   <h3 className="text-xl font-semibold text-[#0d212c]">
-                    Configuraciones Adicionales
+                    Estructura de la organización
                   </h3>
                   <p className="text-slate-500 text-sm">
-                    Opciones avanzadas de personalización
+                    Personaliza las áreas y cargos que ven los denunciantes en
+                    el formulario público
                   </p>
                 </div>
               </CardHeader>
               <CardBody>
-                <div className="text-center py-8">
-                  <i className="icon-[lucide--settings] size-12 text-slate-400 mx-auto mb-4" />
-                  <p className="text-slate-400">
-                    Configuraciones avanzadas próximamente
-                  </p>
-                </div>
+                {isLoading ? null : permissions?.canAccessAreasPositionsCatalog ? (
+                  <OrganizationStructureSection organizationId={organizationId} />
+                ) : (
+                  <UpgradeBlock message="Tu plan no permite personalizar áreas y cargos. Disponible en GROW o superior." />
+                )}
               </CardBody>
             </Card>
           </div>

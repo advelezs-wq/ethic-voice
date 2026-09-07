@@ -56,15 +56,30 @@ export const SUBMISSION_SOURCE = {
   API: "API",
 } as const;
 
+// Ids canónicos: deben coincidir con IRREGULARITY_TYPES en
+// modules/submit/constants/ethicline.constants.ts (fuente de verdad para el
+// formulario público). Se mantienen las claves legacy (con guion bajo, y
+// "adulteracion"/"mal_desempeno" previas a la fusión/renombre de sep-2026)
+// para que reportes históricos sigan mostrando una etiqueta correcta.
 export const IRREGULARITY_TYPES = {
-  acoso: "Acoso, discriminación y malos tratos",
-  corrupcion: "Corrupción y Acuerdos Irregulares",
-  fraude: "Fraude, Robo, Hurto y Gastos irregulares",
-  mal_uso_bienes: "Mal uso de bienes y servicios",
-  robo_informacion: "Robo de información interna",
-  mejora_procesos: "Mejora de Procesos",
-  adulteracion: "Adulteración de Información y Documentación",
-  mal_desempeno: "Mal desempeño, Abuso de Poder y Favoritismo",
+  corrupcion: "Corrupción",
+  "mal-uso": "Mal uso de bienes",
+  "robo-adulteracion": "Robo o adulteración de información",
+  "laft-aml": "LA/FT – AML",
+  fraude: "Fraude",
+  mejora: "Mejora de procesos",
+  acoso: "Acoso y discriminación",
+  "abuso-poder": "Abuso de poder",
+  "reporte-libre": "Reporte Libre",
+
+  // Legacy aliases (reportes creados antes de sep-2026)
+  mal_uso_bienes: "Mal uso de bienes",
+  "robo-info": "Robo de información",
+  robo_informacion: "Robo de información",
+  adulteracion: "Adulteración de información",
+  mejora_procesos: "Mejora de procesos",
+  "mal-desempeno": "Abuso de poder",
+  mal_desempeno: "Abuso de poder",
   reporte_libre: "Reporte Libre",
 } as const;
 

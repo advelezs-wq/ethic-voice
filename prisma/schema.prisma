@@ -254,8 +254,10 @@ model Organization {
   notifications        Notification[]
   notificationSettings NotificationSettings[]
   invitations          OrganizationInvitation[]
-  ethicalContext        OrganizationEthicalContext?
+  ethicalContext          OrganizationEthicalContext?
   ethicalContextDocuments EthicalContextDocument[]
+  areaOptions             OrganizationAreaOption[]
+  positionOptions         OrganizationPositionOption[]
 
   totalSubmissions      Int              @default(0)
   customFormSubmissions Int              @default(0)
@@ -417,6 +419,42 @@ model Department {
   @@index([orgId])
 }
 
+// Catálogo de "Área o sector" del denunciado, configurable por organización
+// (Grow / Grow Pro). Mismo patrón que Department, pero deliberadamente un
+// modelo separado: Department representa la estructura interna de equipos
+// (asignación de miembros/reportes), mientras que esto es solo la lista de
+// opciones que ve el denunciante en el formulario público — desactivar una
+// opción no debe afectar la asignación interna de nadie.
+model OrganizationAreaOption {
+  id        String   @id @default(uuid())
+  orgId     String
+  label     String
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
+// Catálogo de "Cargo o puesto" del denunciado, configurable por organización
+// (Grow / Grow Pro). Ver comentario en OrganizationAreaOption.
+model OrganizationPositionOption {
+  id        String   @id @default(uuid())
+  orgId     String
+  label     String
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@index([orgId])
+}
+
 model Form {
   id               Int      @id @default(autoincrement())
   orgId            String
@@ -429,6 +467,11 @@ model Form {
   visits           Int      @default(0)
   submissionsCount Int      @default(0)
   shareURL         String   @unique @default(uuid())
+  // Formulario "canónico" de la organización: el que resuelve el link único
+  // de denuncias (Organization.slug) cuando el plan es Grow o superior. A lo
+  // sumo uno por organización (mejor esfuerzo, no forzado por DB) — se marca
+  // automáticamente en el primer formulario que crea cada organización.
+  isDefault        Boolean  @default(false)
 
   // Relations
   organization Organization     @relation(fields: [orgId], references: [id], onDelete: Cascade)

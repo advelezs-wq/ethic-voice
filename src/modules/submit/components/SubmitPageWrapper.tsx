@@ -6,25 +6,26 @@ import { EthicLineForm } from "./EthicLineForm";
 import { Organization } from "@prisma/client";
 
 interface SubmitPageWrapperProps {
-  organizations: Organization[];
+  // Cuando se llega por el link único de una organización (item 3, /submit/[orgSlug]),
+  // la organización ya viene resuelta y se salta el paso de búsqueda.
+  initialOrganization?: Organization | null;
 }
 
-export function SubmitPageWrapper({ organizations }: SubmitPageWrapperProps) {
-  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
+export function SubmitPageWrapper({
+  initialOrganization = null,
+}: SubmitPageWrapperProps) {
+  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(
+    initialOrganization
+  );
 
   if (!selectedOrg) {
-    return (
-      <OrganizationSelector
-        organizations={organizations}
-        onSelect={setSelectedOrg}
-      />
-    );
+    return <OrganizationSelector onSelect={setSelectedOrg} />;
   }
 
   return (
     <EthicLineForm
       organization={selectedOrg}
-      onBack={() => setSelectedOrg(null)}
+      onBack={initialOrganization ? undefined : () => setSelectedOrg(null)}
     />
   );
 }

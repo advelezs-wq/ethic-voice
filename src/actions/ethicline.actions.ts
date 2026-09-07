@@ -23,6 +23,39 @@ export async function getActiveOrganizations() {
   }
 }
 
+// Búsqueda pública de organizaciones para el formulario de denuncias.
+// A diferencia de getActiveOrganizations, NUNCA devuelve el listado completo:
+// solo organizaciones que coincidan con una búsqueda de al menos 3
+// caracteres, para no exponer la lista de clientes de EthicVoice a
+// cualquier visitante anónimo.
+export async function searchOrganizationsPublic(query: string) {
+  const trimmed = (query || "").trim();
+  if (trimmed.length < 3) return [];
+
+  try {
+    const organizations = await prisma.organization.findMany({
+      where: {
+        isActive: true,
+        name: { contains: trimmed, mode: "insensitive" },
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        logoUrl: true,
+        brandColor: true,
+        isActive: true,
+      },
+      orderBy: { name: "asc" },
+      take: 8,
+    });
+    return organizations;
+  } catch (error) {
+    console.error("Error searching organizations:", error);
+    return [];
+  }
+}
+
 export async function getOrganizationAnalytics(orgId: string) {
   try {
     const [organization, recentSubmissions, submissionsByType] =

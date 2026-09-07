@@ -27,7 +27,9 @@ import {
 
 interface EthicLineFormProps {
   organization: Organization;
-  onBack: () => void;
+  // Ausente cuando se llega por el link único de la organización (item 3):
+  // en ese caso no hay paso de búsqueda al cual volver, así que se oculta el botón.
+  onBack?: () => void;
 }
 
 export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
@@ -168,7 +170,7 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <Step1Personal />;
+        return <Step1Personal organizationId={organization.id} />;
       case 2:
         return <Step2Type />;
       case 3:
@@ -207,21 +209,23 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
         </div>
 
         <div className="mb-8 rounded-3xl border border-[#0a1e14]/10 bg-white/90 p-5 shadow-[0_18px_55px_rgba(10,30,20,0.08)] md:p-7">
-          <Button
-            variant="light"
-            startContent={
-              <i
-                className="icon-[lucide--chevron-left] size-4"
-                role="img"
-                aria-hidden="true"
-              />
-            }
-            onPress={onBack}
-            isDisabled={pending}
-            className="text-[#0d212c]"
-          >
-            Volver
-          </Button>
+          {onBack && (
+            <Button
+              variant="light"
+              startContent={
+                <i
+                  className="icon-[lucide--chevron-left] size-4"
+                  role="img"
+                  aria-hidden="true"
+                />
+              }
+              onPress={onBack}
+              isDisabled={pending}
+              className="text-[#0d212c]"
+            >
+              Volver
+            </Button>
+          )}
 
           <div className="mt-4">
             <h1 className="text-2xl font-bold text-[#0a1e14]">

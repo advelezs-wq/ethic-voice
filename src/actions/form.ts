@@ -92,12 +92,20 @@ export async function CreateForm(data: formSchemaType) {
     throw new UserNotFoundErr();
   }
 
+  // El primer formulario de la organización se marca como "canónico": es el
+  // que resuelve el link único de denuncias (Organization.slug) para planes
+  // Grow o superior — ver /submit/[formUrl].
+  const existingFormsCount = await prisma.form.count({
+    where: { orgId: orgId as string },
+  });
+
   const form = await prisma.form.create({
     data: {
       userId: user.id,
       title: data.name!,
       description: data.description!,
       orgId: orgId as string,
+      isDefault: existingFormsCount === 0,
     },
   });
 

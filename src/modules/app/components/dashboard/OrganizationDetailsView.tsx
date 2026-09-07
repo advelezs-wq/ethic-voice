@@ -121,6 +121,7 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
   const searchParams = useSearchParams();
   const section = (searchParams.get("section") as OrgSection) || "resumen";
 
+  const [origin, setOrigin] = useState("");
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
   const [billingItems, setBillingItems] = useState<InvoiceItem[]>([]);
   const [members, setMembers] = useState<OrgMember[]>([]);
@@ -258,6 +259,10 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
   useEffect(() => {
     loadReports();
   }, [loadReports]);
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   const quickOpenReportsWithOrgScope = () => {
     document.cookie = `ev_scope=org; path=/; max-age=${60 * 60 * 24 * 30}`;
@@ -417,6 +422,37 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
               </Chip>
             </div>
             <p className="text-sm text-default-500">{organization.slug}</p>
+            {origin && (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="rounded-md bg-slate-50 px-2 py-1 text-xs text-slate-500 break-all">
+                  {origin}/submit/{organization.slug}
+                </span>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  className="border border-emerald-200 bg-white"
+                  onPress={() => {
+                    navigator.clipboard.writeText(
+                      `${origin}/submit/${organization.slug}`
+                    );
+                    showSuccess("Link copiado al portapapeles");
+                  }}
+                >
+                  Copiar enlace
+                </Button>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  className="border border-emerald-200 bg-white"
+                  as="a"
+                  href={`${origin}/submit/${organization.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Abrir canal
+                </Button>
+              </div>
+            )}
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="flat" className="border border-emerald-200 bg-white" onPress={quickOpenReportsWithOrgScope}>

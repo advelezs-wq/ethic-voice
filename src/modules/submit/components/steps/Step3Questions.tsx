@@ -4,16 +4,7 @@ import { useFormContext, Controller } from "react-hook-form";
 import { Textarea } from "@heroui/input";
 import { CompleteFormData } from "../../lib/schemas/ethicline.schema";
 import { Checkbox, Radio, RadioGroup } from "@heroui/react";
-
-const FACT_OPTIONS = [
-  "Uso indebido de recursos",
-  "Conflicto de intereses",
-  "Manipulación de información",
-  "Abuso de autoridad",
-  "Incumplimiento de políticas",
-  "Conducta inapropiada",
-  "Otro (especificar en detalles)",
-];
+import { FACT_OPTIONS_BY_CATEGORY } from "../../constants/ethicline.constants";
 
 const HOW_OPTIONS = [
   "De forma recurrente",
@@ -52,6 +43,9 @@ export function Step3Questions() {
   } = useFormContext<CompleteFormData>();
   const irregularityType = watch("irregularityType");
   const isReporteLibre = irregularityType === "reporte-libre";
+  const FACT_OPTIONS =
+    FACT_OPTIONS_BY_CATEGORY[irregularityType] ||
+    FACT_OPTIONS_BY_CATEGORY.default;
 
   if (isReporteLibre) {
     return (

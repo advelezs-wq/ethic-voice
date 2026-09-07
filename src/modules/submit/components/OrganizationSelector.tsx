@@ -1,31 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@heroui/button";
 import { Card } from "@heroui/card";
-import { Select, SelectItem } from "@heroui/select";
-import { Image } from "@heroui/react";
+import { Input, Image, Spinner } from "@heroui/react";
 import { Organization } from "@prisma/client";
 import { useRouter } from "next/navigation";
+import { searchOrganizationsPublic } from "@/actions/ethicline.actions";
+
+type OrgSearchResult = Pick<
+  Organization,
+  "id" | "name" | "slug" | "logoUrl" | "brandColor" | "isActive"
+>;
 
 interface OrganizationSelectorProps {
-  organizations: Organization[];
   onSelect: (org: Organization) => void;
 }
 
-export function OrganizationSelector({
-  organizations,
-  onSelect,
-}: OrganizationSelectorProps) {
-  const [selected, setSelected] = useState<string>("");
+export function OrganizationSelector({ onSelect }: OrganizationSelectorProps) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<OrgSearchResult[]>([]);
+  const [selectedOrg, setSelectedOrg] = useState<OrgSearchResult | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const router = useRouter();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    const trimmed = query.trim();
+    if (trimmed.length < 3) {
+      setResults([]);
+      setHasSearched(false);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    debounceRef.current = setTimeout(async () => {
+      const orgs = await searchOrganizationsPublic(trimmed);
+      setResults(orgs);
+      setHasSearched(true);
+      setIsSearching(false);
+    }, 350);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [query]);
 
   const handleContinue = () => {
-    const org = organizations.find((o) => o.id === selected);
-    if (org) onSelect(org);
+    if (selectedOrg) onSelect(selectedOrg as Organization);
   };
-
-  const selectedOrg = organizations.find((o) => o.id === selected);
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-16 md:py-20">
@@ -66,66 +93,79 @@ export function OrganizationSelector({
 
       <Card className="rounded-3xl border border-[#0a1e14]/10 bg-white/95 p-6 shadow-[0_20px_60px_rgba(10,30,20,0.1)] md:p-8">
         <div className="space-y-6">
-          <Select
-            label="Organización"
-            placeholder="Busca y selecciona tu organización"
-            selectedKeys={selected ? [selected] : []}
-            onSelectionChange={(keys) =>
-              setSelected(Array.from(keys)[0] as string)
-            }
-            size="lg"
-            radius="lg"
-            classNames={{
-              trigger:
-                "bg-[#f7faf9] border border-[#0a1e14]/10 data-[hover=true]:border-lime-500",
-              value: "text-[#0d212c]",
-              label: "text-[#0a1e14] font-medium",
-            }}
-            startContent={
-              selectedOrg?.logoUrl ? (
-                <div className="relative w-6 h-6 flex items-center justify-center">
-                  <Image
-                    src={selectedOrg.logoUrl}
-                    alt={selectedOrg.name}
-                    className="object-contain"
-                  />
-                </div>
-              ) : (
+          <div>
+            <Input
+              label="Organización"
+              placeholder="Escribe al menos 3 letras del nombre de tu organización"
+              value={query}
+              onValueChange={(value) => {
+                setQuery(value);
+                setSelectedOrg(null);
+              }}
+              size="lg"
+              radius="lg"
+              classNames={{
+                inputWrapper:
+                  "bg-[#f7faf9] border border-[#0a1e14]/10 data-[hover=true]:border-lime-500",
+                input: "text-[#0d212c]",
+                label: "text-[#0a1e14] font-medium",
+              }}
+              startContent={
                 <i
-                  className="icon-[fluent--building-24-regular] size-6 text-gray-400"
+                  className="icon-[lucide--search] size-5 text-gray-400"
                   role="img"
                   aria-hidden="true"
                 />
-              )
-            }
-          >
-            {organizations.map((org) => (
-              <SelectItem
-                key={org.id}
-                startContent={
-                  org.logoUrl ? (
-                    <div className="relative w-6 h-6 flex items-center justify-center">
-                      <Image
-                        src={org.logoUrl}
-                        alt={org.name}
-                        width={24}
-                        height={24}
-                        className="object-contain"
+              }
+              endContent={isSearching ? <Spinner size="sm" /> : null}
+            />
+
+            {!selectedOrg && results.length > 0 && (
+              <div className="mt-2 space-y-1 rounded-2xl border border-[#0a1e14]/10 bg-white p-2 shadow-sm">
+                {results.map((org) => (
+                  <button
+                    key={org.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedOrg(org);
+                      setResults([]);
+                    }}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-lime-50"
+                  >
+                    {org.logoUrl ? (
+                      <div className="relative flex h-6 w-6 items-center justify-center">
+                        <Image
+                          src={org.logoUrl}
+                          alt={org.name}
+                          width={24}
+                          height={24}
+                          className="object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <i
+                        className="icon-[fluent--building-24-regular] size-6 text-gray-400"
+                        role="img"
+                        aria-hidden="true"
                       />
-                    </div>
-                  ) : (
-                    <i
-                      className="icon-[fluent--building-24-regular] size-6 text-gray-400"
-                      role="img"
-                      aria-hidden="true"
-                    />
-                  )
-                }
-              >
-                {org.name}
-              </SelectItem>
-            ))}
-          </Select>
+                    )}
+                    <span className="text-sm font-medium text-[#0a1e14]">
+                      {org.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {!selectedOrg &&
+              !isSearching &&
+              hasSearched &&
+              results.length === 0 && (
+                <p className="mt-2 px-1 text-sm text-[#273c46]">
+                  No encontramos una organización con este nombre.
+                </p>
+              )}
+          </div>
 
           {selectedOrg && (
             <div className="rounded-2xl border border-lime-200 bg-lime-50/80 p-4">
@@ -160,7 +200,7 @@ export function OrganizationSelector({
           <Button
             size="lg"
             color="primary"
-            isDisabled={!selected}
+            isDisabled={!selectedOrg}
             onPress={handleContinue}
             endContent={
               <i

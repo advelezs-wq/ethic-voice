@@ -150,6 +150,14 @@ const SLA_BY_TYPE: Record<string, number> = {
   acoso: 23,
   "mal desempeño": 20,
   "informe libre": 25,
+
+  // Ids canónicos tal como se guardan en report.type (ver
+  // modules/submit/constants/ethicline.constants.ts)
+  "mal-uso": 25,
+  "robo-adulteracion": 20,
+  "laft-aml": 30,
+  mejora: 33,
+  "abuso-poder": 20,
 };
 
 // Porcentaje→semaforo
@@ -270,6 +278,13 @@ export function getReportTypeLabel(type: string | null): string {
     robo_información: "Robo de información",
     mejora_procesos: "Mejora de procesos",
     "mejora-procesos": "Mejora de procesos",
+    mejora: "Mejora de procesos",
+    "mal-uso": "Mal uso de bienes",
+    "robo-adulteracion": "Robo o adulteración de información",
+    "laft-aml": "LA/FT – AML",
+    "abuso-poder": "Abuso de poder",
+    "mal-desempeno": "Abuso de poder",
+    "reporte-libre": "Reporte Libre",
     otro: "Otro",
     otros: "Otros",
     indefinido: "Indefinido",

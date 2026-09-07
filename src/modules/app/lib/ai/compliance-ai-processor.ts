@@ -114,6 +114,32 @@ const ComplianceAnalysisSchema = z.object({
       repeatedPhrases: z.boolean().optional(),
     })
     .optional(),
+
+  // Plan Premium — Contexto Ético Organizacional: análisis frente al marco
+  // interno de la organización, citando los documentos/políticas propias
+  // que sirvieron de fundamento (solo se puebla si la org tiene contexto
+  // ético configurado; ver compliance-ai-processor.ts ethicalContextBlock).
+  internalPolicyAnalysis: z
+    .string()
+    .optional()
+    .describe(
+      "Análisis del caso frente al marco ético/normativo interno de la organización, si fue provisto. Vacío si no hay contexto ético configurado."
+    ),
+  internalPolicyReferences: z
+    .array(
+      z.object({
+        documentName: z.string(),
+        relevantExcerpt: z
+          .string()
+          .describe(
+            "Fragmento o disposición del documento interno citado como fundamento"
+          ),
+      })
+    )
+    .optional()
+    .describe(
+      "Documentos/políticas internas de la organización usados como fundamento, solo si están explícitamente contenidos en el contexto provisto"
+    ),
 });
 
 export type ComplianceAnalysis = z.infer<typeof ComplianceAnalysisSchema>;
@@ -213,6 +239,76 @@ ${priorCases}
       }
     }
 
+    // Plan Premium — Contexto Ético Organizacional: contexto institucional,
+    // gobierno/ética, criterios especiales y documentos internos cortos
+    // (código de ética, política de regalos, anticorrupción, etc.)
+    // insertados directamente en el prompt (sin búsqueda vectorial en esta
+    // primera versión). Solo se construye para organizaciones Premium para
+    // no añadir costo de tokens al resto de los planes.
+    let ethicalContextBlock = "";
+    if (orgId) {
+      try {
+        const org = await prisma.organization.findUnique({
+          where: { id: orgId },
+          select: { currentPlan: true },
+        });
+
+        if (org?.currentPlan === "PREMIUM") {
+          const [ethicalContext, documents] = await Promise.all([
+            prisma.organizationEthicalContext.findUnique({
+              where: { organizationId: orgId },
+            }),
+            prisma.ethicalContextDocument.findMany({
+              where: { organizationId: orgId, isActive: true },
+              orderBy: { uploadedAt: "desc" },
+            }),
+          ]);
+
+          if (ethicalContext || documents.length > 0) {
+            const governance = Array.isArray(
+              ethicalContext?.governanceStructure
+            )
+              ? (ethicalContext!.governanceStructure as any[])
+                  .map((g) => `• ${g.role}: ${g.detail}`)
+                  .join("\n")
+              : "";
+
+            const criteria = Array.isArray(ethicalContext?.specialCriteria)
+              ? (ethicalContext!.specialCriteria as any[])
+                  .filter((c) => c.active !== false)
+                  .map((c) => `• ${c.label}`)
+                  .join("\n")
+              : "";
+
+            const documentsText = documents
+              .map(
+                (d) =>
+                  `--- Documento: "${d.filename}" (tipo: ${d.documentType}, versión: ${d.version}) ---\n${d.extractedText || "(sin texto extraído)"}`
+              )
+              .join("\n\n");
+
+            ethicalContextBlock = `
+[CONTEXTO_ETICO_ORG]
+Contexto de la organización:
+${ethicalContext?.businessContext || "(no especificado)"}
+
+Estructura de gobierno y ética:
+${governance || "(no especificada)"}
+
+Criterios éticos especiales:
+${criteria || "(no especificados)"}
+
+Documentos y políticas internas vigentes:
+${documentsText || "(sin documentos cargados)"}
+[FIN_CONTEXTO_ETICO_ORG]
+            `.trim();
+          }
+        }
+      } catch (e) {
+        ethicalContextBlock = "";
+      }
+    }
+
     const systemPrompt = `
 Eres un oficial de cumplimiento y ética empresarial (Colombia y estándares internacionales) con conocimiento de:
 - Ley 1778 de 2016 (Ley Antisoborno)
@@ -232,6 +328,20 @@ PRINCIPIOS FUNDAMENTALES:
 
 CONTEXTO RAG (si aplica):
 ${ragContext || "(no disponible)"}
+
+${
+  ethicalContextBlock
+    ? `MARCO ÉTICO INTERNO DE LA ORGANIZACIÓN (Plan Premium):
+${ethicalContextBlock}
+
+INSTRUCCIONES PARA EL USO DEL MARCO ÉTICO INTERNO:
+1. Antes de analizar con criterios generales, identifica si alguno de los documentos/políticas internas de arriba aplica directamente al caso reportado (p. ej. un regalo -> política de regalos; un pago irregular -> anticorrupción).
+2. Si aplica, completa 'internalPolicyAnalysis' con el análisis del caso frente a ese marco interno, y 'internalPolicyReferences' citando el nombre exacto del documento y el fragmento/disposición relevante EXACTAMENTE como aparece en el texto provisto arriba.
+3. NUNCA inventes ni atribuyas disposiciones, límites o cláusulas que no estén literalmente en el texto de los documentos provistos. Si el texto no cubre el caso o no hay documento aplicable, deja 'internalPolicyAnalysis' vacío y 'internalPolicyReferences' como lista vacía — no lo completes con suposiciones.
+4. Después de este análisis interno, complementa con los criterios generales de cumplimiento y la normativa listada abajo.
+`
+    : ""
+}
 
 FEW-SHOT (tono y formato):
 ---

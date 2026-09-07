@@ -254,6 +254,8 @@ model Organization {
   notifications        Notification[]
   notificationSettings NotificationSettings[]
   invitations          OrganizationInvitation[]
+  ethicalContext        OrganizationEthicalContext?
+  ethicalContextDocuments EthicalContextDocument[]
 
   totalSubmissions      Int              @default(0)
   customFormSubmissions Int              @default(0)
@@ -262,6 +264,75 @@ model Organization {
 
   @@index([currentPlan])
   @@index([hasActivePlan])
+}
+
+/// Type of internal policy document uploaded for the Ethical Context module
+enum EthicalDocumentType {
+  CODIGO_ETICA
+  REGLAMENTO_INTERNO
+  ANTICORRUPCION
+  COMPRAS
+  GASTOS_VIAJE
+  REGALOS
+  CONFLICTO_INTERES
+  OTRO
+}
+
+/// Plan Premium — organizational ethical context used by the AI triage
+/// to ground its analysis in the org's own governance/policies instead of
+/// only generic criteria. One record per organization.
+model OrganizationEthicalContext {
+  id             String   @id @default(uuid())
+  organizationId String   @unique
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Section 1: free-text business/activity context
+  businessContext String? @db.Text
+
+  // Section 2: governance & ethics structure, e.g.
+  // [{ "role": "Junta Directiva", "detail": "5 miembros" }, ...]
+  governanceStructure Json?
+
+  // Section 3: special ethical criteria/rules, e.g.
+  // [{ "label": "Cero tolerancia a la corrupción y soborno", "active": true }, ...]
+  specialCriteria Json?
+
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([organizationId])
+}
+
+/// Plan Premium — short internal policy documents (código de ética, política
+/// de regalos, anticorrupción, etc.) inserted directly into the AI triage
+/// prompt so the model can cite them as the basis for its recommendations.
+model EthicalContextDocument {
+  id             Int      @id @default(autoincrement())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  filename String
+  fileUrl  String
+  fileSize Int
+  mimeType String
+
+  documentType EthicalDocumentType @default(OTRO)
+  version      String              @default("1.0")
+  isActive     Boolean             @default(true)
+
+  // Plain text extracted from the PDF/Word file at upload time, truncated
+  // to a bounded size so it can be inserted directly into the AI prompt
+  // (no vector search in this first version).
+  extractedText String? @db.Text
+
+  uploadedById   String
+  uploadedByName String
+  uploadedAt     DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([organizationId, isActive])
 }
 
 model OrganizationSettings {

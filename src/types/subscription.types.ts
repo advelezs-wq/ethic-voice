@@ -121,6 +121,9 @@ export interface SubscriptionPermissions {
   // System permissions
   canAccessAllSettings: boolean;
   canAccessAdvancedFeatures: boolean;
+
+  // Ethical context (Premium-only organizational context for the AI triage)
+  canUseEthicalContext: boolean;
 }
 
 export type SubscriptionStatus =
@@ -732,6 +735,7 @@ export interface SubscriptionPermissions {
   canAccessUnlimitedCustomization: boolean;
   canAccessAllSettings: boolean;
   canAccessAdvancedFeatures: boolean;
+  canUseEthicalContext: boolean;
 }
 
 // ✅ Get plan permissions function for backward compatibility
@@ -761,6 +765,7 @@ export const getPlanPermissions = (
     canAccessAllSettings: config.features.hasUnlimitedCustomization,
     canAccessAdvancedFeatures:
       config.type === PlanType.GROW_PRO || config.type === PlanType.PREMIUM, // Grow Pro and Premium
+    canUseEthicalContext: config.type === PlanType.PREMIUM,
   };
 };
 

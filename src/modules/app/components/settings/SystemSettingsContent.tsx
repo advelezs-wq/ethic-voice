@@ -5,8 +5,9 @@ import { Card, CardBody, CardHeader, Tabs, Tab } from "@heroui/react";
 import { LogoUploadSection } from "./LogoUploadSection";
 import { EnhancedDashboardLayoutSection } from "./EnhancedDashboardLayoutSection";
 import { CaseRetentionSection } from "./CaseRetentionSection";
+import { EthicsContextSection } from "./EthicsContextSection";
 import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
-import { Button, Card as UiCard } from "@heroui/react";
+import { Button, Card as UiCard, Chip } from "@heroui/react";
 
 interface SystemSettingsContentProps {
   organizationId: string;
@@ -105,6 +106,41 @@ export function SystemSettingsContent({
               </CardHeader>
               <CardBody>
                 <CaseRetentionSection />
+              </CardBody>
+            </Card>
+          </div>
+        </Tab>
+
+        <Tab
+          key="ethics-context"
+          title={
+            <div className="flex items-center gap-2">
+              <span>Contexto Ético</span>
+              <Chip size="sm" color="secondary" variant="flat">
+                Plan Premium
+              </Chip>
+            </div>
+          }
+        >
+          <div className="space-y-6 pt-6">
+            <Card>
+              <CardHeader>
+                <div>
+                  <h3 className="text-xl font-semibold text-[#0d212c]">
+                    Contexto Ético Organizacional
+                  </h3>
+                  <p className="text-slate-500 text-sm">
+                    Configura el contexto ético que utiliza la IA antes de
+                    generar el triage de cada denuncia
+                  </p>
+                </div>
+              </CardHeader>
+              <CardBody>
+                {permissions?.canUseEthicalContext ? (
+                  <EthicsContextSection organizationId={organizationId} />
+                ) : (
+                  <UpgradeBlock message="El Contexto Ético Organizacional es exclusivo del Plan Premium." />
+                )}
               </CardBody>
             </Card>
           </div>

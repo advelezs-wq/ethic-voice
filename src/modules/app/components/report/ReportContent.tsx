@@ -309,6 +309,45 @@ export const ReportContent: React.FC<ReportContentProps> = ({
               </div>
             )}
 
+            {/* Plan Premium — Contexto Ético Organizacional: análisis y
+                citas frente al marco interno de la organización */}
+            {(aiAnalysis?.internalPolicyAnalysis ||
+              aiAnalysis?.internalPolicyReferences?.length > 0) && (
+              <div className="bg-white rounded-xl border border-indigo-100 p-4">
+                <h4 className="text-xs font-bold text-indigo-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                  <i className="icon-[lucide--shield-check] size-3.5" />
+                  Análisis frente al marco interno de la organización
+                </h4>
+                {aiAnalysis?.internalPolicyAnalysis && (
+                  <p className="text-sm text-slate-600 mb-3">
+                    {aiAnalysis.internalPolicyAnalysis}
+                  </p>
+                )}
+                {aiAnalysis?.internalPolicyReferences?.length > 0 && (
+                  <div className="space-y-2">
+                    {aiAnalysis.internalPolicyReferences.map(
+                      (
+                        ref: { documentName: string; relevantExcerpt: string },
+                        idx: number
+                      ) => (
+                        <div
+                          key={idx}
+                          className="border-l-2 border-indigo-300 pl-3"
+                        >
+                          <p className="text-xs font-semibold text-indigo-700">
+                            {ref.documentName}
+                          </p>
+                          <p className="text-xs text-slate-500 italic">
+                            &ldquo;{ref.relevantExcerpt}&rdquo;
+                          </p>
+                        </div>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Findings + Risk Factors grid */}
             {(aiAnalysis?.keyFindings?.length > 0 ||
               aiAnalysis?.riskFactors?.length > 0) && (

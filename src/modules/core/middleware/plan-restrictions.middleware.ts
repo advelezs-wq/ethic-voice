@@ -88,6 +88,13 @@ const PLAN_RESTRICTIONS: Record<string, PlanRestrictionConfig> = {
     requiresActivePlan: true,
     allowDuringTrial: false,
   },
+
+  // Organizational ethical context (Premium-only AI triage context/documents)
+  "/api/organization/ethics-context": {
+    requiredFeature: "canUseEthicalContext",
+    requiresActivePlan: true,
+    allowDuringTrial: false,
+  },
 };
 
 // Check if a route matches any restriction pattern

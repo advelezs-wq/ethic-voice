@@ -588,6 +588,17 @@ export class SubmissionProcessorService {
           (Array.isArray(aNested?.keyFindings) && aNested.keyFindings[0]) ||
           (typeof a?.summary === "string" ? a.summary.substring(0, 100) : "") ||
           "",
+
+        // Plan Premium — Contexto Ético Organizacional: análisis y citas
+        // frente al marco interno de la organización (vacío si la org no
+        // tiene contexto ético configurado, ver compliance-ai-processor.ts)
+        internalPolicyAnalysis:
+          typeof a?.internalPolicyAnalysis === "string"
+            ? a.internalPolicyAnalysis
+            : "",
+        internalPolicyReferences: Array.isArray(a?.internalPolicyReferences)
+          ? a.internalPolicyReferences
+          : [],
       },
     };
   }
@@ -709,6 +720,13 @@ export class SubmissionProcessorService {
       timeline: Array.isArray(a.timeline) ? a.timeline : [],
       relatedSubmissionHints: Array.isArray(a.relatedSubmissionHints)
         ? a.relatedSubmissionHints
+        : [],
+      internalPolicyAnalysis:
+        typeof a.internalPolicyAnalysis === "string"
+          ? a.internalPolicyAnalysis
+          : "",
+      internalPolicyReferences: Array.isArray(a.internalPolicyReferences)
+        ? a.internalPolicyReferences
         : [],
     };
   }

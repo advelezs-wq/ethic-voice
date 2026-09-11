@@ -757,7 +757,7 @@ function ImpactStatsSection() {
     <section className="relative bg-[#f7faf9]">
       <motion.div
         ref={rootRef}
-        className="relative z-10 mx-auto -mt-12 max-w-5xl overflow-hidden rounded-[2rem] bg-[#0a1e14] px-5 py-8 shadow-[0_28px_70px_rgba(10,30,20,0.35)] sm:-mt-14 sm:px-8 sm:py-10 lg:-mt-16"
+        className="relative z-10 mx-auto -mt-12 max-w-5xl overflow-hidden rounded-[1.75rem] bg-[#0a1e14] px-3 py-6 shadow-[0_28px_70px_rgba(10,30,20,0.35)] sm:-mt-14 sm:rounded-[2rem] sm:px-8 sm:py-8 lg:-mt-16 lg:py-10"
         style={{ marginLeft: "auto", marginRight: "auto" }}
         {...reveal}
       >
@@ -767,16 +767,18 @@ function ImpactStatsSection() {
           style={{ background: "rgba(163,230,53,0.4)" }}
           aria-hidden
         />
-        <div className="relative grid grid-cols-2 gap-y-8 lg:grid-cols-4 lg:divide-x lg:divide-white/10">
+        <div className="relative grid grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-white/10">
           {IMPACT_STATS.map((stat, index) => (
             <div
               key={stat.label}
-              className="flex flex-col items-center gap-2.5 px-4 text-center"
+              className={`flex flex-col items-center gap-2.5 px-3 py-5 text-center sm:px-4 lg:border-0 lg:py-0 ${
+                index % 2 === 0 ? "border-r border-white/10" : ""
+              } ${index < 2 ? "border-b border-white/10" : ""}`}
             >
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-lime-300/[0.12]">
                 <i className={`${stat.icon} h-4 w-4 text-lime-300`} aria-hidden />
               </span>
-              <span className="text-3xl font-black tracking-tight text-white sm:text-4xl md:text-5xl">
+              <span className="text-2xl font-black tracking-tight text-white sm:text-4xl md:text-5xl">
                 <StatTicker
                   spec={stat.spec}
                   active={visible}
@@ -784,7 +786,7 @@ function ImpactStatsSection() {
                   reduceMotion={reduceMotion}
                 />
               </span>
-              <span className="max-w-[11rem] text-pretty text-[11px] font-semibold uppercase leading-snug tracking-widest text-white/45 sm:text-xs">
+              <span className="max-w-[9rem] text-pretty text-[10px] font-semibold uppercase leading-snug tracking-widest text-white/45 sm:max-w-[11rem] sm:text-xs">
                 {stat.label}
               </span>
             </div>

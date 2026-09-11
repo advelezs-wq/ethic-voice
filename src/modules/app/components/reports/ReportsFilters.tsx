@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { ReportFilters } from "@/types/reports";
 import {
   Button,
@@ -32,13 +32,25 @@ export function ReportsFilters({
     end: string | null;
   }>({ start: null, end: null });
 
-  // Debounced search to avoid lag while typing
+  // The search input can't be controlled directly by filters.search: every
+  // debounced commit below triggers a router.push, which re-renders this
+  // component with a fresh filters prop and would otherwise snap the
+  // controlled Input back to the just-committed value mid-keystroke,
+  // dropping anything typed since. Local state absorbs keystrokes
+  // immediately; only the debounced commit talks to the URL.
+  const [searchText, setSearchText] = useState(filters.search);
+  const searchDebounceRef = useRef<number | undefined>(undefined);
+
+  useEffect(() => {
+    setSearchText(filters.search);
+  }, [filters.search]);
+
   const updateFilter = (key: keyof ReportFilters, value: string) => {
     if (key === "search") {
-      // Debounce: update URL only after user stops typing for 400ms
-      window.clearTimeout((updateFilter as any)._t);
-      (updateFilter as any)._t = window.setTimeout(() => {
-        onFiltersChange({ ...filters, [key]: value });
+      setSearchText(value);
+      window.clearTimeout(searchDebounceRef.current);
+      searchDebounceRef.current = window.setTimeout(() => {
+        onFiltersChange({ ...filters, search: value });
       }, 400);
       return;
     }
@@ -137,10 +149,10 @@ export function ReportsFilters({
         <div className="space-y-4">
           {/* Main filters row */}
           <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
+            <div className="flex-1 min-w-[240px]">
               <Input
                 placeholder="Buscar por ID, contenido, denunciante, departamento..."
-                value={filters.search}
+                value={searchText}
                 onValueChange={(value) => updateFilter("search", value)}
                 startContent={
                   <i
@@ -150,7 +162,7 @@ export function ReportsFilters({
                   />
                 }
                 endContent={
-                  filters.search && (
+                  searchText && (
                     <Button
                       isIconOnly
                       size="sm"

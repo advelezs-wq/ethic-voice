@@ -832,12 +832,12 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
             Actividad de Seguridad Reciente
           </h3>
           
-          <Table aria-label="Recent security attacks">
+          <Table aria-label="Actividad de seguridad reciente">
             <TableHeader>
-              <TableColumn>IP ADDRESS</TableColumn>
-              <TableColumn>TIMESTAMP</TableColumn>
-              <TableColumn>TYPE</TableColumn>
-              <TableColumn>REASON</TableColumn>
+              <TableColumn>DIRECCIÓN IP</TableColumn>
+              <TableColumn>FECHA</TableColumn>
+              <TableColumn>TIPO</TableColumn>
+              <TableColumn>MOTIVO</TableColumn>
             </TableHeader>
             <TableBody>
               {stats.recentAttacks.map((attack, index) => (
@@ -876,12 +876,12 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
             Actividades Legítimas Recientes
           </h3>
           
-          <Table aria-label="Recent legitimate activities">
+          <Table aria-label="Actividades legítimas recientes">
             <TableHeader>
-              <TableColumn>IP ADDRESS</TableColumn>
-              <TableColumn>TIMESTAMP</TableColumn>
-              <TableColumn>TYPE</TableColumn>
-              <TableColumn>DETAILS</TableColumn>
+              <TableColumn>DIRECCIÓN IP</TableColumn>
+              <TableColumn>FECHA</TableColumn>
+              <TableColumn>TIPO</TableColumn>
+              <TableColumn>DETALLES</TableColumn>
             </TableHeader>
             <TableBody>
               {stats.recentActivities.map((activity, index) => (

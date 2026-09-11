@@ -51,7 +51,7 @@ export const ClientLogos = () => {
   }, []);
 
   return (
-    <section className="bg-white px-4 py-8 sm:px-6 sm:py-10 md:py-12 lg:px-8">
+    <section className="bg-white px-4 pt-8 pb-14 sm:px-6 sm:pt-10 sm:pb-16 md:pt-12 lg:px-8 lg:pb-20">
       <div className="mx-auto w-full max-w-4xl">
         <SectionReveal className="mb-4 sm:mb-6">
           <h2 className="text-center text-lg font-bold text-gray-900 sm:text-xl md:text-2xl">

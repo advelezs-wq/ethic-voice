@@ -43,14 +43,14 @@ export async function getFormPosterData(
 }
 
 export async function GetFormStats() {
-  const user = await currentUser();
-  if (!user) {
-    throw new UserNotFoundErr();
+  const orgId = await resolveOrgId();
+  if (!orgId) {
+    throw new Error("No autorizado");
   }
 
   const stats = prisma.form.aggregate({
     where: {
-      userId: user.id,
+      orgId,
     },
     _sum: {
       visits: true,
@@ -85,18 +85,26 @@ export async function CreateForm(data: formSchemaType) {
   }
 
   const user = await currentUser();
-
-  const { orgId } = await auth();
-
   if (!user) {
     throw new UserNotFoundErr();
+  }
+
+  // resolveOrgId() reads the app's own org context (ev_org cookie / the
+  // user's OrganizationMembership) — not Clerk's own Organizations feature,
+  // which this app never activates (no setActive({ organization }) call
+  // anywhere), so auth().orgId is always undefined. Using it here meant
+  // orgId was always undefined and every form.create() failed its required
+  // orgId field — no organization has ever been able to create a form.
+  const orgId = await resolveOrgId();
+  if (!orgId) {
+    throw new Error("No autorizado");
   }
 
   // El primer formulario de la organización se marca como "canónico": es el
   // que resuelve el link único de denuncias (Organization.slug) para planes
   // Grow o superior — ver /submit/[formUrl].
   const existingFormsCount = await prisma.form.count({
-    where: { orgId: orgId as string },
+    where: { orgId },
   });
 
   const form = await prisma.form.create({
@@ -104,7 +112,7 @@ export async function CreateForm(data: formSchemaType) {
       userId: user.id,
       title: data.name!,
       description: data.description!,
-      orgId: orgId as string,
+      orgId,
       isDefault: existingFormsCount === 0,
     },
   });
@@ -117,14 +125,17 @@ export async function CreateForm(data: formSchemaType) {
 }
 
 export async function GetForms() {
-  const user = await currentUser();
-  if (!user) {
-    throw new UserNotFoundErr();
+  // Scoped by org, not by the creating user — a form is the organization's
+  // shared reporting channel, and any teammate managing it needs to see it,
+  // not just whoever happened to create it.
+  const orgId = await resolveOrgId();
+  if (!orgId) {
+    throw new Error("No autorizado");
   }
 
   return await prisma.form.findMany({
     where: {
-      userId: user.id,
+      orgId,
     },
     orderBy: {
       createdAt: "asc",
@@ -133,14 +144,14 @@ export async function GetForms() {
 }
 
 export async function GetFormById(id: number) {
-  const user = await currentUser();
-  if (!user) {
-    throw new UserNotFoundErr();
+  const orgId = await resolveOrgId();
+  if (!orgId) {
+    throw new Error("No autorizado");
   }
 
   return await prisma.form.findUnique({
     where: {
-      userId: user.id,
+      orgId,
       id,
     },
     include: {
@@ -150,14 +161,14 @@ export async function GetFormById(id: number) {
 }
 
 export async function UpdateFormContent(id: number, jsonContent: string) {
-  const user = await currentUser();
-  if (!user) {
-    throw new UserNotFoundErr();
+  const orgId = await resolveOrgId();
+  if (!orgId) {
+    throw new Error("No autorizado");
   }
 
   return await prisma.form.update({
     where: {
-      userId: user.id,
+      orgId,
       id,
     },
     data: {
@@ -167,9 +178,9 @@ export async function UpdateFormContent(id: number, jsonContent: string) {
 }
 
 export async function PublishForm(id: number) {
-  const user = await currentUser();
-  if (!user) {
-    throw new UserNotFoundErr();
+  const orgId = await resolveOrgId();
+  if (!orgId) {
+    throw new Error("No autorizado");
   }
 
   return await prisma.form.update({
@@ -177,7 +188,7 @@ export async function PublishForm(id: number) {
       isPublished: true,
     },
     where: {
-      userId: user.id,
+      orgId,
       id,
     },
   });
@@ -238,15 +249,15 @@ export async function SubmitForm(formUrl: string, content: string) {
 }
 
 export async function GetFormWithSubmissions(id: number) {
-  const user = await currentUser();
-  if (!user) {
-    throw new UserNotFoundErr();
+  const orgId = await resolveOrgId();
+  if (!orgId) {
+    throw new Error("No autorizado");
   }
 
   return await prisma.form.findUnique({
     where: {
       id,
-      userId: user.id,
+      orgId,
     },
     include: {
       submissions: true,

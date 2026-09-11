@@ -56,16 +56,20 @@ export async function POST() {
   }
 }
 
-// Also allow GET for testing purposes
+// Also allow GET from Vercel Cron (no auth header) and internal daily-runner
 export async function GET(_request: NextRequest) {
   try {
-    // Allow GET unconditionally to support Vercel Cron "Run" (some environments omit x-vercel-cron)
-    await digestService.sendWeeklyDigests();
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Weekly digests processed successfully',
-      timestamp: new Date().toISOString()
-    });
+    const headersList = await headers();
+    const isCron = headersList.get('x-vercel-cron');
+    if (isCron) {
+      await digestService.sendWeeklyDigests();
+      return NextResponse.json({
+        success: true,
+        message: 'Weekly digests processed successfully (cron)',
+        timestamp: new Date().toISOString()
+      });
+    }
+    return NextResponse.json({ error: 'GET not allowed' }, { status: 405 });
   } catch (error) {
     console.error('Error processing weekly digests:', error);
     return NextResponse.json(
@@ -73,4 +77,4 @@ export async function GET(_request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

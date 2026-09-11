@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { getUserPermissions } from "@/modules/core/utils/permissions";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
@@ -60,7 +60,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Check user permissions
-    const permissions = await getUserPermissions(userId, organizationId);
+    const user = await currentUser();
+    const permissions = await getUserPermissions(
+      userId,
+      organizationId,
+      user?.primaryEmailAddress?.emailAddress
+    );
     if (!permissions.canManageOrganization) {
       return NextResponse.json(
         { error: "No tienes permisos para actualizar la configuración" },

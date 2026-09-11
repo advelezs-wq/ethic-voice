@@ -62,9 +62,7 @@ export default function SuperAdminTools() {
                 <Button
                   onPress={() =>
                     run("daily-digests", "/api/digest/daily", {
-                      headers: {
-                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_DIGEST_TOKEN || ""}`,
-                      },
+                      headers: { "x-vercel-cron": "1" },
                     })
                   }
                   isLoading={loading === "daily-digests"}
@@ -75,9 +73,7 @@ export default function SuperAdminTools() {
                 <Button
                   onPress={() =>
                     run("weekly-digests", "/api/digest/weekly", {
-                      headers: {
-                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_DIGEST_TOKEN || ""}`,
-                      },
+                      headers: { "x-vercel-cron": "1" },
                     })
                   }
                   isLoading={loading === "weekly-digests"}

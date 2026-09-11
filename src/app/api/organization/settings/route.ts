@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { getUserPermissions } from "@/modules/core/utils/permissions";
 
@@ -22,7 +22,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Check user permissions
-    const permissions = await getUserPermissions(userId, orgId);
+    const user = await currentUser();
+    const permissions = await getUserPermissions(
+      userId,
+      orgId,
+      user?.primaryEmailAddress?.emailAddress
+    );
     if (!permissions.canManageOrganization) {
       return NextResponse.json(
         { error: "No tienes permisos para ver la configuración" },

@@ -692,9 +692,9 @@ function HeroSection({ variant }: { variant: LandingVariant }) {
               <div className="-rotate-1">
                 <CaseCardMock />
               </div>
-              {/* Chat flotante superpuesto */}
+              {/* Chat flotante superpuesto — en móvil se apila debajo para no tapar el detalle del caso */}
               <div
-                className="absolute -bottom-10 -left-6 rotate-2 motion-safe:animate-float sm:-left-14"
+                className="relative mt-4 flex justify-center rotate-2 motion-safe:animate-float sm:absolute sm:-bottom-20 sm:-left-14 sm:mt-0 sm:block"
                 style={{ animationDuration: "8s" }}
               >
                 <ChatCardMock />

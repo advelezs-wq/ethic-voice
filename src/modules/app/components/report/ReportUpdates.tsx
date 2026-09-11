@@ -457,7 +457,7 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
               </ModalHeader>
               <ModalBody className="space-y-3">
                 <Input
-                  label="Título *"
+                  label="Título"
                   placeholder="Describe el avance o hito alcanzado"
                   value={form.title}
                   onValueChange={(v) => setField("title", v)}

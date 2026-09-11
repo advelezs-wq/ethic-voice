@@ -205,7 +205,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
   const closureForm = (
     <div className="space-y-4">
       <Select
-        label="Resultado de la investigación *"
+        label="Resultado de la investigación"
         placeholder="Selecciona un resultado"
         selectedKeys={outcome ? [outcome] : []}
         onSelectionChange={(keys) =>
@@ -219,7 +219,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
       </Select>
 
       <Textarea
-        label="Resumen de lo actuado *"
+        label="Resumen de lo actuado"
         placeholder="Describe qué se investigó, qué se encontró y qué acciones se tomaron..."
         value={summary}
         onValueChange={setSummary}

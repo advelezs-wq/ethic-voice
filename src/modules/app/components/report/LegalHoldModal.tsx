@@ -73,7 +73,7 @@ export function LegalHoldModal({
             <ModalBody>
               {!currentlyOnHold && (
                 <Textarea
-                  label="Motivo *"
+                  label="Motivo"
                   placeholder="Ej. litigio en curso, requerimiento regulatorio, investigación externa activa..."
                   value={reason}
                   onValueChange={setReason}

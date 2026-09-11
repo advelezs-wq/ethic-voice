@@ -76,7 +76,7 @@ export function EscalateCaseModal({
             </ModalHeader>
             <ModalBody className="space-y-3">
               <Input
-                label="Escalado a *"
+                label="Escalado a"
                 placeholder="Nombre de la persona o firma externa"
                 value={escalatedToName}
                 onValueChange={setEscalatedToName}
@@ -90,7 +90,7 @@ export function EscalateCaseModal({
                 onValueChange={setEscalatedToEmail}
               />
               <Textarea
-                label="Motivo de la escalación *"
+                label="Motivo de la escalación"
                 placeholder="¿Por qué se escala este caso?"
                 value={reason}
                 onValueChange={setReason}

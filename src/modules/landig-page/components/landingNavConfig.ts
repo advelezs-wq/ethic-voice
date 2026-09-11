@@ -19,5 +19,7 @@ export const productLinks = [
 
 export const companyLinks = [
   { href: "/about", label: "Empresa" },
+  { href: "/partners", label: "Partners" },
+  { href: "/careers", label: "Carreras" },
   { href: "/privacidad", label: "Privacidad" },
 ] as const;

@@ -168,18 +168,16 @@ export async function getTeamMembers(orgId: string) {
           },
         };
 
-        // For members, only count reports in their department
-        const reportWhereClause =
-          member.role === "MEMBER" && member.departmentId
-            ? {
-                orgId,
-                departmentId: member.departmentId,
-                ...assignmentFilter,
-              }
-            : {
-                orgId,
-                ...assignmentFilter,
-              };
+        // Count by assignment only, regardless of the member's current
+        // department — a report's departmentId can differ from the
+        // assignee's own (departments are reassignable independently of
+        // who's working a case), so filtering on it here previously made
+        // this overview undercount vs. getMemberDetails' ground truth,
+        // which counts purely by assignment.
+        const reportWhereClause = {
+          orgId,
+          ...assignmentFilter,
+        };
 
         const [
           assignedReports,

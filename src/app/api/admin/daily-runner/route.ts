@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 // Runs 5 downstream tasks sequentially, including process-queue which now
 // waits up to 50s for AI jobs to complete — give the chain room to finish.
@@ -32,6 +34,27 @@ async function callJson(url: string, init?: RequestInit) {
 }
 
 export async function GET(request: NextRequest) {
+  // This orchestrator attaches a real x-vercel-cron header to every
+  // downstream call regardless of who calls IT, so unlike its downstream
+  // siblings (which each check this themselves) it was reachable by anyone
+  // with no credentials — effectively bypassing their auth checks. Gate
+  // entry the same way validate-plans/route.ts already does.
+  const isCron = request.headers.get("x-vercel-cron");
+  if (!isCron) {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const clerkUser = await currentUser();
+    const userEmail = clerkUser?.primaryEmailAddress?.emailAddress;
+    if (!userEmail || !isSuperAdmin(userEmail)) {
+      return NextResponse.json(
+        { error: "Super admin access required" },
+        { status: 403 }
+      );
+    }
+  }
+
   const base = getBaseUrl(request.url);
   const results: Record<string, unknown> = {};
   // Propaga cabecera de cron a este endpoint también para que el middleware lo detecte
@@ -41,6 +64,7 @@ export async function GET(request: NextRequest) {
   results.validatePlans = await callJson(
     new URL("/api/admin/security/validate-plans", base).toString(),
     {
+      method: "POST",
       headers: { "x-vercel-cron": "1" },
     }
   );

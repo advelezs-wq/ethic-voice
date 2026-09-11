@@ -26,7 +26,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
         ${isCollapsed ? "justify-center" : "justify-start"}
         ${
           isActive
-            ? "border-emerald-200 bg-gradient-to-r from-emerald-50 to-lime-50 text-primary font-medium shadow-[0_10px_20px_-18px_rgba(16,185,129,0.8)]"
+            ? "border-emerald-200 bg-gradient-to-r from-emerald-50 to-lime-50 text-emerald-800 font-medium shadow-[0_10px_20px_-18px_rgba(16,185,129,0.8)]"
             : "border-transparent text-slate-600 hover:border-emerald-100 hover:bg-emerald-50/60 hover:text-[#0d212c]"
         }
       `}
@@ -34,7 +34,7 @@ export const SidebarItem: React.FC<SidebarItemProps> = ({
     >
       <span
         className={`${
-          isActive ? "text-primary" : "text-slate-500"
+          isActive ? "text-emerald-800" : "text-slate-500"
         } flex-shrink-0 transition-colors duration-200`}
       >
         {icon}

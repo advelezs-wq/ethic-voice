@@ -21,14 +21,14 @@ export const PublishFormBtn = ({ id }: { id: number }) => {
     try {
       await PublishForm(id);
       addToast({
-        title: "Success",
-        description: "Este formulario es ahora publico",
+        title: "Publicado",
+        description: "Este formulario ya es público",
       });
       router.refresh();
     } catch {
       addToast({
         title: "Error",
-        description: "Something went wrong",
+        description: "Algo salió mal",
       });
     }
   };

@@ -113,7 +113,7 @@ export const useOrganizationStore = create<OrganizationState>()(
             return {
               success: false,
               error:
-                error instanceof Error ? error.message : "Something went wrong",
+                error instanceof Error ? error.message : "Algo salió mal",
             };
           }
         },

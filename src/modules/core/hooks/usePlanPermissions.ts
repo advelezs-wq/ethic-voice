@@ -66,7 +66,7 @@ export function usePlanPermissions(): UsePlanPermissionsReturn {
       );
       const superAdminPlanInfo: OrganizationPlanInfo = {
         planType: PlanType.PREMIUM,
-        planName: "Super Admin Access",
+        planName: "Acceso de Super Admin",
         hasActivePlan: true,
         isTrialActive: false,
         trialDaysRemaining: 0,
@@ -78,9 +78,9 @@ export function usePlanPermissions(): UsePlanPermissionsReturn {
         restrictions: [],
         canUpgrade: false,
         currentUsers: 0,
-        maxUsers: 999999,
+        maxUsers: -1, // sin límite — usa el mismo centinela que un plan Premium real, para que la UI lo muestre como "∞" en vez de un número arbitrario
         currentInvestigators: 0,
-        maxInvestigators: 999999,
+        maxInvestigators: -1,
       };
       setPlanInfo(superAdminPlanInfo);
       setPermissions(getPlanPermissions(PlanType.PREMIUM));
@@ -152,7 +152,7 @@ export function usePlanPermissions(): UsePlanPermissionsReturn {
           (normalized.currentUsers / normalized.maxUsers) * 100;
         if (userUsagePercent >= 80) {
           warnings.push(
-            `You're using ${normalized.currentUsers}/${normalized.maxUsers} users (${Math.round(userUsagePercent)}%)`
+            `Estás usando ${normalized.currentUsers}/${normalized.maxUsers} usuarios (${Math.round(userUsagePercent)}%)`
           );
         }
       }
@@ -162,7 +162,7 @@ export function usePlanPermissions(): UsePlanPermissionsReturn {
           (normalized.currentInvestigators / normalized.maxInvestigators) * 100;
         if (investigatorUsagePercent >= 80) {
           warnings.push(
-            `You're using ${normalized.currentInvestigators}/${normalized.maxInvestigators} investigators (${Math.round(investigatorUsagePercent)}%)`
+            `Estás usando ${normalized.currentInvestigators}/${normalized.maxInvestigators} investigadores (${Math.round(investigatorUsagePercent)}%)`
           );
         }
       }
@@ -263,7 +263,7 @@ export function usePlanPermissions(): UsePlanPermissionsReturn {
         return {
           reason: PlanRestrictionReason.SUBSCRIPTION_INACTIVE,
           message:
-            "Your subscription is not active. Please activate your plan to access this feature.",
+            "Tu suscripción no está activa. Activa tu plan para acceder a esta función.",
           requiredPlan: planInfo.planType,
           upgradeUrl: `/app/organization?tab=billing`,
         };
@@ -272,13 +272,13 @@ export function usePlanPermissions(): UsePlanPermissionsReturn {
       if (!requiredPlan) {
         return {
           reason: PlanRestrictionReason.FEATURE_NOT_AVAILABLE,
-          message: "This feature is not available in any plan.",
+          message: "Esta función no está disponible en ningún plan.",
         };
       }
 
       return {
         reason: PlanRestrictionReason.PLAN_UPGRADE_REQUIRED,
-        message: `This feature requires the ${requiredPlan} plan or higher.`,
+        message: `Esta función requiere el plan ${requiredPlan} o superior.`,
         requiredPlan,
         upgradeUrl: planInfo.upgradeUrl || "/app/organization?tab=billing",
       };

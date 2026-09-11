@@ -34,14 +34,14 @@ export const CreateFormBtn = () => {
       const formId = await CreateForm(values);
 
       addToast({
-        title: "Success",
+        title: "Formulario creado",
       });
 
       router.push(`/app/your-forms/builder/${formId}`);
     } catch {
       addToast({
         title: "Error",
-        description: "Something went wrong, please try again later",
+        description: "Algo salió mal, intenta de nuevo más tarde",
         color: "danger",
       });
     }
@@ -62,14 +62,14 @@ export const CreateFormBtn = () => {
         }
       >
         <p className="font-bold text-xl text-slate-600 group-hover:text-primary">
-          Create new form
+          Crear formulario
         </p>
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           <ModalHeader className="flex-col items-start">
-            <h2>Create form</h2>
-            <p>Create a new form to start collecting responses</p>
+            <h2>Crear formulario</h2>
+            <p>Crea un nuevo formulario para empezar a recibir denuncias</p>
           </ModalHeader>
           <ModalBody>
             <Form {...form}>
@@ -82,7 +82,7 @@ export const CreateFormBtn = () => {
                   name="name"
                   render={({ field, fieldState: { error } }) => (
                     <Input
-                      label="Name"
+                      label="Nombre"
                       {...field}
                       errorMessage={error?.message}
                       isInvalid={error ? true : false}
@@ -94,7 +94,7 @@ export const CreateFormBtn = () => {
                   name="description"
                   render={({ field, fieldState: { error } }) => (
                     <Textarea
-                      label="Description"
+                      label="Descripción"
                       {...field}
                       errorMessage={error?.message}
                       isInvalid={error ? true : false}
@@ -110,7 +110,7 @@ export const CreateFormBtn = () => {
               isLoading={form.formState.isSubmitting}
               className="w-full"
             >
-              Save
+              Guardar
             </Button>
           </ModalFooter>
         </ModalContent>

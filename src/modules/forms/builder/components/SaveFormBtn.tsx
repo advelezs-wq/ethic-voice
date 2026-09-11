@@ -13,13 +13,13 @@ export const SaveFormBtn = ({ id }: { id: number }) => {
       const jsonElements = JSON.stringify(elements);
       await UpdateFormContent(id, jsonElements);
       addToast({
-        title: "Success",
-        description: "Your form has been saved!",
+        title: "Guardado",
+        description: "Tu formulario se guardó correctamente",
       });
     } catch {
       addToast({
         title: "Error",
-        description: "Something wet wrong",
+        description: "Algo salió mal",
       });
     }
   };

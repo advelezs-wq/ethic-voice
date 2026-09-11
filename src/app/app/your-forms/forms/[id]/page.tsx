@@ -51,7 +51,7 @@ const FormDetailPage = async ({
       </div>
       <div className="w-full pt-8 gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 container">
         <CardStats
-          title="Total visits"
+          title="Total de visitas"
           icon={
             <i
               className="icon-[lets-icons--view] size-5"
@@ -59,13 +59,13 @@ const FormDetailPage = async ({
               aria-hidden="true"
             />
           }
-          helperText="All time form visits"
-          value={visits.toLocaleString() || ""}
+          helperText="Visitas totales del formulario"
+          value={visits.toLocaleString()}
           isLoading={false}
           className="shadow-md"
         />
         <CardStats
-          title="Total submissions"
+          title="Total de envíos"
           icon={
             <i
               className="icon-[humbleicons--upload] size-5"
@@ -73,13 +73,13 @@ const FormDetailPage = async ({
               aria-hidden="true"
             />
           }
-          helperText="All time form submissions"
-          value={submissionsCount.toLocaleString() || ""}
+          helperText="Denuncias enviadas por este formulario"
+          value={submissionsCount.toLocaleString()}
           isLoading={false}
           className="shadow-md "
         />
         <CardStats
-          title="Submission rate"
+          title="Tasa de envío"
           icon={
             <i
               className="icon-[mdi--cursor-default-click-outline] size-5"
@@ -87,13 +87,13 @@ const FormDetailPage = async ({
               aria-hidden="true"
             />
           }
-          helperText="Visits that result in form submissions"
-          value={submissionRate.toLocaleString() + "%" || ""}
+          helperText="Visitas que terminaron en un envío"
+          value={visits > 0 ? `${submissionRate.toLocaleString()}%` : "—"}
           isLoading={false}
           className="shadow-md "
         />
         <CardStats
-          title="Bounce rate"
+          title="Tasa de rebote"
           icon={
             <i
               className="icon-[tabler--bounce-right] size-5"
@@ -101,8 +101,8 @@ const FormDetailPage = async ({
               aria-hidden="true"
             />
           }
-          helperText="Visits that leaves without interacting"
-          value={bounceRate.toLocaleString() + "%" || ""}
+          helperText="Visitas que se fueron sin interactuar"
+          value={visits > 0 ? `${bounceRate.toLocaleString()}%` : "—"}
           isLoading={false}
           className="shadow-md "
         />

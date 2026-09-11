@@ -26,6 +26,7 @@ import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import { EnhancedInviteMemberModal } from "./EnhancedInviteMemberModal";
 import { OrganizationLogoDropzone } from "./OrganizationLogoDropzone";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 interface CustomOrganizationManagementProps {
   className?: string;
@@ -55,6 +56,10 @@ export function CustomOrganizationManagement({
   // State
   const [members, setMembers] = useState<OrganizationMember[]>([]);
   const [membersLoading, setMembersLoading] = useState(true);
+  const [removeMemberConfirm, setRemoveMemberConfirm] = useState<{
+    memberId: string;
+    memberEmail: string;
+  } | null>(null);
   const [updatingRoleMemberId, setUpdatingRoleMemberId] = useState<string | null>(
     null
   );
@@ -206,16 +211,15 @@ export function CustomOrganizationManagement({
     setTimeout(() => window.location.reload(), 500);
   };
 
-  const handleRemoveMember = async (memberId: string, memberEmail: string) => {
+  const handleRemoveMember = (memberId: string, memberEmail: string) => {
     if (!currentOrganization?.id) return;
+    setRemoveMemberConfirm({ memberId, memberEmail });
+  };
 
-    if (
-      !confirm(
-        `¿Estás seguro de que quieres remover a ${memberEmail} de la organización?`
-      )
-    ) {
-      return;
-    }
+  const performRemoveMember = async () => {
+    if (!currentOrganization?.id || !removeMemberConfirm) return;
+    const { memberId, memberEmail } = removeMemberConfirm;
+    setRemoveMemberConfirm(null);
 
     try {
       const response = await fetch(
@@ -711,6 +715,15 @@ export function CustomOrganizationManagement({
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      <ConfirmDialog
+        isOpen={!!removeMemberConfirm}
+        onClose={() => setRemoveMemberConfirm(null)}
+        onConfirm={performRemoveMember}
+        title="Remover miembro"
+        message={`¿Estás seguro de que quieres remover a ${removeMemberConfirm?.memberEmail} de la organización?`}
+        confirmLabel="Remover"
+      />
     </div>
   );
 }

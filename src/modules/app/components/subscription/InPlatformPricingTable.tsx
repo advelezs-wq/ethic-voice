@@ -15,6 +15,7 @@ import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
 import { motion } from "framer-motion";
 import { useExchangeRate } from "@/modules/core/hooks/useExchangeRate";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
+import { addToast } from "@/modules/core/utils/safe-toast";
 // Duplicate import removed
 
 export default function InPlatformPricingTable() {
@@ -90,7 +91,10 @@ export default function InPlatformPricingTable() {
       if (url) window.location.href = url as string;
     } catch (error) {
       console.error("Error creating subscription:", error);
-      alert("Error al crear la suscripción. Por favor intenta nuevamente.");
+      addToast({
+        title: "Error al crear la suscripción. Por favor intenta nuevamente.",
+        color: "danger",
+      });
     } finally {
       setIsProcessing(false);
       setSelectedPlan(null);

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@heroui/button';
 import { useOrganization } from '@clerk/nextjs';
 import { useUser } from '@clerk/nextjs';
+import { addToast } from '@/modules/core/utils/safe-toast';
 
 interface DownloadPDFButtonProps {
   reportType: 'super_admin' | 'organization' | 'member' | 'report_case';
@@ -97,7 +98,10 @@ export const DownloadPDFButton: React.FC<DownloadPDFButtonProps> = ({
       }
     } catch (error) {
       console.error('Error generating PDF:', error);
-      alert('Error al generar el PDF. Por favor, intenta nuevamente.');
+      addToast({
+        title: 'Error al generar el PDF. Por favor, intenta nuevamente.',
+        color: 'danger',
+      });
     } finally {
       setIsGenerating(false);
     }

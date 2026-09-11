@@ -19,6 +19,7 @@ import {
 import CheckoutSidebar from "../checkout/CheckoutSidebar";
 import { useClerk } from "@clerk/nextjs";
 import { motion } from "framer-motion";
+import { addToast } from "@/modules/core/utils/safe-toast";
 
 interface InPlatformPricingModalProps {
   isOpen: boolean;
@@ -108,7 +109,10 @@ export default function InPlatformPricingModal({
         // Verify subscription ID exists
         if (!data.subscription.id) {
           console.error("❌ [PRICING-MODAL] No subscription ID in response!");
-          alert("Error: No subscription ID received. Please try again.");
+          addToast({
+            title: "No se recibió el ID de la suscripción. Intenta de nuevo.",
+            color: "danger",
+          });
           return;
         }
 
@@ -126,11 +130,17 @@ export default function InPlatformPricingModal({
         });
       } else {
         console.error("❌ Failed to create subscription:", data);
-        alert("Failed to create subscription. Please try again.");
+        addToast({
+          title: "No se pudo crear la suscripción. Intenta de nuevo.",
+          color: "danger",
+        });
       }
     } catch (error) {
       console.error("❌ Error creating subscription:", error);
-      alert("An error occurred. Please try again.");
+      addToast({
+        title: "Ocurrió un error. Intenta de nuevo.",
+        color: "danger",
+      });
     } finally {
       setIsCreatingSubscription(false);
     }

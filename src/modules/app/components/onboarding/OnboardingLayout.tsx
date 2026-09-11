@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@heroui/react";
 import { useClerk } from "@clerk/nextjs";
 import { OnboardingContextType, OnboardingStep } from "./OnboardingClient";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 interface OnboardingLayoutProps {
   children: React.ReactNode;
@@ -78,14 +79,10 @@ export function OnboardingLayout({
     return "upcoming";
   };
 
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+
   const handleLogout = () => {
-    if (
-      confirm(
-        "¿Estás seguro que quieres cerrar sesión? Se perderá todo el progreso de configuración y tendrás que comenzar nuevamente."
-      )
-    ) {
-      signOut({ redirectUrl: "/" });
-    }
+    setLogoutConfirmOpen(true);
   };
 
   return (
@@ -233,6 +230,15 @@ export function OnboardingLayout({
       >
         <div className="w-full max-w-3xl mx-auto">{children}</div>
       </div>
+
+      <ConfirmDialog
+        isOpen={logoutConfirmOpen}
+        onClose={() => setLogoutConfirmOpen(false)}
+        onConfirm={() => signOut({ redirectUrl: "/" })}
+        title="Cerrar sesión"
+        message="¿Estás seguro que quieres cerrar sesión? Se perderá todo el progreso de configuración y tendrás que comenzar nuevamente."
+        confirmLabel="Cerrar sesión"
+      />
     </div>
   );
 }

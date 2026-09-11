@@ -25,6 +25,7 @@ import {
 import { getDepartments } from "@/actions/department.actions";
 import { Department } from "@/types/department.types";
 import { useSafeToast } from "../../hooks/useSafeToast";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 interface AssignMembersModalProps {
   isOpen: boolean;
@@ -84,6 +85,13 @@ export function AssignMembersModal({
   const [reassignToId, setReassignToId] = useState<string>("");
   const [reassignReason, setReassignReason] = useState("");
   const [isReassigning, setIsReassigning] = useState(false);
+  const [conflictConfirm, setConflictConfirm] = useState<{
+    names: string;
+  } | null>(null);
+  const [removeConfirm, setRemoveConfirm] = useState<{
+    userId: string;
+    userName: string;
+  } | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -121,13 +129,15 @@ export function AssignMembersModal({
       .filter((m): m is AvailableMember => !!m && !!conflictReason(m.conflict));
 
     if (conflicted.length > 0) {
-      const names = conflicted.map((m) => m.userName).join(", ");
-      const proceed = confirm(
-        `Posible conflicto de interés con: ${names}. ¿Deseas asignarlos de todas formas?`
-      );
-      if (!proceed) return;
+      setConflictConfirm({ names: conflicted.map((m) => m.userName).join(", ") });
+      return;
     }
 
+    await performAssign();
+  };
+
+  const performAssign = async () => {
+    setConflictConfirm(null);
     setLoading(true);
     try {
       const membersToAssign = selectedMembers.map((userId) => {
@@ -152,10 +162,14 @@ export function AssignMembersModal({
     }
   };
 
-  const handleRemove = async (userId: string, userName: string) => {
-    if (!confirm(`¿Estás seguro de remover a ${userName} de este reporte?`)) {
-      return;
-    }
+  const handleRemove = (userId: string, userName: string) => {
+    setRemoveConfirm({ userId, userName });
+  };
+
+  const performRemove = async () => {
+    if (!removeConfirm) return;
+    const { userId, userName } = removeConfirm;
+    setRemoveConfirm(null);
 
     setRemovingUserId(userId);
     try {
@@ -241,6 +255,7 @@ export function AssignMembersModal({
   };
 
   return (
+    <>
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
@@ -507,5 +522,27 @@ export function AssignMembersModal({
         </ModalFooter>
       </ModalContent>
     </Modal>
+
+      <ConfirmDialog
+        isOpen={!!conflictConfirm}
+        onClose={() => setConflictConfirm(null)}
+        onConfirm={performAssign}
+        title="Posible conflicto de interés"
+        message={`Posible conflicto de interés con: ${conflictConfirm?.names}. ¿Deseas asignarlos de todas formas?`}
+        confirmLabel="Asignar de todas formas"
+        confirmColor="warning"
+        isLoading={loading}
+      />
+
+      <ConfirmDialog
+        isOpen={!!removeConfirm}
+        onClose={() => setRemoveConfirm(null)}
+        onConfirm={performRemove}
+        title="Remover investigador"
+        message={`¿Estás seguro de remover a ${removeConfirm?.userName} de este reporte?`}
+        confirmLabel="Remover"
+        isLoading={!!removingUserId}
+      />
+    </>
   );
 }

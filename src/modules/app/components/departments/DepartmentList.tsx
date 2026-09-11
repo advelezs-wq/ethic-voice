@@ -10,6 +10,7 @@ import { DepartmentWithStats } from "@/types/department.types";
 import { deleteDepartment } from "@/actions/department.actions";
 import { CreateDepartmentModal } from "./CreateDepartmentModal";
 import { EditDepartmentModal } from "./EditDepartmentModal";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 interface DepartmentListProps {
   departments: DepartmentWithStats[];
@@ -23,6 +24,10 @@ export function DepartmentList({
   const [selectedDepartment, setSelectedDepartment] =
     useState<DepartmentWithStats | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const createModal = useDisclosure();
   const editModal = useDisclosure();
@@ -32,14 +37,14 @@ export function DepartmentList({
     editModal.onOpen();
   };
 
-  const handleDelete = async (departmentId: string, departmentName: string) => {
-    if (
-      !confirm(
-        `¿Estás seguro de eliminar el departamento "${departmentName}"? Los miembros y reportes serán movidos al departamento General.`
-      )
-    ) {
-      return;
-    }
+  const handleDelete = (departmentId: string, departmentName: string) => {
+    setDeleteConfirm({ id: departmentId, name: departmentName });
+  };
+
+  const performDelete = async () => {
+    if (!deleteConfirm) return;
+    const departmentId = deleteConfirm.id;
+    setDeleteConfirm(null);
 
     setDeleting(departmentId);
     try {
@@ -180,6 +185,16 @@ export function DepartmentList({
           }}
         />
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteConfirm}
+        onClose={() => setDeleteConfirm(null)}
+        onConfirm={performDelete}
+        title="Eliminar departamento"
+        message={`¿Estás seguro de eliminar el departamento "${deleteConfirm?.name}"? Los miembros y reportes serán movidos al departamento General.`}
+        confirmLabel="Eliminar"
+        isLoading={!!deleting}
+      />
     </>
   );
 }

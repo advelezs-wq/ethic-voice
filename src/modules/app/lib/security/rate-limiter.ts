@@ -25,6 +25,15 @@ const REDIS_KEYS = {
   IDEMPOTENCY_STATS: 'security:idempotency_stats',
 };
 
+// Formats a millisecond duration for the security dashboard's attack log
+// (e.g. 1800000 -> "30 minutes") instead of showing the raw ms value.
+function formatDurationMs(ms: number): string {
+  const minutes = Math.round(ms / 60000);
+  if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'}`;
+  const hours = Math.round(minutes / 60);
+  return `${hours} hour${hours === 1 ? '' : 's'}`;
+}
+
 // Store request counts per IP/email (keeping in memory for performance)
 const requestCounts = new Map<string, { count: number; lastReset: number; suspicious: boolean }>();
 
@@ -246,7 +255,7 @@ export class SecurityManager {
       null
     );
 
-    this.logAttack(ip, 'IP Blocked', `Automatically blocked for ${duration}ms`);
+    this.logAttack(ip, 'IP Blocked', `Automatically blocked for ${formatDurationMs(duration)}`);
   }
 
   async unblockIP(ip: string): Promise<boolean> {

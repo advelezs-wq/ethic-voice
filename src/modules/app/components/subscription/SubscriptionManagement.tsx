@@ -53,6 +53,7 @@ interface SubscriptionInfo {
   monthlyPrice: string;
   yearlyPrice?: string;
   billingCycle: string;
+  currency: string;
   isTrialActive: boolean;
   trialDaysRemaining?: number;
   nextChargeDate?: string;
@@ -312,12 +313,15 @@ export function SubscriptionManagement({
     }
   };
 
-  const formatPrice = (price: string | number | null | undefined) => {
+  const formatPrice = (
+    price: string | number | null | undefined,
+    currency: string = subscription?.currency || "COP"
+  ) => {
     const numericPrice =
       typeof price === "string" ? parseFloat(price) : price || 0;
     return new Intl.NumberFormat("es-CO", {
       style: "currency",
-      currency: "COP",
+      currency,
       minimumFractionDigits: 0,
     }).format(isNaN(numericPrice) ? 0 : numericPrice);
   };
@@ -562,7 +566,7 @@ export function SubscriptionManagement({
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <p className="font-semibold">
-                        {formatPrice(invoice.amount)}
+                        {formatPrice(invoice.amount, invoice.currency)}
                       </p>
                       <Chip
                         size="sm"
@@ -695,7 +699,8 @@ export function SubscriptionManagement({
                             {formatPrice(
                               ((targetBillingCycle || subscription.billingCycle) === "YEARLY"
                                 ? (config.price.yearly as number)
-                                : config.price.monthly) as number
+                                : config.price.monthly) as number,
+                              "USD"
                             )}
                             <span className="text-sm font-normal text-slate-500">
                               /{(targetBillingCycle || subscription.billingCycle) === "YEARLY" ? "año" : "mes"}

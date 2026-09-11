@@ -678,9 +678,15 @@ export function CustomOrganizationManagement({
         onSuccess={handleInviteSuccess}
         currentMembersCount={members.filter((m) => m.role === "MEMBER").length}
         currentAdminsCount={members.filter((m) => m.role === "ADMIN").length}
-        maxUsers={planInfo?.maxUsers ?? 1}
-        maxInvestigators={planInfo?.maxInvestigators ?? 4}
-        planType={planInfo?.planType || "STARTER"}
+        // orgPlanLimits (the browsed org's real plan-info) takes priority
+        // over planInfo, which usePlanPermissions() synthesizes as an
+        // unlimited Premium plan for any superadmin — see the "Límites del
+        // Plan" card above, which already made this fix.
+        maxUsers={orgPlanLimits?.maxUsers ?? planInfo?.maxUsers ?? 1}
+        maxInvestigators={
+          orgPlanLimits?.maxInvestigators ?? planInfo?.maxInvestigators ?? 4
+        }
+        planType={orgPlanLimits?.planType || planInfo?.planType || "STARTER"}
       />
 
       {/* Organization Settings Modal */}

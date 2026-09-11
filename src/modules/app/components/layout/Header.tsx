@@ -17,7 +17,6 @@ import {
 } from "@heroui/react";
 import { useSidebar } from "../../context/SidebarContext";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
-import { useTheme } from "@/modules/core/providers/ThemeProvider";
 import { NotificationBell } from "../notifications/NotificationBell";
 import { CreateReportModal } from "../reports/CreateReportModal";
 import { Button as AppButton } from "@/modules/app/components/ui";
@@ -28,8 +27,6 @@ export function Header() {
   const { permissions, isSuperAdmin } = useUserRole();
   const { currentOrganization, organizations, switchOrganization, setCurrentOrganization } =
     useOrganization();
-  const { settings } = useTheme();
-  const organizationLogoUrl = settings?.logoUrl;
   const { isLoaded: _userLoaded } = useUser();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [superAdminScope, setSuperAdminScope] = useState<"all" | "org">("org");
@@ -92,26 +89,16 @@ export function Header() {
           className="lg:hidden inline-flex items-center pl-10 md:pl-16"
           aria-label="EthicVoice — inicio"
         >
-          {organizationLogoUrl ? (
-            <Image
-              src={organizationLogoUrl}
-              alt="Logo de la organización"
-              width={160}
-              height={38}
-              className="h-8 w-auto max-w-[9.5rem] object-contain"
-              priority
-              unoptimized
-            />
-          ) : (
-            <Image
-              src="/brand/logo-nobg.png"
-              alt="EthicVoice"
-              width={160}
-              height={38}
-              className="h-8 w-auto max-w-[9.5rem] object-contain"
-              priority
-            />
-          )}
+          {/* Shared home/brand link for every org and superadmins — always
+              EthicVoice's own mark, never the org-in-context's uploaded logo. */}
+          <Image
+            src="/brand/logo-nobg.png"
+            alt="EthicVoice"
+            width={160}
+            height={38}
+            className="h-8 w-auto max-w-[9.5rem] object-contain"
+            priority
+          />
         </Link>
 
         <div className="hidden lg:block">

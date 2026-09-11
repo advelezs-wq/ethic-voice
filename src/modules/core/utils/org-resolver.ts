@@ -111,11 +111,21 @@ export async function assertUserCanAccessReport(
     },
   });
 
+  // A superadmin browsing "por org" (via the ev_org cookie) has no
+  // OrganizationMembership row for that org — resolveOrgId() already
+  // bypasses the membership lookup for them, so this check must match or
+  // the chat/messages tab breaks for every org a superadmin isn't a member
+  // of, even though the rest of the report page loads fine.
+  let role = membership?.role;
   if (!membership) {
-    throw new Error("No autorizado");
+    const userEmail = (await currentUser())?.primaryEmailAddress?.emailAddress;
+    if (!userEmail || !isSuperAdmin(userEmail)) {
+      throw new Error("No autorizado");
+    }
+    role = "ADMIN";
   }
 
-  await assertConfidentialityAllows(reportId, userId, membership.role);
+  await assertConfidentialityAllows(reportId, userId, role!);
 
   return submission;
 }
@@ -150,17 +160,22 @@ export async function assertUserCanWriteToReport(
     },
   });
 
+  let role = membership?.role;
   if (!membership) {
-    throw new Error("No autorizado");
+    const userEmail = (await currentUser())?.primaryEmailAddress?.emailAddress;
+    if (!userEmail || !isSuperAdmin(userEmail)) {
+      throw new Error("No autorizado");
+    }
+    role = "ADMIN";
   }
 
-  if (membership.role === "VIEWER") {
+  if (role === "VIEWER") {
     throw new Error(
       "Tu rol es de solo lectura — no puedes escribir en este caso"
     );
   }
 
-  await assertConfidentialityAllows(reportId, userId, membership.role);
+  await assertConfidentialityAllows(reportId, userId, role!);
 
   return submission;
 }

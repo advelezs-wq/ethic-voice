@@ -22,19 +22,7 @@ export async function createDepartment(
     throw new Error("No autorizado");
   }
 
-  // Check if user is admin
-  const membership = await prisma.organizationMembership.findUnique({
-    where: {
-      userId_orgId: {
-        userId,
-        orgId,
-      },
-    },
-  });
-
-  if (!membership || membership.role !== "ADMIN") {
-    throw new Error("No tienes permisos para crear departamentos");
-  }
+  await assertOrgAdmin(userId, orgId, "No tienes permisos para crear departamentos");
 
   // Generate slug if not provided
   const slug =
@@ -88,6 +76,30 @@ async function assertOrgMembership(orgId: string): Promise<string> {
   if (!membership && !isSuper) throw new Error("No autorizado");
 
   return userId;
+}
+
+// Same superadmin-aware pattern as assertOrgMembership, but for the write
+// paths (create/update/delete), which require ADMIN rather than just any
+// membership — a superadmin browsing "por org" has no membership row for
+// that org, so without this bypass they can never manage departments there.
+async function assertOrgAdmin(
+  userId: string,
+  orgId: string,
+  errorMessage: string
+): Promise<void> {
+  const [membership, user] = await Promise.all([
+    prisma.organizationMembership.findUnique({
+      where: { userId_orgId: { userId, orgId } },
+    }),
+    currentUser(),
+  ]);
+
+  const userEmail = user?.primaryEmailAddress?.emailAddress;
+  const isSuper = Boolean(userEmail && isSuperAdmin(userEmail));
+
+  if (membership?.role !== "ADMIN" && !isSuper) {
+    throw new Error(errorMessage);
+  }
 }
 
 // Get all departments for an organization
@@ -179,19 +191,7 @@ export async function updateDepartment(
     throw new Error("No autorizado");
   }
 
-  // Check if user is admin
-  const membership = await prisma.organizationMembership.findUnique({
-    where: {
-      userId_orgId: {
-        userId,
-        orgId,
-      },
-    },
-  });
-
-  if (!membership || membership.role !== "ADMIN") {
-    throw new Error("No tienes permisos para actualizar departamentos");
-  }
+  await assertOrgAdmin(userId, orgId, "No tienes permisos para actualizar departamentos");
 
   // department.update's `where` only accepts a unique key (id), which on
   // its own doesn't prove this department belongs to the admin's org —
@@ -223,19 +223,7 @@ export async function deleteDepartment(departmentId: string): Promise<void> {
     throw new Error("No autorizado");
   }
 
-  // Check if user is admin
-  const membership = await prisma.organizationMembership.findUnique({
-    where: {
-      userId_orgId: {
-        userId,
-        orgId,
-      },
-    },
-  });
-
-  if (!membership || membership.role !== "ADMIN") {
-    throw new Error("No tienes permisos para eliminar departamentos");
-  }
+  await assertOrgAdmin(userId, orgId, "No tienes permisos para eliminar departamentos");
 
   // Check if it's the default department — scoped by orgId, not just id:
   // without this, an admin of org A could pass a department id belonging

@@ -6,6 +6,32 @@ import prisma from "@/modules/prisma/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { notificationsService } from "@/modules/app/services/notifications.service";
 import { resolveOrgId } from "@/modules/core/utils/org-resolver";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
+
+// A superadmin browsing "por org" has no OrganizationMembership row for
+// that org — resolveOrgId() already trusts the ev_org cookie for them
+// without requiring one, so these ADMIN-only actions need the same bypass
+// or a superadmin can never assign/reassign/remove investigators anywhere
+// they aren't a real member.
+async function assertOrgAdmin(
+  userId: string,
+  orgId: string,
+  errorMessage: string
+): Promise<void> {
+  const [membership, user] = await Promise.all([
+    prisma.organizationMembership.findUnique({
+      where: { userId_orgId: { userId, orgId } },
+    }),
+    currentUser(),
+  ]);
+
+  const userEmail = user?.primaryEmailAddress?.emailAddress;
+  const isSuper = Boolean(userEmail && isSuperAdmin(userEmail));
+
+  if (membership?.role !== "ADMIN" && !isSuper) {
+    throw new Error(errorMessage);
+  }
+}
 
 export interface AssignMemberInput {
   userId: string;
@@ -34,19 +60,7 @@ export async function assignMembersToReport(
     throw new Error("No autorizado");
   }
 
-  // Verify user is admin
-  const membership = await prisma.organizationMembership.findUnique({
-    where: {
-      userId_orgId: {
-        userId: currentUserId,
-        orgId,
-      },
-    },
-  });
-
-  if (!membership || membership.role !== "ADMIN") {
-    throw new Error("No tienes permisos para asignar investigadores");
-  }
+  await assertOrgAdmin(currentUserId, orgId, "No tienes permisos para asignar investigadores");
 
   // Verify report exists and belongs to organization
   const report = await prisma.formSubmission.findFirst({
@@ -166,19 +180,7 @@ export async function removeAssignmentFromReport(
     throw new Error("No autorizado");
   }
 
-  // Verify user is admin
-  const membership = await prisma.organizationMembership.findUnique({
-    where: {
-      userId_orgId: {
-        userId: currentUserId,
-        orgId,
-      },
-    },
-  });
-
-  if (!membership || membership.role !== "ADMIN") {
-    throw new Error("No tienes permisos para remover investigadores");
-  }
+  await assertOrgAdmin(currentUserId, orgId, "No tienes permisos para remover investigadores");
 
   try {
     const assignment = await prisma.reportAssignment.findUnique({
@@ -392,12 +394,7 @@ export async function reassignReportMember(
   const orgId = await resolveOrgId();
   if (!currentUserId || !orgId) throw new Error("No autorizado");
 
-  const membership = await prisma.organizationMembership.findUnique({
-    where: { userId_orgId: { userId: currentUserId, orgId } },
-  });
-  if (!membership || membership.role !== "ADMIN") {
-    throw new Error("No tienes permisos para reasignar investigadores");
-  }
+  await assertOrgAdmin(currentUserId, orgId, "No tienes permisos para reasignar investigadores");
 
   const cleanReason = reason?.trim();
   if (!cleanReason) {

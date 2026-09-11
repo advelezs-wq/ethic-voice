@@ -34,6 +34,24 @@ async function assertCanViewOrgTeam(orgId: string): Promise<string> {
   return userId;
 }
 
+// Same pattern as assertCanViewOrgTeam, but for actions that require ADMIN
+// specifically rather than just any membership.
+async function assertIsOrgAdmin(userId: string, orgId: string): Promise<void> {
+  const [membership, user] = await Promise.all([
+    prisma.organizationMembership.findUnique({
+      where: { userId_orgId: { userId, orgId } },
+    }),
+    currentUser(),
+  ]);
+
+  const userEmail = user?.primaryEmailAddress?.emailAddress;
+  const isSuper = Boolean(userEmail && isSuperAdmin(userEmail));
+
+  if (membership?.role !== "ADMIN" && !isSuper) {
+    throw new Error("Forbidden");
+  }
+}
+
 export async function getTeamPerformance(orgId: string) {
   await assertCanViewOrgTeam(orgId);
 
@@ -230,19 +248,7 @@ export async function getMemberDetails(memberId: string, orgId: string) {
   }
 
   try {
-    // Verify the user is admin of the organization
-    const adminMembership = await prisma.organizationMembership.findUnique({
-      where: {
-        userId_orgId: {
-          userId,
-          orgId,
-        },
-      },
-    });
-
-    if (!adminMembership || adminMembership.role !== "ADMIN") {
-      throw new Error("Forbidden");
-    }
+    await assertIsOrgAdmin(userId, orgId);
 
     // Get member details
     const member = await prisma.organizationMembership.findUnique({

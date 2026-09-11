@@ -87,6 +87,17 @@ export function CustomOrganizationManagement({
     logoUrl: currentOrganization?.logoUrl || "",
   });
 
+  // usePlanPermissions() synthesizes an unlimited "Acceso de Super Admin"
+  // planInfo for any super admin, regardless of which org they're browsing
+  // "por org" — correct for gating features, but wrong for this card, which
+  // must show the actual browsed org's plan/limits. Fetch those directly,
+  // the same way the billing page sources its plan display.
+  const [orgPlanLimits, setOrgPlanLimits] = useState<{
+    planType: string;
+    maxUsers: number;
+    maxInvestigators: number;
+  } | null>(null);
+
   // Load members on component mount
   useEffect(() => {
     if (currentOrganization?.id) {
@@ -96,6 +107,18 @@ export function CustomOrganizationManagement({
         name: currentOrganization.name || "",
         logoUrl: currentOrganization.logoUrl || "",
       });
+      fetch(`/api/organization/${currentOrganization.id}/plan-info`)
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data) {
+            setOrgPlanLimits({
+              planType: data.planType,
+              maxUsers: data.maxUsers,
+              maxInvestigators: data.maxInvestigators,
+            });
+          }
+        })
+        .catch(() => setOrgPlanLimits(null));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentOrganization?.id]);
@@ -374,7 +397,7 @@ export function CustomOrganizationManagement({
                       Límites del Plan
                     </h3>
                     <Chip color="primary" variant="flat">
-                      {planInfo?.planType || "STARTER"}
+                      {orgPlanLimits?.planType || planInfo?.planType || "STARTER"}
                     </Chip>
                   </div>
                 </CardHeader>
@@ -383,16 +406,21 @@ export function CustomOrganizationManagement({
                     <div className="text-center">
                       <p className="text-xl sm:text-2xl font-bold text-primary">
                         {members.filter((m) => m.role === "ADMIN").length} /{" "}
-                        {planInfo?.maxUsers === -1 ? "∞" : (planInfo?.maxUsers ?? 1)}
+                        {(orgPlanLimits?.maxUsers ?? planInfo?.maxUsers) === -1
+                          ? "∞"
+                          : (orgPlanLimits?.maxUsers ?? planInfo?.maxUsers ?? 1)}
                       </p>
                       <p className="text-sm text-slate-500">Administradores</p>
                     </div>
                     <div className="text-center">
                       <p className="text-xl sm:text-2xl font-bold text-primary">
                         {members.filter((m) => m.role === "MEMBER").length} /{" "}
-                        {planInfo?.maxInvestigators === -1
+                        {(orgPlanLimits?.maxInvestigators ??
+                          planInfo?.maxInvestigators) === -1
                           ? "∞"
-                          : (planInfo?.maxInvestigators ?? 5)}
+                          : (orgPlanLimits?.maxInvestigators ??
+                            planInfo?.maxInvestigators ??
+                            5)}
                       </p>
                       <p className="text-sm text-slate-500">Investigadores</p>
                     </div>

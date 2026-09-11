@@ -433,6 +433,10 @@ async function getWeeklyPerformance(userId: string, orgId: string) {
             assignments: {
               some: {
                 userId: userId,
+                createdAt: {
+                  gte: startOfDay,
+                  lte: endOfDay,
+                },
               },
             },
           },

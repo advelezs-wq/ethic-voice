@@ -79,7 +79,7 @@ export function ReportsFilters({
   };
 
   const statusOptions = [
-    { key: "all", label: "Todos los estados" },
+    { key: "all", label: "Todos" },
     { key: "pending", label: "Pendiente", color: "warning" },
     { key: "in_progress", label: "En progreso", color: "primary" },
     { key: "resolved", label: "Resuelto", color: "success" },
@@ -88,7 +88,7 @@ export function ReportsFilters({
   ];
 
   const severityOptions = [
-    { key: "all", label: "Todas las severidades" },
+    { key: "all", label: "Todas" },
     { key: "HIGH", label: "Alta", color: "danger" },
     { key: "MEDIUM", label: "Media", color: "warning" },
     { key: "LOW", label: "Baja", color: "success" },
@@ -96,7 +96,7 @@ export function ReportsFilters({
   ];
 
   const sourceOptions = [
-    { key: "all", label: "Todas las fuentes" },
+    { key: "all", label: "Todas" },
     { key: "ETHIC_LINE", label: "Línea Ética", icon: "icon-[lucide--shield]" },
     {
       key: "CUSTOM_FORM",
@@ -106,7 +106,7 @@ export function ReportsFilters({
   ];
 
   const dateRangeOptions = [
-    { key: "all", label: "Todas las fechas" },
+    { key: "all", label: "Todas" },
     { key: "today", label: "Hoy" },
     { key: "yesterday", label: "Ayer" },
     { key: "week", label: "Esta semana" },
@@ -117,14 +117,14 @@ export function ReportsFilters({
   ];
 
   const assigneeOptions = [
-    { key: "all", label: "Todos los asignados" },
+    { key: "all", label: "Todos" },
     { key: "unassigned", label: "Sin asignar" },
     { key: "me", label: "Asignados a mí" },
     { key: "others", label: "Asignados a otros" },
   ];
 
   const slaOptions = [
-    { key: "all", label: "Todos SLA" },
+    { key: "all", label: "Todos" },
     { key: "green", label: "SLA Verde (≤60%)" },
     { key: "yellow", label: "SLA Amarillo (61–85%)" },
     { key: "orange", label: "SLA Naranja (86–100%)" },
@@ -173,7 +173,7 @@ export function ReportsFilters({
               {!isArchivedView && (
                 <Select
                   label="Estado"
-                  placeholder="Filtrar por estado"
+                  placeholder="Todos"
                   selectedKeys={
                     filters.status === "all" ? [] : [filters.status]
                   }
@@ -181,7 +181,7 @@ export function ReportsFilters({
                     const value = Array.from(keys)[0] as string;
                     updateFilter("status", value || "all");
                   }}
-                  className="w-40"
+                  className="w-[170px]"
                   size="sm"
                 >
                   {statusOptions.map((option) => (
@@ -205,12 +205,13 @@ export function ReportsFilters({
               )}
 
               <Select
+                label="Severidad"
                 selectedKeys={filters.severity ? [filters.severity] : []}
                 onSelectionChange={(keys) =>
                   updateFilter("severity", Array.from(keys)[0] as string)
                 }
-                className="w-[160px]"
-                placeholder="Severidad"
+                className="w-[150px]"
+                size="sm"
               >
                 {severityOptions.map((option) => (
                   <SelectItem key={option.key} textValue={option.label}>
@@ -231,12 +232,13 @@ export function ReportsFilters({
               </Select>
 
               <Select
+                label="Fuente"
                 selectedKeys={filters.source ? [filters.source] : []}
                 onSelectionChange={(keys) =>
                   updateFilter("source", Array.from(keys)[0] as string)
                 }
-                className="w-[180px]"
-                placeholder="Fuente"
+                className="w-[150px]"
+                size="sm"
               >
                 {sourceOptions.map((option) => (
                   <SelectItem key={option.key} textValue={option.label}>
@@ -255,12 +257,13 @@ export function ReportsFilters({
               </Select>
 
               <Select
+                label="Fecha"
                 selectedKeys={filters.dateRange ? [filters.dateRange] : []}
                 onSelectionChange={(keys) =>
                   handleDateRangeChange(Array.from(keys)[0] as string)
                 }
-                className="w-[160px]"
-                placeholder="Fecha"
+                className="w-[150px]"
+                size="sm"
               >
                 {dateRangeOptions.map((option) => (
                   <SelectItem key={option.key}>{option.label}</SelectItem>
@@ -268,12 +271,13 @@ export function ReportsFilters({
               </Select>
 
               <Select
+                label="Asignado"
                 selectedKeys={filters.assignee ? [filters.assignee] : []}
                 onSelectionChange={(keys) =>
                   updateFilter("assignee", Array.from(keys)[0] as string)
                 }
-                className="w-[180px]"
-                placeholder="Asignado"
+                className="w-[160px]"
+                size="sm"
               >
                 {assigneeOptions.map((option) => (
                   <SelectItem key={option.key} textValue={option.label}>
@@ -285,8 +289,9 @@ export function ReportsFilters({
               </Select>
 
               <Select
-                placeholder="SLA"
-                className="w-[180px]"
+                label="SLA"
+                className="w-[130px]"
+                size="sm"
                 selectedKeys={filters.sla ? [filters.sla as any] : []}
                 onSelectionChange={(keys) =>
                   updateFilter(

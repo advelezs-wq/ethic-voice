@@ -90,7 +90,7 @@ export default function PrivacyPage() {
               { icon: "icon-[lucide--lock]", label: "Cifrado" },
               { icon: "icon-[lucide--key-round]", label: "MFA / SSO" },
               { icon: "icon-[lucide--database-backup]", label: "Respaldos" },
-              { icon: "icon-[lucide--user-round-lock]", label: "Accesos" },
+              { icon: "icon-[lucide--user-lock]", label: "Accesos" },
             ].map((item) => (
               <div
                 key={item.label}

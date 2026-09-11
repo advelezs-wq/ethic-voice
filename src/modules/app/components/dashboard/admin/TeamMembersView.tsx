@@ -113,14 +113,13 @@ export function TeamMembersView({
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[#0d212c]">
-          Equipo de Investigadores
-        </h1>
-        <p className="text-slate-500">
+      <section className="ev-page-hero">
+        <p className="ev-page-hero-kicker">Equipo</p>
+        <h1 className="ev-page-hero-title">Equipo de Investigadores</h1>
+        <p className="ev-page-hero-description">
           Gestiona y revisa el rendimiento de tu equipo por departamento
         </p>
-      </div>
+      </section>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

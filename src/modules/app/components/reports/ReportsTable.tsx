@@ -216,9 +216,14 @@ export function ReportsTable({
           category = report.metadata.subject;
         }
       } else if (report.source === "ETHIC_LINE") {
-        // For EthicVoice (línea ética) reports
+        // For EthicVoice (línea ética) reports. Skip prefixing with the
+        // category when it's just the "not yet classified" fallback — the
+        // subtitle already shows it, so repeating it here read as duplicate text.
         const reportedName = content.reported?.firstName || "No especificado";
-        title = `${category} - ${reportedName}`;
+        title =
+          category === "Sin categorizar"
+            ? reportedName
+            : `${category} - ${reportedName}`;
         description = extractReportSummary(report);
 
         if (aiAnalysis) {
@@ -691,7 +696,7 @@ export function ReportsTable({
                   <th className="p-4 text-left text-sm font-medium text-slate-600 md:w-40 lg:w-48">
                     Denunciado
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-slate-600 min-w-[140px]">
+                  <th className="p-4 text-left text-sm font-medium text-slate-600 min-w-[190px]">
                     Análisis
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-slate-600 w-24 whitespace-nowrap">
@@ -727,7 +732,8 @@ export function ReportsTable({
                   return (
                     <tr
                       key={report.id}
-                      className={`hover:bg-emerald-50/30 border-b border-emerald-100 transition-colors ${
+                      onClick={() => router.push(`/app/reports/${report.id}`)}
+                      className={`hover:bg-emerald-50/30 border-b border-emerald-100 transition-colors cursor-pointer ${
                         isSelected ? "bg-primary-50" : ""
                       } ${
                         reportInfo.requiresUrgentAction
@@ -735,7 +741,7 @@ export function ReportsTable({
                           : ""
                       }`}
                     >
-                      <td className="p-4">
+                      <td className="p-4" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="checkbox"
                           title={`Seleccionar reporte ${report.id}`}
@@ -775,7 +781,7 @@ export function ReportsTable({
                           </span>
                         </div>
                       </td>
-                      <td className="p-4 hidden lg:table-cell min-w-[100px]">
+                      <td className="p-4 hidden lg:table-cell min-w-[190px]">
                         {reportInfo.hasAiAnalysis ? (
                           <div className="space-y-1">
                             {reportInfo.keyFindings.length > 0 && (
@@ -1011,7 +1017,7 @@ export function ReportsTable({
                           )}
                         </td>
                       )}
-                      <td className="p-4">
+                      <td className="p-4" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-2">
                           <Button
                             size="sm"

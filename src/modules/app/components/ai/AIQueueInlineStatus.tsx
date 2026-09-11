@@ -32,13 +32,20 @@ export const AIQueueInlineStatus: React.FC<AIQueueInlineStatusProps> = ({
 
   const textSize = size === "xs" ? "text-xs" : "text-sm";
 
+  // El nombre de la columna ("Análisis") ya da el contexto, así que el texto
+  // aquí solo necesita el estado — repetir "Análisis AI en cola" forzaba un
+  // párrafo largo dentro de una celda angosta.
   return (
-    <div className={`flex items-center gap-2 ${className || ""}`}>
+    <div className={`flex flex-col items-start gap-1 ${className || ""}`}>
       <Tooltip content="ETA aprox.">
-        <span className={`${textSize} text-sky-700`}>
+        <span className={`${textSize} text-sky-700 whitespace-nowrap`}>
           {loading && <Spinner size="sm" className="mr-1 inline" />}
-          Análisis AI en cola{pos ? `: ${pos}` : ""} • {etaText}
-          {info?.status === "active" && relativeMinutes ? ` (${relativeMinutes})` : ""}
+          En cola{pos ? ` #${pos}` : ""}
+          {info?.status === "active" && relativeMinutes
+            ? ` · ${relativeMinutes}`
+            : etaText
+              ? ` · ${etaText}`
+              : ""}
         </span>
       </Tooltip>
       <button
@@ -46,7 +53,7 @@ export const AIQueueInlineStatus: React.FC<AIQueueInlineStatusProps> = ({
         onClick={() => refresh()}
         className={`${textSize} underline text-sky-700 hover:text-sky-700`}
       >
-        Actualizar ahora
+        Actualizar
       </button>
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useOrganization } from "@/modules/app/hooks/useOrganization";
 import { Spinner } from "@heroui/react";
@@ -11,6 +12,27 @@ export default function AppDashboard() {
   const { isLoaded, user } = useUser();
   const { organizationId: storeOrgId } = useOrganization();
   const { isLoading: roleLoading, isSuperAdmin } = useUserRole();
+
+  // A superadmin browsing "por org" (Sidebar's org-picker sets ev_scope via
+  // this same cookie) should see that org's own dashboard, not the global
+  // panel — mirrors the scope check every other org-scoped page already
+  // does server-side via resolveOrgId()/ev_scope.
+  const [superAdminScope, setSuperAdminScope] = useState<"all" | "org">("all");
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    const readScope = () => {
+      const scopeCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("ev_scope="))
+        ?.split("=")[1];
+      setSuperAdminScope(scopeCookie === "org" ? "org" : "all");
+    };
+    readScope();
+    window.addEventListener("ev-scope-changed", readScope as EventListener);
+    return () => {
+      window.removeEventListener("ev-scope-changed", readScope as EventListener);
+    };
+  }, [isSuperAdmin]);
 
   // Show loading while auth or role is loading
   if (!isLoaded || !user || roleLoading) {
@@ -24,8 +46,8 @@ export default function AppDashboard() {
     );
   }
 
-  // Super admin sees global dashboard even without selecting an organization
-  if (isSuperAdmin) {
+  // Super admin sees the global dashboard, unless they're browsing "por org"
+  if (isSuperAdmin && superAdminScope !== "org") {
     return <SuperAdminDashboard />;
   }
 

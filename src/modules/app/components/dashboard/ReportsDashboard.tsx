@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Spinner } from "@heroui/spinner";
 import { Button } from "@heroui/button";
 import { useUser } from "@clerk/nextjs";
@@ -20,6 +20,25 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
 }) => {
   const { role, isSuperAdmin, isLoading: roleLoading } = useUserRole();
   const { user } = useUser();
+
+  // Superadmin browsing "por org" (see Sidebar.tsx) should see this org's
+  // own admin dashboard, not the global cross-org panel.
+  const [superAdminScope, setSuperAdminScope] = useState<"all" | "org">("all");
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    const readScope = () => {
+      const scopeCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("ev_scope="))
+        ?.split("=")[1];
+      setSuperAdminScope(scopeCookie === "org" ? "org" : "all");
+    };
+    readScope();
+    window.addEventListener("ev-scope-changed", readScope as EventListener);
+    return () => {
+      window.removeEventListener("ev-scope-changed", readScope as EventListener);
+    };
+  }, [isSuperAdmin]);
 
   // Use analytics context
   const {
@@ -67,8 +86,8 @@ export const ReportsDashboard: React.FC<ReportsDashboardProps> = ({
     );
   }
 
-  // Super Admin gets a different dashboard
-  if (isSuperAdmin) {
+  // Super Admin gets a different dashboard, unless they're browsing "por org"
+  if (isSuperAdmin && superAdminScope !== "org") {
     return <SuperAdminDashboard />;
   }
 

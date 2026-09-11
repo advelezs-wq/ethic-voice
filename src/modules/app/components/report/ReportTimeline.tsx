@@ -134,6 +134,9 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
       auto_assigned_critical: "Asignación automática (crítico)",
       auto_assigned: "Asignación automática",
       CLOSURE_APPROVED: "Cierre aprobado",
+      CASE_ESCALATED: "Caso escalado",
+      UPDATE_ADDED: "Actualización agregada",
+      department_assigned: "Departamento asignado",
     };
     if (EXTRA_ACTION_TITLES[action]) return EXTRA_ACTION_TITLES[action];
     const titles = {
@@ -206,6 +209,19 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
       return outcomeLabel
         ? `Cierre aprobado con desenlace: ${outcomeLabel}`
         : "Cierre del caso aprobado";
+    }
+    if (action === "CASE_ESCALATED") {
+      return details?.escalatedToName
+        ? `Caso escalado a ${details.escalatedToName}`
+        : "El caso fue escalado";
+    }
+    if (action === "UPDATE_ADDED") {
+      return details?.title
+        ? `Se agregó la actualización "${details.title}"`
+        : "Se agregó una actualización al caso";
+    }
+    if (action === "department_assigned") {
+      return "El caso fue asignado automáticamente a un departamento por IA";
     }
     switch (action) {
       case ACTIVITY_TYPES.CREATED:
@@ -466,6 +482,10 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                             "departmentId", "oldDepartment", "newDepartment",
                             // CLOSURE_APPROVED's outcome is in getDescription()
                             "outcome", "selfClosed",
+                            // CASE_ESCALATED's escalatedToName is in getDescription()
+                            "escalatedToName",
+                            // raw internal id, not useful to a reader
+                            "updateId",
                           ]);
                           if (SKIP_KEYS.has(key)) return null;
                           if (key === "type" && String(value) === "custom") return null;
@@ -488,14 +508,23 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                             reason: "Motivo",
                             confidence: "Confianza",
                             departmentName: "Departamento",
+                            escalatedToEmail: "Email de contacto",
+                            assignedTo: "Asignado a",
+                            assignedCount: "Cantidad asignada",
+                            statusChanged: "Estado actualizado",
+                            immediateActions: "Acciones inmediatas",
                           };
 
-                          const label =
-                            LABEL_MAP[key] ||
-                            key
-                              .replace(/([A-Z])/g, " $1")
-                              .trim()
-                              .toLowerCase();
+                          // Every action type across the codebase stuffs its
+                          // own ad-hoc keys into `details` (processingJobId,
+                          // updated, assignedCount, ...). Guessing a label by
+                          // splitting camelCase produced raw English noise
+                          // ("Processing Job Id", "Updated: True") for any
+                          // key nobody had explicitly translated yet. Only
+                          // render keys with a real Spanish label instead of
+                          // widening this list forever.
+                          if (!LABEL_MAP[key]) return null;
+                          const label = LABEL_MAP[key];
 
                           let display: string;
                           switch (key) {
@@ -513,6 +542,7 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                               display = getSourceLabel(String(value));
                               break;
                             case "isAnonymous":
+                            case "statusChanged":
                               display =
                                 String(value).toLowerCase() === "true" ? "Sí" : "No";
                               break;
@@ -524,6 +554,16 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                                       String(v).replace(/[_-]+/g, " ").toLowerCase()
                                     )
                                     .join(", ")
+                                : String(value);
+                              break;
+                            case "assignedTo":
+                              display = Array.isArray(value)
+                                ? (value as any[]).join(", ")
+                                : String(value);
+                              break;
+                            case "immediateActions":
+                              display = Array.isArray(value)
+                                ? (value as any[]).join("; ")
                                 : String(value);
                               break;
                             default:

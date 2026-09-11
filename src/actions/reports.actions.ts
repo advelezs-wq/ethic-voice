@@ -1957,11 +1957,24 @@ export async function updateReportMetadata(
     },
   });
 
+  // departmentId is a per-org UUID with no static label map (unlike `type`,
+  // whose fixed slug set the timeline can resolve on the client) — resolve
+  // its name here so the timeline shows "Control Interno" instead of the
+  // raw id.
+  let departmentName: string | undefined;
+  if (data.departmentId) {
+    const department = await prisma.department.findUnique({
+      where: { id: data.departmentId },
+      select: { name: true },
+    });
+    departmentName = department?.name;
+  }
+
   await prisma.reportActivity.create({
     data: {
       submissionId: reportId,
       action: "METADATA_UPDATED",
-      details: { ...data },
+      details: { ...data, ...(departmentName ? { departmentName } : {}) },
       userId,
       userName: user?.fullName || "Usuario",
     },

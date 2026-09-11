@@ -133,6 +133,7 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
       report_created: "Reporte creado por IA",
       auto_assigned_critical: "Asignación automática (crítico)",
       auto_assigned: "Asignación automática",
+      CLOSURE_APPROVED: "Cierre aprobado",
     };
     if (EXTRA_ACTION_TITLES[action]) return EXTRA_ACTION_TITLES[action];
     const titles = {
@@ -191,6 +192,20 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
     }
     if (action === "auto_assigned") {
       return "El caso fue asignado automáticamente";
+    }
+    if (action === "CLOSURE_APPROVED") {
+      const OUTCOME_LABELS: Record<string, string> = {
+        SUBSTANTIATED: "Fundamentada",
+        PARTIALLY_SUBSTANTIATED: "Parcialmente fundamentada",
+        UNSUBSTANTIATED: "No fundamentada",
+        INCONCLUSIVE: "Inconclusa",
+      };
+      const outcomeLabel = details?.outcome
+        ? OUTCOME_LABELS[details.outcome] || details.outcome
+        : null;
+      return outcomeLabel
+        ? `Cierre aprobado con desenlace: ${outcomeLabel}`
+        : "Cierre del caso aprobado";
     }
     switch (action) {
       case ACTIVITY_TYPES.CREATED:
@@ -447,6 +462,10 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                             // ASSIGNED is in getDescription()
                             "assigneeName", "assigneeId",
                             // type:"custom" is noise
+                            // raw per-org UUID — departmentName (if present) is shown instead
+                            "departmentId", "oldDepartment", "newDepartment",
+                            // CLOSURE_APPROVED's outcome is in getDescription()
+                            "outcome", "selfClosed",
                           ]);
                           if (SKIP_KEYS.has(key)) return null;
                           if (key === "type" && String(value) === "custom") return null;
@@ -468,6 +487,7 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                             severity: "Severidad",
                             reason: "Motivo",
                             confidence: "Confianza",
+                            departmentName: "Departamento",
                           };
 
                           const label =

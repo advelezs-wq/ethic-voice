@@ -103,7 +103,7 @@ export function DepartmentList({
                       <p className="font-bold">{department.memberCount}</p>
                     </div>
                     <div>
-                      <p className="text-slate-500">Reportes Total</p>
+                      <p className="text-slate-500">Reportes totales</p>
                       <p className="font-bold">{department.reportCount}</p>
                     </div>
                   </div>

@@ -1890,7 +1890,8 @@ export async function updateReportDepartment(
   userId?: string,
   userName?: string
 ) {
-  const { userId: authUserId, orgId } = await auth();
+  const { userId: authUserId } = await auth();
+  const orgId = await resolveOrgId();
 
   if (!authUserId || !orgId) {
     throw new Error("Unauthorized");
@@ -1940,7 +1941,8 @@ export async function updateReportMetadata(
     subject?: string | null;
   }
 ): Promise<void> {
-  const { userId, orgId } = await auth();
+  const { userId } = await auth();
+  const orgId = await resolveOrgId();
   const user = await currentUser();
 
   if (!userId || !orgId) throw new Error("Unauthorized");

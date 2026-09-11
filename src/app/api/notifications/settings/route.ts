@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { z } from 'zod';
 import prisma from '@/modules/prisma/lib/prisma';
+import { resolveOrgId } from '@/modules/core/utils/org-resolver';
 
 const NotificationSettingsSchema = z.object({
   emailReportCreated: z.boolean().optional(),
@@ -21,8 +22,9 @@ const NotificationSettingsSchema = z.object({
 
 export async function GET() {
   try {
-    const { userId, orgId } = await auth();
-    
+    const { userId } = await auth();
+    const orgId = await resolveOrgId();
+
     if (!userId) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
@@ -53,8 +55,9 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { userId, orgId } = await auth();
-    
+    const { userId } = await auth();
+    const orgId = await resolveOrgId();
+
     if (!userId) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }

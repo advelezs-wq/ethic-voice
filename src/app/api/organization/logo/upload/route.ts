@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -13,10 +14,14 @@ export async function POST(req: NextRequest) {
     const organizationId = String(formData.get("organizationId") || "");
     if (!logo || !organizationId) return NextResponse.json({ error: "Missing data" }, { status: 400 });
 
-    // Check permissions: user must be ADMIN of org
+    // Check permissions: user must be ADMIN of org (or a superadmin
+    // browsing "por org", who has no membership row of their own)
     const membership = await prisma.organizationMembership.findUnique({ where: { userId_orgId: { userId, orgId: organizationId } } });
-    if (!membership || membership.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (membership?.role !== "ADMIN") {
+      const requesterEmail = (await currentUser())?.primaryEmailAddress?.emailAddress;
+      if (!requesterEmail || !isSuperAdmin(requesterEmail)) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
     }
 
     // Prepare Cloudinary signed upload

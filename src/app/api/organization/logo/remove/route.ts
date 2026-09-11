@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 export async function DELETE(req: NextRequest) {
   try {
@@ -10,10 +11,14 @@ export async function DELETE(req: NextRequest) {
     const { organizationId } = await req.json();
     if (!organizationId) return NextResponse.json({ error: "Missing orgId" }, { status: 400 });
 
-    // Check permission
+    // Check permission (or a superadmin browsing "por org", who has no
+    // membership row of their own)
     const membership = await prisma.organizationMembership.findUnique({ where: { userId_orgId: { userId, orgId: organizationId } } });
-    if (!membership || membership.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (membership?.role !== "ADMIN") {
+      const requesterEmail = (await currentUser())?.primaryEmailAddress?.emailAddress;
+      if (!requesterEmail || !isSuperAdmin(requesterEmail)) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
     }
 
     await prisma.organizationSettings.upsert({

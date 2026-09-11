@@ -306,19 +306,7 @@ export async function assignMemberToDepartment(
     throw new Error("No autorizado");
   }
 
-  // Check if admin
-  const adminMembership = await prisma.organizationMembership.findUnique({
-    where: {
-      userId_orgId: {
-        userId: adminId,
-        orgId,
-      },
-    },
-  });
-
-  if (!adminMembership || adminMembership.role !== "ADMIN") {
-    throw new Error("No tienes permisos para asignar miembros a departamentos");
-  }
+  await assertOrgAdmin(adminId, orgId, "No tienes permisos para asignar miembros a departamentos");
 
   // Department.id is globally unique, not scoped to an org — without this
   // check an admin could point a member's departmentId at another org's

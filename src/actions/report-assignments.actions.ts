@@ -484,12 +484,7 @@ export async function escalateReport(
   const user = await currentUser();
   if (!userId || !orgId || !user) throw new Error("No autorizado");
 
-  const membership = await prisma.organizationMembership.findUnique({
-    where: { userId_orgId: { userId, orgId } },
-  });
-  if (!membership || membership.role !== "ADMIN") {
-    throw new Error("Solo un administrador puede escalar un caso");
-  }
+  await assertOrgAdmin(userId, orgId, "Solo un administrador puede escalar un caso");
 
   const reason = data.reason?.trim();
   const escalatedToName = data.escalatedToName?.trim();

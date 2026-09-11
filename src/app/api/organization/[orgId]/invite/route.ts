@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
@@ -17,12 +17,16 @@ export async function POST(
   const { email, role } = await req.json();
   if (!email) return NextResponse.json({ error: "Email requerido" }, { status: 400 });
 
-  // Check permission: requester must be ADMIN of org
+  // Check permission: requester must be ADMIN of org (or a superadmin
+  // browsing "por org", who has no membership row of their own)
   const membership = await prisma.organizationMembership.findUnique({
     where: { userId_orgId: { userId, orgId } },
   });
-  if (!membership || membership.role !== "ADMIN") {
-    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  if (membership?.role !== "ADMIN") {
+    const requesterEmail = (await currentUser())?.primaryEmailAddress?.emailAddress;
+    if (!requesterEmail || !isSuperAdmin(requesterEmail)) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
   }
 
   // Enforce plan limits robustly (including pending invitations)

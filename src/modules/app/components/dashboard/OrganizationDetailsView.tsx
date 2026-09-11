@@ -119,7 +119,9 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
   const { organization, stats } = data;
   const router = useRouter();
   const searchParams = useSearchParams();
-  const section = (searchParams.get("section") as OrgSection) || "resumen";
+  const [section, setSectionState] = useState<OrgSection>(
+    (searchParams.get("section") as OrgSection) || "resumen"
+  );
 
   const [origin, setOrigin] = useState("");
   const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
@@ -142,10 +144,21 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
     return { admins, investigators: Math.max(0, members.length - admins), total: members.length };
   }, [members]);
 
+  // Switching tabs used router.replace(), which — since this route has no
+  // local Suspense boundary — forces Next to re-fetch the whole page's RSC
+  // tree on every click, flashing the full "Cargando..." fallback each
+  // time. Update the URL directly via the History API instead: it stays
+  // deep-linkable/refreshable (page.tsx still reads `section` from the URL
+  // server-side on a hard load) without triggering that re-fetch.
   const setSection = (next: OrgSection) => {
+    setSectionState(next);
     const params = new URLSearchParams(searchParams.toString());
     params.set("section", next);
-    router.replace(`/app/organizations/${organization.id}?${params.toString()}`);
+    window.history.replaceState(
+      null,
+      "",
+      `/app/organizations/${organization.id}?${params.toString()}`
+    );
   };
 
   const loadPlanData = useCallback(async () => {
@@ -431,11 +444,15 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
                   size="sm"
                   variant="flat"
                   className="border border-emerald-200 bg-white"
-                  onPress={() => {
-                    navigator.clipboard.writeText(
-                      `${origin}/submit/${organization.slug}`
-                    );
-                    showSuccess("Link copiado al portapapeles");
+                  onPress={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
+                        `${origin}/submit/${organization.slug}`
+                      );
+                      showSuccess("Link copiado al portapapeles");
+                    } catch {
+                      showError("No se pudo copiar el enlace");
+                    }
                   }}
                 >
                   Copiar enlace

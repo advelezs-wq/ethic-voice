@@ -648,9 +648,9 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
                           <Chip variant="flat">{subscription.billingCycle === "YEARLY" ? "Anual" : "Mensual"}</Chip>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          <SummaryKpi label="Admins límite" value={subscription.maxUsers} />
-                          <SummaryKpi label="Investigadores límite" value={subscription.maxInvestigators} />
-                          <SummaryKpi label="Empleados límite" value={subscription.maxEmployees} />
+                          <SummaryKpi label="Admins límite" value={formatPlanLimit(subscription.maxUsers)} />
+                          <SummaryKpi label="Investigadores límite" value={formatPlanLimit(subscription.maxInvestigators)} />
+                          <SummaryKpi label="Empleados límite" value={formatPlanLimit(subscription.maxEmployees)} />
                         </div>
                         <div className="flex flex-wrap gap-2">
                           <Button size="sm" color="warning" variant="flat" isDisabled={subscription.status === "PAUSED"} onPress={() => setPendingAction({ type: "pause-subscription", subscriptionId: subscription.id })}>Pausar</Button>
@@ -791,13 +791,19 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
   );
 }
 
+// -1 is the plan-config sentinel for "unlimited" (see resolveMax in
+// subscription.utils.ts) — must never be shown to the user as a raw number.
+function formatPlanLimit(value: number): string {
+  return value === -1 ? "∞" : String(value);
+}
+
 function SummaryKpi({
   label,
   value,
   tone = "default",
 }: {
   label: string;
-  value: number;
+  value: number | string;
   tone?: "default" | "primary" | "success" | "warning";
 }) {
   const colorMap: Record<string, string> = {

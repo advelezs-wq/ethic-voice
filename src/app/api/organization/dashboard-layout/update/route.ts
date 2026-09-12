@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { getUserPermissions } from "@/modules/core/utils/permissions";
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
+    const user = await currentUser();
 
     if (!userId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
@@ -43,7 +44,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Check user permissions
-    const permissions = await getUserPermissions(userId, organizationId);
+    const permissions = await getUserPermissions(
+      userId,
+      organizationId,
+      user?.primaryEmailAddress?.emailAddress
+    );
     if (!permissions.canManageOrganization) {
       return NextResponse.json(
         { error: "No tienes permisos para actualizar la organización" },

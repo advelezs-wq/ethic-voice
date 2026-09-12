@@ -229,7 +229,9 @@ export async function GET(request: NextRequest) {
 
     // Enhanced team performance calculation
     const assignedReports = reports.filter((r) => r.assignments.length > 0);
-    const resolvedReports = reports.filter((r) => r.status === "RESOLVED");
+    const resolvedReports = reports.filter(
+      (r) => r.status === "RESOLVED" || r.status === "CLOSED"
+    );
     const anonymousReports = reports.filter((r) => r.isAnonymous);
     const highPriorityReports = reports.filter(
       (r) => r.priority === "HIGH" || r.priority === "URGENT"

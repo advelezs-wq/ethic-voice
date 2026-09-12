@@ -62,13 +62,15 @@ export default function FullBillingHistoryPage() {
       }));
   }, [invoices]);
 
-  const formatPrice = (v: string | number) =>
+  const formatPrice = (v: string | number, currency?: string) =>
     new Intl.NumberFormat("es-CO", {
       style: "currency",
-      currency: "COP",
+      currency: currency?.trim() || "COP",
       minimumFractionDigits: 0,
     }).format(Number(v || 0));
   const formatDate = (s: string) => new Date(s).toLocaleString("es-CO");
+  const formatStatus = (status?: string) =>
+    String(status).toLowerCase() === "paid" ? "Pagado" : status || "";
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -117,13 +119,13 @@ export default function FullBillingHistoryPage() {
                           {inv.description || "Pago"}
                         </td>
                         <td className="px-4 py-3 text-right text-sm font-semibold text-[#0d212c]">
-                          {formatPrice(inv.amount)}
+                          {formatPrice(inv.amount, inv.currency)}
                         </td>
                         <td className="px-4 py-3 text-right text-sm">
                           <span
                             className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${String(inv.status).toLowerCase() === "paid" ? "text-emerald-700 bg-emerald-100" : "text-slate-600 bg-slate-100"}`}
                           >
-                            {inv.status || ""}
+                            {formatStatus(inv.status)}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right text-sm">

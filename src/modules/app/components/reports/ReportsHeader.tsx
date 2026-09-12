@@ -20,6 +20,7 @@ import {
 } from "@heroui/react";
 import { useSearchParams } from "next/navigation";
 import { useAiQueue } from "../../hooks/useAiQueue";
+import { addToast } from "@/modules/core/utils/safe-toast";
 
 interface ReportsHeaderProps {
   selectedCount: number;
@@ -39,6 +40,9 @@ export function ReportsHeader({
   const [selectedAssignee, setSelectedAssignee] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [selectedPriority, setSelectedPriority] = useState<string>("");
+  const [exportingFormat, setExportingFormat] = useState<
+    "csv" | "xlsx" | "pdf" | null
+  >(null);
 
   const searchParams = useSearchParams();
   const { processingCount, pendingCount } = useAiQueue(8000);
@@ -71,7 +75,7 @@ export function ReportsHeader({
     setSelectedPriority("");
   };
 
-  const downloadPDF = async () => {
+  const collectExportFilters = () => {
     const filters: Record<string, string> = {};
     [
       "status",
@@ -87,74 +91,115 @@ export function ReportsHeader({
       const v = searchParams.get(k);
       if (v && v !== "all") filters[k] = v;
     });
+    return filters;
+  };
 
-    const res = await fetch("/api/reports/pdf", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        reportType: "reports_list",
-        filename: "reporte-de-denuncias",
-        filters,
-      }),
-    });
-    if (!res.ok) return;
+  const downloadPDF = async () => {
+    if (exportingFormat) return;
+    setExportingFormat("pdf");
+    try {
+      const res = await fetch("/api/reports/pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reportType: "reports_list",
+          filename: "reporte-de-denuncias",
+          filters: collectExportFilters(),
+        }),
+      });
+      if (!res.ok) {
+        addToast({
+          title: "Error en la descarga",
+          description: "No se pudo generar el reporte. Intenta nuevamente",
+          color: "danger",
+        });
+        return;
+      }
 
-    // El servidor puede degradar a un HTML con el mismo diseño cuando no
-    // puede lanzar Chromium; en ese caso lo abrimos en una pestaña nueva.
-    const contentType = res.headers.get("content-type") || "";
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
+      // El servidor puede degradar a un HTML con el mismo diseño cuando no
+      // puede lanzar Chromium; en ese caso lo abrimos en una pestaña nueva.
+      const contentType = res.headers.get("content-type") || "";
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
 
-    if (contentType.includes("text/html")) {
-      window.open(url, "_blank");
-      return;
+      if (contentType.includes("text/html")) {
+        window.open(url, "_blank");
+        addToast({
+          title: "Reporte generado",
+          description:
+            "El reporte se abrió en una nueva pestaña. Puedes guardarlo como PDF usando Ctrl+P",
+          color: "success",
+        });
+        return;
+      }
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `reporte-de-denuncias.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+      a.remove();
+      addToast({
+        title: "Descarga exitosa",
+        description: "El reporte ha sido descargado en formato PDF",
+        color: "success",
+      });
+    } catch {
+      addToast({
+        title: "Error en la descarga",
+        description: "No se pudo generar el reporte. Intenta nuevamente",
+        color: "danger",
+      });
+    } finally {
+      setExportingFormat(null);
     }
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `reporte-de-denuncias.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    URL.revokeObjectURL(url);
-    a.remove();
   };
 
   const downloadFile = async (format: "csv" | "xlsx") => {
-    const filters: Record<string, string> = {};
-    [
-      "status",
-      "severity",
-      "source",
-      "dateRange",
-      "assignee",
-      "departmentId",
-      "reportType",
-      "anonymous",
-      "search",
-    ].forEach((k) => {
-      const v = searchParams.get(k);
-      if (v && v !== "all") filters[k] = v;
-    });
-
-    const res = await fetch("/api/reports/download", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        format,
-        filename: "reporte-de-denuncias",
-        filters,
-      }),
-    });
-    if (!res.ok) return;
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `reporte-de-denuncias.${format === "xlsx" ? "xlsx" : "csv"}`;
-    document.body.appendChild(a);
-    a.click();
-    URL.revokeObjectURL(url);
-    a.remove();
+    if (exportingFormat) return;
+    setExportingFormat(format);
+    try {
+      const res = await fetch("/api/reports/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          format,
+          filename: "reporte-de-denuncias",
+          filters: collectExportFilters(),
+        }),
+      });
+      if (!res.ok) {
+        addToast({
+          title: "Error en la descarga",
+          description: "No se pudo generar el reporte. Intenta nuevamente",
+          color: "danger",
+        });
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `reporte-de-denuncias.${format === "xlsx" ? "xlsx" : "csv"}`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+      a.remove();
+      addToast({
+        title: "Descarga exitosa",
+        description: `El reporte ha sido descargado en formato ${format.toUpperCase()}`,
+        color: "success",
+      });
+    } catch {
+      addToast({
+        title: "Error en la descarga",
+        description: "No se pudo generar el reporte. Intenta nuevamente",
+        color: "danger",
+      });
+    } finally {
+      setExportingFormat(null);
+    }
   };
 
   const getBulkActionModalContent = () => {
@@ -371,12 +416,18 @@ export function ReportsHeader({
 
         <Dropdown>
           <DropdownTrigger>
-            <Button variant="bordered" size="sm">
-              <i className="icon-[lucide--download] size-4 mr-2" />
-              Exportar
+            <Button
+              variant="bordered"
+              size="sm"
+              isLoading={exportingFormat !== null}
+            >
+              {exportingFormat === null && (
+                <i className="icon-[lucide--download] size-4 mr-2" />
+              )}
+              {exportingFormat ? "Generando..." : "Exportar"}
             </Button>
           </DropdownTrigger>
-          <DropdownMenu>
+          <DropdownMenu disabledKeys={exportingFormat ? ["excel", "pdf", "csv"] : []}>
             <DropdownItem
               key="excel"
               startContent={

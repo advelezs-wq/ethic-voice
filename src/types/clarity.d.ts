@@ -5,41 +5,16 @@
 
 declare global {
   interface Window {
+    /**
+     * Microsoft Clarity se expone como una única función invocable
+     * (el snippet oficial la usa como cola de comandos), no como un
+     * objeto con métodos nombrados. Uso: window.clarity('identify', ...),
+     * window.clarity('set', key, value), window.clarity('event', name),
+     * window.clarity('consent'[, false]), window.clarity('getSessionId', cb).
+     */
     clarity?: {
-      /**
-       * Identifica un usuario con un ID personalizado
-       * @param userId - ID único del usuario
-       */
-      identify: (userId: string, sessionId?: string, pageId?: string, friendlyName?: string) => void;
-      
-      /**
-       * Establece tags personalizados para la sesión
-       * @param key - Nombre del tag
-       * @param value - Valor del tag (string o array de strings)
-       */
-      set: (key: string, value: string | string[]) => void;
-      
-      /**
-       * Envía eventos personalizados a Clarity
-       * @param eventName - Nombre del evento
-       */
-      event: (eventName: string) => void;
-      
-      /**
-       * Actualiza el consentimiento del usuario
-       * @param consent - 'granted' o 'denied'
-       */
-      consent: (consent: 'granted' | 'denied') => void;
-      
-      /**
-       * Obtiene el ID de sesión actual
-       */
-      getSessionId: () => string | undefined;
-      
-      /**
-       * Función para hacer push a la cola cuando Clarity aún no está cargado
-       */
-      q?: any[];
+      (...args: unknown[]): void;
+      q?: unknown[];
     };
   }
 }

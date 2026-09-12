@@ -35,7 +35,8 @@ export const identifyClarityUser = (options: ClarityIdentifyOptions): void => {
   if (!clarityAnalyticsAllowed()) return;
   if (isClarityAvailable() && window.clarity) {
     try {
-      window.clarity.identify(
+      window.clarity(
+        'identify',
         options.userId,
         options.sessionId,
         options.pageId,
@@ -72,7 +73,7 @@ export const setClarityTag = (key: string, value: string | string[]): void => {
   if (!clarityAnalyticsAllowed()) return;
   if (isClarityAvailable() && window.clarity) {
     try {
-      window.clarity.set(key, value);
+      window.clarity('set', key, value);
       
       if (process.env.NODE_ENV === 'development') {
         console.log(`[Clarity] Tag set: ${key} =`, value);
@@ -121,7 +122,7 @@ export const trackClarityEvent = (eventName: ClarityCustomEvent): void => {
   if (!clarityAnalyticsAllowed()) return;
   if (isClarityAvailable() && window.clarity) {
     try {
-      window.clarity.event(eventName);
+      window.clarity('event', eventName);
       
       if (process.env.NODE_ENV === 'development') {
         console.log(`[Clarity] Event tracked: ${eventName}`);
@@ -150,7 +151,11 @@ export const trackClarityEvent = (eventName: ClarityCustomEvent): void => {
 export const updateClarityConsent = (consent: 'granted' | 'denied'): void => {
   if (isClarityAvailable() && window.clarity) {
     try {
-      window.clarity.consent(consent);
+      if (consent === 'granted') {
+        window.clarity('consent');
+      } else {
+        window.clarity('consent', false);
+      }
       
       if (process.env.NODE_ENV === 'development') {
         console.log(`[Clarity] Consent updated: ${consent}`);
@@ -162,27 +167,28 @@ export const updateClarityConsent = (consent: 'granted' | 'denied'): void => {
 };
 
 /**
- * Obtiene el ID de sesión actual de Clarity
+ * Obtiene el ID de sesión actual de Clarity de forma asíncrona
  * Útil para vincular sesiones con otros sistemas de analytics
- * 
- * @returns Session ID o undefined si no está disponible
- * 
+ *
+ * @param callback - Recibe el session ID, o undefined si no está disponible
+ *
  * @example
- * const sessionId = getClaritySessionId();
- * if (sessionId) {
- *   console.log('Session ID:', sessionId);
- * }
+ * getClaritySessionId((sessionId) => {
+ *   if (sessionId) console.log('Session ID:', sessionId);
+ * });
  */
-export const getClaritySessionId = (): string | undefined => {
-  if (!clarityAnalyticsAllowed()) return undefined;
-  if (isClarityAvailable() && window.clarity && window.clarity.getSessionId) {
-    try {
-      return window.clarity.getSessionId();
-    } catch (error) {
-      console.error('[Clarity] Error getting session ID:', error);
-      return undefined;
-    }
+export const getClaritySessionId = (
+  callback: (sessionId: string | undefined) => void
+): void => {
+  if (!clarityAnalyticsAllowed() || !isClarityAvailable() || !window.clarity) {
+    callback(undefined);
+    return;
   }
-  return undefined;
+  try {
+    window.clarity('getSessionId', (sessionId: string) => callback(sessionId));
+  } catch (error) {
+    console.error('[Clarity] Error getting session ID:', error);
+    callback(undefined);
+  }
 };
 

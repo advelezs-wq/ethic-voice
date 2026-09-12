@@ -137,6 +137,9 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
     reportType: string
   ) => {
     const key = `${format}:${reportType}`;
+    // Abrimos la pestaña de forma síncrona, dentro del gesto del clic — si se
+    // abre después de un await, algunos navegadores la bloquean como popup.
+    const pendingTab = format === "pdf" ? window.open("", "_blank") : null;
     try {
       setDownloadingKey(key, true);
       const response = await fetch("/api/analytics/download", {
@@ -161,7 +164,11 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
 
       if (contentType?.includes("text/html")) {
         const url = window.URL.createObjectURL(blob);
-        window.open(url, "_blank");
+        if (pendingTab) {
+          pendingTab.location.href = url;
+        } else {
+          window.open(url, "_blank");
+        }
 
         addToast({
           title: "Reporte generado",
@@ -170,6 +177,7 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
           color: "success",
         });
       } else {
+        pendingTab?.close();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.style.display = "none";
@@ -192,6 +200,7 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         });
       }
     } catch {
+      pendingTab?.close();
       addToast({
         title: "Error en la descarga",
         description: "No se pudo generar el reporte. Intenta nuevamente",

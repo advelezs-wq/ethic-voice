@@ -97,6 +97,9 @@ export function ReportsHeader({
   const downloadPDF = async () => {
     if (exportingFormat) return;
     setExportingFormat("pdf");
+    // Abrimos la pestaña de forma síncrona, dentro del gesto del clic — si se
+    // abre después de un await, algunos navegadores la bloquean como popup.
+    const pendingTab = window.open("", "_blank");
     try {
       const res = await fetch("/api/reports/pdf", {
         method: "POST",
@@ -108,6 +111,7 @@ export function ReportsHeader({
         }),
       });
       if (!res.ok) {
+        pendingTab?.close();
         addToast({
           title: "Error en la descarga",
           description: "No se pudo generar el reporte. Intenta nuevamente",
@@ -123,7 +127,11 @@ export function ReportsHeader({
       const url = URL.createObjectURL(blob);
 
       if (contentType.includes("text/html")) {
-        window.open(url, "_blank");
+        if (pendingTab) {
+          pendingTab.location.href = url;
+        } else {
+          window.open(url, "_blank");
+        }
         addToast({
           title: "Reporte generado",
           description:
@@ -132,6 +140,8 @@ export function ReportsHeader({
         });
         return;
       }
+
+      pendingTab?.close();
 
       const a = document.createElement("a");
       a.href = url;
@@ -146,6 +156,7 @@ export function ReportsHeader({
         color: "success",
       });
     } catch {
+      pendingTab?.close();
       addToast({
         title: "Error en la descarga",
         description: "No se pudo generar el reporte. Intenta nuevamente",

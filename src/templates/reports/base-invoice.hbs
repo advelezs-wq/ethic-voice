@@ -1,11 +1,18 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <title>Invoice - EthicVoice</title>
+    <title>Comprobante de pago - EthicVoice</title>
     <style>
       @page {
         size: A4;
         margin: 0;
+      }
+      :root {
+        --ev-forest: #0a1e14;
+        --ev-ink: #111827;
+        --ev-lime: #a3e635;
+        --ev-emerald: #10b981;
+        --ev-border: #e5e7eb;
       }
 
       body {
@@ -16,7 +23,7 @@
           BlinkMacSystemFont,
           "Segoe UI",
           sans-serif;
-        color: #111827; /* neutral, no brand colors */
+        color: var(--ev-ink);
         background: #ffffff;
         line-height: 1.6;
         font-size: 14px;
@@ -25,20 +32,34 @@
       .page {
         width: 210mm;
         min-height: 297mm;
-        padding: 20mm;
         margin: 0 auto;
         box-sizing: border-box;
       }
 
+      .brand-strip {
+        height: 3mm;
+        background: linear-gradient(
+          90deg,
+          var(--ev-lime) 0%,
+          var(--ev-emerald) 100%
+        );
+      }
+
+      .page-body {
+        padding: 16mm 20mm 20mm 20mm;
+      }
+
       h1 {
-        font-size: 28px;
+        font-size: 26px;
         font-weight: 800;
         margin: 0 0 6px 0;
+        color: var(--ev-forest);
       }
       h2 {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 700;
         margin: 24px 0 12px 0;
+        color: var(--ev-forest);
       }
       p {
         margin: 0 0 6px 0;
@@ -46,35 +67,37 @@
       }
 
       .section {
-        margin-bottom: 28px;
+        margin-bottom: 24px;
         page-break-inside: avoid;
       }
       .section-title {
-        font-size: 18px;
+        font-size: 16px;
         font-weight: 700;
-        color: #111827;
+        color: var(--ev-forest);
         margin: 0 0 10px 0;
         padding-bottom: 6px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 2px solid var(--ev-lime);
       }
 
-      /* Tables: neutral, thin borders */
+      /* Tables: neutral, brand-accented header */
       table {
         width: 100%;
         border-collapse: collapse;
       }
       th,
       td {
-        padding: 8px 0;
-        border-bottom: 1px solid #e5e7eb;
+        padding: 8px 4px;
+        border-bottom: 1px solid var(--ev-border);
       }
       th {
         text-align: left;
         font-size: 11px;
         letter-spacing: 0.04em;
         text-transform: uppercase;
-        color: #6b7280;
+        color: var(--ev-forest);
         font-weight: 700;
+        background: #f7faf9;
+        border-bottom: 1.5px solid var(--ev-lime);
       }
 
       .totals {
@@ -87,33 +110,48 @@
       }
       .totals .grand td {
         font-weight: 800;
+        color: var(--ev-forest);
+        border-top: 1.5px solid var(--ev-lime);
+        padding-top: 8px;
       }
 
-      /* Header logo strip */
+      /* Header logo band */
       .header {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 12px;
-        margin-bottom: 16px;
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--ev-border);
       }
       .brand {
-        height: 32px;
+        height: 34px;
+      }
+      .header-doc-label {
+        text-align: right;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #6b7280;
+        font-weight: 700;
       }
 
       /* Footer */
       .footer {
         margin-top: 40px;
         padding-top: 12px;
-        border-top: 1px solid #e5e7eb;
+        border-top: 2px solid var(--ev-lime);
         font-size: 12px;
         color: #6b7280;
       }
+      .footer strong {
+        color: var(--ev-forest);
+      }
 
       @media print {
-        .page {
-          width: 100%;
-          height: 100%;
-          padding: 15mm;
+        .page-body {
+          padding: 15mm 15mm;
         }
         .section {
           page-break-inside: avoid;
@@ -123,13 +161,20 @@
   </head>
   <body>
     <div class="page">
-      <div class="header">
-        {{#if ethicVoiceLogo}}
-          <img class="brand" src="{{ethicVoiceLogo}}" alt="EthicVoice" />
-        {{/if}}
+      <div class="brand-strip"></div>
+      <div class="page-body">
+        <div class="header">
+          {{#if ethicVoiceLogo}}
+            <img class="brand" src="{{ethicVoiceLogo}}" alt="EthicVoice" />
+          {{/if}}
+          <div class="header-doc-label">Comprobante de pago</div>
+        </div>
+        {{{content}}}
+        <div class="footer">
+          <strong>EthicVoice</strong> • Documento generado automáticamente. Conserva
+          este comprobante para tus registros contables.
+        </div>
       </div>
-      {{{content}}}
-      <div class="footer">Documento generado por EthicVoice</div>
     </div>
   </body>
 </html>

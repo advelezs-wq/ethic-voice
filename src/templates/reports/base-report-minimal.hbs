@@ -10,6 +10,14 @@
       * {
         box-sizing: border-box;
       }
+      :root {
+        --ev-forest: #0a1e14;
+        --ev-ink: #0d212c;
+        --ev-mint: #f7faf9;
+        --ev-lime: #a3e635;
+        --ev-emerald: #10b981;
+        --ev-border: #e3e8e5;
+      }
       body {
         font-family:
           Inter,
@@ -17,46 +25,59 @@
           BlinkMacSystemFont,
           "Segoe UI",
           sans-serif;
-        color: #111;
+        color: var(--ev-ink);
         margin: 0;
       }
       h1 {
-        font-size: 20px;
+        font-size: 19px;
         margin: 0 0 2mm 0;
-        font-weight: 700;
+        font-weight: 800;
+        color: #fff;
       }
       h2 {
-        font-size: 13px;
+        font-size: 12.5px;
         margin: 0 0 4mm 0;
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.04em;
-        color: #333;
+        color: var(--ev-forest);
+        display: flex;
+        align-items: center;
+        gap: 2.5mm;
+      }
+      h2::before {
+        content: "";
+        display: inline-block;
+        width: 2.6mm;
+        height: 2.6mm;
+        border-radius: 1px;
+        background: var(--ev-lime);
+        flex-shrink: 0;
       }
       h3 {
-        font-size: 12px;
+        font-size: 11.5px;
         margin: 0 0 2mm 0;
-        font-weight: 600;
+        font-weight: 700;
         color: #333;
       }
       p,
       li,
       td,
       th {
-        font-size: 11px;
+        font-size: 10.5px;
         line-height: 1.45;
       }
 
-      /* Fixed header on every page */
+      /* Fixed brand header on every page */
       .fixed-header {
         position: fixed;
         top: 0;
-        left: 0;
-        right: 0;
-        height: 30mm;
-        padding: 5mm 16mm;
-        border-bottom: 1px solid #e5e7eb;
-        background: #fff;
+        left: -16mm;
+        right: -16mm;
+        height: 28mm;
+        padding: 6mm 16mm;
+        background: var(--ev-forest);
+        border-bottom: 3px solid var(--ev-lime);
         z-index: 10;
       }
       .header-inner {
@@ -72,8 +93,8 @@
       }
       .meta {
         text-align: right;
-        color: #666;
-        font-size: 10px;
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 9.5px;
       }
       .meta .stack {
         display: flex;
@@ -82,22 +103,30 @@
         align-items: flex-end;
       }
       .brand-logo {
-        height: 10mm;
+        height: 9mm;
         width: auto;
         object-fit: contain;
-        filter: grayscale(100%);
+        background: #fff;
+        border-radius: 1.5mm;
+        padding: 1mm 2mm;
+      }
+      .muted {
+        color: #667;
+      }
+      .header-inner .muted {
+        color: rgba(255, 255, 255, 0.68);
       }
 
       .page-content {
         position: relative;
         z-index: 0;
-        margin-top: 34mm;
+        margin-top: 32mm;
         padding-top: 4mm;
       }
 
       .divider {
         height: 1px;
-        background: #e5e7eb;
+        background: var(--ev-border);
         margin: 6mm 0;
       }
 
@@ -119,13 +148,14 @@
 
       .panel {
         padding: 0;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--ev-border);
+        border-top: 2.5px solid var(--ev-lime);
         border-radius: 4px;
       }
       .panel .panel-h {
         padding: 4mm;
-        border-bottom: 1px solid #e5e7eb;
-        background: #fafafa;
+        border-bottom: 1px solid var(--ev-border);
+        background: var(--ev-mint);
       }
       .panel .panel-b {
         padding: 4mm;
@@ -142,11 +172,12 @@
         text-align: left;
       }
       th {
-        font-size: 10px;
-        color: #555;
+        font-size: 9.5px;
+        color: var(--ev-forest);
         text-transform: uppercase;
         letter-spacing: 0.04em;
-        background: #fafafa;
+        background: var(--ev-mint);
+        border-bottom: 1.5px solid var(--ev-lime);
       }
 
       .kpi {
@@ -154,18 +185,19 @@
         gap: 1mm;
       }
       .kpi .label {
-        color: #666;
-        font-size: 10px;
+        color: #667;
+        font-size: 9.5px;
         text-transform: uppercase;
         letter-spacing: 0.04em;
       }
       .kpi .value {
-        font-size: 18px;
-        font-weight: 700;
+        font-size: 17px;
+        font-weight: 800;
+        color: var(--ev-forest);
       }
       .kpi .note {
-        color: #666;
-        font-size: 10px;
+        color: #667;
+        font-size: 9.5px;
       }
 
       .legend {
@@ -180,24 +212,26 @@
       .box {
         width: 8px;
         height: 8px;
-        background: #bbb;
+        background: var(--ev-lime);
+        border-radius: 1px;
       }
 
       .bar {
         height: 8px;
-        background: #e5e7eb;
+        background: var(--ev-border);
         border-radius: 2px;
         overflow: hidden;
       }
       .bar > span {
         display: block;
         height: 100%;
-        background: #000;
+        background: linear-gradient(
+          90deg,
+          var(--ev-lime) 0%,
+          var(--ev-emerald) 100%
+        );
       }
 
-      .muted {
-        color: #666;
-      }
       .mono {
         font-family:
           ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
@@ -206,10 +240,15 @@
 
       .footer {
         margin-top: 10mm;
-        color: #666;
-        font-size: 10px;
+        padding-top: 4mm;
+        border-top: 2px solid var(--ev-lime);
+        color: #5a6a63;
+        font-size: 9.5px;
         display: flex;
         justify-content: space-between;
+      }
+      .footer strong {
+        color: var(--ev-forest);
       }
     </style>
   </head>
@@ -239,7 +278,7 @@
       {{{content}}}
 
       <div class="footer">
-        <div>EthicVoice • Confidencial</div>
+        <div><strong>EthicVoice</strong> • Confidencial</div>
         <div>{{formatDate generatedAt "yyyy"}}</div>
       </div>
     </div>

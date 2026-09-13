@@ -618,7 +618,15 @@ export async function POST(req: Request) {
 
   // Add this at the end of your webhook handler, before the default return
   if (eventType === "organizationInvitation.accepted") {
-    const { organization_id, email_address } = evt.data;
+    const { organization_id, email_address, role } = evt.data as typeof evt.data & {
+      role?: string;
+    };
+    // The only place this app creates a Clerk organization invitation today
+    // is the superadmin auto-invite in organization.created above, always
+    // with role "org:admin" — but read the invitation's actual role instead
+    // of hardcoding ADMIN, so this doesn't silently over-grant admin access
+    // if a non-admin Clerk invitation is ever sent from anywhere else.
+    const membershipRole = role === "admin" || role === "org:admin" ? "ADMIN" : "MEMBER";
 
     try {
       // Find the user by email
@@ -636,12 +644,12 @@ export async function POST(req: Request) {
             },
           },
           update: {
-            role: "ADMIN",
+            role: membershipRole,
           },
           create: {
             userId: user.id,
             orgId: organization_id,
-            role: "ADMIN",
+            role: membershipRole,
           },
         });
       }

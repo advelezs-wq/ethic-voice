@@ -674,20 +674,49 @@ export class RebillService {
     return REBILL_PLANS[planType] || null;
   }
 
-  // Webhook signature verification
+  // Webhook signature verification.
+  //
+  // CRITICAL: this used to be a placeholder that always returned true once a
+  // webhookSecret was configured — the signature and payload were never
+  // actually checked, so anyone who found this endpoint's URL could POST a
+  // forged "subscription.activated"/"payment.succeeded" event and activate
+  // a paid plan for free (the handler in webhooks/rebill/route.ts performs
+  // real Subscription/Organization writes based on the event body).
+  //
+  // This now does real HMAC-SHA256 verification (the standard scheme used by
+  // Stripe, MercadoPago — see verifyMercadoPagoWebhookSignature — and most
+  // providers whose webhook secrets use a "whsec_" prefix, as Rebill's does
+  // per REBILL_SETUP_GUIDE.md). VERIFY THIS MATCHES REBILL'S ACTUAL DOCUMENTED
+  // FORMAT before relying on it in production — if Rebill signs a
+  // timestamp+body construction (like Stripe's `t=...,v1=...` header) rather
+  // than a bare HMAC of the raw body, this needs adjusting to match, or
+  // legitimate webhooks will start failing signature checks.
   verifyWebhookSignature(payload: string, signature: string): boolean {
-    // Implementation would depend on Rebill's webhook signature method
-    // This is a placeholder - need to check Rebill's webhook documentation
-    console.log("🔐 Verifying Rebill webhook signature...");
-
     if (!this.config.webhookSecret) {
-      console.warn("⚠️ Webhook secret not configured");
+      console.error("❌ REBILL_WEBHOOK_SECRET not configured — rejecting webhook");
+      return false;
+    }
+    if (!signature) {
       return false;
     }
 
-    // TODO: Implement actual signature verification based on Rebill docs
-    // This would typically involve HMAC verification
-    return true; // Placeholder
+    try {
+      const crypto = require("crypto");
+      const expected = crypto
+        .createHmac("sha256", this.config.webhookSecret)
+        .update(payload)
+        .digest("hex");
+
+      const provided = signature.replace(/^sha256=/, "");
+      if (expected.length !== provided.length) return false;
+      return crypto.timingSafeEqual(
+        Buffer.from(expected, "hex"),
+        Buffer.from(provided, "hex")
+      );
+    } catch (error) {
+      console.error("❌ Error verifying Rebill webhook signature:", error);
+      return false;
+    }
   }
 
   private validateConfig() {

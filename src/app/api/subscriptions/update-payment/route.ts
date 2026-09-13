@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/modules/prisma/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import mercadoPagoService from "@/modules/app/services/mercadopago.service";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 interface UpdatePaymentRequest {
   subscriptionId?: number;
@@ -171,7 +172,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, subscription: updated, requiresAuthorization, url: initPoint });
     }
 
-    // Update subscription with payment information
+    // Update subscription with payment information. This directly trusts a
+    // client-supplied `status`/`paymentData` with no verification against the
+    // payment provider — getOrganizationPlanInfo() treats Subscription.status
+    // === "ACTIVE" as the org's real active plan, so without a stronger gate
+    // here any user who owns (or admins the org of) a subscription could
+    // activate a paid plan for free. No legitimate UI flow calls this branch
+    // (the only real caller uses action: "reactivate", which re-verifies
+    // against MercadoPago before activating) — restricted to superadmin as a
+    // manual override, matching manual-create-client's manual-payment pattern.
     if (!bodySubscriptionId) {
       return NextResponse.json(
         { error: "subscriptionId is required when not using action=reactivate" },
@@ -179,14 +188,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const requesterEmail = (await currentUser())?.primaryEmailAddress?.emailAddress;
+    if (!requesterEmail || !isSuperAdmin(requesterEmail)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const existingSubscription = await prisma.subscription.findUnique({
       where: { id: bodySubscriptionId },
     });
     if (!existingSubscription) {
       return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
-    }
-    if (!(await assertOwnsSubscription(existingSubscription, userId))) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const updatedSubscription = await prisma.subscription.update({

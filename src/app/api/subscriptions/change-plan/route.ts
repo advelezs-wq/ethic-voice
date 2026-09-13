@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     let { subscriptionId, newPlanType, organizationId, newBillingCycle, prorationMode } = body;
+    const estimateOnlyRequested = Boolean(body.estimate);
 
     // Resolve subscription automatically if not provided
     if (!subscriptionId) {
@@ -221,9 +222,15 @@ export async function POST(req: NextRequest) {
     const credits = (existingMetadata as any)?.credits || {};
     const currentCreditBalance: number = Number(credits.balance || 0);
 
-    // Support estimate-only mode to preview proration without applying changes
-    const estimateOnly = Boolean((await req.json().catch(() => ({} as any))).estimate);
-    if (estimateOnly) {
+    // Support estimate-only mode to preview proration without applying changes.
+    // Read from the already-parsed `body` above — a Request's body stream can
+    // only be consumed once, so re-calling req.json() here always threw and
+    // was silently swallowed, meaning estimateOnly was ALWAYS false and every
+    // "preview" call (fired on every plan/billing-cycle selection change in
+    // PlanChangeModal, before the user confirms anything) actually executed
+    // the real upgrade/downgrade — including real MercadoPago charges and
+    // downgrade plan-limit enforcement that can block/kick out users.
+    if (estimateOnlyRequested) {
       const amountToCharge = Math.max(0, prorationAmount - currentCreditBalance);
       return NextResponse.json({
         success: true,

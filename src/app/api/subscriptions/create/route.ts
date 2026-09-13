@@ -162,14 +162,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ✅ For sidebar checkout: Create as TRIALING (pending payment)
-    // ✅ Only activate to ACTIVE when payment is confirmed
+    // CRITICAL: always create as TRIALING (pending payment) — this endpoint has
+    // no payment step of its own, and getOrganizationPlanInfo() treats any
+    // subscription with status "ACTIVE" as a real, feature-unlocking plan
+    // (auto-linking it to the caller's org if unlinked). Setting status:
+    // "ACTIVE" here for the non-sidebar branch let anyone POST
+    // {planType, billingCycle} directly (every real UI caller passes
+    // openSidebar: true; this route has no other gate) and receive a fully
+    // active paid plan for free, with no MercadoPago checkout ever happening.
+    // Only the webhook (payment provider, signature-verified) or the
+    // superadmin manual-activation path may set status to ACTIVE.
     const subscription = await prisma.subscription.create({
       data: {
         userId,
         planType,
         planName: planConfig.name,
-        status: openSidebar ? "TRIALING" : "ACTIVE", // Sidebar = pending payment, direct = active
+        status: "TRIALING", // Pending payment confirmation via provider webhook
         billingCycle: billingCycle as BillingCycle,
         startDate: new Date(),
         monthlyPrice: billingCycle === "MONTHLY" ? price : null,

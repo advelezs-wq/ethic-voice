@@ -69,7 +69,7 @@ export function PlanWidget() {
               </Chip>
               {planInfo.isTrialActive && (
                 <Chip size="sm" color="warning" variant="flat">
-                  Trial
+                  Prueba
                 </Chip>
               )}
             </div>
@@ -81,11 +81,11 @@ export function PlanWidget() {
           <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
             <div className="flex items-center gap-2 text-orange-700 text-sm mb-1">
               <i className="icon-[lucide--clock] w-4 h-4" />
-              <span className="font-medium">Trial Ending Soon</span>
+              <span className="font-medium">La prueba termina pronto</span>
             </div>
             <p className="text-orange-600 text-xs">
-              Your trial ends in {planInfo.trialDaysRemaining} days. Upgrade to
-              continue using all features.
+              Tu prueba termina en {planInfo.trialDaysRemaining} días. Mejora tu
+              plan para seguir usando todas las funcionalidades.
             </p>
           </div>
         )}
@@ -98,7 +98,7 @@ export function PlanWidget() {
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span className="text-slate-500 flex items-center gap-1">
                     <i className="icon-[lucide--users] w-3 h-3" />
-                    Users
+                    Usuarios
                   </span>
                   <span className="font-medium">
                     {planInfo.currentUsers}/{planInfo.maxUsers}
@@ -127,7 +127,7 @@ export function PlanWidget() {
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span className="text-slate-500 flex items-center gap-1">
                     <i className="icon-[lucide--user-check] w-3 h-3" />
-                    Investigators
+                    Investigadores
                   </span>
                   <span className="font-medium">
                     {planInfo.currentInvestigators}/{planInfo.maxInvestigators}
@@ -163,7 +163,7 @@ export function PlanWidget() {
           <div className="space-y-2 mb-4">
             <h4 className="text-sm font-medium text-slate-600 flex items-center gap-1">
               <i className="icon-[lucide--alert-triangle] w-4 h-4" />
-              Attention Required
+              Atención requerida
             </h4>
             {usageWarnings.map((warning, index) => (
               <div
@@ -184,7 +184,7 @@ export function PlanWidget() {
           className="w-full"
           endContent={<i className="icon-[mdi--arrow-right] w-4 h-4" />}
         >
-          {planInfo.planType === "PREMIUM" ? "Contact Support" : "Upgrade Plan"}
+          {planInfo.planType === "PREMIUM" ? "Contactar soporte" : "Mejorar plan"}
         </Button>
 
         {/* Plan Details Link */}
@@ -196,7 +196,7 @@ export function PlanWidget() {
             size="sm"
             className="text-xs text-slate-400"
           >
-            Compare all plans
+            Comparar todos los planes
           </Button>
         </div>
       </CardBody>

@@ -3,15 +3,7 @@ import prisma from "@/modules/prisma/lib/prisma";
 import { addSubmissionToQueue } from "@/modules/app/lib/queue/queue-manager";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
 import { SubmissionSource } from "@/types/submission.types";
-
-function verifyAdminApiKey(request: NextRequest): boolean {
-  const apiKey =
-    request.headers.get("x-admin-api-key") ||
-    request.headers.get("authorization")?.replace("Bearer ", "");
-  const expectedApiKey = process.env.ADMIN_API_KEY;
-  if (!expectedApiKey) return false;
-  return apiKey === expectedApiKey;
-}
+import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
 
 function toReadable(content: string): string {
   try {
@@ -78,8 +70,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const isCron = request.headers.get("x-vercel-cron");
-  if (!isCron && !verifyAdminApiKey(request)) {
+  if (!verifyCronOrAdminRequest(request)) {
     return NextResponse.json(
       { error: "Unauthorized - Invalid or missing API key" },
       { status: 401 }

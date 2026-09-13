@@ -7,6 +7,7 @@ import {
 } from "@/modules/core/utils/plan-security.utils";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import prisma from "@/modules/prisma/lib/prisma";
+import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
 
 /**
  * Admin endpoint for running security validation on all organizations
@@ -14,9 +15,10 @@ import prisma from "@/modules/prisma/lib/prisma";
  */
 export async function POST(request: NextRequest) {
   try {
-    // Allow Vercel Cron to call this directly (daily-runner already does).
-    const isCron = request.headers.get("x-vercel-cron");
-    if (!isCron) {
+    // Allow Vercel Cron / daily-runner to call this directly with a real
+    // secret (see cron-auth.ts) instead of trusting the unverifiable
+    // x-vercel-cron header.
+    if (!verifyCronOrAdminRequest(request)) {
       const { userId } = await auth();
       if (!userId) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

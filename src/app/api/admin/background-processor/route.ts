@@ -3,24 +3,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { backgroundProcessor } from "@/modules/app/lib/background-processor";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
-
-function verifyAdminApiKey(request: NextRequest): boolean {
-  const apiKey =
-    request.headers.get("x-admin-api-key") ||
-    request.headers.get("authorization")?.replace("Bearer ", "");
-  const expectedApiKey = process.env.ADMIN_API_KEY;
-  if (!expectedApiKey) return false;
-  return apiKey === expectedApiKey;
-}
+import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
 
 export async function POST(request: NextRequest) {
   try {
     // This retries failed AI jobs across every organization on the
     // platform, not just the caller's — "any logged-in user" was not
-    // nearly strict enough. Require the admin key/cron header, or an
+    // nearly strict enough. Require the admin key/cron secret, or an
     // actual platform superadmin.
-    const isCron = request.headers.get("x-vercel-cron");
-    if (!isCron && !verifyAdminApiKey(request)) {
+    if (!verifyCronOrAdminRequest(request)) {
       const clerkUser = await currentUser();
       const userEmail = clerkUser?.primaryEmailAddress?.emailAddress;
       if (!userEmail || !isSuperAdmin(userEmail)) {

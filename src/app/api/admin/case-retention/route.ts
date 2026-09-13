@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { notificationsService } from "@/modules/app/services/notifications.service";
-
-function verifyAdminApiKey(request: NextRequest): boolean {
-  const apiKey =
-    request.headers.get("x-admin-api-key") ||
-    request.headers.get("authorization")?.replace("Bearer ", "");
-  const expectedApiKey = process.env.ADMIN_API_KEY;
-  if (!expectedApiKey) return false;
-  return apiKey === expectedApiKey;
-}
+import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
 
 // Daily cron: enforces each org's case-level retention policy (see
 // Organization.caseRetentionDays). Cases under legal hold are never
@@ -17,8 +9,7 @@ function verifyAdminApiKey(request: NextRequest): boolean {
 // throttled in-app notification instead of automatic deletion — the safe
 // default is a human reviews before anything is destroyed.
 export async function POST(request: NextRequest) {
-  const isCron = request.headers.get("x-vercel-cron");
-  if (!isCron && !verifyAdminApiKey(request)) {
+  if (!verifyCronOrAdminRequest(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

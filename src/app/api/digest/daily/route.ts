@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 import { digestService } from '@/modules/app/services/digest.service';
+import { verifyCronOrAdminRequest } from '@/lib/security/cron-auth';
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
     // Debug: Log environment and headers (remove in production)
     console.log('🔍 Daily Digest Debug:', {
@@ -11,31 +11,22 @@ export async function POST() {
       timestamp: new Date().toISOString()
     });
 
-    // Verify the request is authorized
-    const headersList = await headers();
-    const authHeader = headersList.get('authorization');
+    // CRITICAL: this used to let the x-vercel-cron header alone bypass the
+    // DIGEST_CRON_TOKEN check entirely — that header isn't verified/stripped
+    // by Vercel's edge on inbound requests, so anyone could set it and skip
+    // the real token check. Accept either a genuine cron/admin secret
+    // (verifyCronOrAdminRequest) or the DIGEST_CRON_TOKEN bearer token.
+    const authHeader = request.headers.get('authorization');
     const expectedToken = process.env.DIGEST_CRON_TOKEN;
-    
-    if (!expectedToken) {
-      console.error('❌ DIGEST_CRON_TOKEN not found in environment');
-      return NextResponse.json({ 
-        error: 'Server configuration error - missing token' 
-      }, { status: 500 });
-    }
 
-    const hdrs = await headers();
-    const isCron = hdrs.get('x-vercel-cron');
-    if (!authHeader && !isCron) {
-      console.error('❌ No Authorization header provided');
-      return NextResponse.json({ 
-        error: 'Authorization header required' 
-      }, { status: 401 });
-    }
+    const hasCronOrAdminAuth = verifyCronOrAdminRequest(request);
+    const hasDigestToken =
+      !!expectedToken && authHeader === `Bearer ${expectedToken}`;
 
-    if (!isCron && authHeader !== `Bearer ${expectedToken}`) {
-      console.error('❌ Invalid authorization token');
-      return NextResponse.json({ 
-        error: 'Invalid authorization token' 
+    if (!hasCronOrAdminAuth && !hasDigestToken) {
+      console.error('❌ No valid authorization provided');
+      return NextResponse.json({
+        error: 'Authorization required'
       }, { status: 401 });
     }
 
@@ -56,15 +47,12 @@ export async function POST() {
 }
 
 // Also allow GET for testing purposes
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Allow GET from Vercel Cron (no auth header) and internal daily-runner
-    const headersList = await headers();
-    const isCron = headersList.get('x-vercel-cron');
-    if (isCron) {
+    if (verifyCronOrAdminRequest(request)) {
       await digestService.sendDailyDigests();
-      return NextResponse.json({ 
-        success: true, 
+      return NextResponse.json({
+        success: true,
         message: 'Daily digests processed successfully (cron)',
         timestamp: new Date().toISOString()
       });

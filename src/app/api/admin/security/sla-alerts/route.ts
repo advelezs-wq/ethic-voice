@@ -3,12 +3,14 @@ import prisma from "@/modules/prisma/lib/prisma";
 import { notificationsService } from "@/modules/app/services/notifications.service";
 import { NotificationChannel, NotificationType } from "@prisma/client";
 import { getSlaTotalDays } from "@/modules/app/utils/dashboard.utils";
+import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
 
 export async function POST(request: NextRequest) {
   try {
-    // Allow only cron/internal calls (relaxed check: header present)
-    const isCron = request.headers.get("x-vercel-cron") === "1";
-    if (!isCron) {
+    // Allow only cron/internal calls carrying a real shared secret — the
+    // x-vercel-cron header alone isn't verified/stripped by Vercel's edge
+    // and can be set by any caller.
+    if (!verifyCronOrAdminRequest(request)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

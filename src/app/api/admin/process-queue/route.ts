@@ -12,31 +12,15 @@ import {
   createEmailWorker,
   submissionQueue,
 } from "@/modules/app/lib/queue/queue-manager";
+import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
 // Removed env gating; always process queues
-
-// Function to verify admin API key
-function verifyAdminApiKey(request: NextRequest): boolean {
-  const apiKey =
-    request.headers.get("x-admin-api-key") ||
-    request.headers.get("authorization")?.replace("Bearer ", "");
-  const expectedApiKey = process.env.ADMIN_API_KEY;
-
-  if (!expectedApiKey) {
-    console.error("❌ ADMIN_API_KEY not configured in environment variables");
-    return false;
-  }
-
-  return apiKey === expectedApiKey;
-}
 
 // Manual queue processing endpoint for deployment environments
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function POST(request: NextRequest) {
   console.log("🔄 [API] Manual queue processing triggered");
 
-  // Allow from Vercel Cron without API key; require key otherwise
-  const isCron = request.headers.get("x-vercel-cron");
-  if (!isCron && !verifyAdminApiKey(request)) {
+  if (!verifyCronOrAdminRequest(request)) {
     console.error("❌ [API] Unauthorized access attempt to admin endpoint");
     return NextResponse.json(
       { error: "Unauthorized - Invalid or missing API key" },
@@ -153,9 +137,8 @@ export async function POST(request: NextRequest) {
 
 // Get queue status
 export async function GET(request: NextRequest) {
-  // Verify API key authentication for health check too
-  const isCron = request.headers.get("x-vercel-cron");
-  if (!isCron && !verifyAdminApiKey(request)) {
+  // Verify authentication for health check too
+  if (!verifyCronOrAdminRequest(request)) {
     console.error("❌ [API] Unauthorized access attempt to admin health check");
     return NextResponse.json(
       { error: "Unauthorized - Invalid or missing API key" },

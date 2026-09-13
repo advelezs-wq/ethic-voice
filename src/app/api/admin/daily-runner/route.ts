@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
+import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
 
 // Runs 5 downstream tasks sequentially, including process-queue which now
 // waits up to 50s for AI jobs to complete — give the chain room to finish.
@@ -34,13 +35,15 @@ async function callJson(url: string, init?: RequestInit) {
 }
 
 export async function GET(request: NextRequest) {
-  // This orchestrator attaches a real x-vercel-cron header to every
-  // downstream call regardless of who calls IT, so unlike its downstream
-  // siblings (which each check this themselves) it was reachable by anyone
-  // with no credentials — effectively bypassing their auth checks. Gate
-  // entry the same way validate-plans/route.ts already does.
-  const isCron = request.headers.get("x-vercel-cron");
-  if (!isCron) {
+  // CRITICAL: this orchestrator used to attach a plain x-vercel-cron header
+  // to every downstream call and trust that same header on its own entry —
+  // that header isn't verified/stripped by Vercel on inbound requests, so
+  // anyone could set it and trigger this (and everything it chains into,
+  // including destructive org/case deletion) with no credentials at all.
+  // verifyCronOrAdminRequest requires a real secret (CRON_SECRET, which
+  // Vercel automatically sends as a Bearer token for its own Cron
+  // invocations, or ADMIN_API_KEY).
+  if (!verifyCronOrAdminRequest(request)) {
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -57,15 +60,14 @@ export async function GET(request: NextRequest) {
 
   const base = getBaseUrl(request.url);
   const results: Record<string, unknown> = {};
-  // Propaga cabecera de cron a este endpoint también para que el middleware lo detecte
-  // Vercel la incluirá automáticamente en la invocación del cron job
+  const adminAuthHeader = { Authorization: `Bearer ${process.env.ADMIN_API_KEY || ""}` };
 
   // 1) Validación de planes/estado
   results.validatePlans = await callJson(
     new URL("/api/admin/security/validate-plans", base).toString(),
     {
       method: "POST",
-      headers: { "x-vercel-cron": "1" },
+      headers: adminAuthHeader,
     }
   );
 
@@ -73,7 +75,7 @@ export async function GET(request: NextRequest) {
   results.maintenance = await callJson(
     new URL("/api/admin/maintenance", base).toString(),
     {
-      headers: { "x-vercel-cron": "1" },
+      headers: adminAuthHeader,
     }
   );
 
@@ -85,17 +87,17 @@ export async function GET(request: NextRequest) {
       new URL("/api/digest/daily", base).toString(),
       {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "x-vercel-cron": "1" },
+        headers: { Authorization: `Bearer ${token}` },
       }
     );
   }
 
-  // 4) Procesar colas (permitimos sin API key indicando cabecera de cron)
+  // 4) Procesar colas
   results.processQueue = await callJson(
     new URL("/api/admin/process-queue", base).toString(),
     {
       method: "POST",
-      headers: { "x-vercel-cron": "1" },
+      headers: adminAuthHeader,
     }
   );
 
@@ -104,7 +106,7 @@ export async function GET(request: NextRequest) {
     new URL("/api/admin/security/sla-alerts", base).toString(),
     {
       method: "POST",
-      headers: { "x-vercel-cron": "1" },
+      headers: adminAuthHeader,
     }
   );
 
@@ -113,7 +115,7 @@ export async function GET(request: NextRequest) {
     new URL("/api/admin/case-retention", base).toString(),
     {
       method: "POST",
-      headers: { "x-vercel-cron": "1" },
+      headers: adminAuthHeader,
     }
   );
 

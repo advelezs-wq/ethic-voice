@@ -9,6 +9,7 @@ import {
   signPublicBlogMarker,
 } from "@/lib/public-blog";
 import { preflightPublicBlog } from "@/lib/public-blog-preflight";
+import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
 
 const PUBLIC_BLOG_PREFLIGHT_TIMEOUT_MS = 3000;
 
@@ -71,21 +72,6 @@ const isAdminRoute = createRouteMatcher([
   "/api/ai/requeue(.*)",
 ]);
 
-// Function to verify admin API key
-function verifyAdminApiKey(req: Request): boolean {
-  const apiKey =
-    req.headers.get("x-admin-api-key") ||
-    req.headers.get("authorization")?.replace("Bearer ", "");
-  const expectedApiKey = process.env.ADMIN_API_KEY;
-
-  if (!expectedApiKey) {
-    console.error("❌ ADMIN_API_KEY not configured in environment variables");
-    return false;
-  }
-
-  return apiKey === expectedApiKey;
-}
-
 function sanitizeRequest(req: NextRequest) {
   const requestHeaders = new Headers(req.headers);
   requestHeaders.delete(PUBLIC_BLOG_REQUEST_HEADER);
@@ -125,16 +111,18 @@ const clerkHandler = clerkMiddleware(async (auth, req) => {
 
   // Check for admin routes with API key authentication
   if (isAdminRoute(req)) {
-    const isVercelCron =
-      req.headers.get("x-vercel-cron") || req.headers.get("x-vercel-signature");
-    if (isVercelCron) {
-      // Allow Vercel Cron to hit admin endpoints without Clerk/Auth
-      return nextWithPublicBlogMarker(req);
-    }
-    if (verifyAdminApiKey(req)) {
-      // Valid API key, allow access to admin route
+    // CRITICAL: previously trusted the mere presence of x-vercel-cron or
+    // x-vercel-signature headers as proof of a genuine Vercel Cron
+    // invocation — neither is stripped/verified by Vercel's edge on inbound
+    // requests, so anyone could set them and bypass auth entirely on routes
+    // that include destructive operations (org hard-deletion in
+    // maintenance/route.ts, case-data deletion in case-retention/route.ts).
+    // verifyCronOrAdminRequest requires a real shared secret (CRON_SECRET,
+    // which Vercel automatically sends as a Bearer token for its own Cron
+    // invocations, or ADMIN_API_KEY) instead.
+    if (verifyCronOrAdminRequest(req)) {
       console.log(
-        "✅ [PROXY] Admin API key verified, allowing access to:",
+        "✅ [PROXY] Cron/admin secret verified, allowing access to:",
         req.nextUrl.pathname
       );
       return nextWithPublicBlogMarker(req);

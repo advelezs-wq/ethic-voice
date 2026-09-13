@@ -2,26 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { NotificationsService } from "@/modules/app/services/notifications.service";
 import { NotificationType } from "@prisma/client";
-
-function verifyAdminApiKey(request: NextRequest): boolean {
-  const apiKey =
-    request.headers.get("x-admin-api-key") ||
-    request.headers.get("authorization")?.replace("Bearer ", "");
-  const expectedApiKey = process.env.ADMIN_API_KEY;
-  if (!expectedApiKey) return false;
-  return apiKey === expectedApiKey;
-}
+import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
 
 export async function GET(request: NextRequest) {
   // This route notifies orgs of pending deletion and hard-deletes (with
   // billing cancellation) orgs expired 90+ days — it has no UI caller and is
   // meant to run only via Vercel Cron or an admin script. Being under
   // /api/admin(.*) lets the platform middleware bypass Clerk for a valid
-  // cron header or API key, but *any* logged-in user would otherwise fall
+  // cron secret or API key, but *any* logged-in user would otherwise fall
   // through and reach this handler — so it needs its own explicit check
   // rather than relying on "some session exists".
-  const isCron = request.headers.get("x-vercel-cron");
-  if (!isCron && !verifyAdminApiKey(request)) {
+  if (!verifyCronOrAdminRequest(request)) {
     return NextResponse.json(
       { error: "Unauthorized - Invalid or missing API key" },
       { status: 401 }

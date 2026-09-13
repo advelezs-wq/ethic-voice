@@ -2,7 +2,10 @@
 "use server";
 
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { resolveOrgId } from "@/modules/core/utils/org-resolver";
+import {
+  resolveOrgId,
+  assertUserCanAccessOrg,
+} from "@/modules/core/utils/org-resolver";
 import prisma from "@/modules/prisma/lib/prisma";
 import { notificationsService } from "@/modules/app/services/notifications.service";
 import { v2 as cloudinary } from "cloudinary";
@@ -58,11 +61,7 @@ export async function getRecentReports(
   limit = 5,
   userId?: string // For member filtering
 ): Promise<Report[]> {
-  const { userId: authUserId } = await auth();
-
-  if (!authUserId) {
-    redirect("/sign-in");
-  }
+  await assertUserCanAccessOrg(orgId);
 
   try {
     const whereClause: any = {
@@ -163,6 +162,8 @@ export async function getChartData(
   orgId: string,
   userId?: string // For member filtering
 ): Promise<ChartDataPoint[]> {
+  await assertUserCanAccessOrg(orgId);
+
   try {
     const whereClause: Prisma.FormSubmissionWhereInput = { orgId };
 
@@ -208,6 +209,8 @@ export async function getCategoryData(
   orgId: string,
   userId?: string // For member filtering
 ): Promise<CategoryData[]> {
+  await assertUserCanAccessOrg(orgId);
+
   try {
     const whereClause: Prisma.FormSubmissionWhereInput = { orgId };
 

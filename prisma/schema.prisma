@@ -122,6 +122,16 @@ model CommentAttachment {
   // message just by guessing a nearby id.
   uploadedByUserId String?
 
+  // Same reasoning as uploadedByUserId, but for the unauthenticated public
+  // reporter chat (public-chat.actions.ts) where there is no userId at all —
+  // set at upload time (uploadPublicChatAttachment) to the submission the
+  // file was uploaded for, and required to match when a reporter's message
+  // later claims an orphaned attachment by id. Without this, any anonymous
+  // reporter could guess another reporter's still-orphaned attachment id
+  // (from a completely unrelated case, even another organization) and pull
+  // it into their own report's message thread.
+  uploadedForSubmissionId Int?
+
   @@index([commentId])
 }
 

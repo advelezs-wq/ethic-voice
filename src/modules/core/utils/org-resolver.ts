@@ -55,6 +55,31 @@ export async function resolveOrgId(): Promise<string | null> {
 }
 
 /**
+ * Use for server actions/API routes that accept a caller-supplied `orgId`
+ * directly (superadmin "browse any org" panels, analytics functions called
+ * with `organization.id` from a details view, etc.) instead of deriving it
+ * from resolveOrgId()'s cookie/session. Without this, any authenticated user
+ * — or in a Server Action reachable from a client component, potentially any
+ * visitor — could pass an arbitrary orgId and read that organization's data.
+ */
+export async function assertUserCanAccessOrg(orgId: string): Promise<void> {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error("No autorizado");
+  }
+
+  const membership = await prisma.organizationMembership.findUnique({
+    where: { userId_orgId: { userId, orgId } },
+  });
+  if (membership) return;
+
+  const userEmail = (await currentUser())?.primaryEmailAddress?.emailAddress;
+  if (userEmail && isSuperAdmin(userEmail)) return;
+
+  throw new Error("No autorizado");
+}
+
+/**
  * Use for report-scoped server actions (chat, etc.). Resolves org from the
  * submission row and checks membership, so a mismatched `ev_org` cookie cannot
  * make the action think the report does not exist while the user is viewing it.

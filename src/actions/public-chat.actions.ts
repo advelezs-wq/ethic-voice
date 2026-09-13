@@ -180,8 +180,16 @@ export async function sendPublicReportMessage(
     });
 
     if (attachmentIds.length > 0) {
+      // Scoped to this submission — without uploadedForSubmissionId, any
+      // anonymous reporter could guess another reporter's still-orphaned
+      // attachment id (from a completely unrelated case) and pull it into
+      // their own report's message thread.
       await tx.commentAttachment.updateMany({
-        where: { id: { in: attachmentIds }, commentId: null },
+        where: {
+          id: { in: attachmentIds },
+          commentId: null,
+          uploadedForSubmissionId: submission.id,
+        },
         data: { commentId: newMessage.id },
       });
     }
@@ -341,6 +349,7 @@ export async function uploadPublicChatAttachment(
       fileUrl: uploadResponse.secure_url,
       fileSize: file.size,
       mimeType: file.type,
+      uploadedForSubmissionId: submission.id,
     },
   });
 

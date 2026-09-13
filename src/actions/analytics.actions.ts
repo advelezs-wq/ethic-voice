@@ -5,19 +5,14 @@ import { subDays, format } from "date-fns";
 import { es } from "date-fns/locale";
 import type { DashboardStats } from "@/types/dashboard.types";
 import { Prisma } from "@prisma/client";
-import { redirect } from "next/navigation";
-import { auth } from "@clerk/nextjs/server";
+import { assertUserCanAccessOrg } from "@/modules/core/utils/org-resolver";
 
 export async function getDashboardStats(
   orgId: string,
   userId?: string,
   departmentId?: string
 ): Promise<DashboardStats> {
-  const { userId: authUserId } = await auth();
-
-  if (!authUserId) {
-    redirect("/sign-in");
-  }
+  await assertUserCanAccessOrg(orgId);
 
   // Base filters for all queries - exclude archived reports
   const baseWhere: Prisma.FormSubmissionWhereInput = {
@@ -158,6 +153,8 @@ export async function getSeverityDistribution(
   orgId: string,
   userId?: string
 ): Promise<{ high: number; medium: number; low: number; unknown: number }> {
+  await assertUserCanAccessOrg(orgId);
+
   try {
     const baseWhere: Prisma.FormSubmissionWhereInput = { orgId };
 
@@ -196,6 +193,8 @@ export async function getSourceDistribution(
   orgId: string,
   userId?: string
 ): Promise<{ ethicLine: number; customForm: number }> {
+  await assertUserCanAccessOrg(orgId);
+
   try {
     const baseWhere: Prisma.FormSubmissionWhereInput = { orgId };
 
@@ -228,6 +227,8 @@ export async function getWeeklyTrend(
   orgId: string,
   userId?: string
 ): Promise<Array<{ name: string; reports: number }>> {
+  await assertUserCanAccessOrg(orgId);
+
   try {
     const baseWhere: Prisma.FormSubmissionWhereInput = { orgId };
 

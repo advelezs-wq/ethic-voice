@@ -54,11 +54,25 @@ export async function assignMembersToReport(
   members: AssignMemberInput[]
 ): Promise<void> {
   const { userId: currentUserId } = await auth();
-  const orgId = await resolveOrgId();
-
-  if (!currentUserId || !orgId) {
+  if (!currentUserId) {
     throw new Error("No autorizado");
   }
+
+  // Derive orgId from the report itself rather than resolveOrgId()'s single
+  // cookie-selected org: a superadmin browsing "Todas las Organizaciones"
+  // routinely has a different org selected than whatever report they click
+  // into, which made every assignment on a cross-org report fail (bogus-id
+  // or "Reporte no encontrado", depending on membership overlap) instead of
+  // working like the rest of the global view already does. This is also
+  // strictly safer — it ties the permission check to the record actually
+  // being modified instead of ambient session state.
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+  });
+  if (!report) {
+    throw new Error("Reporte no encontrado");
+  }
+  const orgId = report.orgId;
 
   await assertOrgAdmin(currentUserId, orgId, "No tienes permisos para asignar investigadores");
 
@@ -78,18 +92,6 @@ export async function assignMembersToReport(
   const bogusIds = memberIds.filter((id) => !realMemberIds.has(id));
   if (bogusIds.length > 0) {
     throw new Error("Uno o más usuarios no pertenecen a esta organización");
-  }
-
-  // Verify report exists and belongs to organization
-  const report = await prisma.formSubmission.findFirst({
-    where: {
-      id: reportId,
-      orgId,
-    },
-  });
-
-  if (!report) {
-    throw new Error("Reporte no encontrado");
   }
 
   try {
@@ -192,11 +194,21 @@ export async function removeAssignmentFromReport(
   userId: string
 ): Promise<void> {
   const { userId: currentUserId } = await auth();
-  const orgId = await resolveOrgId();
-
-  if (!currentUserId || !orgId) {
+  if (!currentUserId) {
     throw new Error("No autorizado");
   }
+
+  // See assignMembersToReport — orgId comes from the report itself, not the
+  // caller's cookie-selected org, so this works from the superadmin global
+  // view regardless of which org happens to be currently selected.
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: { orgId: true },
+  });
+  if (!report) {
+    throw new Error("Reporte no encontrado");
+  }
+  const orgId = report.orgId;
 
   await assertOrgAdmin(currentUserId, orgId, "No tienes permisos para remover investigadores");
 
@@ -436,8 +448,15 @@ export async function reassignReportMember(
   reason: string
 ): Promise<void> {
   const { userId: currentUserId } = await auth();
-  const orgId = await resolveOrgId();
-  if (!currentUserId || !orgId) throw new Error("No autorizado");
+  if (!currentUserId) throw new Error("No autorizado");
+
+  // See assignMembersToReport — orgId comes from the report itself.
+  const reportForOrg = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: { orgId: true },
+  });
+  if (!reportForOrg) throw new Error("Reporte no encontrado");
+  const orgId = reportForOrg.orgId;
 
   await assertOrgAdmin(currentUserId, orgId, "No tienes permisos para reasignar investigadores");
 
@@ -535,9 +554,16 @@ export async function escalateReport(
   data: { reason: string; escalatedToName: string; escalatedToEmail?: string }
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
-  if (!userId || !orgId || !user) throw new Error("No autorizado");
+  if (!userId || !user) throw new Error("No autorizado");
+
+  // See assignMembersToReport — orgId comes from the report itself.
+  const reportForOrg = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: { orgId: true },
+  });
+  if (!reportForOrg) throw new Error("Reporte no encontrado");
+  const orgId = reportForOrg.orgId;
 
   await assertOrgAdmin(userId, orgId, "Solo un administrador puede escalar un caso");
 

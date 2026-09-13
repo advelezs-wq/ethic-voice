@@ -62,7 +62,7 @@ export default function SuperAdminTools() {
                 <Button
                   onPress={() =>
                     run("daily-digests", "/api/digest/daily", {
-                      headers: { "x-vercel-cron": "1" },
+                      method: "POST",
                     })
                   }
                   isLoading={loading === "daily-digests"}
@@ -73,7 +73,7 @@ export default function SuperAdminTools() {
                 <Button
                   onPress={() =>
                     run("weekly-digests", "/api/digest/weekly", {
-                      headers: { "x-vercel-cron": "1" },
+                      method: "POST",
                     })
                   }
                   isLoading={loading === "weekly-digests"}

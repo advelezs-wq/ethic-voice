@@ -12,7 +12,7 @@ import {
   createEmailWorker,
   submissionQueue,
 } from "@/modules/app/lib/queue/queue-manager";
-import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
+import { verifyCronAdminOrSuperAdmin } from "@/lib/security/cron-auth";
 // Removed env gating; always process queues
 
 // Manual queue processing endpoint for deployment environments
@@ -20,7 +20,7 @@ import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
 export async function POST(request: NextRequest) {
   console.log("🔄 [API] Manual queue processing triggered");
 
-  if (!verifyCronOrAdminRequest(request)) {
+  if (!(await verifyCronAdminOrSuperAdmin(request))) {
     console.error("❌ [API] Unauthorized access attempt to admin endpoint");
     return NextResponse.json(
       { error: "Unauthorized - Invalid or missing API key" },
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
 // Get queue status
 export async function GET(request: NextRequest) {
   // Verify authentication for health check too
-  if (!verifyCronOrAdminRequest(request)) {
+  if (!(await verifyCronAdminOrSuperAdmin(request))) {
     console.error("❌ [API] Unauthorized access attempt to admin health check");
     return NextResponse.json(
       { error: "Unauthorized - Invalid or missing API key" },

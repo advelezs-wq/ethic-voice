@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { digestService } from '@/modules/app/services/digest.service';
-import { verifyCronOrAdminRequest } from '@/lib/security/cron-auth';
+import { verifyCronAdminOrSuperAdmin } from '@/lib/security/cron-auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,12 +14,14 @@ export async function POST(request: NextRequest) {
     // CRITICAL: this used to let the x-vercel-cron header alone bypass the
     // DIGEST_CRON_TOKEN check entirely — that header isn't verified/stripped
     // by Vercel's edge on inbound requests, so anyone could set it and skip
-    // the real token check. Accept either a genuine cron/admin secret
-    // (verifyCronOrAdminRequest) or the DIGEST_CRON_TOKEN bearer token.
+    // the real token check. Accept either a genuine cron/admin secret, an
+    // authenticated superadmin (this is also triggered manually from
+    // /app/superadmin/tools's "Ejecutar Weekly Digest" button), or the
+    // DIGEST_CRON_TOKEN bearer token.
     const authHeader = request.headers.get('authorization');
     const expectedToken = process.env.DIGEST_CRON_TOKEN;
 
-    const hasCronOrAdminAuth = verifyCronOrAdminRequest(request);
+    const hasCronOrAdminAuth = await verifyCronAdminOrSuperAdmin(request);
     const hasDigestToken =
       !!expectedToken && authHeader === `Bearer ${expectedToken}`;
 
@@ -49,7 +51,7 @@ export async function POST(request: NextRequest) {
 // Also allow GET from Vercel Cron (no auth header) and internal daily-runner
 export async function GET(request: NextRequest) {
   try {
-    if (verifyCronOrAdminRequest(request)) {
+    if (await verifyCronAdminOrSuperAdmin(request)) {
       await digestService.sendWeeklyDigests();
       return NextResponse.json({
         success: true,

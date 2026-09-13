@@ -57,34 +57,62 @@ export function ChatMessage({
     await onDelete(message.id);
   };
 
-  const renderContent = (content: string) => {
-    if (!message.mentions || message.mentions.length === 0) {
-      // Replace task refs like #t123 with links to tasks tab
-      const withTasks = content.replace(
-        /#t(\d+)/g,
-        (_m, id) =>
-          `<a href="?tab=tasks&task=${id}" class="text-sky-700 underline">#t${id}</a>`
-      );
-      return withTasks;
+  const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  // Highlights @mentions and links #t123 task refs without ever putting
+  // message content through dangerouslySetInnerHTML. Message content is
+  // free text written by any org member with report access — rendering it
+  // as raw HTML let one member's chat message run arbitrary script in
+  // every other viewer's session (including admins), a stored XSS with a
+  // real privilege-escalation path since actions in this app are plain
+  // same-origin fetches that ride the viewer's session.
+  const renderContent = (content: string): React.ReactNode => {
+    const mentionNames = (message.mentions || []).map((m) => m.userName);
+    const mentionAlternatives = mentionNames
+      .map((name) => `@${escapeRegExp(name)}`)
+      .join("|");
+    const pattern = mentionAlternatives
+      ? `(${mentionAlternatives})|(#t\\d+)`
+      : `(#t\\d+)`;
+    const regex = new RegExp(pattern, "g");
+
+    const nodes: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    let key = 0;
+
+    while ((match = regex.exec(content)) !== null) {
+      if (match.index > lastIndex) {
+        nodes.push(content.slice(lastIndex, match.index));
+      }
+      const matched = match[0];
+      if (matched.startsWith("@")) {
+        nodes.push(
+          <span
+            key={key++}
+            className="bg-sky-100 text-sky-700 px-1 rounded"
+          >
+            {matched}
+          </span>
+        );
+      } else {
+        const id = matched.slice(2);
+        nodes.push(
+          <a
+            key={key++}
+            href={`?tab=tasks&task=${id}`}
+            className="text-sky-700 underline"
+          >
+            {matched}
+          </a>
+        );
+      }
+      lastIndex = match.index + matched.length;
     }
-
-    let renderedContent = content;
-    message.mentions.forEach((mention) => {
-      const mentionRegex = new RegExp(`@${mention.userName}`, "g");
-      renderedContent = renderedContent.replace(
-        mentionRegex,
-        `<span class="bg-sky-100 text-sky-700 px-1 rounded">@${mention.userName}</span>`
-      );
-    });
-
-    // Also convert task refs when mentions exist
-    renderedContent = renderedContent.replace(
-      /#t(\d+)/g,
-      (_m, id) =>
-        `<a href="?tab=tasks&task=${id}" class="text-sky-700 underline">#t${id}</a>`
-    );
-
-    return <div dangerouslySetInnerHTML={{ __html: renderedContent }} />;
+    if (lastIndex < content.length) {
+      nodes.push(content.slice(lastIndex));
+    }
+    return nodes;
   };
 
   return (
@@ -178,9 +206,7 @@ export function ChatMessage({
             />
           ) : (
             <div className="whitespace-pre-wrap break-words">
-              {typeof renderContent(message.content) === "string"
-                ? renderContent(message.content)
-                : renderContent(message.content)}
+              {renderContent(message.content)}
             </div>
           )}
 

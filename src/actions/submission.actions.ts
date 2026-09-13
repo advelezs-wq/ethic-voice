@@ -2,6 +2,7 @@
 "use server";
 
 import prisma from "@/modules/prisma/lib/prisma";
+import { assertUserCanAccessOrg } from "@/modules/core/utils/org-resolver";
 import { SubmissionSource, SubmissionMetadata } from "@/types/submission.types";
 // import { headers } from "next/headers";
 import { z } from "zod";
@@ -708,7 +709,14 @@ export async function submitEthicLineReport(
 
 // Removed unused getIrregularityTypeLabel function
 
+// Currently unreachable as a client-invocable Server Action (no client
+// component imports it) — hardened anyway, same reasoning as
+// ethicline.actions.ts's getOrganizationAnalytics: it accepts an arbitrary
+// caller-supplied orgId and returns per-org submission counts/recent report
+// metadata with no auth check at all.
 export async function getSubmissionAnalytics(orgId: string) {
+  await assertUserCanAccessOrg(orgId);
+
   try {
     const [organization, recentSubmissions, submissionsByType] =
       await Promise.all([

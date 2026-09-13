@@ -1,8 +1,28 @@
 "use server";
 
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { RebillService } from "@/modules/app/services/rebill.service";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
+
+// None of this file's functions are currently imported into any client
+// component, so they aren't reachable as Server Actions today — but they're
+// exported from a "use server" file with no auth check at all, and two of
+// them are genuinely dangerous the moment that changes: this one creates a
+// real Rebill subscription/payment link as a side effect (manual dev/QA
+// tool, never meant for a real customer to trigger), and getRebillPayments
+// below returns platform-wide payment records. Gating on superadmin now,
+// before either is wired into any UI.
+async function assertSuperAdmin(): Promise<void> {
+  const { userId } = await auth();
+  if (!userId) throw new Error("No autorizado");
+  const email = (await currentUser())?.primaryEmailAddress?.emailAddress;
+  if (!email || !isSuperAdmin(email)) {
+    throw new Error("No autorizado");
+  }
+}
 
 export async function testRebillIntegration() {
+  await assertSuperAdmin();
   try {
     console.log("🚀 Testing Rebill Integration...");
 
@@ -77,6 +97,7 @@ export async function createRebillCustomer(customerData: {
   lastName?: string;
   phone?: string;
 }) {
+  await assertSuperAdmin();
   try {
     const rebillService = new RebillService();
 
@@ -114,6 +135,7 @@ export async function getRebillPayments(options?: {
   page?: number;
   take?: number;
 }) {
+  await assertSuperAdmin();
   try {
     const rebillService = new RebillService();
 

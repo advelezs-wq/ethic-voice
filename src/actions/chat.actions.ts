@@ -296,12 +296,18 @@ export async function sendMessage(
       },
     });
 
-    // Update attachments with the new message ID
+    // Update attachments with the new message ID. attachmentIds are plain
+    // sequential ints supplied by the client — without the
+    // uploadedByUserId check, any authenticated user could claim another
+    // user's still-orphaned upload (from a different report, even a
+    // different organization) just by guessing a nearby id, leaking that
+    // file into their own case's chat.
     if (options?.attachmentIds && options.attachmentIds.length > 0) {
       await tx.commentAttachment.updateMany({
         where: {
           id: { in: options.attachmentIds },
           commentId: null, // Only update orphaned attachments
+          uploadedByUserId: userId,
         },
         data: { commentId: newMessage.id },
       });
@@ -657,6 +663,8 @@ export async function markAsRead(messageIds: number[]): Promise<void> {
   }
 }
 
+const MAX_CHAT_ATTACHMENT_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+
 export async function uploadAttachment(formData: FormData): Promise<{
   id: number;
   filename: string;
@@ -676,9 +684,38 @@ export async function uploadAttachment(formData: FormData): Promise<{
     throw new Error("No file provided");
   }
 
+  // Reject oversized files before reading them into memory — Cloudinary's
+  // own max_file_size only rejects after this server has already buffered
+  // and base64-encoded the whole file, which is itself a memory-exhaustion
+  // vector for an arbitrarily large upload.
+  if (file.size > MAX_CHAT_ATTACHMENT_SIZE_BYTES) {
+    throw new Error("El archivo excede el tamaño máximo permitido (10MB)");
+  }
+
+  const { ALLOWED_ATTACHMENT_MIME_TYPES, scanUploadedFile } = await import(
+    "@/lib/security/submission-security"
+  );
+  if (!ALLOWED_ATTACHMENT_MIME_TYPES.has(file.type)) {
+    throw new Error("Tipo de archivo no permitido");
+  }
+
   // Convert file to base64
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
+
+  // Chat attachments went straight to Cloudinary with no content
+  // validation at all — no MIME allowlist, no magic-byte check, no
+  // executable-signature check — unlike every other upload path in this
+  // app (submission evidence, reporter chat replies), which all share
+  // scanUploadedFile(). This is a chat any org member can post evidence
+  // into, so it's exactly as untrusted as a public upload.
+  const scanResult = await scanUploadedFile(buffer, file.name, file.type);
+  if (!scanResult.safe) {
+    throw new Error(
+      scanResult.reason || "El archivo no pasó la validación de seguridad"
+    );
+  }
+
   const base64 = buffer.toString("base64");
   const dataURI = `data:${file.type};base64,${base64}`;
 
@@ -686,7 +723,7 @@ export async function uploadAttachment(formData: FormData): Promise<{
   const uploadResponse = await cloudinary.uploader.upload(dataURI, {
     folder: `reports/${orgId}`,
     resource_type: "auto",
-    max_file_size: 10000000, // 10MB
+    max_file_size: MAX_CHAT_ATTACHMENT_SIZE_BYTES,
   });
 
   // Save to database with null commentId - will be updated when message is sent
@@ -697,6 +734,7 @@ export async function uploadAttachment(formData: FormData): Promise<{
       fileUrl: uploadResponse.secure_url,
       fileSize: file.size,
       mimeType: file.type,
+      uploadedByUserId: userId,
     },
   });
 

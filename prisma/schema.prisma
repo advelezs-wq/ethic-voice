@@ -114,6 +114,14 @@ model CommentAttachment {
   mimeType   String
   uploadedAt DateTime @default(now())
 
+  // Set at upload time (uploadAttachment) and checked when a message later
+  // claims an orphaned (commentId: null) attachment by id — ids are a plain
+  // sequential Int with no other ownership check, so without this any
+  // authenticated user could attach another user's still-orphaned upload
+  // (from a different report, even a different organization) to their own
+  // message just by guessing a nearby id.
+  uploadedByUserId String?
+
   @@index([commentId])
 }
 

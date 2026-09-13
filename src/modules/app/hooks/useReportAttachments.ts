@@ -34,12 +34,7 @@ export function useReportAttachments(reportId: number) {
 
     setIsUploading(true);
     try {
-      const newAttachment = await uploadReportAttachment(
-        reportId,
-        file,
-        user.id,
-        user.fullName || "Usuario"
-      );
+      const newAttachment = await uploadReportAttachment(reportId, file);
       setAttachments((prev) => [...prev, newAttachment]);
       return newAttachment;
     } catch (err) {

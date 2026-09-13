@@ -2133,9 +2133,7 @@ export async function getReportAttachments(
 
 export async function uploadReportAttachment(
   reportId: number,
-  file: File,
-  uploadedById?: string,
-  uploadedByName?: string
+  file: File
 ): Promise<ReportAttachment> {
   const { userId: authUserId } = await auth();
   const orgId = await resolveOrgId();
@@ -2144,8 +2142,20 @@ export async function uploadReportAttachment(
     throw new Error("Unauthorized");
   }
 
-  const actualUploadedById = uploadedById || authUserId;
-  const actualUploadedByName = uploadedByName || "Current User";
+  // uploadedById/uploadedByName used to be caller-supplied parameters that
+  // both real call sites always omitted — the only effect was that a
+  // Server Action call crafted outside the normal UI could name any
+  // uploader it liked, forging who added a piece of evidence. This app
+  // handles chain-of-custody-sensitive material, so attribution always
+  // comes from the authenticated session now, never the caller.
+  const uploaderUser = await currentUser();
+  const actualUploadedById = authUserId;
+  const actualUploadedByName =
+    [uploaderUser?.firstName, uploaderUser?.lastName]
+      .filter(Boolean)
+      .join(" ") ||
+    uploaderUser?.primaryEmailAddress?.emailAddress ||
+    "Usuario desconocido";
 
   const report = await prisma.formSubmission.findFirst({
     where: { id: reportId, orgId },
@@ -2155,9 +2165,32 @@ export async function uploadReportAttachment(
     throw new Error("Report not found");
   }
 
+  // Reject oversized files before reading them into memory — Cloudinary's
+  // own max_file_size only rejects after this server has already buffered
+  // and base64-encoded the whole file.
+  const MAX_REPORT_ATTACHMENT_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
+  if (file.size > MAX_REPORT_ATTACHMENT_SIZE_BYTES) {
+    throw new Error("El archivo excede el tamaño máximo permitido (50MB)");
+  }
+
   // Upload to Cloudinary
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
+
+  // Cloudinary's allowed_formats below checks extension/format, not file
+  // content — bring this in line with scanUploadedFile(), the same
+  // magic-byte + executable-signature check every other upload path in
+  // this app (public submission evidence, chat attachments) already uses.
+  const { scanUploadedFile } = await import(
+    "@/lib/security/submission-security"
+  );
+  const scanResult = await scanUploadedFile(buffer, file.name, file.type);
+  if (!scanResult.safe) {
+    throw new Error(
+      scanResult.reason || "El archivo no pasó la validación de seguridad"
+    );
+  }
+
   const base64 = buffer.toString("base64");
   const dataURI = `data:${file.type};base64,${base64}`;
 

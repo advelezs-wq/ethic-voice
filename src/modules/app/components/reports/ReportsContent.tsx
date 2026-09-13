@@ -203,13 +203,21 @@ export function ReportsContent({
         </div>
       )}
 
-      {/* Show stats only if available */}
+      {/* Show stats only if available. Detailed stats are per-organization
+          (loadReportsStats is only called when organizationId is set, just
+          below) — the superadmin's global "all organizations" scope has no
+          single orgId to fetch them for, which isn't a failure and
+          shouldn't read as one. */}
       {reportsStats ? (
         <ReportsStats stats={reportsStats} />
       ) : (
         <div className="text-center py-8">
           {reportsStatsLoading ? (
             <p className="text-slate-400">Cargando estadísticas...</p>
+          ) : !organizationId ? (
+            <p className="text-slate-400">
+              Selecciona una organización específica para ver sus estadísticas detalladas.
+            </p>
           ) : (
             <p className="text-slate-400">
               No se pudieron cargar las estadísticas

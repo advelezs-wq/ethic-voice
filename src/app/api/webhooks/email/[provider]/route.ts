@@ -1,7 +1,16 @@
 import { EmailWebhookService } from "@/modules/app/services/email-account.service";
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
+import {
+  securityManager,
+  getClientIP,
+} from "@/modules/app/lib/security/rate-limiter";
 
+// This route has no spam scoring, unlike /api/webhooks/email/secure — it
+// exists for direct/manual provider testing (see EmailAccountService's own
+// comment on the ImprovMX-specific route). Without at least a rate limit,
+// anyone holding the shared webhook secret could bypass every anti-abuse
+// control on /secure simply by posting here instead.
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ provider: string }> }
@@ -15,6 +24,18 @@ export async function POST(
     const isValid = await verifyWebhookSignature(req, provider, data);
     if (!isValid) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+    }
+
+    const clientIP = getClientIP(req);
+    const rateLimitResult = await securityManager.checkRateLimit({
+      type: "email",
+      identifier: clientIP,
+    });
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded" },
+        { status: 429 }
+      );
     }
 
     const webhookService = new EmailWebhookService();
@@ -70,6 +91,19 @@ async function verifyWebhookSignature(
         const signature = String(parsedBody.signature || "");
 
         if (signingKey && timestamp && token && signature) {
+          // Mailgun signatures never expire on their own — without a
+          // freshness check, a single captured (timestamp, token,
+          // signature) triple stays a forever-valid credential that can be
+          // replayed at will. Reject anything outside a 5-minute window.
+          const timestampSeconds = Number(timestamp);
+          const nowSeconds = Date.now() / 1000;
+          if (
+            !Number.isFinite(timestampSeconds) ||
+            Math.abs(nowSeconds - timestampSeconds) > 300
+          ) {
+            return false;
+          }
+
           const expected = createHmac("sha256", signingKey)
             .update(`${timestamp}${token}`)
             .digest("hex");

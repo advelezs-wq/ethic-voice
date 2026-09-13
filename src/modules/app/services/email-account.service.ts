@@ -484,12 +484,25 @@ export class EmailWebhookService {
   }
 
   private async identifyOrganization(toEmail: string) {
-    // Extraer alias del email
-    const [localPart] = toEmail.split("@");
+    const normalizedToEmail = toEmail.trim().toLowerCase();
+    const [localPart, domain] = normalizedToEmail.split("@");
+    const forwardingDomain = (
+      process.env.FORWARDING_DOMAIN || "ethicvoice.co"
+    ).toLowerCase();
+
+    // Only trust the alias-only match when the recipient's domain is our own
+    // forwarding domain. Matching on emailAlias alone (ignoring the domain
+    // entirely) would let a request naming an arbitrary domain impersonate
+    // any organization just by guessing its alias — the emailAddress match
+    // above already covers the real, full address safely.
+    const aliasMatchesOwnDomain = domain === forwardingDomain;
 
     const config = await prisma.emailConfiguration.findFirst({
       where: {
-        OR: [{ emailAddress: toEmail }, { emailAlias: localPart }],
+        OR: [
+          { emailAddress: { equals: normalizedToEmail, mode: "insensitive" } },
+          ...(aliasMatchesOwnDomain ? [{ emailAlias: localPart }] : []),
+        ],
         isActive: true,
       },
       include: {

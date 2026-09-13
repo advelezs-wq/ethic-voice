@@ -20,19 +20,24 @@ const emailRateLimits = {
   perSubject: 5, // Max 5 emails with similar subject per hour
 };
 
-// Spam detection patterns
+// Spam detection patterns. Word boundaries (\b) matter here: this channel
+// receives real ethics reports in Spanish, and unbounded substring matches
+// like /urgent/i or /test/i false-positive on ordinary Spanish words —
+// "URGENTE" (a completely normal subject for a real report), "testimonio",
+// "testigo" (witness), and "freelance" all contain those English substrings
+// and were being scored as spam indicators.
 const spamPatterns = {
   subjects: [
-    /test/i,
-    /spam/i,
-    /free/i,
-    /urgent/i,
-    /click here/i,
-    /limited time/i,
-    /act now/i,
-    /congratulations/i,
-    /winner/i,
-    /prize/i,
+    /\btest\b/i,
+    /\bspam\b/i,
+    /\bfree\b/i,
+    /\burgent\b/i,
+    /\bclick here\b/i,
+    /\blimited time\b/i,
+    /\bact now\b/i,
+    /\bcongratulations\b/i,
+    /\bwinner\b/i,
+    /\bprize\b/i,
   ],
   senders: [
     /noreply/i,
@@ -45,10 +50,10 @@ const spamPatterns = {
   content: [
     /http:\/\//gi, // Excessive HTTP links
     /https:\/\//gi, // Excessive HTTPS links
-    /buy now/i,
-    /discount/i,
-    /offer/i,
-    /sale/i,
+    /\bbuy now\b/i,
+    /\bdiscount\b/i,
+    /\boffer\b/i,
+    /\bsale\b/i,
   ],
 };
 
@@ -211,14 +216,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // The sender's real address is the only identifier that varies between
+    // reporters — `clientIP` here is always the forwarding provider's own
+    // IP, shared by every organization on the platform. A prior version of
+    // this check blocked `clientIP` on a high spam score, which meant one
+    // spammy (or misclassified legitimate) email to any customer's public
+    // {slug}@ethicvoice.co address could take down inbound email for every
+    // customer for an hour. Block the sender instead.
+    const senderBlockResult = await securityManager.checkRateLimit({
+      type: 'email',
+      identifier: emailData.sender,
+    });
+    if (!senderBlockResult.allowed && senderBlockResult.reason === 'IP temporarily blocked') {
+      return NextResponse.json(
+        { error: 'Sender temporarily blocked due to spam indicators' },
+        { status: 403 }
+      );
+    }
+
     // Calculate spam score
     const spamScore = calculateSpamScore(emailData);
 
     if (spamScore >= 70) {
       securityManager.logAttack(clientIP, 'Spam Detection', `High spam score (${spamScore}) from ${emailData.sender}`);
 
-      // Block the IP for repeated spam attempts
-      securityManager.blockIP(clientIP, 3600000); // 1 hour
+      // Block the sender's address, never the shared forwarding-provider IP.
+      securityManager.blockIP(emailData.sender, 3600000); // 1 hour
 
       return NextResponse.json(
         { error: 'Email rejected due to spam indicators' },

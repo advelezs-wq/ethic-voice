@@ -15,6 +15,7 @@ import {
   Tooltip,
 } from "@heroui/react";
 import Link from "next/link";
+import { EmptyState } from "@/modules/app/components/ui";
 import { AssignMembersModal } from "./AssignMembersModal";
 import { useOrganization } from "@/modules/app/hooks/useOrganization";
 import { useDisclosure } from "@heroui/react";
@@ -326,6 +327,16 @@ export function ReportsTable({
       setDeletingReportId(null);
     }
   };
+
+  if (reports.length === 0) {
+    return (
+      <EmptyState
+        icon={<i className="icon-[lucide--inbox] size-6" />}
+        title="No hay denuncias que coincidan"
+        description="Ajusta los filtros o el término de búsqueda para ver otros resultados."
+      />
+    );
+  }
 
   if (viewMode === "cards") {
     return (

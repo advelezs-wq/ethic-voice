@@ -267,21 +267,37 @@ export async function POST(req: NextRequest) {
       process.env.MP_WEBHOOK_SECRET ||
       process.env.MERCADOPAGO_WEBHOOK_SECRET ||
       "";
-    if (webhookSecret) {
-      const validSignature = verifyMercadoPagoWebhookSignature({
-        dataId: dataIdForSignature,
-        requestId,
-        signatureHeader,
-        secret: webhookSecret,
-      });
+    // Fail closed: this handler activates real subscriptions and flips
+    // organization plan access based on the payload it receives, so an
+    // unsigned request must never be trusted. The previous `if
+    // (webhookSecret)` guard skipped verification entirely — accepting any
+    // payload unchecked — whenever the secret env var wasn't set, which is
+    // its current state even in this repo's own .env. A misconfigured or
+    // missing secret must block processing, not silently disable the check
+    // that exists specifically to stop forged "payment approved" events
+    // from activating a plan for free.
+    if (!webhookSecret) {
+      console.error(
+        `⚠️ [MP-WEBHOOK][${reqId}] MP_WEBHOOK_SECRET is not configured — rejecting webhook`,
+      );
+      return NextResponse.json(
+        { ok: false, error: "Webhook secret not configured" },
+        { status: 500 },
+      );
+    }
+    const validSignature = verifyMercadoPagoWebhookSignature({
+      dataId: dataIdForSignature,
+      requestId,
+      signatureHeader,
+      secret: webhookSecret,
+    });
 
-      if (!validSignature) {
-        console.warn(`⚠️ [MP-WEBHOOK][${reqId}] Invalid signature`);
-        return NextResponse.json(
-          { ok: false, error: "Invalid signature" },
-          { status: 401 },
-        );
-      }
+    if (!validSignature) {
+      console.warn(`⚠️ [MP-WEBHOOK][${reqId}] Invalid signature`);
+      return NextResponse.json(
+        { ok: false, error: "Invalid signature" },
+        { status: 401 },
+      );
     }
 
     const reservation = await reserveWebhookEvent({

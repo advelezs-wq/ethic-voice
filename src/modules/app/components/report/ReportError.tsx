@@ -1,16 +1,31 @@
+"use client";
+
 import React from "react";
+import { useRouter } from "next/navigation";
 
 interface ReportErrorProps {
   error: string;
-  onRetry?: () => void;
-  onGoBack?: () => void;
+  /** Show the "Intentar nuevamente" button, which reloads the current route. */
+  showRetry?: boolean;
+  /** Show the "Volver" button, which navigates to the reports list. */
+  showGoBack?: boolean;
 }
 
 export const ReportError: React.FC<ReportErrorProps> = ({
   error,
-  onRetry,
-  onGoBack,
+  showRetry,
+  showGoBack,
 }) => {
+  const router = useRouter();
+  // Functions can't cross the Server->Client Component prop boundary (this
+  // is rendered from a Server Component's catch block), so navigation is
+  // handled here with the client-side router instead of callback props —
+  // passing plain closures like `onGoBack={() => redirect(...)}` silently
+  // crashed the whole page with a generic, digest-only RSC render error,
+  // masking the actual error message this component exists to show.
+  const onRetry = () => router.refresh();
+  const onGoBack = () => router.push("/app/reports");
+
   return (
     <div className="min-h-screen bg-emerald-50/40 flex items-center justify-center">
       <div className="max-w-md w-full mx-4">
@@ -33,7 +48,7 @@ export const ReportError: React.FC<ReportErrorProps> = ({
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            {onRetry && (
+            {showRetry && (
               <button
                 onClick={onRetry}
                 className="flex items-center justify-center space-x-2 bg-[#0d212c] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#0d212c]/90 transition-colors"
@@ -47,7 +62,7 @@ export const ReportError: React.FC<ReportErrorProps> = ({
               </button>
             )}
 
-            {onGoBack && (
+            {showGoBack && (
               <button
                 onClick={onGoBack}
                 className="flex items-center justify-center space-x-2 bg-emerald-100 text-slate-600 px-6 py-2 rounded-lg font-medium hover:bg-emerald-200 transition-colors"

@@ -1608,17 +1608,25 @@ export async function bulkUpdateReports(
 
 export async function getReport(reportId: number): Promise<FormSubmission> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
 
-  if (!userId || !orgId) {
+  // Mirror resolveReportsScope()'s global-scope check (used by the reports
+  // list) — a superadmin viewing "Todas las organizaciones" sees reports
+  // across every org with no orgId filter, but this detail lookup used to
+  // always scope to resolveOrgId()'s single cookie-selected org. Clicking
+  // into any report belonging to a *different* org than whatever org
+  // happened to be last selected threw "Report not found" even though the
+  // report was right there in the list the admin clicked it from.
+  const { orgId, isGlobalScope } = await resolveReportsScope();
+
+  if (!isGlobalScope && !orgId) {
     throw new Error("Unauthorized");
   }
 
   const report = await prisma.formSubmission.findFirst({
-    where: {
-      id: reportId,
-      orgId,
-    },
+    where: isGlobalScope ? { id: reportId } : { id: reportId, orgId: orgId as string },
     include: {
       department: {
         select: {
@@ -1653,9 +1661,12 @@ export async function getReport(reportId: number): Promise<FormSubmission> {
       // canViewAllReports is true for ADMIN, VIEWER (oversight), and
       // SUPER_ADMIN alike — false for a MEMBER who isn't assigned, which
       // is exactly who a confidential case needs to be hidden from.
+      // Use the report's own org, not the resolver's org — in global scope
+      // they can legitimately differ, and the permission check must run
+      // against the org the report actually belongs to.
       const canBypass = await userHasPermission(
         userId,
-        orgId,
+        report.orgId,
         "canViewAllReports",
         userEmail
       );

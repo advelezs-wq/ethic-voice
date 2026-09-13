@@ -33,7 +33,7 @@ export default async function ReportDetailsPage({
           <main className="pt-20">
             <ReportError
               error="No se pudo procesar el contenido del reporte"
-              onGoBack={() => redirect("/app/reports")}
+              showGoBack
             />
           </main>
         </div>
@@ -86,7 +86,7 @@ export default async function ReportDetailsPage({
                 ? error.message
                 : "Error al cargar el reporte"
             }
-            onGoBack={() => redirect("/app/reports")}
+            showGoBack
           />
         </main>
       </div>

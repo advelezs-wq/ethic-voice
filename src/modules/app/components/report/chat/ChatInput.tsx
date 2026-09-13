@@ -24,11 +24,12 @@ interface ChatInputProps {
   isReportClosed?: boolean;
 }
 
-export function ChatInput({ 
-  onSendMessage, 
-  onTyping, 
-  disabled = false, 
-  isReportClosed = false 
+export function ChatInput({
+  reportId,
+  onSendMessage,
+  onTyping,
+  disabled = false,
+  isReportClosed = false
 }: ChatInputProps) {
   const { user } = useUser();
   const [message, setMessage] = useState("");
@@ -331,6 +332,7 @@ export function ChatInput({
 
           {!isInputDisabled && (
             <MentionAutocomplete
+              reportId={reportId}
               value={message}
               onSelectMention={(mention) => {
                 setMentions((prev) => [...prev, mention]);

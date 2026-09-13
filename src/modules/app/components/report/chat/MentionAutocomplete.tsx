@@ -2,14 +2,17 @@
 
 import { cn } from "@heroui/react";
 import React, { useState, useEffect, useRef } from "react";
+import { searchMentionCandidates } from "@/actions/chat.actions";
 
 interface MentionAutocompleteProps {
+  reportId: number;
   value: string;
   onSelectMention: (mention: { userId: string; userName: string }) => void;
   className?: string;
 }
 
 export function MentionAutocomplete({
+  reportId,
   value,
   onSelectMention,
   className,
@@ -21,11 +24,6 @@ export function MentionAutocomplete({
   >([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  //   const { user } = useUser();
-  //   const { userMemberships } = useOrganizationList({
-  //     userMemberships: { infinite: true },
-  //   });
 
   useEffect(() => {
     const lastAtIndex = value.lastIndexOf("@");
@@ -50,22 +48,25 @@ export function MentionAutocomplete({
       return;
     }
 
-    // Get organization members (mock data - replace with actual API call)
-    const mockUsers = [
-      { userId: "user_1", userName: "John Doe" },
-      { userId: "user_2", userName: "Jane Smith" },
-      { userId: "user_3", userName: "Mike Johnson" },
-      { userId: "user_4", userName: "Sarah Williams" },
-      { userId: "user_5", userName: "Tom Brown" },
-    ];
+    let cancelled = false;
+    const timeoutId = setTimeout(async () => {
+      try {
+        const results = await searchMentionCandidates(reportId, searchTerm);
+        if (!cancelled) {
+          setSuggestions(results);
+          setSelectedIndex(0);
+        }
+      } catch (error) {
+        console.error("Error searching mention candidates:", error);
+        if (!cancelled) setSuggestions([]);
+      }
+    }, 250);
 
-    const filtered = mockUsers.filter((user) =>
-      user.userName.toLowerCase().includes(searchTerm)
-    );
-
-    setSuggestions(filtered);
-    setSelectedIndex(0);
-  }, [searchTerm, showSuggestions]);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, [reportId, searchTerm, showSuggestions]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

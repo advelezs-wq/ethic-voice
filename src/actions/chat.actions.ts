@@ -206,6 +206,52 @@ export async function getReportMessages(
   };
 }
 
+// Powers the @mention autocomplete in the chat composer. Scoped by the
+// report's own organization (via assertUserCanAccessReport) rather than a
+// caller-supplied orgId, so a caller can't probe another organization's
+// roster by passing an arbitrary reportId — access is denied the same way
+// reading the report itself would be.
+export async function searchMentionCandidates(
+  reportId: number,
+  query: string
+): Promise<Array<{ userId: string; userName: string }>> {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error("No autorizado");
+  }
+
+  const { orgId } = await (
+    await import("@/modules/core/utils/org-resolver")
+  ).assertUserCanAccessReport(reportId);
+
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  const members = await prisma.organizationMembership.findMany({
+    where: {
+      orgId,
+      user: {
+        OR: [
+          { firstName: { contains: trimmed, mode: "insensitive" } },
+          { lastName: { contains: trimmed, mode: "insensitive" } },
+          { email: { contains: trimmed, mode: "insensitive" } },
+        ],
+      },
+    },
+    include: { user: true },
+    take: 8,
+  });
+
+  return members
+    .filter((m) => m.userId !== userId)
+    .map((m) => ({
+      userId: m.userId,
+      userName:
+        [m.user.firstName, m.user.lastName].filter(Boolean).join(" ") ||
+        m.user.email,
+    }));
+}
+
 export async function sendMessage(
   reportId: number,
   content: string,

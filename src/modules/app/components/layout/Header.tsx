@@ -143,7 +143,7 @@ export function Header() {
               />
             }
           >
-            Crear Reporte
+            <span className="hidden sm:inline">Crear Reporte</span>
           </AppButton>
         )}
 
@@ -156,14 +156,14 @@ export function Header() {
                 onPress={goBackToSuperAdminPanel}
                 startContent={<i className="icon-[lucide--arrow-left] size-4" />}
               >
-                Volver a Super Admin
+                <span className="hidden sm:inline">Volver a Super Admin</span>
               </Button>
             )}
             <Dropdown>
               <DropdownTrigger>
                 <Button
                   variant="flat"
-                  className="min-w-[170px] sm:min-w-[230px] max-w-[280px] justify-start border border-emerald-200 bg-emerald-50/60"
+                  className="min-w-0 sm:min-w-[230px] max-w-[280px] justify-start border border-emerald-200 bg-emerald-50/60"
                 >
                   <span className="inline-flex min-w-0 items-center gap-2">
                     <span
@@ -257,7 +257,7 @@ export function Header() {
                   <i className="icon-[lucide--file-text] size-4" aria-hidden="true" />
                 }
               >
-                Ir a reportes
+                <span className="hidden sm:inline">Ir a reportes</span>
               </Button>
             </Tooltip>
           </div>

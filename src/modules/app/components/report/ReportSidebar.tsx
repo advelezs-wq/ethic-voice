@@ -79,12 +79,12 @@ function SidebarSection({
 }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white/95 shadow-none">
-      <div className="flex items-center justify-between border-b border-emerald-100 bg-emerald-50/40 px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-100 bg-emerald-50/40 px-4 py-3">
         <div className="flex items-center gap-2">
           <i className={`${icon} size-4 text-emerald-700`} />
           <span className="text-sm font-semibold text-[#0d212c]">{title}</span>
         </div>
-        {action && <div>{action}</div>}
+        {action && <div className="flex flex-wrap items-center gap-1.5">{action}</div>}
       </div>
       <div className="p-4">{children}</div>
     </div>
@@ -362,7 +362,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
           icon="icon-[lucide--settings]"
           action={
             permissions.canAssignReports ? (
-              <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-1.5">
                 <Button
                   size="sm"
                   variant="flat"

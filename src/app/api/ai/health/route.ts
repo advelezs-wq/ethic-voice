@@ -1,8 +1,8 @@
 import { getQueueStats, submissionQueue, emailQueue } from "@/modules/app/lib/queue/queue-manager";
+import { queueRedisConnection } from "@/modules/app/lib/queue/redis-config";
 import prisma from "@/modules/prisma/lib/prisma";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
-import IORedis from "ioredis";
 import { NextResponse } from "next/server";
 
 // CRITICAL: this destructured Clerk's own `orgId` from auth() — this app
@@ -28,15 +28,15 @@ export async function GET() {
 
     const orgId: string | null = null;
 
-    // 1. Check Redis connection
+    // 1. Check Redis connection — ping the actual queue connection (picks
+    // UPSTASH_REDIS_URL over REDIS_URL, same as redis-config.ts) rather than
+    // a fresh client hardcoded to REDIS_URL, which falsely reported Redis as
+    // down whenever only UPSTASH_REDIS_URL was configured (the common case
+    // in production).
     let redisStatus = "disconnected";
     try {
-      const redis = new IORedis(
-        process.env.REDIS_URL || "redis://localhost:6379"
-      );
-      await redis.ping();
+      await queueRedisConnection.ping();
       redisStatus = "connected";
-      await redis.quit();
     } catch (error) {
       redisStatus = `error: ${error}`;
     }

@@ -76,8 +76,15 @@ export class BackgroundProcessor {
       }
 
       const content = parsedContent.content || job.rawContent;
-      const metadata =
-        parsedContent.metadata || JSON.parse(job.metadata || "{}");
+      // AiProcessingJob has no `metadata` column — job.metadata was always
+      // undefined here, so this silently dropped submissionId on every
+      // retry and made processSubmission create a brand-new FormSubmission
+      // instead of completing the one this job was actually linked to.
+      // submissionId is a real column on the model; use it directly.
+      const metadata = {
+        ...(parsedContent.metadata || {}),
+        ...(job.submissionId ? { submissionId: job.submissionId } : {}),
+      };
 
       // Extract reporter info if available
       const reporterInfo = {

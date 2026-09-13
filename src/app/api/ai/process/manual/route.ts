@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { SubmissionSource } from "@/types/submission.types";
 import { z } from "zod";
-import {
-  addSubmissionToQueue,
-  submissionQueue,
-} from "@/modules/app/lib/queue/queue-manager";
+import { addSubmissionToQueue } from "@/modules/app/lib/queue/queue-manager";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
 import { submissionProcessor } from "@/modules/app/services/submission-processor.service";
 import { resolveOrgId } from "@/modules/core/utils/org-resolver";
@@ -103,24 +100,17 @@ export async function POST(req: NextRequest) {
         throw syncError;
       }
 
-      const submissionId = validatedData.metadata?.submissionId as
-        | number
-        | undefined;
-      const dedupJobId = submissionId ? `submission-${orgId}-${submissionId}` : null;
-      let alreadyQueued = false;
-      if (dedupJobId) {
-        const existingJob = await submissionQueue.getJob(dedupJobId);
-        alreadyQueued = !!existingJob;
-      }
-
-      const job = alreadyQueued
-        ? { id: dedupJobId }
-        : await addSubmissionToQueue({
-            orgId,
-            content: validatedData.content,
-            source: validatedData.source,
-            metadata: validatedData.metadata,
-          });
+      // addSubmissionToQueue already handles dedup correctly — including
+      // clearing a stale completed/failed job left over from a prior
+      // attempt at this same submissionId, which is exactly the case a
+      // fallback-after-sync-failure needs to actually retry instead of
+      // silently no-op'ing against a job that already finished.
+      const job = await addSubmissionToQueue({
+        orgId,
+        content: validatedData.content,
+        source: validatedData.source,
+        metadata: validatedData.metadata,
+      });
 
       return NextResponse.json({
         success: true,

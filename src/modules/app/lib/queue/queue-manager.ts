@@ -181,17 +181,30 @@ async function notifyAdminsOfPermanentFailure(
     where: { orgId, role: "ADMIN" },
   });
 
+  // Notification.reportId is a real FK — a submissionId that no longer
+  // points to an existing row (e.g. deleted since this job was queued, by
+  // org/case retention or a manual delete) makes the insert itself throw,
+  // silently swallowing the one alert this whole retry path exists to send.
+  // Confirm the row is still there before using it.
+  const submissionStillExists =
+    submissionId != null &&
+    (await prisma.formSubmission.findUnique({
+      where: { id: submissionId },
+      select: { id: true },
+    })) != null;
+  const linkedSubmissionId = submissionStillExists ? submissionId : undefined;
+
   for (const admin of admins) {
     await notificationsService.createNotification({
       userId: admin.userId,
       orgId,
       type: NotificationType.SYSTEM_ALERT,
       title: "Análisis de IA no se pudo completar",
-      message: submissionId
-        ? `El análisis automático del reporte REP-${String(submissionId).padStart(6, "0")} falló tras varios intentos. El reporte sigue disponible; usa el botón "Analizar con IA" para reintentarlo manualmente.`
+      message: linkedSubmissionId
+        ? `El análisis automático del reporte REP-${String(linkedSubmissionId).padStart(6, "0")} falló tras varios intentos. El reporte sigue disponible; usa el botón "Analizar con IA" para reintentarlo manualmente.`
         : `El análisis automático de un reporte falló tras varios intentos y necesita revisión manual.`,
-      actionUrl: submissionId ? `/app/reports/${submissionId}` : "/app/reports",
-      reportId: submissionId,
+      actionUrl: linkedSubmissionId ? `/app/reports/${linkedSubmissionId}` : "/app/reports",
+      reportId: linkedSubmissionId,
       channel: NotificationChannel.IN_APP,
       metadata: { kind: "ai_processing_failed", errorMessage: errorMessage.slice(0, 300) },
     });
@@ -247,6 +260,29 @@ export async function addSubmissionToQueue(data: DirectSubmissionJob) {
       await tempQueue.close();
       console.log(`✅ [QUEUE] (transient) Added submission job ${job.id} to queue for org: ${data.orgId}${data.metadata?.submissionId ? ` (submission: ${data.metadata.submissionId})` : ''}`);
       return job as any;
+    }
+
+    // BullMQ's addStandardJob script returns early (without ever storing the
+    // job or pushing it onto the wait list) whenever a job with this exact
+    // jobId already exists in Redis, no matter its state — completed and
+    // failed jobs included, until removeOnComplete/removeOnFail eventually
+    // evicts them. No error is thrown either, so a caller sees a normal
+    // resolved Job and believes it queued. That silently breaks every retry
+    // path built on this deterministic jobId (the admin requeue endpoint,
+    // and "Analizar con IA" falling back to the queue after a failed sync
+    // attempt) precisely when a submission's prior job permanently failed —
+    // the exact case those retries exist for. So: only treat a still-live
+    // job (waiting/active/delayed/paused) as a genuine duplicate to skip;
+    // clear a finished one first so the retry can actually run again.
+    const existingJob = await submissionQueue.getJob(jobId);
+    if (existingJob) {
+      const state = await existingJob.getState();
+      if (state === "completed" || state === "failed" || state === "unknown") {
+        await existingJob.remove();
+      } else {
+        console.log(`ℹ️ [QUEUE] Job ${jobId} already ${state}, skipping duplicate for org: ${data.orgId}${data.metadata?.submissionId ? ` (submission: ${data.metadata.submissionId})` : ''}`);
+        return existingJob;
+      }
     }
 
     const job = await submissionQueue.add("process-submission", data, {

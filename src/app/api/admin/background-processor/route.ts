@@ -45,8 +45,16 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    if (!verifyCronOrAdminRequest(request)) {
+      const clerkUser = await currentUser();
+      const userEmail = clerkUser?.primaryEmailAddress?.emailAddress;
+      if (!userEmail || !isSuperAdmin(userEmail)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    }
+
     // Get current stats without processing
     const stats = await backgroundProcessor.getStats();
 

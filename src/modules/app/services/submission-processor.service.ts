@@ -74,7 +74,7 @@ export class SubmissionProcessorService {
                 duplicate: {
                   success: true,
                   submissionId: existingSubmission.id,
-                  trackingCode: await createTrackingCode(existingSubmission.id),
+                  trackingCode: `REP-${existingSubmission.trackingToken}`,
                   analysis: existingSubmission.metadata,
                   duplicate: true,
                 },
@@ -117,7 +117,7 @@ export class SubmissionProcessorService {
               duplicate: {
                 success: true,
                 submissionId: existingSubmission.id,
-                trackingCode: await createTrackingCode(existingSubmission.id),
+                trackingCode: `REP-${existingSubmission.trackingToken}`,
                 analysis: existingSubmission.metadata,
                 duplicate: true,
               },
@@ -442,7 +442,7 @@ export class SubmissionProcessorService {
           return {
             success: true,
             submissionId: submission.id,
-            trackingCode: await createTrackingCode(submission.id),
+            trackingCode: `REP-${submission.trackingToken}`,
             analysis,
           };
         },
@@ -738,12 +738,23 @@ export class SubmissionProcessorService {
     // Try to extract a meaningful title based on the type of report
     if (analysis.irregularityType) {
       const typeLabels: Record<string, string> = {
+        // Canonical ids (see IRREGULARITY_TYPES in ethicline.constants.ts,
+        // which is what the AI processor's own enum is kept in sync with)
         corrupcion: "Denuncia de Corrupción",
-        acoso: "Reporte de Acoso",
+        "mal-uso": "Mal Uso de Bienes",
+        "robo-adulteracion": "Robo o Adulteración de Información",
+        "laft-aml": "LA/FT – AML",
+        fraude: "Fraude Detectado",
+        mejora: "Mejora de Procesos",
+        acoso: "Acoso y Discriminación",
+        "abuso-poder": "Abuso de Poder",
+        "reporte-libre": "Reporte Libre",
+        // Legacy ids from before the taxonomy update — kept so historical
+        // reports still render a proper label instead of a raw id string.
         "robo-info": "Fuga de Información",
         discriminacion: "Caso de Discriminación",
         violencia: "Incidente de Violencia",
-        fraude: "Fraude Detectado",
+        "mal-desempeno": "Abuso de Poder",
         otro: "Reporte General",
         otros: "Reporte General",
         indefinido: "Caso sin Clasificar",
@@ -794,15 +805,26 @@ export class SubmissionProcessorService {
    */
   private getCategoryLabel(irregularityType: string): string {
     const labels: Record<string, string> = {
+      // Canonical ids (see IRREGULARITY_TYPES in ethicline.constants.ts,
+      // which is what the AI processor's own enum is kept in sync with)
       corrupcion: "Corrupción",
-      acoso: "Acoso Laboral",
+      "mal-uso": "Mal Uso de Bienes",
+      "robo-adulteracion": "Robo o Adulteración de Información",
+      "laft-aml": "LA/FT – AML",
+      fraude: "Fraude",
+      mejora: "Mejora de Procesos",
+      acoso: "Acoso y Discriminación",
+      "abuso-poder": "Abuso de Poder",
+      "reporte-libre": "Reporte Libre",
+      // Legacy ids from before the taxonomy update — kept so historical
+      // reports still render a proper label instead of a raw id string.
       "robo-info": "Fuga de Información",
       discriminacion: "Discriminación",
       violencia: "Violencia",
-      fraude: "Fraude",
       "conflicto-interes": "Conflicto de Interés",
       "mal-uso-recursos": "Mal Uso de Recursos",
       "incumplimiento-politicas": "Incumplimiento de Políticas",
+      "mal-desempeno": "Abuso de Poder",
       otro: "Otros",
       otros: "Otros",
       indefinido: "Sin Clasificar",

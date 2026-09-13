@@ -72,36 +72,34 @@ export const CreateFormBtn = () => {
             <p>Crea un nuevo formulario para empezar a recibir denuncias</p>
           </ModalHeader>
           <ModalBody>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-2 w-full"
-              >
-                <Controller
-                  control={form.control}
-                  name="name"
-                  render={({ field, fieldState: { error } }) => (
-                    <Input
-                      label="Nombre"
-                      {...field}
-                      errorMessage={error?.message}
-                      isInvalid={error ? true : false}
-                    />
-                  )}
-                />
-                <Controller
-                  control={form.control}
-                  name="description"
-                  render={({ field, fieldState: { error } }) => (
-                    <Textarea
-                      label="Descripción"
-                      {...field}
-                      errorMessage={error?.message}
-                      isInvalid={error ? true : false}
-                    />
-                  )}
-                />
-              </form>
+            <Form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-2 w-full"
+            >
+              <Controller
+                control={form.control}
+                name="name"
+                render={({ field, fieldState: { error } }) => (
+                  <Input
+                    label="Nombre"
+                    {...field}
+                    errorMessage={error?.message}
+                    isInvalid={error ? true : false}
+                  />
+                )}
+              />
+              <Controller
+                control={form.control}
+                name="description"
+                render={({ field, fieldState: { error } }) => (
+                  <Textarea
+                    label="Descripción"
+                    {...field}
+                    errorMessage={error?.message}
+                    isInvalid={error ? true : false}
+                  />
+                )}
+              />
             </Form>
           </ModalBody>
           <ModalFooter className="mt-0">

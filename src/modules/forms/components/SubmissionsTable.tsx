@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@heroui/react";
 import { formatDistance } from "date-fns";
+import { es } from "date-fns/locale";
 
 type Row = {
   [key: string]: string;
@@ -77,7 +78,10 @@ export function SubmissionsTable({ form }: { form: FormWithSubmissions }) {
 
   const renderCell = (row: Row, columnKey: string) => {
     if (columnKey === "submittedAt") {
-      return formatDistance(row.submittedAt, new Date(), { addSuffix: true });
+      return formatDistance(row.submittedAt, new Date(), {
+        addSuffix: true,
+        locale: es,
+      });
     }
 
     const column = columns.find((col) => col.id === columnKey);
@@ -98,7 +102,7 @@ export function SubmissionsTable({ form }: { form: FormWithSubmissions }) {
     ...columns,
     {
       id: "submittedAt",
-      label: "Submitted at",
+      label: "Enviado",
       required: false,
       type: "DateTime" as ElementsType,
     },
@@ -106,7 +110,7 @@ export function SubmissionsTable({ form }: { form: FormWithSubmissions }) {
 
   return (
     <>
-      <h1 className="text-2xl font-bold my-4">Submissions</h1>
+      <h1 className="text-2xl font-bold my-4">Respuestas</h1>
       <div className="rounded-md border">
         <Table aria-label="Form submissions table">
           <TableHeader columns={allColumns}>
@@ -123,7 +127,7 @@ export function SubmissionsTable({ form }: { form: FormWithSubmissions }) {
               </TableColumn>
             )}
           </TableHeader>
-          <TableBody emptyContent="No submissions found" items={rows}>
+          <TableBody emptyContent="No se encontraron respuestas" items={rows}>
             {(item) => (
               <TableRow key={rows.indexOf(item)}>
                 {(columnKey) => (

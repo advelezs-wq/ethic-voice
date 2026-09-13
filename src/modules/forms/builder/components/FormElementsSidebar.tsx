@@ -10,7 +10,7 @@ export const FormElementsSidebar = () => {
       <Divider className="my-2 w-full" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 place-items-center">
         <p className="text-sm text-gray-600 col-span-1 md:col-span-2 my-2 place-self-start">
-          Layout elements
+          Elementos de diseño
         </p>
         <SidebarBtnElement formElement={FormElements.TitleField} />
         <SidebarBtnElement formElement={FormElements.SubTitleField} />
@@ -18,7 +18,7 @@ export const FormElementsSidebar = () => {
         <SidebarBtnElement formElement={FormElements.SeparatorField} />
         <SidebarBtnElement formElement={FormElements.SpacerField} />
         <p className="text-sm text-gray-600 col-span-1 md:col-span-2 my-2 place-self-start">
-          Form elements
+          Elementos de formulario
         </p>
         <SidebarBtnElement formElement={FormElements.TextField} />
         <SidebarBtnElement formElement={FormElements.NumberField} />

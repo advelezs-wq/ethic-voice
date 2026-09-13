@@ -27,9 +27,9 @@ const type: ElementsType = "SelectField";
 
 const extraAttributes = {
   label: "Campo de selección",
-  helperText: "Helper text",
+  helperText: "Texto de ayuda",
   required: false,
-  placeHolder: "Value here...",
+  placeHolder: "Escribe aquí...",
   options: [],
 };
 
@@ -196,8 +196,7 @@ function PropertiesComponent({
   }
 
   return (
-    <Form {...form}>
-      <form className="space-y-3 w-full">
+    <Form className="space-y-3 w-full">
         <Controller
           control={form.control}
           name="label"
@@ -206,7 +205,7 @@ function PropertiesComponent({
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();
               }}
-              label="Label"
+              label="Etiqueta"
               {...field}
               errorMessage={error?.message}
               isInvalid={error ? true : false}
@@ -221,7 +220,7 @@ function PropertiesComponent({
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();
               }}
-              label="Place holder"
+              label="Texto de ejemplo"
               {...field}
               errorMessage={error?.message}
               isInvalid={error ? true : false}
@@ -236,7 +235,7 @@ function PropertiesComponent({
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();
               }}
-              label="Helper text"
+              label="Texto de ayuda"
               {...field}
               errorMessage={error?.message}
               isInvalid={error ? true : false}
@@ -250,7 +249,7 @@ function PropertiesComponent({
           render={({ field }) => (
             <>
               <div className="flex justify-between items-center">
-                <p>Options</p>
+                <p>Opciones</p>
                 <Button
                   variant="light"
                   startContent={
@@ -262,10 +261,10 @@ function PropertiesComponent({
                   }
                   onClick={(e) => {
                     e.preventDefault();
-                    form.setValue("options", field.value?.concat("New option"));
+                    form.setValue("options", field.value?.concat("Nueva opción"));
                   }}
                 >
-                  Add
+                  Agregar
                 </Button>
               </div>
               <div className="flex flex-col gap-2">
@@ -311,7 +310,7 @@ function PropertiesComponent({
           name="required"
           render={({ field }) => (
             <div className="bg-[#f4f4f5] py-2 px-2 rounded-lg flex items-center justify-between">
-              <h3>Is required?</h3>
+              <h3>¿Es obligatorio?</h3>
               <Switch checked={field.value} onValueChange={field.onChange} />
             </div>
           )}
@@ -322,9 +321,8 @@ function PropertiesComponent({
           className="w-full bg-black text-white"
           onClick={form.handleSubmit(applyChanges)}
         >
-          Save
+          Guardar
         </Button>
-      </form>
     </Form>
   );
 }

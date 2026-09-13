@@ -115,12 +115,13 @@ function PropertiesComponent({
   }
 
   return (
-    <Form {...form}>
-      <form
+    <Form
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}
+    >
+      <div
         onBlur={form.handleSubmit(applyChanges)}
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
         className="space-y-3 w-full"
       >
         <Controller
@@ -151,7 +152,7 @@ function PropertiesComponent({
             </>
           )}
         />
-      </form>
+      </div>
     </Form>
   );
 }

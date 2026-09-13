@@ -46,7 +46,7 @@ export const PublishFormBtn = ({ id }: { id: number }) => {
           />
         }
       >
-        Publish
+        Publicar
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>

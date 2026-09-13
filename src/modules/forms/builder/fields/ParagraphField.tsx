@@ -15,7 +15,7 @@ import { useDesigner } from "../hooks/useDesigner";
 const type: ElementsType = "ParagraphField";
 
 const extraAttributes = {
-  text: "Text field",
+  text: "Texto de párrafo",
 };
 
 const propertiesSchema = z.object({
@@ -110,12 +110,13 @@ function PropertiesComponent({
   }
 
   return (
-    <Form {...form}>
-      <form
+    <Form
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}
+    >
+      <div
         onBlur={form.handleSubmit(applyChanges)}
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
         className="space-y-3 w-full"
       >
         <Controller
@@ -134,7 +135,7 @@ function PropertiesComponent({
             />
           )}
         />
-      </form>
+      </div>
     </Form>
   );
 }

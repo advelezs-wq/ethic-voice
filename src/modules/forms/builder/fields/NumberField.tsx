@@ -185,12 +185,13 @@ function PropertiesComponent({
   }
 
   return (
-    <Form {...form}>
-      <form
+    <Form
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}
+    >
+      <div
         onBlur={form.handleSubmit(applyChanges)}
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
         className="space-y-3 w-full"
       >
         <Controller
@@ -201,7 +202,7 @@ function PropertiesComponent({
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();
               }}
-              label="Label"
+              label="Etiqueta"
               {...field}
               errorMessage={error?.message}
               isInvalid={error ? true : false}
@@ -216,7 +217,7 @@ function PropertiesComponent({
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();
               }}
-              label="Place holder"
+              label="Texto de ejemplo"
               {...field}
               errorMessage={error?.message}
               isInvalid={error ? true : false}
@@ -231,7 +232,7 @@ function PropertiesComponent({
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();
               }}
-              label="Helper text"
+              label="Texto de ayuda"
               {...field}
               errorMessage={error?.message}
               isInvalid={error ? true : false}
@@ -243,12 +244,12 @@ function PropertiesComponent({
           name="required"
           render={({ field }) => (
             <div className="bg-[#f4f4f5] py-2 px-2 rounded-lg flex items-center justify-between">
-              <h3>Is required?</h3>
+              <h3>¿Es obligatorio?</h3>
               <Switch checked={field.value} onValueChange={field.onChange} />
             </div>
           )}
         />
-      </form>
+      </div>
     </Form>
   );
 }

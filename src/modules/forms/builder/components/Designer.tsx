@@ -129,7 +129,7 @@ export const Designer = () => {
         >
           {!droppable.isOver && elements.length === 0 && (
             <p className="text-3xl text-gray-700 flex flex-grow items-center font-bold">
-              Drop here
+              Suelta aquí
             </p>
           )}
           {droppable.isOver && elements.length === 0 && (

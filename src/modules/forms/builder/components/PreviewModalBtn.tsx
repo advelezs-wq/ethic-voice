@@ -20,14 +20,16 @@ export const PreviewModalBtn = () => {
           />
         }
       >
-        Preview
+        Vista previa
       </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent className="w-screen h-screen max-h-screen max-w-full flex flex-col flex-grow p-0 gap-0">
           <div className="px-4 py-2 border-b">
-            <p className="text-lg font-bold text-gray-600">Form Preview</p>
+            <p className="text-lg font-bold text-gray-600">
+              Vista previa del formulario
+            </p>
             <p className="text-sm text-gray-600">
-              This is how your form will look like to your users.
+              Así se verá tu formulario para tus usuarios.
             </p>
           </div>
           <div className="bg-slate-50 flex flex-col flex-grow items-center justify-center p4 bg-dots overflow-y-auto">

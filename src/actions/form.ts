@@ -111,7 +111,7 @@ export async function CreateForm(data: formSchemaType) {
     data: {
       userId: user.id,
       title: data.name!,
-      description: data.description!,
+      description: data.description ?? "",
       orgId,
       isDefault: existingFormsCount === 0,
     },

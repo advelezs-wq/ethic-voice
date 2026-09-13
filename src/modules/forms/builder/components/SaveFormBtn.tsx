@@ -40,7 +40,7 @@ export const SaveFormBtn = ({ id }: { id: number }) => {
       }
       isLoading={loading}
     >
-      Save
+      Guardar
     </Button>
   );
 };

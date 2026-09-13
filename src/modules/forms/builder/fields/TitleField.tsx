@@ -15,7 +15,7 @@ import { useDesigner } from "../hooks/useDesigner";
 const type: ElementsType = "TitleField";
 
 const extraAttributes = {
-  title: "Title field",
+  title: "Campo de título",
 };
 
 const propertiesSchema = z.object({
@@ -39,7 +39,7 @@ export const TitleFieldFormElement: FormElement = {
         aria-hidden="true"
       />
     ),
-    label: "Title field",
+    label: "Campo de título",
   },
   designerComponent: DesignerComponent,
   formComponent: FormComponent,
@@ -110,12 +110,13 @@ function PropertiesComponent({
   }
 
   return (
-    <Form {...form}>
-      <form
+    <Form
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}
+    >
+      <div
         onBlur={form.handleSubmit(applyChanges)}
-        onSubmit={(e) => {
-          e.preventDefault();
-        }}
         className="space-y-3 w-full"
       >
         <Controller
@@ -126,14 +127,14 @@ function PropertiesComponent({
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();
               }}
-              label="Title"
+              label="Título"
               {...field}
               errorMessage={error?.message}
               isInvalid={error ? true : false}
             />
           )}
         />
-      </form>
+      </div>
     </Form>
   );
 }

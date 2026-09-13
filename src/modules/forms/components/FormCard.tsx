@@ -1,5 +1,6 @@
 import { Form } from "@prisma/client";
 import { formatDistance } from "date-fns";
+import { es } from "date-fns/locale";
 import Link from "next/link";
 
 export const FormCard = ({ form }: { form: Form }) => {
@@ -10,18 +11,19 @@ export const FormCard = ({ form }: { form: Form }) => {
           <span className="truncate font-bold">{form.title}</span>
           {form.isPublished && (
             <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-              Published
+              Publicado
             </span>
           )}
           {!form.isPublished && (
             <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-slate-600">
-              Draft
+              Borrador
             </span>
           )}
         </div>
         <div className="w-full flex flex-row items-center justify-between text-slate-600 text-sm flex-none">
           {formatDistance(form.createdAt, new Date(), {
             addSuffix: true,
+            locale: es,
           })}
           {form.isPublished && (
             <span className="flex items-center gap-2">
@@ -42,7 +44,7 @@ export const FormCard = ({ form }: { form: Form }) => {
         </div>
       </div>
       <div className="h-[20px] truncate text-sm text-slate-600 px-4">
-        {form.description || "No description"}
+        {form.description || "Sin descripción"}
       </div>
       <div className="justify-center p-4 flex">
         {form.isPublished && (
@@ -50,7 +52,7 @@ export const FormCard = ({ form }: { form: Form }) => {
             href={`/app/your-forms/builder/${form.id}`}
             className="inline-flex items-center gap-2 rounded-lg bg-primary text-white px-4 py-2 text-sm font-medium hover:opacity-90"
           >
-            View submissions
+            Ver respuestas
             <i
               className="icon-[bx--right-arrow-alt]"
               role="img"
@@ -63,7 +65,7 @@ export const FormCard = ({ form }: { form: Form }) => {
             href={`/app/your-forms/builder/${form.id}`}
             className="inline-flex items-center gap-2 rounded-lg bg-primary text-white px-4 py-2 text-sm font-medium hover:opacity-90"
           >
-            Edit form
+            Editar formulario
             <i
               className="icon-[ant-design--form-outlined]"
               role="img"

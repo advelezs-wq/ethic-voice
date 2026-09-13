@@ -1,16 +1,32 @@
 import { getQueueStats, submissionQueue, emailQueue } from "@/modules/app/lib/queue/queue-manager";
 import prisma from "@/modules/prisma/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import IORedis from "ioredis";
 import { NextResponse } from "next/server";
 
+// CRITICAL: this destructured Clerk's own `orgId` from auth() — this app
+// doesn't use Clerk Organizations, so that's always undefined for every
+// user. The `orgId ? {orgId} : {}` fallbacks below then silently queried
+// with NO org filter at all, so any signed-in user (this is an internal
+// diagnostics page at /app/debug/ai-system with no superadmin gate) got the
+// 5 most recent AI processing jobs across every organization on the
+// platform. Gated on superadmin, matching this endpoint's actual intent as
+// an internal ops tool.
 export async function GET() {
   try {
-    const { userId, orgId } = await auth();
+    const { userId } = await auth();
 
     if (!userId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
+
+    const requesterEmail = (await currentUser())?.primaryEmailAddress?.emailAddress;
+    if (!requesterEmail || !isSuperAdmin(requesterEmail)) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
+
+    const orgId: string | null = null;
 
     // 1. Check Redis connection
     let redisStatus = "disconnected";

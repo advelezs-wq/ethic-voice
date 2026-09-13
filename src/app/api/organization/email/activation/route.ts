@@ -18,10 +18,10 @@ export async function PATCH(req: NextRequest) {
     const activate = body?.activate === true;
 
     const emailService = new EmailAccountService();
-    const config = await emailService.setEmailActivation(
+    await emailService.setEmailActivation(orgId, userId, activate, userEmail);
+    const config = await emailService.getOrganizationEmailConfiguration(
       orgId,
       userId,
-      activate,
       userEmail
     );
 

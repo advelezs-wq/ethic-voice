@@ -101,7 +101,7 @@ export class EmailAccountService {
       if (deactivation.count > 0) {
         await this.appendEmailAuditEvent(orgId, {
           type: "EMAIL_INBOX_AUTO_DEACTIVATED_PLAN",
-          reason: "Plan inactive or without email channel",
+          reason: "Plan inactivo o sin canal de correo",
         });
       }
 
@@ -279,8 +279,8 @@ export class EmailAccountService {
       actorUserId: userId,
       actorEmail: userEmail || null,
       reason: activate
-        ? "Manual activation by organization manager"
-        : "Manual deactivation by organization manager",
+        ? "Activación manual por el administrador de la organización"
+        : "Desactivación manual por el administrador de la organización",
     });
 
     return updated;

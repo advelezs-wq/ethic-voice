@@ -15,7 +15,8 @@ export async function POST() {
     }
 
     const emailService = new EmailAccountService();
-    const config = await emailService.createOrganizationEmail(
+    await emailService.createOrganizationEmail(orgId, userId, userEmail);
+    const config = await emailService.getOrganizationEmailConfiguration(
       orgId,
       userId,
       userEmail

@@ -149,10 +149,23 @@ export async function checkPlanRestrictions(
     // Get organization ID from request (could be from params, query, or body)
     let orgId: string | null = null;
 
-    // Try to get orgId from URL params
+    // Try to get orgId from URL params. Only trust this segment if it looks
+    // like a UUID — routes such as /api/organization/email/create,
+    // /api/organization/settings/theme, and /api/organization/ethics-context
+    // have no orgId in the URL at all (they resolve org from the ev_org
+    // cookie inside the route handler), and blindly taking the next path
+    // segment turned every request to those routes into a lookup for a
+    // nonexistent org literally named "email"/"settings"/"ethics-context",
+    // 404ing with "Organization not found" for every single request.
     const urlParts = pathname.split("/");
     const orgIndex = urlParts.findIndex((part) => part === "organization");
-    if (orgIndex !== -1 && urlParts[orgIndex + 1]) {
+    const uuidPattern =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (
+      orgIndex !== -1 &&
+      urlParts[orgIndex + 1] &&
+      uuidPattern.test(urlParts[orgIndex + 1])
+    ) {
       orgId = urlParts[orgIndex + 1];
     }
 
@@ -172,6 +185,12 @@ export async function checkPlanRestrictions(
       } catch {
         // Ignore JSON parse errors
       }
+    }
+
+    // Fall back to the active-organization cookie for routes that resolve
+    // org from session context rather than the URL (see above).
+    if (!orgId) {
+      orgId = req.cookies.get("ev_org")?.value || null;
     }
 
     if (!orgId) {

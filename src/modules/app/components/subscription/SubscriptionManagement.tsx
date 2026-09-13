@@ -530,25 +530,34 @@ export function SubscriptionManagement({
           </div>
         </CardHeader>
         <CardBody>
-          {invoices.length === 0 ? (
-            <EmptyState
-              icon={<i className="icon-[lucide--receipt] size-6" />}
-              title="No hay facturas disponibles"
-            />
-          ) : (
-            <div className="space-y-3">
-              {invoices
-                .filter((invoice) => {
-                  try {
-                    const d = new Date(invoice.createdAt as string);
-                    const now = new Date();
-                    const start = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-                    return d >= start;
-                  } catch {
-                    return true;
+          {(() => {
+            const recentInvoices = invoices.filter((invoice) => {
+              try {
+                const d = new Date(invoice.createdAt as string);
+                const now = new Date();
+                const start = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+                return d >= start;
+              } catch {
+                return true;
+              }
+            });
+
+            if (recentInvoices.length === 0) {
+              return (
+                <EmptyState
+                  icon={<i className="icon-[lucide--receipt] size-6" />}
+                  title={
+                    invoices.length === 0
+                      ? "No hay facturas disponibles"
+                      : "No hay facturas en los últimos 2 meses"
                   }
-                })
-                .map((invoice) => (
+                />
+              );
+            }
+
+            return (
+              <div className="space-y-3">
+                {recentInvoices.map((invoice) => (
                 <div
                   key={invoice.id}
                   className="flex items-center justify-between p-4 border border-emerald-100 rounded-xl hover:bg-emerald-50/40 transition-colors"
@@ -588,9 +597,10 @@ export function SubscriptionManagement({
                     </Button>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            );
+          })()}
         </CardBody>
       </Card>
 

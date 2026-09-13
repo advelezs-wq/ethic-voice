@@ -293,7 +293,7 @@ export function TeamMembersView({
                           color={
                             member.performanceScore > 80
                               ? "success"
-                              : member.performanceScore > 50
+                              : member.performanceScore >= 50
                               ? "warning"
                               : "danger"
                           }

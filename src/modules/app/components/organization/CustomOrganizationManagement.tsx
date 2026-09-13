@@ -396,35 +396,46 @@ export function CustomOrganizationManagement({
                     <h3 className="text-base sm:text-lg font-semibold">
                       Límites del Plan
                     </h3>
-                    <Chip color="primary" variant="flat">
-                      {orgPlanLimits?.planType || planInfo?.planType || "STARTER"}
-                    </Chip>
+                    {orgPlanLimits && (
+                      <Chip color="primary" variant="flat">
+                        {orgPlanLimits.planType}
+                      </Chip>
+                    )}
                   </div>
                 </CardHeader>
                 <CardBody>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center">
-                      <p className="text-xl sm:text-2xl font-bold text-primary">
-                        {members.filter((m) => m.role === "ADMIN").length} /{" "}
-                        {(orgPlanLimits?.maxUsers ?? planInfo?.maxUsers) === -1
-                          ? "∞"
-                          : (orgPlanLimits?.maxUsers ?? planInfo?.maxUsers ?? 1)}
-                      </p>
-                      <p className="text-sm text-slate-500">Administradores</p>
+                  {/* Wait for the browsed org's real plan-info before rendering
+                      numbers: falling back to planInfo (usePlanPermissions()'s
+                      synthesized unlimited Premium plan for superadmins) here
+                      briefly showed the wrong plan/limits for the org actually
+                      being browsed, with a 0 numerator on top since `members`
+                      hadn't loaded yet either. */}
+                  {orgPlanLimits && !membersLoading ? (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center">
+                        <p className="text-xl sm:text-2xl font-bold text-primary">
+                          {members.filter((m) => m.role === "ADMIN").length} /{" "}
+                          {orgPlanLimits.maxUsers === -1
+                            ? "∞"
+                            : orgPlanLimits.maxUsers}
+                        </p>
+                        <p className="text-sm text-slate-500">Administradores</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xl sm:text-2xl font-bold text-primary">
+                          {members.filter((m) => m.role === "MEMBER").length} /{" "}
+                          {orgPlanLimits.maxInvestigators === -1
+                            ? "∞"
+                            : orgPlanLimits.maxInvestigators}
+                        </p>
+                        <p className="text-sm text-slate-500">Investigadores</p>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <p className="text-xl sm:text-2xl font-bold text-primary">
-                        {members.filter((m) => m.role === "MEMBER").length} /{" "}
-                        {(orgPlanLimits?.maxInvestigators ??
-                          planInfo?.maxInvestigators) === -1
-                          ? "∞"
-                          : (orgPlanLimits?.maxInvestigators ??
-                            planInfo?.maxInvestigators ??
-                            5)}
-                      </p>
-                      <p className="text-sm text-slate-500">Investigadores</p>
+                  ) : (
+                    <div className="flex justify-center py-4">
+                      <Spinner size="sm" />
                     </div>
-                  </div>
+                  )}
                 </CardBody>
               </Card>
 

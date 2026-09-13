@@ -152,19 +152,21 @@ export function useMultiStepForm() {
       // Extract only the fields relevant to the current step
       const stepData = getStepData(currentValues, currentStep);
 
-      // Debug logging
-      console.log(`Validating step ${currentStep}:`, stepData);
+      // Clear this step's previous errors before re-validating, otherwise a
+      // field the user just fixed keeps showing its old message below —
+      // setError only ever adds issues found in *this* pass, so a stale
+      // error for an already-fixed field would never go away until every
+      // other field in the step became valid too.
+      const stepFields = getStepFields(currentStep);
+      form.clearErrors(stepFields as any);
 
       // Use safeParse instead of parseAsync to avoid the _zod error
       const result = schema.safeParse(stepData);
 
       if (!result.success) {
-        console.error(`Validation error in step ${currentStep}:`, result.error);
-
         // Set validation errors from Zod
         result.error.issues.forEach((err: any) => {
           const path = err.path.join(".");
-          console.log(`Setting error for path: ${path}`, err.message);
 
           // Handle nested paths properly
           if (path) {
@@ -183,10 +185,6 @@ export function useMultiStepForm() {
 
         return false;
       }
-
-      // Clear any existing errors for this step
-      const stepFields = getStepFields(currentStep);
-      form.clearErrors(stepFields as any);
 
       return true;
     } catch (error: any) {

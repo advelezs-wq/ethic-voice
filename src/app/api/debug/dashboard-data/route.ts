@@ -1,9 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 export async function GET(request: NextRequest) {
   try {
     console.log("🔍 [DEBUG] Starting dashboard data test...");
+
+    // This route is listed as middleware-unrestricted (it skips plan-
+    // restriction checks, same as /api/notifications and others in that
+    // list), but unlike those it never checked auth itself — making it a
+    // fully unauthenticated endpoint that returned any organization's
+    // complete report data (titles, categories, severity, assignee names)
+    // to anyone who knew or guessed its orgId. No login, no membership,
+    // nothing.
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
 
     const { searchParams } = new URL(request.url);
     const orgId = searchParams.get("orgId");
@@ -16,6 +30,28 @@ export async function GET(request: NextRequest) {
         { error: "Organization ID es requerido" },
         { status: 400 }
       );
+    }
+
+    const [membership, user] = await Promise.all([
+      prisma.organizationMembership.findUnique({
+        where: { userId_orgId: { userId, orgId } },
+      }),
+      currentUser(),
+    ]);
+    const userEmail = user?.primaryEmailAddress?.emailAddress;
+    const isSuper = Boolean(userEmail && isSuperAdmin(userEmail));
+    if (!membership && !isSuper) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+    }
+
+    // scopeUserId narrows the stats to one member's assigned reports — the
+    // legitimate caller (AnalyticsContext.tsx) only ever passes the
+    // signed-in user's own id, but as a query param nothing stopped a
+    // regular member from substituting a colleague's id to see
+    // specifically what cases they're handling. Only admins/superadmins
+    // may query someone else's scope.
+    if (scopeUserId && scopeUserId !== userId && membership?.role !== "ADMIN" && !isSuper) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 403 });
     }
 
     console.log("🔍 [DEBUG] Using orgId:", orgId, "scopeUserId:", scopeUserId);

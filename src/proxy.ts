@@ -54,7 +54,6 @@ const isUnrestrictedRoute = createRouteMatcher([
   "/api/organization/settings/update(.*)",
   "/api/organization/(.*)/plan-info(.*)",
   "/api/notifications(.*)",
-  "/api/debug(.*)", // Debug routes are unrestricted
   "/auth(.*)",
   "/checkout(.*)", // Checkout flow should be unrestricted
   "/api/cron(.*)", // Cron runner endpoints are unrestricted

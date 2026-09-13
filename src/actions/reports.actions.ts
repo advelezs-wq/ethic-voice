@@ -985,6 +985,17 @@ export async function approveReportClosure(reportId: number): Promise<void> {
   if (!report.closureRequestedAt || report.closureApprovedAt) {
     throw new Error("No hay una solicitud de cierre pendiente");
   }
+  // A pending request only exists when the original requester wasn't an
+  // admin (requestReportClosure closes admin-submitted requests
+  // immediately). If that person is promoted to admin before anyone else
+  // reviews it, this stops them from approving their own prior request —
+  // the two-stage workflow exists specifically so the person who did the
+  // investigation isn't also the one certifying it was done correctly.
+  if (report.closureRequestedById === userId) {
+    throw new Error(
+      "Quien solicitó el cierre no puede aprobarlo — se requiere otro administrador"
+    );
+  }
 
   const approverName = user.fullName || "Usuario";
   const now = new Date();

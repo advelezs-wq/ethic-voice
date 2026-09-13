@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { securityManager, getClientIP } from '@/modules/app/lib/security/rate-limiter';
 import { scanUploadedFile } from '@/lib/security/submission-security';
+import prisma from '@/modules/prisma/lib/prisma';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -43,6 +44,20 @@ export async function POST(request: NextRequest) {
     }
 
     if (!orgId || typeof orgId !== 'string' || orgId.length < 2 || orgId.length > 100) {
+      return NextResponse.json({ error: 'Invalid organization ID' }, { status: 400 });
+    }
+
+    // This is the public, unauthenticated submission-evidence upload — orgId
+    // is whatever the client sends. Without checking it's a real,
+    // active organization, anyone could upload arbitrary files (within the
+    // allowed types) to a made-up orgId's Cloudinary folder indefinitely,
+    // limited only by the per-IP rate limit — free, unbounded storage
+    // consumption against this app's Cloudinary account.
+    const org = await prisma.organization.findUnique({
+      where: { id: orgId },
+      select: { id: true, isActive: true },
+    });
+    if (!org || !org.isActive) {
       return NextResponse.json({ error: 'Invalid organization ID' }, { status: 400 });
     }
 

@@ -2031,21 +2031,17 @@ export async function getReportActivities(
   }));
 }
 
-export async function addReportNote(
-  reportId: number,
-  note: string,
-  userId?: string,
-  userName?: string
-) {
+export async function addReportNote(reportId: number, note: string) {
   const { userId: authUserId } = await auth();
   const orgId = await resolveOrgId();
+  const user = await currentUser();
 
   if (!authUserId || !orgId) {
     throw new Error("Unauthorized");
   }
 
-  const actualUserId = userId || authUserId;
-  const actualUserName = userName || "Current User";
+  const actualUserId = authUserId;
+  const actualUserName = user?.fullName || "Usuario";
 
   const report = await prisma.formSubmission.findFirst({
     where: { id: reportId, orgId },

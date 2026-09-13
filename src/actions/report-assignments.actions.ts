@@ -62,6 +62,24 @@ export async function assignMembersToReport(
 
   await assertOrgAdmin(currentUserId, orgId, "No tienes permisos para asignar investigadores");
 
+  // members[].userId is caller-supplied with no other validation — without
+  // this, an admin (or a Server Action call crafted outside the UI) could
+  // "assign" an arbitrary Clerk user id, which itself doesn't grant that
+  // user access to the report (view access separately requires real
+  // OrganizationMembership), but does trigger a notification to that id
+  // containing case details (title, reason) — leaking a snippet of
+  // confidential case content outside the organization.
+  const memberIds = members.map((m) => m.userId);
+  const realMembers = await prisma.organizationMembership.findMany({
+    where: { orgId, userId: { in: memberIds } },
+    select: { userId: true },
+  });
+  const realMemberIds = new Set(realMembers.map((m) => m.userId));
+  const bogusIds = memberIds.filter((id) => !realMemberIds.has(id));
+  if (bogusIds.length > 0) {
+    throw new Error("Uno o más usuarios no pertenecen a esta organización");
+  }
+
   // Verify report exists and belongs to organization
   const report = await prisma.formSubmission.findFirst({
     where: {
@@ -275,9 +293,36 @@ export async function getAvailableMembersForAssignment(
   orgIdOverride?: string
 ): Promise<(AssignMemberInput & { conflict: ConflictFlags })[]> {
   const { userId } = await auth();
-  const orgId = orgIdOverride ?? (await resolveOrgId());
 
-  if (!userId || !orgId) {
+  if (!userId) {
+    throw new Error("No autorizado");
+  }
+
+  // orgIdOverride came from a client-side prop with no server-side check
+  // that the caller actually belongs to it — any authenticated user could
+  // call this directly with another organization's id and get back that
+  // org's full member roster (real names, emails, departments). Only trust
+  // it once verified against real membership or a superadmin bypass, the
+  // same check resolveOrgId() applies to the ev_org cookie.
+  let orgId: string | null;
+  if (orgIdOverride) {
+    const [membership, user] = await Promise.all([
+      prisma.organizationMembership.findUnique({
+        where: { userId_orgId: { userId, orgId: orgIdOverride } },
+      }),
+      currentUser(),
+    ]);
+    const userEmail = user?.primaryEmailAddress?.emailAddress;
+    const isSuper = Boolean(userEmail && isSuperAdmin(userEmail));
+    if (!membership && !isSuper) {
+      throw new Error("No autorizado para ver esta organización");
+    }
+    orgId = orgIdOverride;
+  } else {
+    orgId = await resolveOrgId();
+  }
+
+  if (!orgId) {
     throw new Error("No autorizado");
   }
 
@@ -399,6 +444,16 @@ export async function reassignReportMember(
   const cleanReason = reason?.trim();
   if (!cleanReason) {
     throw new Error("Debes indicar un motivo para la reasignación");
+  }
+
+  // Same validation as assignMembersToReport — toUserId is caller-supplied
+  // and otherwise unchecked, and a bogus id here still gets a notification
+  // containing the case reference and the reassignment reason.
+  const targetMembership = await prisma.organizationMembership.findUnique({
+    where: { userId_orgId: { userId: toUserId, orgId } },
+  });
+  if (!targetMembership) {
+    throw new Error("El usuario destino no pertenece a esta organización");
   }
 
   const oldAssignment = await prisma.reportAssignment.findUnique({

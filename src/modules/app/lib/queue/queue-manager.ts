@@ -425,7 +425,15 @@ export async function checkQueueHealth() {
       return { healthy: true, details: { redis: false, emailQueue: true, submissionQueue: true }, stats: await getQueueStats() };
     }
     const stats = await getQueueStats();
-    const isHealthy = { redis: queueRedisConnection.status === 'ready', emailQueue: stats.email.failed < 10, submissionQueue: stats.submission.failed < 10 };
+    // getFailedCount() is the total failed-job count still retained in Redis
+    // (up to removeOnFail's cap), not a rate — it only grows over the
+    // queue's lifetime and was permanently tripping this check (any
+    // real-world backlog of >10 historical failures made it "unhealthy"
+    // forever, with no way to recover). Backlog size (waiting jobs piling
+    // up faster than they're processed) is the signal that actually reflects
+    // current health; permanent per-job failures are already surfaced via
+    // notifyAdminsOfPermanentFailure.
+    const isHealthy = { redis: queueRedisConnection.status === 'ready', emailQueue: stats.email.waiting < 50, submissionQueue: stats.submission.waiting < 50 };
 
     return {
       healthy: Object.values(isHealthy).every(Boolean),

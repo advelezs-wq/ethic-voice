@@ -97,7 +97,7 @@ export function PublicReportChat({ reportId, trackingCode }: PublicReportChatPro
   }, [trackingCode, seenKey]);
 
   useEffect(() => {
-    const channel = pusherClient.subscribe(`report-${reportId}`);
+    const channel = pusherClient.subscribe(`report-public-${reportId}`);
 
     channel.bind(
       "new-message",
@@ -122,7 +122,7 @@ export function PublicReportChat({ reportId, trackingCode }: PublicReportChatPro
     );
 
     return () => {
-      pusherClient.unsubscribe(`report-${reportId}`);
+      pusherClient.unsubscribe(`report-public-${reportId}`);
     };
   }, [reportId]);
 

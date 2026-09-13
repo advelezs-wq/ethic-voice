@@ -222,7 +222,12 @@ export async function sendPublicReportMessage(
   const publicMessage = toPublicMessage(message);
 
   try {
-    await pusherServer.trigger(`report-${submission.id}`, "new-message", {
+    // Distinct name from the internal chat's private-report-<id> channel —
+    // this one stays a plain (unauthenticated) Pusher channel by design,
+    // since anonymous reporters have no session to authenticate a private
+    // channel with, but it must never carry the same events as the internal
+    // channel, whose payloads include isInternal notes not meant to be public.
+    await pusherServer.trigger(`report-public-${submission.id}`, "new-message", {
       message: {
         id: message.id,
         content: message.content,

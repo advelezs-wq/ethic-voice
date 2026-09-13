@@ -103,7 +103,7 @@ export function useReportChat({
   useEffect(() => {
     if (!enableRealtime) return;
 
-    const channel = pusherClient.subscribe(`report-${reportId}`);
+    const channel = pusherClient.subscribe(`private-report-${reportId}`);
 
     channel.bind("new-message", (data: { message: ChatMessage }) => {
       // Remove optimistic message if it exists
@@ -177,7 +177,7 @@ export function useReportChat({
     });
 
     return () => {
-      pusherClient.unsubscribe(`report-${reportId}`);
+      pusherClient.unsubscribe(`private-report-${reportId}`);
     };
   }, [reportId, enableRealtime, user?.id, loadMessages]);
 
@@ -379,7 +379,7 @@ export function useReportChat({
     if (!user || !enableRealtime) return;
 
     // Get the channel first
-    const channel = pusherClient.subscribe(`report-${reportId}`);
+    const channel = pusherClient.subscribe(`private-report-${reportId}`);
 
     // Trigger client event (note: must be prefixed with 'client-')
     channel.trigger("client-user-typing", {

@@ -1,8 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import mercadoPagoService from "@/modules/app/services/mercadopago.service";
 import { ModernPDFGeneratorService } from "@/modules/app/services/pdf-generator.service";
+import { isSuperAdmin } from "@/modules/core/utils/permissions";
+
+// `id` is a small sequential PaymentTransaction id or a MercadoPago payment
+// id — both are trivially guessable/enumerable. Without checking the
+// resolved org against the caller, anyone signed in could download any
+// other organization's invoice: buyer name/email/phone/address, amount,
+// payment method, provider transaction id.
+async function assertCanAccessOrgInvoice(
+  userId: string,
+  orgId: string | null | undefined
+): Promise<boolean> {
+  if (!orgId) return false;
+  const [membership, user] = await Promise.all([
+    prisma.organizationMembership.findUnique({
+      where: { userId_orgId: { userId, orgId } },
+    }),
+    currentUser(),
+  ]);
+  if (membership) return true;
+  const email = user?.primaryEmailAddress?.emailAddress;
+  return Boolean(email && isSuperAdmin(email));
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -55,6 +77,10 @@ export async function GET(req: NextRequest) {
     };
     let organizationLogo: string | undefined;
 
+    if (tx && !(await assertCanAccessOrgInvoice(userId, tx.orgId))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     if (tx) {
       // Map internal transaction
       const amount = Number(tx.amount || 0);
@@ -89,6 +115,21 @@ export async function GET(req: NextRequest) {
     } else if (mpId) {
       // Otherwise assume it's a Mercado Pago payment id and fetch it
       const pay = await mercadoPagoService.getPayment(String(mpId));
+
+      // Resolve the owning org via external_reference (our subscription id)
+      // and verify access BEFORE building any part of the response — this
+      // payment's payer name/email/phone/address is real customer PII.
+      const subIdForAuth = parseInt(String(pay?.external_reference || ""), 10);
+      const subForAuth = Number.isFinite(subIdForAuth)
+        ? await prisma.subscription.findUnique({
+            where: { id: subIdForAuth },
+            select: { orgId: true },
+          })
+        : null;
+      if (!(await assertCanAccessOrgInvoice(userId, subForAuth?.orgId))) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+
       const amount = Number(pay?.transaction_amount || 0);
       invoice = {
         id: String(pay?.id),

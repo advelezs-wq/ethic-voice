@@ -369,7 +369,7 @@ export async function sendMessage(
     readBy: [],
   };
 
-  await safePusherTrigger(`report-${reportId}`, "new-message", {
+  await safePusherTrigger(`private-report-${reportId}`, "new-message", {
     message: fullMessage,
   });
 
@@ -480,7 +480,7 @@ export async function editMessage(
   });
 
   await safePusherTrigger(
-    `report-${updatedMessage.submissionId}`,
+    `private-report-${updatedMessage.submissionId}`,
     "message-updated",
     {
       messageId,
@@ -552,7 +552,7 @@ export async function deleteMessage(messageId: number): Promise<void> {
     where: { id: messageId },
   });
 
-  await safePusherTrigger(`report-${submissionId}`, "message-deleted", {
+  await safePusherTrigger(`private-report-${submissionId}`, "message-deleted", {
     messageId,
   });
 
@@ -609,7 +609,7 @@ export async function toggleReaction(
   }
 
   await safePusherTrigger(
-    `report-${message.submissionId}`,
+    `private-report-${message.submissionId}`,
     "reaction-toggled",
     { messageId, emoji, userId }
   );
@@ -656,7 +656,7 @@ export async function markAsRead(messageIds: number[]): Promise<void> {
 
   const reportIds = [...new Set(messages.map((m) => m.submissionId))];
   for (const rid of reportIds) {
-    await safePusherTrigger(`report-${rid}`, "messages-read", {
+    await safePusherTrigger(`private-report-${rid}`, "messages-read", {
       messageIds,
       userId,
     });

@@ -89,8 +89,26 @@ export async function GET(request: NextRequest) {
         r.aiSeverity === "HIGH"
     ).length;
 
-    // Calculate percentage change (mock for now)
-    const percentageChange = totalReports > 0 ? 100.0 : 0;
+    // Month-over-month change in report volume. Previously hardcoded to
+    // always show "+100.0% este mes" for any org with at least one report,
+    // regardless of actual trend — every customer's dashboard displayed the
+    // same fake growth figure forever.
+    const now = new Date();
+    const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const previousMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const reportsThisMonth = reports.filter(
+      (r) => new Date(r.submittedAt) >= currentMonthStart
+    ).length;
+    const reportsPreviousMonth = reports.filter((r) => {
+      const d = new Date(r.submittedAt);
+      return d >= previousMonthStart && d < currentMonthStart;
+    }).length;
+    const percentageChange =
+      reportsPreviousMonth > 0
+        ? ((reportsThisMonth - reportsPreviousMonth) / reportsPreviousMonth) * 100
+        : reportsThisMonth > 0
+          ? 100
+          : 0;
 
     // Calculate average resolution time
     const resolvedReportsWithTime = reports.filter(

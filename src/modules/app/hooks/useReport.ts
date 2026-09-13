@@ -88,12 +88,7 @@ export function useReport(reportId: number) {
     }
 
     try {
-      await updateReportPriority(
-        reportId,
-        newPriority,
-        user.id,
-        user.fullName || "Usuario"
-      );
+      await updateReportPriority(reportId, newPriority);
       setReport((prev) =>
         prev ? { ...prev, priority: newPriority as any } : null
       );

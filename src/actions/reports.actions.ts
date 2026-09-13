@@ -28,7 +28,6 @@ import {
   FormSubmission,
   ReportActivity,
   ReportAttachment,
-  ReportComment,
 } from "@/types/reports";
 import { SubmissionSource } from "@/types/submission.types";
 import {
@@ -677,6 +676,7 @@ export async function updateReportStatus(
   if (!userId || !orgId) {
     throw new Error("Unauthorized - No organization access");
   }
+  await assertRoleCanWrite(userId, orgId);
 
   try {
     const report = await prisma.formSubmission.findFirst({
@@ -1518,6 +1518,7 @@ export async function updateReportProcessedAt(
   if (!orgId) {
     throw new Error("Organization not found");
   }
+  await assertRoleCanWrite(userId, orgId);
 
   await prisma.formSubmission.update({
     where: {
@@ -1557,6 +1558,7 @@ export async function bulkUpdateReports(
   if (!userId || !orgId) {
     throw new Error("Unauthorized");
   }
+  await assertRoleCanWrite(userId, orgId);
 
   if (!reportIds.length) return;
 
@@ -1715,103 +1717,21 @@ export async function getReport(reportId: number): Promise<FormSubmission> {
   };
 }
 
-export async function updateReportStatusDetailed(
-  reportId: number,
-  newStatus: string,
-  userId?: string,
-  userName?: string
-) {
-  const { userId: authUserId } = await auth();
-  const orgId = await resolveOrgId();
-
-  if (!authUserId || !orgId) {
-    throw new Error("Unauthorized");
-  }
-
-  const actualUserId = userId || authUserId;
-  const actualUserName = userName || "Current User";
-
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-  });
-
-  if (!report) {
-    throw new Error("Report not found");
-  }
-
-  const oldStatus = report.status;
-
-  await prisma.$transaction([
-    prisma.formSubmission.update({
-      where: { id: reportId },
-      data: { status: newStatus.toUpperCase() as any },
-    }),
-    prisma.reportActivity.create({
-      data: {
-        submissionId: reportId,
-        action: "STATUS_CHANGED",
-        details: {
-          oldStatus,
-          newStatus: newStatus.toUpperCase(),
-        },
-        userId: actualUserId,
-        userName: actualUserName,
-      },
-    }),
-  ]);
-
-  // Send notifications to assigned members
-  try {
-    const assignments = await prisma.reportAssignment.findMany({
-      where: { reportId },
-      select: { userId: true },
-    });
-
-    for (const assignment of assignments) {
-      await notificationsService.createNotification({
-        userId: assignment.userId,
-        orgId,
-        type: "REPORT_STATUS_CHANGED",
-        title: "Estado de Reporte Actualizado",
-        message: `El reporte REP-${String(reportId).padStart(6, "0")} cambió de ${oldStatus} a ${newStatus.toUpperCase()}`,
-        actionUrl: `/app/reports/${reportId}`,
-        reportId,
-        channel: "IN_APP",
-        metadata: {
-          oldStatus,
-          newStatus: newStatus.toUpperCase(),
-          changedBy: actualUserName,
-          reportTitle: `REP-${String(reportId).padStart(6, "0")}`,
-        },
-      });
-    }
-  } catch (notificationError) {
-    console.error(
-      "Error sending status change notifications:",
-      notificationError
-    );
-    // Don't fail the status update if notifications fail
-  }
-
-  revalidatePath(`/app/reports/${reportId}`);
-  revalidatePath("/app/reports");
-}
-
 export async function updateReportPriority(
   reportId: number,
-  newPriority: string,
-  userId?: string,
-  userName?: string
+  newPriority: string
 ) {
   const { userId: authUserId } = await auth();
   const orgId = await resolveOrgId();
+  const user = await currentUser();
 
   if (!authUserId || !orgId) {
     throw new Error("Unauthorized");
   }
+  await assertRoleCanWrite(authUserId, orgId);
 
-  const actualUserId = userId || authUserId;
-  const actualUserName = userName || "Current User";
+  const actualUserId = authUserId;
+  const actualUserName = user?.fullName || "Usuario";
 
   const report = await prisma.formSubmission.findFirst({
     where: { id: reportId, orgId },
@@ -1846,104 +1766,6 @@ export async function updateReportPriority(
   revalidatePath("/app/reports");
 }
 
-export async function updateReportCategory(
-  reportId: number,
-  newCategory: string,
-  userId?: string,
-  userName?: string
-) {
-  const { userId: authUserId } = await auth();
-  const orgId = await resolveOrgId();
-
-  if (!authUserId || !orgId) {
-    throw new Error("Unauthorized");
-  }
-
-  const actualUserId = userId || authUserId;
-  const actualUserName = userName || "Current User";
-
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-  });
-
-  if (!report) {
-    throw new Error("Report not found");
-  }
-
-  const oldCategory = report.type;
-
-  await prisma.$transaction([
-    prisma.formSubmission.update({
-      where: { id: reportId },
-      data: { type: newCategory.toUpperCase() as any },
-    }),
-    prisma.reportActivity.create({
-      data: {
-        submissionId: reportId,
-        action: "CATEGORY_UPDATED",
-        details: {
-          oldCategory,
-          newCategory: newCategory.toUpperCase(),
-        },
-        userId: actualUserId,
-        userName: actualUserName,
-      },
-    }),
-  ]);
-
-  revalidatePath(`/app/reports/${reportId}`);
-  revalidatePath("/app/reports");
-}
-
-export async function updateReportDepartment(
-  reportId: number,
-  newDepartment: string,
-  userId?: string,
-  userName?: string
-) {
-  const { userId: authUserId } = await auth();
-  const orgId = await resolveOrgId();
-
-  if (!authUserId || !orgId) {
-    throw new Error("Unauthorized");
-  }
-
-  const actualUserId = userId || authUserId;
-  const actualUserName = userName || "Current User";
-
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-  });
-
-  if (!report) {
-    throw new Error("Report not found");
-  }
-
-  const oldDepartment = report.departmentId;
-
-  await prisma.$transaction([
-    prisma.formSubmission.update({
-      where: { id: reportId },
-      data: { departmentId: newDepartment.toUpperCase() as any },
-    }),
-    prisma.reportActivity.create({
-      data: {
-        submissionId: reportId,
-        action: "DEPARTMENT_UPDATED",
-        details: {
-          oldDepartment,
-          newDepartment: newDepartment.toUpperCase(),
-        },
-        userId: actualUserId,
-        userName: actualUserName,
-      },
-    }),
-  ]);
-
-  revalidatePath(`/app/reports/${reportId}`);
-  revalidatePath("/app/reports");
-}
-
 export async function updateReportMetadata(
   reportId: number,
   data: {
@@ -1957,6 +1779,7 @@ export async function updateReportMetadata(
   const user = await currentUser();
 
   if (!userId || !orgId) throw new Error("Unauthorized");
+  await assertRoleCanWrite(userId, orgId);
 
   await prisma.formSubmission.update({
     where: { id: reportId, orgId },
@@ -2003,6 +1826,7 @@ export async function updateReportSubject(
   const user = await currentUser();
 
   if (!userId || !orgId) throw new Error("Unauthorized");
+  await assertRoleCanWrite(userId, orgId);
 
   await prisma.formSubmission.update({
     where: { id: reportId, orgId },
@@ -2023,96 +1847,6 @@ export async function updateReportSubject(
   });
 
   revalidatePath(`/app/reports/${reportId}`);
-}
-
-export async function getReportComments(
-  reportId: number
-): Promise<ReportComment[]> {
-  const { userId } = await auth();
-  const orgId = await resolveOrgId();
-
-  if (!userId || !orgId) {
-    throw new Error("Unauthorized");
-  }
-
-  const comments = await prisma.reportComment.findMany({
-    where: {
-      submissionId: reportId,
-      submission: {
-        orgId,
-      },
-    },
-    orderBy: { createdAt: "asc" },
-  });
-
-  // Convert Date objects to strings
-  return comments.map((comment) => ({
-    ...comment,
-    updatedAt: comment.updatedAt,
-    createdAt: comment.createdAt,
-    authorEmail: comment.authorEmail ?? undefined, // Convert null to undefined
-  }));
-}
-
-export async function addReportComment(
-  reportId: number,
-  content: string,
-  authorId?: string,
-  authorName?: string,
-  authorEmail?: string,
-  isInternal = false
-): Promise<ReportComment> {
-  const { userId: authUserId } = await auth();
-  const orgId = await resolveOrgId();
-
-  if (!authUserId || !orgId) {
-    throw new Error("Unauthorized");
-  }
-
-  const actualAuthorId = authorId || authUserId;
-  const actualAuthorName = authorName || "Current User";
-
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-  });
-
-  if (!report) {
-    throw new Error("Report not found");
-  }
-
-  const [comment] = await prisma.$transaction([
-    prisma.reportComment.create({
-      data: {
-        submissionId: reportId,
-        content,
-        authorId: actualAuthorId,
-        authorName: actualAuthorName,
-        authorEmail,
-        isInternal,
-      },
-    }),
-    prisma.reportActivity.create({
-      data: {
-        submissionId: reportId,
-        action: "COMMENT_ADDED",
-        details: {
-          isInternal,
-          preview: content.substring(0, 100),
-        },
-        userId: actualAuthorId,
-        userName: actualAuthorName,
-      },
-    }),
-  ]);
-
-  revalidatePath(`/app/reports/${reportId}`);
-
-  // Convert Date to string
-  return {
-    ...comment,
-    createdAt: comment.createdAt,
-    authorEmail: comment.authorEmail ?? undefined, // Convert null to undefined
-  };
 }
 
 export async function getReportAttachments(
@@ -3286,6 +3020,7 @@ export async function reorderReportTasks(
   const { userId } = await auth();
   const orgId = await resolveOrgId();
   if (!userId || !orgId) throw new Error("Unauthorized");
+  await assertRoleCanWrite(userId, orgId);
 
   // Verify tasks belong to org and report
   const tasks = await prisma.reportUpdate.findMany({

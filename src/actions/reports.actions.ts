@@ -5,6 +5,8 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   resolveOrgId,
   assertUserCanAccessOrg,
+  assertUserCanAccessReport,
+  assertUserCanWriteToReport,
 } from "@/modules/core/utils/org-resolver";
 import prisma from "@/modules/prisma/lib/prisma";
 import { notificationsService } from "@/modules/app/services/notifications.service";
@@ -673,22 +675,27 @@ export async function updateReportStatus(
   closureSummary?: string
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId) {
+  if (!userId) {
     throw new Error("Unauthorized - No organization access");
   }
-  await assertRoleCanWrite(userId, orgId);
 
   try {
+    // orgId comes from the report itself, not resolveOrgId()'s cookie-
+    // selected org — see assignMembersToReport in report-assignments.actions.ts
+    // for the full rationale (a superadmin in the global cross-org view
+    // routinely has a different org selected than the report being acted
+    // on, which made this throw a misleading "not found or access denied").
     const report = await prisma.formSubmission.findFirst({
-      where: { id: reportId, orgId },
+      where: { id: reportId },
     });
 
     if (!report) {
       throw new Error("Report not found or access denied");
     }
+    const orgId = report.orgId;
+    await assertRoleCanWrite(userId, orgId);
 
     await prisma.formSubmission.update({
       where: { id: reportId },
@@ -812,9 +819,8 @@ export async function requestReportClosure(
   data: { summary: string; outcome: ClosureOutcome }
 ): Promise<{ finalized: boolean }> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
-  if (!userId || !orgId || !user) throw new Error("No autorizado");
+  if (!userId || !user) throw new Error("No autorizado");
 
   if (!CLOSURE_OUTCOMES.includes(data.outcome)) {
     throw new Error("Resultado de cierre no válido");
@@ -826,9 +832,11 @@ export async function requestReportClosure(
     );
   }
 
+  // orgId comes from the report itself — see updateReportStatus above.
   const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
+    where: { id: reportId },
     select: {
+      orgId: true,
       status: true,
       closureRequestedAt: true,
       closureApprovedAt: true,
@@ -836,6 +844,7 @@ export async function requestReportClosure(
     },
   });
   if (!report) throw new Error("Reporte no encontrado o sin acceso");
+  const orgId = report.orgId;
   if (report.status === "CLOSED") throw new Error("El caso ya está cerrado");
   if (report.closureRequestedAt && !report.closureApprovedAt) {
     throw new Error("Ya hay una solicitud de cierre pendiente de aprobación");
@@ -959,9 +968,23 @@ export async function requestReportClosure(
 
 export async function approveReportClosure(reportId: number): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
-  if (!userId || !orgId || !user) throw new Error("No autorizado");
+  if (!userId || !user) throw new Error("No autorizado");
+
+  // orgId comes from the report itself — see updateReportStatus above.
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: {
+      orgId: true,
+      status: true,
+      closureRequestedAt: true,
+      closureApprovedAt: true,
+      closureRequestedById: true,
+      isAnonymous: true,
+    },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+  const orgId = report.orgId;
 
   const userEmail = user.primaryEmailAddress?.emailAddress;
   const isAdmin = await userHasPermission(
@@ -973,18 +996,6 @@ export async function approveReportClosure(reportId: number): Promise<void> {
   if (!isAdmin) {
     throw new Error("Solo un administrador puede aprobar el cierre del caso");
   }
-
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-    select: {
-      status: true,
-      closureRequestedAt: true,
-      closureApprovedAt: true,
-      closureRequestedById: true,
-      isAnonymous: true,
-    },
-  });
-  if (!report) throw new Error("Reporte no encontrado o sin acceso");
   if (!report.closureRequestedAt || report.closureApprovedAt) {
     throw new Error("No hay una solicitud de cierre pendiente");
   }
@@ -1073,9 +1084,21 @@ export async function rejectReportClosure(
   reason?: string
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
-  if (!userId || !orgId || !user) throw new Error("No autorizado");
+  if (!userId || !user) throw new Error("No autorizado");
+
+  // orgId comes from the report itself — see updateReportStatus above.
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: {
+      orgId: true,
+      closureRequestedAt: true,
+      closureApprovedAt: true,
+      closureRequestedById: true,
+    },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+  const orgId = report.orgId;
 
   const userEmail = user.primaryEmailAddress?.emailAddress;
   const isAdmin = await userHasPermission(
@@ -1089,16 +1112,6 @@ export async function rejectReportClosure(
       "Solo un administrador puede rechazar una solicitud de cierre"
     );
   }
-
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-    select: {
-      closureRequestedAt: true,
-      closureApprovedAt: true,
-      closureRequestedById: true,
-    },
-  });
-  if (!report) throw new Error("Reporte no encontrado o sin acceso");
   if (!report.closureRequestedAt || report.closureApprovedAt) {
     throw new Error("No hay una solicitud de cierre pendiente");
   }
@@ -1153,9 +1166,16 @@ export async function rejectReportClosure(
 
 export async function reopenReportCase(reportId: number): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
-  if (!userId || !orgId || !user) throw new Error("No autorizado");
+  if (!userId || !user) throw new Error("No autorizado");
+
+  // orgId comes from the report itself — see updateReportStatus above.
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: { orgId: true, status: true },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+  const orgId = report.orgId;
 
   const userEmail = user.primaryEmailAddress?.emailAddress;
   const isAdmin = await userHasPermission(
@@ -1167,12 +1187,6 @@ export async function reopenReportCase(reportId: number): Promise<void> {
   if (!isAdmin) {
     throw new Error("Solo un administrador puede reabrir un caso cerrado");
   }
-
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-    select: { status: true },
-  });
-  if (!report) throw new Error("Reporte no encontrado o sin acceso");
 
   await prisma.formSubmission.update({
     where: { id: reportId },
@@ -1217,9 +1231,16 @@ export async function setLegalHold(
   reason?: string
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
-  if (!userId || !orgId || !user) throw new Error("No autorizado");
+  if (!userId || !user) throw new Error("No autorizado");
+
+  // orgId comes from the report itself — see updateReportStatus above.
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: { orgId: true, legalHold: true },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+  const orgId = report.orgId;
 
   const userEmail = user.primaryEmailAddress?.emailAddress;
   const isAdmin = await userHasPermission(
@@ -1231,12 +1252,6 @@ export async function setLegalHold(
   if (!isAdmin) {
     throw new Error("Solo un administrador puede activar o quitar el legal hold");
   }
-
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-    select: { legalHold: true },
-  });
-  if (!report) throw new Error("Reporte no encontrado o sin acceso");
 
   const actorName = user.fullName || "Usuario";
   const cleanReason = reason?.trim() || null;
@@ -1291,9 +1306,16 @@ export async function setReportConfidential(
   isConfidential: boolean
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
-  if (!userId || !orgId || !user) throw new Error("No autorizado");
+  if (!userId || !user) throw new Error("No autorizado");
+
+  // orgId comes from the report itself — see updateReportStatus above.
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: { orgId: true, isConfidential: true },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+  const orgId = report.orgId;
 
   const userEmail = user.primaryEmailAddress?.emailAddress;
   const isAdmin = await userHasPermission(
@@ -1307,12 +1329,6 @@ export async function setReportConfidential(
       "Solo un administrador puede marcar un caso como confidencial"
     );
   }
-
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-    select: { isConfidential: true },
-  });
-  if (!report) throw new Error("Reporte no encontrado o sin acceso");
 
   const actorName = user.fullName || "Usuario";
 
@@ -1363,9 +1379,24 @@ export async function anonymizeReporterData(
   reason?: string
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
-  if (!userId || !orgId || !user) throw new Error("No autorizado");
+  if (!userId || !user) throw new Error("No autorizado");
+
+  // orgId comes from the report itself — see updateReportStatus above.
+  const report = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: {
+      orgId: true,
+      isAnonymous: true,
+      legalHold: true,
+      reporterName: true,
+      reporterEmail: true,
+      reporterPhone: true,
+      reporterDataAnonymized: true,
+    },
+  });
+  if (!report) throw new Error("Reporte no encontrado o sin acceso");
+  const orgId = report.orgId;
 
   const userEmail = user.primaryEmailAddress?.emailAddress;
   const isAdmin = await userHasPermission(
@@ -1379,19 +1410,6 @@ export async function anonymizeReporterData(
       "Solo un administrador puede anonimizar los datos del denunciante"
     );
   }
-
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-    select: {
-      isAnonymous: true,
-      legalHold: true,
-      reporterName: true,
-      reporterEmail: true,
-      reporterPhone: true,
-      reporterDataAnonymized: true,
-    },
-  });
-  if (!report) throw new Error("Reporte no encontrado o sin acceso");
 
   if (report.legalHold) {
     throw new Error(
@@ -1452,12 +1470,22 @@ export async function anonymizeReporterData(
 
 export async function deleteReport(reportId: number): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId) {
+  if (!userId) {
     throw new Error("Unauthorized");
   }
+
+  // orgId comes from the report itself — see updateReportStatus above.
+  const existingReport = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: { id: true, orgId: true },
+  });
+
+  if (!existingReport) {
+    throw new Error("Reporte no encontrado");
+  }
+  const orgId = existingReport.orgId;
 
   const userEmail = user?.primaryEmailAddress?.emailAddress || undefined;
   const canManageOrganization = await userHasPermission(
@@ -1469,20 +1497,6 @@ export async function deleteReport(reportId: number): Promise<void> {
 
   if (!canManageOrganization) {
     throw new Error("No tienes permisos para eliminar reportes");
-  }
-
-  const existingReport = await prisma.formSubmission.findFirst({
-    where: {
-      id: reportId,
-      orgId,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (!existingReport) {
-    throw new Error("Reporte no encontrado");
   }
 
   await prisma.$transaction(async (tx) => {
@@ -1510,24 +1524,24 @@ export async function updateReportProcessedAt(
   processedAt: Date
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
-
   const user = await currentUser();
 
   if (!userId) {
     throw new Error("Unauthorized");
   }
 
-  if (!orgId) {
+  // orgId comes from the report itself — see updateReportStatus above.
+  const existingReport = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: { orgId: true },
+  });
+  if (!existingReport) {
     throw new Error("Organization not found");
   }
-  await assertRoleCanWrite(userId, orgId);
+  await assertRoleCanWrite(userId, existingReport.orgId);
 
   await prisma.formSubmission.update({
-    where: {
-      id: reportId,
-      orgId,
-    },
+    where: { id: reportId },
     data: {
       processedAt: processedAt,
     },
@@ -1555,15 +1569,28 @@ export async function bulkUpdateReports(
   value?: string
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId) {
+  if (!userId) {
     throw new Error("Unauthorized");
   }
-  await assertRoleCanWrite(userId, orgId);
 
   if (!reportIds.length) return;
+
+  // A superadmin's bulk selection in the global cross-org view can span
+  // multiple orgs — restricting the update to a single resolveOrgId() org
+  // (or requiring one at all) would silently update only the subset that
+  // happened to match, dropping the rest with no error. Verify per-org
+  // write access for every org actually represented in the selection
+  // instead of assuming one.
+  const targetReports = await prisma.formSubmission.findMany({
+    where: { id: { in: reportIds } },
+    select: { id: true, orgId: true },
+  });
+  const orgIds = [...new Set(targetReports.map((r) => r.orgId))];
+  for (const orgId of orgIds) {
+    await assertRoleCanWrite(userId, orgId);
+  }
 
   const updateData: Prisma.FormSubmissionUpdateManyArgs["data"] = {};
 
@@ -1584,7 +1611,7 @@ export async function bulkUpdateReports(
   if (Object.keys(updateData).length === 0) return;
 
   await prisma.formSubmission.updateMany({
-    where: { id: { in: reportIds }, orgId },
+    where: { id: { in: reportIds } },
     data: updateData,
   });
 
@@ -1736,24 +1763,24 @@ export async function updateReportPriority(
   newPriority: string
 ) {
   const { userId: authUserId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
 
-  if (!authUserId || !orgId) {
+  if (!authUserId) {
     throw new Error("Unauthorized");
   }
-  await assertRoleCanWrite(authUserId, orgId);
 
-  const actualUserId = authUserId;
-  const actualUserName = user?.fullName || "Usuario";
-
+  // orgId comes from the report itself — see updateReportStatus above.
   const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
+    where: { id: reportId },
   });
 
   if (!report) {
     throw new Error("Report not found");
   }
+  await assertRoleCanWrite(authUserId, report.orgId);
+
+  const actualUserId = authUserId;
+  const actualUserName = user?.fullName || "Usuario";
 
   const oldPriority = report.priority;
 
@@ -1789,14 +1816,20 @@ export async function updateReportMetadata(
   }
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId) throw new Error("Unauthorized");
-  await assertRoleCanWrite(userId, orgId);
+  if (!userId) throw new Error("Unauthorized");
+
+  // orgId comes from the report itself — see updateReportStatus above.
+  const existingReport = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: { orgId: true },
+  });
+  if (!existingReport) throw new Error("Report not found");
+  await assertRoleCanWrite(userId, existingReport.orgId);
 
   await prisma.formSubmission.update({
-    where: { id: reportId, orgId },
+    where: { id: reportId },
     data: {
       type: data.type ?? undefined,
       departmentId: data.departmentId ?? undefined,
@@ -1836,14 +1869,23 @@ export async function updateReportSubject(
   subject: string
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId) throw new Error("Unauthorized");
-  await assertRoleCanWrite(userId, orgId);
+  if (!userId) throw new Error("Unauthorized");
+
+  // orgId comes from the report itself — see updateReportStatus above.
+  // Confirmed live: this exact function silently failed (Prisma's update
+  // where-clause matched nothing) whenever the caller's resolveOrgId()
+  // org didn't match the report's real org, with no visible error.
+  const existingReport = await prisma.formSubmission.findFirst({
+    where: { id: reportId },
+    select: { orgId: true },
+  });
+  if (!existingReport) throw new Error("Report not found");
+  await assertRoleCanWrite(userId, existingReport.orgId);
 
   await prisma.formSubmission.update({
-    where: { id: reportId, orgId },
+    where: { id: reportId },
     data: {
       aiSummary: subject,
       updatedAt: new Date(),
@@ -1866,20 +1908,14 @@ export async function updateReportSubject(
 export async function getReportAttachments(
   reportId: number
 ): Promise<ReportAttachment[]> {
-  const { userId } = await auth();
-  const orgId = await resolveOrgId();
-
-  if (!userId || !orgId) {
-    throw new Error("Unauthorized");
-  }
+  // Resolves org from the report itself and enforces confidentiality —
+  // the old resolveOrgId()-based check silently returned an empty list
+  // (Prisma's relational filter just matches nothing) for any report
+  // outside the caller's cookie-selected org, instead of erroring.
+  await assertUserCanAccessReport(reportId);
 
   const attachments = await prisma.reportAttachment.findMany({
-    where: {
-      submissionId: reportId,
-      submission: {
-        orgId,
-      },
-    },
+    where: { submissionId: reportId },
     orderBy: { uploadedAt: "desc" },
   });
 
@@ -1895,11 +1931,14 @@ export async function uploadReportAttachment(
   file: File
 ): Promise<ReportAttachment> {
   const { userId: authUserId } = await auth();
-  const orgId = await resolveOrgId();
 
-  if (!authUserId || !orgId) {
+  if (!authUserId) {
     throw new Error("Unauthorized");
   }
+
+  // orgId comes from the report itself, and this also enforces the
+  // VIEWER-can't-write restriction — see updateReportStatus above.
+  const { orgId } = await assertUserCanWriteToReport(reportId);
 
   // uploadedById/uploadedByName used to be caller-supplied parameters that
   // both real call sites always omitted — the only effect was that a
@@ -1915,14 +1954,6 @@ export async function uploadReportAttachment(
       .join(" ") ||
     uploaderUser?.primaryEmailAddress?.emailAddress ||
     "Usuario desconocido";
-
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-  });
-
-  if (!report) {
-    throw new Error("Report not found");
-  }
 
   // Reject oversized files before reading them into memory — Cloudinary's
   // own max_file_size only rejects after this server has already buffered
@@ -2020,20 +2051,11 @@ export async function uploadReportAttachment(
 export async function getReportActivities(
   reportId: number
 ): Promise<ReportActivity[]> {
-  const { userId } = await auth();
-  const orgId = await resolveOrgId();
-
-  if (!userId || !orgId) {
-    throw new Error("Unauthorized");
-  }
+  // orgId comes from the report itself — see updateReportStatus above.
+  await assertUserCanAccessReport(reportId);
 
   const activities = await prisma.reportActivity.findMany({
-    where: {
-      submissionId: reportId,
-      submission: {
-        orgId,
-      },
-    },
+    where: { submissionId: reportId },
     orderBy: { createdAt: "desc" },
   });
 
@@ -2047,24 +2069,18 @@ export async function getReportActivities(
 
 export async function addReportNote(reportId: number, note: string) {
   const { userId: authUserId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
 
-  if (!authUserId || !orgId) {
+  if (!authUserId) {
     throw new Error("Unauthorized");
   }
 
   const actualUserId = authUserId;
   const actualUserName = user?.fullName || "Usuario";
 
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-  });
-
-  if (!report) {
-    throw new Error("Report not found");
-  }
-  await assertRoleCanWrite(authUserId, orgId);
+  // orgId comes from the report itself, and this also enforces the
+  // VIEWER-can't-write restriction — see updateReportStatus above.
+  await assertUserCanWriteToReport(reportId);
 
   await prisma.$transaction([
     prisma.formSubmission.update({
@@ -2090,18 +2106,12 @@ export async function addReportNote(reportId: number, note: string) {
 // ===== REPORT UPDATES MANAGEMENT =====
 
 export async function getReportUpdates(reportId: number) {
-  const orgId = await resolveOrgId();
-
-  if (!orgId) {
-    throw new Error("Unauthorized - No organization access");
-  }
+  // orgId comes from the report itself — see updateReportStatus above.
+  await assertUserCanAccessReport(reportId);
 
   try {
     const updates = await prisma.reportUpdate.findMany({
-      where: {
-        submissionId: reportId,
-        submission: { orgId },
-      },
+      where: { submissionId: reportId },
       orderBy: { createdAt: "desc" },
     });
 
@@ -2123,23 +2133,16 @@ export async function createReportUpdate(
   }
 ) {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId || !user) {
+  if (!userId || !user) {
     throw new Error("Unauthorized");
   }
 
   try {
-    // Verify report exists and user has access
-    const report = await prisma.formSubmission.findFirst({
-      where: { id: reportId, orgId },
-    });
-
-    if (!report) {
-      throw new Error("Report not found or access denied");
-    }
-    await assertRoleCanWrite(userId, orgId);
+    // orgId comes from the report itself, and this also enforces the
+    // VIEWER-can't-write restriction — see updateReportStatus above.
+    const report = await assertUserCanWriteToReport(reportId);
 
     // Check if report is closed
     if (report.status === "CLOSED" || report.status === "RESOLVED") {
@@ -2226,27 +2229,24 @@ export async function updateReportUpdate(
   }
 ) {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId || !user) {
+  if (!userId || !user) {
     throw new Error("Unauthorized");
   }
 
   try {
-    // Verify update exists and user has access
+    // Verify update exists — org comes from its own submission, not the
+    // caller's cookie-selected org — see updateReportStatus above.
     const existingUpdate = await prisma.reportUpdate.findFirst({
-      where: {
-        id: updateId,
-        submission: { orgId },
-      },
+      where: { id: updateId },
       include: { submission: true },
     });
 
     if (!existingUpdate) {
       throw new Error("Update not found or access denied");
     }
-    await assertRoleCanWrite(userId, orgId);
+    await assertUserCanWriteToReport(existingUpdate.submissionId);
 
     // Check if report is closed
     if (
@@ -2299,27 +2299,24 @@ export async function updateReportUpdate(
 
 export async function deleteReportUpdate(updateId: number) {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId || !user) {
+  if (!userId || !user) {
     throw new Error("Unauthorized");
   }
 
   try {
-    // Verify update exists and user has access
+    // Verify update exists — org comes from its own submission, not the
+    // caller's cookie-selected org — see updateReportStatus above.
     const existingUpdate = await prisma.reportUpdate.findFirst({
-      where: {
-        id: updateId,
-        submission: { orgId },
-      },
+      where: { id: updateId },
       include: { submission: true },
     });
 
     if (!existingUpdate) {
       throw new Error("Update not found or access denied");
     }
-    await assertRoleCanWrite(userId, orgId);
+    await assertUserCanWriteToReport(existingUpdate.submissionId);
 
     // Check if report is closed
     if (
@@ -2431,23 +2428,16 @@ export async function createCustomReportActivity(
   }
 ) {
   const { userId } = await auth();
-  const orgId = await (await import("@/modules/core/utils/org-resolver")).resolveOrgId();
   const user = await (await import("@clerk/nextjs/server")).currentUser();
 
-  if (!userId || !orgId || !user) {
+  if (!userId || !user) {
     throw new Error("No autorizado");
   }
 
   try {
-    // Verify report exists and user has access
-    const report = await prisma.formSubmission.findFirst({
-      where: { id: reportId, orgId },
-    });
-
-    if (!report) {
-      throw new Error("Report not found or access denied");
-    }
-    await assertRoleCanWrite(userId, orgId);
+    // orgId comes from the report itself, and this also enforces the
+    // VIEWER-can't-write restriction — see updateReportStatus above.
+    await assertUserCanWriteToReport(reportId);
 
     // Idempotency: avoid duplicates created within 10s with same title/description by same user
     const tenSecondsAgo = new Date(Date.now() - 10_000);
@@ -2830,18 +2820,16 @@ export async function createReportTask(
   }
 ) {
   const { userId } = await auth();
-  const orgId = await (await import("@/modules/core/utils/org-resolver")).resolveOrgId();
   const user = await currentUser();
 
-  if (!userId || !orgId || !user) {
+  if (!userId || !user) {
     throw new Error("No autorizado");
   }
 
-  const report = await prisma.formSubmission.findFirst({
-    where: { id: reportId, orgId },
-  });
-  if (!report) throw new Error("Report not found or access denied");
-  await assertRoleCanWrite(userId, orgId);
+  // orgId comes from the report itself, and this also enforces the
+  // VIEWER-can't-write restriction — see updateReportStatus above.
+  const report = await assertUserCanWriteToReport(reportId);
+  const orgId = report.orgId;
 
   if (report.status === "CLOSED" || report.status === "RESOLVED") {
     throw new Error("No se pueden agregar tareas a un caso cerrado");
@@ -2914,15 +2902,15 @@ export async function updateReportTask(
   }>
 ) {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
-  if (!userId || !orgId || !user) throw new Error("Unauthorized");
+  if (!userId || !user) throw new Error("Unauthorized");
 
+  // Org comes from the task's own submission — see updateReportStatus above.
   const existing = await prisma.reportUpdate.findFirst({
-    where: { id: taskId, submission: { orgId } },
+    where: { id: taskId },
   });
   if (!existing) throw new Error("Task not found or access denied");
-  await assertRoleCanWrite(userId, orgId);
+  const { orgId } = await assertUserCanWriteToReport(existing.submissionId);
 
   const isCompleting = data.status === "completed" && existing.status !== "completed";
 
@@ -2989,15 +2977,15 @@ export async function updateReportTask(
 
 export async function deleteReportTask(taskId: number) {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
   const user = await currentUser();
-  if (!userId || !orgId || !user) throw new Error("Unauthorized");
+  if (!userId || !user) throw new Error("Unauthorized");
 
+  // Org comes from the task's own submission — see updateReportStatus above.
   const existing = await prisma.reportUpdate.findFirst({
-    where: { id: taskId, submission: { orgId } },
+    where: { id: taskId },
   });
   if (!existing) throw new Error("Task not found or access denied");
-  await assertRoleCanWrite(userId, orgId);
+  await assertUserCanWriteToReport(existing.submissionId);
 
   // Delete children first to avoid FK constraint violations, then parent
   await prisma.$transaction(async (tx) => {
@@ -3028,16 +3016,17 @@ export async function reorderReportTasks(
   orderedIds: number[]
 ): Promise<void> {
   const { userId } = await auth();
-  const orgId = await resolveOrgId();
-  if (!userId || !orgId) throw new Error("Unauthorized");
-  await assertRoleCanWrite(userId, orgId);
+  if (!userId) throw new Error("Unauthorized");
 
-  // Verify tasks belong to org and report
+  // orgId comes from the report itself, and this also enforces the
+  // VIEWER-can't-write restriction — see updateReportStatus above.
+  await assertUserCanWriteToReport(reportId);
+
+  // Verify tasks belong to this report (org access already checked above)
   const tasks = await prisma.reportUpdate.findMany({
     where: {
       id: { in: orderedIds },
       submissionId: reportId,
-      submission: { orgId },
       parentId: parentId ?? null,
     },
     select: { id: true },

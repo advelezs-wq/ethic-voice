@@ -54,7 +54,6 @@ export async function assignMembersToReport(
   members: AssignMemberInput[]
 ): Promise<void> {
   try {
-  // TEMP DEBUG wrapper — revert once diagnosed
   const { userId: currentUserId } = await auth();
   if (!currentUserId) {
     throw new Error("No autorizado");
@@ -185,14 +184,7 @@ export async function assignMembersToReport(
     revalidatePath("/app/reports");
   } catch (error) {
     console.error("Error assigning members:", error);
-    // TEMP DEBUG — surfacing the real cause of a production-only failure;
-    // revert this to the generic message once diagnosed.
-    throw new Error(
-      "DEBUG: " +
-        (error instanceof Error
-          ? `${error.message} :: ${error.stack?.slice(0, 800)}`
-          : String(error))
-    );
+    throw new Error("Error al asignar investigadores");
   }
 }
 

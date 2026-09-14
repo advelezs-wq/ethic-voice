@@ -74,8 +74,10 @@ export async function assignMembersToReport(
     throw new Error("Reporte no encontrado");
   }
   const orgId = report.orgId;
+  console.log("[TRACE assign] report found, orgId:", orgId);
 
   await assertOrgAdmin(currentUserId, orgId, "No tienes permisos para asignar investigadores");
+  console.log("[TRACE assign] assertOrgAdmin passed");
 
   // members[].userId is caller-supplied with no other validation — without
   // this, an admin (or a Server Action call crafted outside the UI) could
@@ -94,6 +96,7 @@ export async function assignMembersToReport(
   if (bogusIds.length > 0) {
     throw new Error("Uno o más usuarios no pertenecen a esta organización");
   }
+  console.log("[TRACE assign] membership validation passed, starting transaction");
 
     // Create assignments in a transaction
     await prisma.$transaction(async (tx) => {
@@ -101,6 +104,7 @@ export async function assignMembersToReport(
       const existingAssignments = await tx.reportAssignment.findMany({
         where: { reportId },
       });
+      console.log("[TRACE assign] existingAssignments fetched:", existingAssignments.length);
 
       // Create new assignments
       const assignments = members.map((member) => ({
@@ -114,6 +118,7 @@ export async function assignMembersToReport(
         data: assignments,
         skipDuplicates: true, // Skip if already assigned
       });
+      console.log("[TRACE assign] createMany done");
 
       // If this is the first assignment and report is PENDING, change status to IN_PROGRESS
       if (existingAssignments.length === 0 && report.status === "PENDING") {
@@ -161,16 +166,20 @@ export async function assignMembersToReport(
           userName: "Current User",
         },
       });
+      console.log("[TRACE assign] activity logged, transaction complete");
     });
+    console.log("[TRACE assign] transaction committed");
 
     // Send notification to each assigned member
     try {
       for (const member of members) {
+        console.log("[TRACE assign] notifying", member.userId);
         await notificationsService.notifyReportAssigned(
           reportId,
           member.userId,
           currentUserId
         );
+        console.log("[TRACE assign] notified", member.userId);
       }
     } catch (notificationError) {
       console.error(

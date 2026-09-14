@@ -5,7 +5,6 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { notificationsService } from "@/modules/app/services/notifications.service";
-import { resolveOrgId } from "@/modules/core/utils/org-resolver";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
 // A superadmin browsing "por org" has no OrganizationMembership row for
@@ -74,10 +73,8 @@ export async function assignMembersToReport(
     throw new Error("Reporte no encontrado");
   }
   const orgId = report.orgId;
-  console.log("[TRACE assign] report found, orgId:", orgId);
 
   await assertOrgAdmin(currentUserId, orgId, "No tienes permisos para asignar investigadores");
-  console.log("[TRACE assign] assertOrgAdmin passed");
 
   // members[].userId is caller-supplied with no other validation — without
   // this, an admin (or a Server Action call crafted outside the UI) could
@@ -96,7 +93,6 @@ export async function assignMembersToReport(
   if (bogusIds.length > 0) {
     throw new Error("Uno o más usuarios no pertenecen a esta organización");
   }
-  console.log("[TRACE assign] membership validation passed, starting transaction");
 
     // Create assignments in a transaction
     await prisma.$transaction(async (tx) => {
@@ -104,7 +100,6 @@ export async function assignMembersToReport(
       const existingAssignments = await tx.reportAssignment.findMany({
         where: { reportId },
       });
-      console.log("[TRACE assign] existingAssignments fetched:", existingAssignments.length);
 
       // Create new assignments
       const assignments = members.map((member) => ({
@@ -118,7 +113,6 @@ export async function assignMembersToReport(
         data: assignments,
         skipDuplicates: true, // Skip if already assigned
       });
-      console.log("[TRACE assign] createMany done");
 
       // If this is the first assignment and report is PENDING, change status to IN_PROGRESS
       if (existingAssignments.length === 0 && report.status === "PENDING") {
@@ -166,20 +160,16 @@ export async function assignMembersToReport(
           userName: "Current User",
         },
       });
-      console.log("[TRACE assign] activity logged, transaction complete");
     });
-    console.log("[TRACE assign] transaction committed");
 
     // Send notification to each assigned member
     try {
       for (const member of members) {
-        console.log("[TRACE assign] notifying", member.userId);
         await notificationsService.notifyReportAssigned(
           reportId,
           member.userId,
           currentUserId
         );
-        console.log("[TRACE assign] notified", member.userId);
       }
     } catch (notificationError) {
       console.error(
@@ -310,8 +300,7 @@ export async function removeAssignmentFromReport(
 // Get available members for assignment (members not already assigned)
 export async function getAvailableMembersForAssignment(
   reportId: number,
-  departmentId?: string,
-  orgIdOverride?: string
+  departmentId?: string
 ): Promise<(AssignMemberInput & { conflict: ConflictFlags })[]> {
   const { userId } = await auth();
 
@@ -319,35 +308,30 @@ export async function getAvailableMembersForAssignment(
     throw new Error("No autorizado");
   }
 
-  // orgIdOverride came from a client-side prop with no server-side check
-  // that the caller actually belongs to it — any authenticated user could
-  // call this directly with another organization's id and get back that
-  // org's full member roster (real names, emails, departments). Only trust
-  // it once verified against real membership or a superadmin bypass, the
-  // same check resolveOrgId() applies to the ev_org cookie.
-  let orgId: string | null;
-  if (orgIdOverride) {
-    const [membership, user] = await Promise.all([
-      prisma.organizationMembership.findUnique({
-        where: { userId_orgId: { userId, orgId: orgIdOverride } },
-      }),
-      currentUser(),
-    ]);
-    const userEmail = user?.primaryEmailAddress?.emailAddress;
-    const isSuper = Boolean(userEmail && isSuperAdmin(userEmail));
-    if (!membership && !isSuper) {
-      throw new Error("No autorizado para ver esta organización");
-    }
-    orgId = orgIdOverride;
-  } else {
-    orgId = await resolveOrgId();
-  }
-
-  if (!orgId) {
-    throw new Error("No autorizado");
-  }
-
   try {
+    // orgId comes from the report itself, not a client-supplied org (the
+    // old orgIdOverride) or resolveOrgId()'s cookie-selected org — either
+    // could point at a different org than the report actually belongs to
+    // (routine for a superadmin in the global cross-org view), which
+    // silently returned a DIFFERENT org's member roster than the one
+    // assignMembersToReport validates against, so a name shown as
+    // assignable here would then fail there with "no pertenece a esta
+    // organización".
+    const report = await prisma.formSubmission.findFirst({
+      where: { id: reportId },
+      select: {
+        orgId: true,
+        departmentId: true,
+        content: true,
+        isAnonymous: true,
+        reporterEmail: true,
+      },
+    });
+    if (!report) {
+      throw new Error("Reporte no encontrado");
+    }
+    const orgId = report.orgId;
+
     // Get current assignments
     const currentAssignments = await prisma.reportAssignment.findMany({
       where: { reportId },
@@ -355,20 +339,6 @@ export async function getAvailableMembersForAssignment(
     });
 
     const assignedUserIds = currentAssignments.map((a) => a.userId);
-
-    // Pull the report's own department + reporter/accused info so we can
-    // flag likely conflicts of interest on each candidate below — an
-    // investigator from the same department as the case, sharing a name
-    // with the accused, or being the reporter themselves.
-    const report = await prisma.formSubmission.findFirst({
-      where: { id: reportId, orgId },
-      select: {
-        departmentId: true,
-        content: true,
-        isAnonymous: true,
-        reporterEmail: true,
-      },
-    });
 
     let accusedName: string | null = null;
     if (report?.content) {
@@ -385,13 +355,15 @@ export async function getAvailableMembersForAssignment(
       }
     }
 
-    // Get all organization members
+    // Get all organization members. No role filter: assignMembersToReport
+    // itself accepts any real member of the org (ADMIN included) — a
+    // single-admin org (the common case on Starter) would otherwise have
+    // zero assignable candidates ever shown here despite being assignable.
     const whereClause: any = {
       orgId,
       userId: {
         notIn: assignedUserIds, // Exclude already assigned
       },
-      role: "MEMBER", // Only show members, not admins
     };
 
     // Filter by department if specified

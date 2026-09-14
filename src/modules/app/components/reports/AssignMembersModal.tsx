@@ -104,7 +104,7 @@ export function AssignMembersModal({
     setLoadingMembers(true);
     try {
       const [membersData, departmentsData] = await Promise.all([
-        getAvailableMembersForAssignment(reportId, undefined, organizationId),
+        getAvailableMembersForAssignment(reportId),
         getDepartments(organizationId),
       ]);
 

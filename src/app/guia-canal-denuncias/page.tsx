@@ -9,6 +9,18 @@ export const metadata: Metadata = {
     title: "Guía gratuita: canal de denuncias efectivo | EthicVoice",
     description:
       "Detecta fraude y conductas indebidas antes de que se conviertan en crisis. Recurso gratuito con EthicVoice y Valor Estratégico.",
+    // Per-route openGraph replaces the root layout's wholesale rather than
+    // merging — see page.tsx (homepage) for the full explanation of the
+    // bug this caused (no og:image at all, crawler fell back to a random
+    // page image instead).
+    images: [
+      {
+        url: "/brand/ethicvoice.jpeg",
+        width: 1200,
+        height: 630,
+        alt: "EthicVoice | Plataforma de Línea Ética",
+      },
+    ],
   },
 };
 

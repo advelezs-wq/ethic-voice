@@ -13,6 +13,23 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "EthicVoice",
     type: "website",
+    // Next.js's per-route metadata replaces the parent layout's `openGraph`
+    // object wholesale rather than merging it field-by-field — omitting
+    // `images` here meant the homepage shipped with NO og:image tag at all.
+    // Link-preview crawlers (WhatsApp, etc.) then fell back to grabbing an
+    // image from the page content itself, landing on a client logo from
+    // the landing page's "trusted by" section instead of the real brand
+    // image — cropped down to a small thumbnail, it looked like an
+    // unrelated company's logo.
+    images: [
+      {
+        // Relative — resolved against the root layout's metadataBase.
+        url: "/brand/ethicvoice.jpeg",
+        width: 1200,
+        height: 630,
+        alt: "EthicVoice | Plataforma de Línea Ética",
+      },
+    ],
   },
 };
 

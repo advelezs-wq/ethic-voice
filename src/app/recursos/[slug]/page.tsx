@@ -30,12 +30,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       magnet.description?.slice(0, 160) ||
       `Descarga gratis: ${magnet.title}. Recurso de EthicVoice.`,
     alternates: { canonical: `/recursos/${magnet.slug}` },
+    // Per-route openGraph replaces the root layout's wholesale rather than
+    // merging — always define images with a real fallback so a resource
+    // without a cover never ships with no og:image at all. See
+    // src/app/page.tsx for the full explanation.
     openGraph: {
       title: magnet.title,
       description: magnet.description?.slice(0, 160) || magnet.title,
-      ...(magnet.coverImageUrl
-        ? { images: [{ url: magnet.coverImageUrl }] }
-        : {}),
+      images: [{ url: magnet.coverImageUrl || "/brand/ethicvoice.jpeg" }],
     },
   };
 }

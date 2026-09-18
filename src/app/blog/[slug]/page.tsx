@@ -62,13 +62,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           },
         }
       : undefined,
-    openGraph: ogImage
-      ? {
-          images: [{ url: ogImage }],
-          title: finalTitle,
-          description: finalDescription,
-        }
-      : undefined,
+    // Per-route openGraph replaces the root layout's wholesale rather than
+    // merging — always define it with a real image (the post's own, or the
+    // brand default) so a post without a cover never ships with no
+    // og:image at all. See src/app/page.tsx for the full explanation.
+    openGraph: {
+      images: [{ url: ogImage || "/brand/ethicvoice.jpeg" }],
+      title: finalTitle,
+      description: finalDescription,
+    },
   };
 }
 

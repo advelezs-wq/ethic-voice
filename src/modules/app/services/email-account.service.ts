@@ -6,6 +6,10 @@ import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils
 import { sanitizeSubmissionText } from "@/lib/security/submission-security";
 import { SubmissionSource } from "@/types/submission.types";
 import { userHasPermission } from "@/modules/core/utils/permissions";
+import {
+  upsertImprovMxAlias,
+  deleteImprovMxAliasByName,
+} from "@/modules/app/lib/improvmx-client";
 import type { Prisma } from "@prisma/client";
 
 /**
@@ -85,6 +89,11 @@ export class EmailAccountService {
     );
 
     if (!hasEmailChannel) {
+      const existingConfig = await prisma.emailConfiguration.findUnique({
+        where: { orgId },
+        select: { isActive: true, emailAlias: true },
+      });
+
       const deactivation = await prisma.emailConfiguration.updateMany({
         where: { orgId, isActive: true },
         data: {
@@ -99,6 +108,18 @@ export class EmailAccountService {
       });
 
       if (deactivation.count > 0) {
+        if (existingConfig?.emailAlias) {
+          try {
+            const domain = process.env.FORWARDING_DOMAIN || "ethicvoice.co";
+            await deleteImprovMxAliasByName(domain, existingConfig.emailAlias);
+          } catch (e) {
+            console.error(
+              `Failed to remove ImprovMX alias for org ${orgId} on plan lapse:`,
+              e
+            );
+          }
+        }
+
         await this.appendEmailAuditEvent(orgId, {
           type: "EMAIL_INBOX_AUTO_DEACTIVATED_PLAN",
           reason: "Plan inactivo o sin canal de correo",
@@ -246,12 +267,14 @@ export class EmailAccountService {
 
     const config = await prisma.emailConfiguration.findUnique({
       where: { orgId },
-      select: { id: true, isActive: true },
+      select: { id: true, isActive: true, emailAlias: true },
     });
 
     if (!config) {
       throw new Error("Primero debes crear la configuración de bandeja");
     }
+
+    const domain = process.env.FORWARDING_DOMAIN || "ethicvoice.co";
 
     if (activate) {
       const planInfo = await getOrganizationPlanInfo(orgId);
@@ -261,6 +284,26 @@ export class EmailAccountService {
       if (!hasEmailChannel) {
         throw new Error(
           "Tu plan actual no permite activar la bandeja de correo. Actualiza a GROW o superior."
+        );
+      }
+
+      // Re-sync (not just trust the DB) before flipping isActive — the
+      // alias could be missing entirely if it was never created, deleted
+      // out-of-band in the ImprovMX dashboard, or created before
+      // IMPROVMX_API_KEY existed. Marking the channel active without this
+      // would let an admin believe email is flowing when every incoming
+      // report would actually go nowhere.
+      await upsertImprovMxAlias(domain, config.emailAlias, this.buildWebhookUrl());
+    } else {
+      try {
+        await deleteImprovMxAliasByName(domain, config.emailAlias);
+      } catch (e) {
+        // Don't block deactivation on this — the webhook already checks
+        // plan/isActive and no-ops, so a stray alias left in ImprovMX is a
+        // cleanup miss, not a correctness or security issue.
+        console.error(
+          `Failed to remove ImprovMX alias for org ${orgId}:`,
+          e
         );
       }
     }
@@ -286,26 +329,43 @@ export class EmailAccountService {
     return updated;
   }
 
+  /** The webhook target every org's ImprovMX alias forwards to. */
+  private buildWebhookUrl(): string {
+    const webhookSecret =
+      process.env.IMPROVMX_WEBHOOK_SECRET || process.env.EMAIL_WEBHOOK_SHARED_SECRET;
+    if (!webhookSecret) {
+      throw new Error(
+        "IMPROVMX_WEBHOOK_SECRET no está configurada — no se puede gestionar el alias de correo de forma segura"
+      );
+    }
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || "";
+    return `${baseUrl}/api/webhooks/email/secure?secret=${webhookSecret}`;
+  }
+
   /**
-   * Opción 1: Usar servicio de email forwarding
-   * Servicios como ForwardEmail, ImprovMX, o tu propio dominio
+   * Creates (or re-points, if it already exists) the org's ImprovMX inbound
+   * alias via the real API, so a report sent to `{slug}@ethicvoice.co`
+   * actually reaches the webhook that turns it into a case — this used to
+   * just write DB config and "simulate" the creation, silently leaving
+   * every new org's alias unconfigured in ImprovMX until someone noticed
+   * and added it by hand in the dashboard.
    */
   private async createEmailForwarding(org: any) {
-    // Ejemplo con ImprovMX (servicio gratuito de forwarding)
-    const baseEmail = process.env.FORWARDING_DOMAIN || "ethicvoice.co";
-    const emailAddress = `${org.slug}@${baseEmail}`;
-    const forwardTo = process.env.MASTER_INBOX || "info@ethicvoice.co";
+    const domain = process.env.FORWARDING_DOMAIN || "ethicvoice.co";
+    const emailAddress = `${org.slug}@${domain}`;
+    const webhookUrl = this.buildWebhookUrl();
 
-    // En producción, llamarías a la API del servicio
-    // Por ahora, simulamos la creación
+    const alias = await upsertImprovMxAlias(domain, org.slug, webhookUrl);
+
     return {
       address: emailAddress,
-      forwardingAddress: forwardTo,
+      forwardingAddress: webhookUrl,
       provider: "improvmx",
       config: {
         alias: org.slug,
-        domain: baseEmail,
-        forwardTo,
+        domain,
+        improvmxAliasId: alias.id,
       },
     };
   }

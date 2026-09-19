@@ -515,30 +515,50 @@ export class EmailWebhookService {
       },
     });
 
+    // The case record above is already durably saved in Postgres — queueing
+    // it for AI analysis is a separate, best-effort step that depends on
+    // Redis/BullMQ being up. Letting a queueing failure (e.g. a Redis
+    // outage) throw out of this function would make the webhook return an
+    // error even though the report was successfully received, which risks
+    // ImprovMX re-delivering the same email and/or the reporter seeing a
+    // bounce for a report that actually exists. A submission that fails to
+    // queue here just sits with no AI analysis, exactly like one whose
+    // queueing succeeded but whose worker job later failed — both are
+    // already recoverable via the "Analizar con IA" manual retry and the
+    // daily stale-job reconciliation.
     const canUseAi = Boolean(planInfo?.features?.hasAiProcessing);
+    let queued = false;
     if (canUseAi) {
-      await addSubmissionToQueue({
-        orgId: emailConfig.orgId,
-        content: normalizedContent,
-        source: SubmissionSource.EMAIL,
-        metadata: {
-          submissionId: submission.id,
-          emailId: emailData.messageId || null,
-          deduplicationHash,
-          emailProvider: provider,
-        },
-        reporterInfo: {
-          email: emailData.from || null,
-          name: emailData.fromName || null,
-          isAnonymous: false,
-        },
-      });
+      try {
+        await addSubmissionToQueue({
+          orgId: emailConfig.orgId,
+          content: normalizedContent,
+          source: SubmissionSource.EMAIL,
+          metadata: {
+            submissionId: submission.id,
+            emailId: emailData.messageId || null,
+            deduplicationHash,
+            emailProvider: provider,
+          },
+          reporterInfo: {
+            email: emailData.from || null,
+            name: emailData.fromName || null,
+            isAnonymous: false,
+          },
+        });
+        queued = true;
+      } catch (queueError) {
+        console.error(
+          `[EMAIL_WEBHOOK] Failed to queue submission ${submission.id} for AI analysis (report was still saved):`,
+          queueError
+        );
+      }
     }
 
     return {
       success: true,
       submissionId: submission.id,
-      queued: canUseAi,
+      queued,
       aiEnabled: canUseAi,
     };
   }

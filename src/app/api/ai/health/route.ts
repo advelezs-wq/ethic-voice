@@ -28,11 +28,10 @@ export async function GET() {
 
     const orgId: string | null = null;
 
-    // 1. Check Redis connection — ping the actual queue connection (picks
-    // UPSTASH_REDIS_URL over REDIS_URL, same as redis-config.ts) rather than
-    // a fresh client hardcoded to REDIS_URL, which falsely reported Redis as
-    // down whenever only UPSTASH_REDIS_URL was configured (the common case
-    // in production).
+    // 1. Check Redis connection — ping the actual queue connection (same
+    // resolution as redis-config.ts: REDIS_URL, falling back to the legacy
+    // UPSTASH_REDIS_URL name) rather than a fresh client that could resolve
+    // a different URL and falsely report Redis as up or down.
     let redisStatus = "disconnected";
     try {
       await queueRedisConnection.ping();

@@ -3,7 +3,7 @@ import { securityManager, getClientIP } from '@/modules/app/lib/security/rate-li
 import { submitEthicLineReport } from '@/actions/submission.actions';
 import { verifyHcaptchaToken } from '@/lib/security/verify-hcaptcha';
 import { normalizeIdempotencyKey } from '@/lib/security/submission-security';
-import { upstashRedis } from '@/modules/app/lib/queue/redis-config';
+import { appRedis } from '@/modules/app/lib/queue/redis-config';
 
 export async function POST(request: NextRequest) {
   try {
@@ -96,10 +96,7 @@ export async function POST(request: NextRequest) {
     if (idempotencyKey) {
       await securityManager.updateIdempotencyStats('attempts');
       lockKey = `submit:idempotency:lock:${organizationId}:${idempotencyKey}`;
-      const lockResult = await upstashRedis.set(lockKey, "1", {
-        nx: true,
-        ex: 60,
-      });
+      const lockResult = await appRedis.set(lockKey, "1", 'EX', 60, 'NX');
       lockAcquired = lockResult === "OK";
 
       if (!lockAcquired) {
@@ -206,7 +203,7 @@ export async function POST(request: NextRequest) {
       });
     } finally {
       if (lockAcquired && lockKey) {
-        await upstashRedis.del(lockKey);
+        await appRedis.del(lockKey);
       }
     }
 

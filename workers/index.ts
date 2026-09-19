@@ -8,7 +8,7 @@ async function startWorkers() {
   try {
     // Test Redis connections first
     const connectionTest = await testRedisConnections();
-    if (!connectionTest.upstash || !connectionTest.queue) {
+    if (!connectionTest.app || !connectionTest.queue) {
       console.error('❌ Redis connections failed. Exiting...');
       process.exit(1);
     }
@@ -83,7 +83,7 @@ async function startWorkers() {
     console.log('   - Submission Worker: Running (concurrency: 3)');
     console.log('   - Email Worker: Running (concurrency: 1)');
     console.log('   - Health Checks: Every 30 seconds');
-    console.log('   - Redis: Connected to Upstash');
+    console.log('   - Redis: Connected');
     
   } catch (error) {
     console.error('❌ Failed to start workers:', error);

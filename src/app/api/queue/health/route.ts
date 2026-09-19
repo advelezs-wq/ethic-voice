@@ -30,10 +30,10 @@ export async function GET() {
     const queueStats = await getQueueStats();
 
     const healthReport = {
-      status: redisConnections.upstash && redisConnections.queue && queueHealth.healthy ? 'healthy' : 'unhealthy',
+      status: redisConnections.app && redisConnections.queue && queueHealth.healthy ? 'healthy' : 'unhealthy',
       timestamp: new Date().toISOString(),
       redis: {
-        upstash: redisConnections.upstash,
+        app: redisConnections.app,
         queue: redisConnections.queue,
       },
       queues: {
@@ -45,12 +45,12 @@ export async function GET() {
     };
 
     // Add recommendations based on health status
-    if (!redisConnections.upstash) {
-      healthReport.recommendations.push('Configure Upstash Redis credentials (UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN)');
+    if (!redisConnections.app) {
+      healthReport.recommendations.push('Configure REDIS_URL (and REDIS_TLS_CA if using TLS)');
     }
-    
+
     if (!redisConnections.queue) {
-      healthReport.recommendations.push('Configure Redis connection for BullMQ (UPSTASH_REDIS_URL or REDIS_URL)');
+      healthReport.recommendations.push('Configure Redis connection for BullMQ (REDIS_URL)');
     }
     
     if (!queueHealth.healthy) {

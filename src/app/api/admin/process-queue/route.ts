@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   try {
     // Verify Redis connections first
     const connectionTest = await testRedisConnections();
-    if (!connectionTest.upstash || !connectionTest.queue) {
+    if (!connectionTest.app || !connectionTest.queue) {
       console.error("❌ Redis connections failed");
       return NextResponse.json(
         {
@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      healthy: connectionTest.upstash && connectionTest.queue,
+      healthy: connectionTest.app && connectionTest.queue,
       connections: connectionTest,
       stats,
     });

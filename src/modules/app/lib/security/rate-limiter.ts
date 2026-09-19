@@ -151,6 +151,19 @@ export class SecurityManager {
     const rateKey = `${REDIS_KEYS.RATE_LIMIT_PREFIX}:${type}:${identifier}:${currentWindow}`;
     const maxTokens = RATE_LIMITS[type];
 
+    // Fail OPEN, not closed: this counter backs every public intake point
+    // on the platform (the report submission form, all three email
+    // webhooks, uploads, public chat, lead magnets) — a `maxTokens + 1`
+    // fallback here means ANY Redis hiccup (an outage, an exceeded Upstash
+    // quota, a network blip) forces `allowed = false` for every single
+    // request everywhere, turning a rate-limiter defense-in-depth layer
+    // into a full platform-wide outage of the actual reporting channels it
+    // was meant to protect. Confirmed live: during an active Upstash quota
+    // outage, the authenticated (shared-secret-gated) email webhook was
+    // rejecting every inbound complaint with 429 before ever reaching
+    // EmailWebhookService. Falling back to 0 means "can't count this
+    // window, so don't rate-limit it" — the blocked-IP and suspicious-IP
+    // checks above (which fail open) remain the real abuse defense.
     const currentCount = await this.safeRedisOperation(
       async () => {
         const next = await upstashRedis.incr(rateKey);
@@ -159,7 +172,7 @@ export class SecurityManager {
         }
         return Number(next || 0);
       },
-      maxTokens + 1
+      0
     );
     const allowed = currentCount <= maxTokens;
     const remaining = Math.max(0, maxTokens - currentCount);

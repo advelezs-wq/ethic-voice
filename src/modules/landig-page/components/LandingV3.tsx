@@ -313,6 +313,29 @@ const PLAN_ORDER = [
   PlanType.GROW_PRO,
 ] as const;
 
+const PREMIUM_JOURNEY = [
+  {
+    step: "01",
+    title: "Diagnóstico",
+    desc: "Programa, riesgos y necesidades de tu organización.",
+  },
+  {
+    step: "02",
+    title: "Diseño personalizado",
+    desc: "Landing, canales, flujos e identidad a tu medida.",
+  },
+  {
+    step: "03",
+    title: "Implementación",
+    desc: "Configuración, migración de datos y capacitación al equipo.",
+  },
+  {
+    step: "04",
+    title: "Cultura y mejora continua",
+    desc: "Comunicación interna, confianza y acompañamiento.",
+  },
+] as const;
+
 const LANDING_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const LANDING_STAGGER_CONTAINER: Variants = {
@@ -1984,6 +2007,31 @@ export function PricingSection() {
                 ))}
               </div>
             </div>
+            <div className="relative mt-8 border-t border-white/10 pt-8">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-200">
+                Implementación premium
+              </p>
+              <h4 className="mt-2 text-lg font-extrabold text-white">
+                Una solución diseñada para tu organización
+              </h4>
+              <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {PREMIUM_JOURNEY.map((item) => (
+                  <li key={item.step} className="flex gap-3">
+                    <span className="text-2xl font-black text-emerald-300/40">
+                      {item.step}
+                    </span>
+                    <div>
+                      <p className="text-sm font-bold text-white">
+                        {item.title}
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-white/50">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </article>
         ) : (
           <motion.article
@@ -2062,6 +2110,41 @@ export function PricingSection() {
                   </motion.div>
                 ))}
               </motion.div>
+            </div>
+            <div className="relative mt-8 border-t border-white/10 pt-8">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-200">
+                Implementación premium
+              </p>
+              <h4 className="mt-2 text-lg font-extrabold text-white">
+                Una solución diseñada para tu organización
+              </h4>
+              <motion.ol
+                className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+                initial="hidden"
+                whileInView="visible"
+                viewport={LANDING_VIEWPORT}
+                variants={LANDING_STAGGER_CONTAINER}
+              >
+                {PREMIUM_JOURNEY.map((item) => (
+                  <motion.li
+                    key={item.step}
+                    variants={LANDING_STAGGER_ITEM}
+                    className="flex gap-3"
+                  >
+                    <span className="text-2xl font-black text-emerald-300/40">
+                      {item.step}
+                    </span>
+                    <div>
+                      <p className="text-sm font-bold text-white">
+                        {item.title}
+                      </p>
+                      <p className="mt-1 text-xs leading-relaxed text-white/50">
+                        {item.desc}
+                      </p>
+                    </div>
+                  </motion.li>
+                ))}
+              </motion.ol>
             </div>
           </motion.article>
         )}

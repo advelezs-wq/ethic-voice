@@ -42,6 +42,8 @@ import {
 const DEMO_PRODUCT_VIDEO_SRC = "/demo-video.mp4";
 const DEMO_PRODUCT_VIDEO_POSTER = "/platform/ethicvoice-hero-frame.jpg";
 
+const MotionLink = motion(Link);
+
 const LANDING_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const LANDING_VIEWPORT = {
@@ -1096,6 +1098,276 @@ function BentoSection() {
   );
 }
 
+const REPORT_PORTAL_FEATURES = {
+  report: [
+    {
+      icon: "icon-[lucide--user-check]",
+      title: "Anonimato bajo tu control",
+      desc: "Reporta de forma anónima o identificada, tú decides.",
+    },
+    {
+      icon: "icon-[lucide--paperclip]",
+      title: "Evidencia protegida",
+      desc: "Adjunta documentos sin comprometer tu identidad.",
+    },
+  ],
+  track: [
+    {
+      icon: "icon-[lucide--key-round]",
+      title: "Acceso mediante clave segura",
+      desc: "Solo tú puedes consultar el estado del caso.",
+    },
+    {
+      icon: "icon-[lucide--message-circle]",
+      title: "Chat confidencial",
+      desc: "Recibe novedades y responde solicitudes.",
+    },
+  ],
+} as const;
+
+const TRACK_CASE_EVENTS = [
+  { label: "Denuncia recibida", done: true },
+  { label: "Análisis inicial completado", done: true },
+  { label: "Investigación en curso", done: false },
+] as const;
+
+const REPORT_FORM_STEPS = [
+  "Cuéntanos qué ocurrió",
+  "Personas involucradas",
+  "Adjuntar evidencia",
+] as const;
+
+/** Sección dedicada a las dos acciones del usuario final: denunciar y hacer seguimiento. */
+function ReportPortalSection() {
+  const reduced = useReducedMotion();
+  const reveal = useInViewReveal();
+  return (
+    <section
+      className="scroll-mt-24 bg-white py-16 sm:py-20 md:py-24"
+      id="denunciar"
+    >
+      <div className="mx-auto max-w-6xl px-5 sm:px-6 lg:px-8">
+        <motion.div className="text-center" {...reveal}>
+          <SectionEyebrow>Paso a seguir</SectionEyebrow>
+          <h2 className="mx-auto mt-4 max-w-2xl text-balance text-3xl font-extrabold leading-tight tracking-tight text-[#0a1e14] sm:text-4xl md:text-5xl">
+            Estamos aquí para escucharte
+          </h2>
+          <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-slate-500 sm:text-lg">
+            Realiza tu denuncia de forma confidencial y segura, o consulta su
+            estado en cualquier momento.
+          </p>
+          <div className="mx-auto mt-6 flex w-fit items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50/60 px-5 py-2.5 text-xs font-semibold text-emerald-800">
+            <i
+              className="icon-[lucide--shield-check] h-4 w-4 shrink-0"
+              aria-hidden
+            />
+            Acceso protegido · EthicVoice Secure Gateway · Cifrado de extremo
+            a extremo
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="mt-10 grid gap-6 md:grid-cols-2"
+          initial={reduced === true ? false : "hidden"}
+          whileInView={reduced === true ? undefined : "visible"}
+          viewport={LANDING_VIEWPORT}
+          variants={STAGGER_CONTAINER}
+        >
+          {/* Card 1 — Realizar denuncia */}
+          <MotionLink
+            href="/submit"
+            variants={reduced === true ? undefined : STAGGER_ITEM}
+            onMouseMove={handleSpotlightMove}
+            style={SPOTLIGHT_INITIAL_STYLE}
+            onClick={() =>
+              trackGA4Event("landing_cta_click", {
+                cta_name: "portal_report",
+                placement: "report_portal",
+              })
+            }
+            className="group relative isolate flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-[#f7faf9] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_24px_60px_rgba(10,30,20,0.12)] sm:p-8"
+          >
+            <SpotlightGlow color="rgba(163,230,53,0.16)" />
+            <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-700">
+              01 · Canal seguro
+            </span>
+            <h3 className="mt-2 text-2xl font-extrabold text-[#0a1e14]">
+              Realizar denuncia
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-500">
+              Comparte una situación de forma segura. Tú decides si deseas
+              identificarte.
+            </p>
+            <ul className="mt-5 space-y-3">
+              {REPORT_PORTAL_FEATURES.report.map((f) => (
+                <li key={f.title} className="flex items-start gap-2.5">
+                  <i
+                    className={`${f.icon} mt-0.5 h-4 w-4 shrink-0 text-emerald-600`}
+                    aria-hidden
+                  />
+                  <span className="text-sm text-slate-600">
+                    <span className="block font-bold text-[#0a1e14]">
+                      {f.title}
+                    </span>
+                    {f.desc}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4">
+              <div className="flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-rose-300" />
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
+                <span className="ml-2 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                  Nueva denuncia
+                </span>
+                <span className="ml-auto rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-bold text-emerald-700">
+                  Confidencial
+                </span>
+              </div>
+              <div className="mt-3 space-y-2">
+                {REPORT_FORM_STEPS.map((step, i) => (
+                  <div
+                    key={step}
+                    className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 ${
+                      i === 0 ? "bg-emerald-50" : ""
+                    }`}
+                  >
+                    <span
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                        i === 0
+                          ? "bg-emerald-600 text-white"
+                          : "bg-slate-100 text-slate-400"
+                      }`}
+                    >
+                      {i + 1}
+                    </span>
+                    <span
+                      className={`text-xs font-semibold ${
+                        i === 0 ? "text-[#0a1e14]" : "text-slate-400"
+                      }`}
+                    >
+                      {step}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-emerald-700">
+              Iniciar una denuncia
+              <i
+                className="icon-[lucide--arrow-right] h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            </span>
+          </MotionLink>
+
+          {/* Card 2 — Seguir mi denuncia */}
+          <MotionLink
+            href="/track"
+            variants={reduced === true ? undefined : STAGGER_ITEM}
+            onMouseMove={handleSpotlightMove}
+            style={SPOTLIGHT_INITIAL_STYLE}
+            onClick={() =>
+              trackGA4Event("landing_cta_click", {
+                cta_name: "portal_track",
+                placement: "report_portal",
+              })
+            }
+            className="group relative isolate flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-[#f7faf9] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_24px_60px_rgba(10,30,20,0.12)] sm:p-8"
+          >
+            <SpotlightGlow color="rgba(6,182,212,0.16)" />
+            <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-700">
+              02 · Consulta privada
+            </span>
+            <h3 className="mt-2 text-2xl font-extrabold text-[#0a1e14]">
+              Seguir mi denuncia
+            </h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-500">
+              Consulta avances y conversa con el equipo responsable sin
+              revelar tu identidad.
+            </p>
+            <ul className="mt-5 space-y-3">
+              {REPORT_PORTAL_FEATURES.track.map((f) => (
+                <li key={f.title} className="flex items-start gap-2.5">
+                  <i
+                    className={`${f.icon} mt-0.5 h-4 w-4 shrink-0 text-emerald-600`}
+                    aria-hidden
+                  />
+                  <span className="text-sm text-slate-600">
+                    <span className="block font-bold text-[#0a1e14]">
+                      {f.title}
+                    </span>
+                    {f.desc}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                  Caso EV-2026-0148
+                </span>
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-bold text-amber-700">
+                  En investigación
+                </span>
+              </div>
+              <div className="mt-3 space-y-2.5">
+                {TRACK_CASE_EVENTS.map((ev) => (
+                  <div key={ev.label} className="flex items-center gap-2.5">
+                    <span
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                        ev.done ? "bg-emerald-600" : "bg-amber-400"
+                      }`}
+                    >
+                      <i
+                        className={`${
+                          ev.done ? "icon-[lucide--check]" : "icon-[lucide--dot]"
+                        } h-3 w-3 text-white`}
+                        aria-hidden
+                      />
+                    </span>
+                    <span className="text-xs font-semibold text-[#0a1e14]">
+                      {ev.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-emerald-700">
+              Consultar mi caso
+              <i
+                className="icon-[lucide--arrow-right] h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            </span>
+          </MotionLink>
+        </motion.div>
+
+        <div className="mt-8 flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-[#f7faf9] px-5 py-4 text-center sm:flex-row sm:text-left">
+          <i
+            className="icon-[lucide--lock] h-5 w-5 shrink-0 text-emerald-600"
+            aria-hidden
+          />
+          <p className="text-sm text-slate-600">
+            <span className="font-bold text-[#0a1e14]">
+              Privacidad desde el diseño.
+            </span>{" "}
+            Tu información está cifrada y será tratada bajo la máxima
+            confidencialidad.{" "}
+            <span className="font-semibold text-emerald-700">ISO 37002</span>
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function IndustryChip({
   industry,
 }: {
@@ -1385,6 +1657,7 @@ export function LandingV4() {
         <HeroSection variant={variant} />
         <ClientLogos />
         <ImpactStatsSection />
+        <ReportPortalSection />
         <PainComparisonSection />
         <InteractiveDemoSection />
         <BentoSection />

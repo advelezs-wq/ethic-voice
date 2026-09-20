@@ -512,6 +512,21 @@ const SECURITY_CARDS = [
   },
 ] as const;
 
+const SECURITY_METRICS = [
+  { icon: "icon-[lucide--lock]", value: "AES-256", label: "Cifrado" },
+  { icon: "icon-[lucide--activity]", value: "99.9%", label: "Disponibilidad" },
+  { icon: "icon-[lucide--shield-check]", value: "100%", label: "Trazabilidad" },
+] as const;
+
+const SECURITY_ACCESS_LOG = [
+  { event: "Acceso autorizado", role: "Administrador" },
+  { event: "Política actualizada", role: "Investigador" },
+  { event: "Copia verificada", role: "Auditor" },
+  { event: "Acceso autorizado", role: "Investigador" },
+] as const;
+
+const SECURITY_UPTIME_BARS = [82, 91, 88, 95, 90, 97, 93, 100, 96, 99, 94, 100] as const;
+
 // ─── SECTIONS ─────────────────────────────────────────────────────────────────
 
 function HeroSection({ variant }: { variant: LandingVariant }) {
@@ -1603,6 +1618,117 @@ function SecuritySection() {
             ))}
           </motion.div>
         </div>
+
+        {/* Centro de seguridad — consola simulada, sin datos reales de ningún cliente. */}
+        <motion.div
+          className="relative z-10 mt-10 lg:mt-14"
+          initial={reduced === true ? false : { opacity: 0, y: 24 }}
+          whileInView={reduced === true ? undefined : { opacity: 1, y: 0 }}
+          viewport={LANDING_VIEWPORT}
+          transition={{ duration: 0.6, ease: LANDING_EASE }}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-8">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute h-full w-full rounded-full bg-emerald-400 opacity-60 motion-safe:animate-ping" />
+                <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              <h3 className="text-sm font-bold text-white">
+                Centro de seguridad
+              </h3>
+            </div>
+            <span className="text-xs text-white/40">
+              Todos los sistemas operativos
+            </span>
+          </div>
+
+          <div className="mt-5 grid grid-cols-3 gap-3 sm:gap-4">
+            {SECURITY_METRICS.map((m) => (
+              <div
+                key={m.label}
+                className="rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3.5"
+              >
+                <i className={`${m.icon} h-4 w-4 text-lime-300`} aria-hidden />
+                <p className="mt-2 text-base font-black text-white sm:text-lg">
+                  {m.value}
+                </p>
+                <p className="text-[10px] text-white/45 sm:text-[11px]">
+                  {m.label}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+            <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-5">
+              <h4 className="text-sm font-bold text-white">
+                Accesos recientes
+              </h4>
+              <div className="mt-3 space-y-2">
+                {SECURITY_ACCESS_LOG.map((row, i) => (
+                  <div
+                    key={`${row.event}-${i}`}
+                    className="flex items-center justify-between gap-3 rounded-xl bg-white/[0.03] px-3 py-2.5"
+                  >
+                    <span className="text-xs text-white/70">{row.event}</span>
+                    <span className="rounded-full bg-lime-300/10 px-2 py-0.5 text-[10px] font-bold text-lime-300">
+                      {row.role}
+                    </span>
+                    <i
+                      className="icon-[lucide--check] h-3.5 w-3.5 shrink-0 text-emerald-400"
+                      aria-hidden
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+                  Registro de auditoría
+                </p>
+                <p className="mt-1 text-2xl font-black text-white">12,842</p>
+                <p className="text-[11px] text-white/40">
+                  eventos registrados
+                </p>
+                <div className="mt-3 flex h-6 items-end gap-0.5">
+                  {[40, 55, 35, 70, 50, 80, 60, 90].map((h, i) => (
+                    <span
+                      key={i}
+                      className="flex-1 rounded-sm bg-lime-300/40"
+                      style={{ height: `${h}%` }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">
+                      Disponibilidad · 30 días
+                    </p>
+                    <p className="mt-1 text-sm font-bold text-white">99.9%</p>
+                  </div>
+                  <i
+                    className="icon-[lucide--circle-check-big] h-5 w-5 shrink-0 text-emerald-400"
+                    aria-hidden
+                  />
+                </div>
+                <div className="mt-3 flex h-5 items-end gap-0.5">
+                  {SECURITY_UPTIME_BARS.map((h, i) => (
+                    <span
+                      key={i}
+                      className="flex-1 rounded-sm bg-emerald-400/50"
+                      style={{ height: `${h}%` }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </motion.div>
     </section>
   );

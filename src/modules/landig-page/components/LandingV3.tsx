@@ -2262,8 +2262,20 @@ export function FAQSection() {
   );
 }
 
+const GUIDE_META = [
+  { value: "18", label: "páginas prácticas" },
+  { value: "03", label: "herramientas listas" },
+  { value: "PDF", label: "descarga inmediata" },
+] as const;
+
+const GUIDE_PREVIEW_ITEMS = [
+  { step: "01", label: "Diagnóstico inicial", state: "done" as const },
+  { step: "02", label: "Plan de implementación", state: "next" as const },
+];
+
 export function LeadMagnetBandSection() {
   const reveal = useInViewReveal();
+  const reduced = useReducedMotion();
   return (
     <motion.section
       className="scroll-mt-24 border-t border-slate-100 bg-white py-14 sm:py-16 md:py-20"
@@ -2277,7 +2289,7 @@ export function LeadMagnetBandSection() {
             style={{ background: "rgba(163,230,53,0.3)" }}
             aria-hidden
           />
-          <div className="relative grid gap-8 md:grid-cols-[1fr_auto] md:items-center md:gap-10">
+          <div className="relative grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-10">
             <div>
               <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-700">
                 Recurso gratuito
@@ -2289,10 +2301,21 @@ export function LeadMagnetBandSection() {
                 ¿Aún no estás listo para una demo? Empieza por la guía.
               </h2>
               <p className="mt-3 max-w-xl text-pretty text-sm leading-relaxed text-slate-600 sm:text-base">
-                Descarga la guía para implementar un canal de denuncias
-                exitoso: pasos, errores comunes y checklist de lanzamiento
-                interno para tu organización.
+                Una ruta práctica para diseñar e implementar un canal de
+                denuncias que las personas realmente quieran utilizar.
               </p>
+
+              <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+                {GUIDE_META.map((m) => (
+                  <div key={m.label} className="flex items-baseline gap-1.5">
+                    <span className="text-lg font-black text-[#0d212c]">
+                      {m.value}
+                    </span>
+                    <span className="text-xs text-slate-500">{m.label}</span>
+                  </div>
+                ))}
+              </div>
+
               <div className="mt-5 flex flex-wrap gap-2">
                 {[
                   "Checklist de implementación",
@@ -2311,28 +2334,108 @@ export function LeadMagnetBandSection() {
                   </span>
                 ))}
               </div>
+
+              <div className="mt-7 flex flex-col items-start gap-2">
+                <Link
+                  href="/guia-canal-denuncias"
+                  onClick={() =>
+                    trackGA4Event("landing_cta_click", {
+                      cta_name: "lead_magnet_guide",
+                      placement: "lead_magnet",
+                    })
+                  }
+                  className="inline-flex items-center gap-2 rounded-full bg-[#0a1e14] px-7 py-3.5 text-sm font-bold text-white transition hover:bg-[#123527]"
+                >
+                  <i
+                    className="icon-[lucide--download] h-4 w-4 shrink-0"
+                    aria-hidden
+                  />
+                  Descargar guía gratis
+                </Link>
+                <p className="text-xs text-slate-400">
+                  Sin costo · Sin tarjeta · Acceso inmediato
+                </p>
+              </div>
             </div>
-            <div className="flex flex-col items-start gap-3 md:items-center">
-              <Link
-                href="/guia-canal-denuncias"
-                onClick={() =>
-                  trackGA4Event("landing_cta_click", {
-                    cta_name: "lead_magnet_guide",
-                    placement: "lead_magnet",
-                  })
-                }
-                className="inline-flex items-center gap-2 rounded-full bg-[#0a1e14] px-7 py-3.5 text-sm font-bold text-white transition hover:bg-[#123527]"
-              >
-                <i
-                  className="icon-[lucide--download] h-4 w-4 shrink-0"
+
+            {/* Mockup del libro — hecho en código, sin depender de una portada real */}
+            <motion.div
+              className="relative mx-auto w-full max-w-[15rem] md:mx-0 md:justify-self-center"
+              initial={reduced === true ? false : { opacity: 0, y: 20, rotate: -2 }}
+              whileInView={reduced === true ? undefined : { opacity: 1, y: 0, rotate: -2 }}
+              viewport={LANDING_VIEWPORT}
+              transition={{ duration: 0.6, ease: LANDING_EASE, delay: 0.1 }}
+            >
+              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-[#0a1e14] to-[#123527] p-6 shadow-[0_28px_70px_rgba(10,30,20,0.35)]">
+                <div
+                  className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-40 blur-2xl"
+                  style={{ background: "rgba(163,230,53,0.4)" }}
                   aria-hidden
                 />
-                Descargar guía gratis
-              </Link>
-              <p className="text-xs text-slate-400">
-                Sin costo · Descarga inmediata
-              </p>
-            </div>
+                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-lime-300">
+                  <i className="icon-[lucide--sparkles] h-3 w-3" aria-hidden />
+                  EthicVoice
+                </div>
+                <span className="mt-8 block text-[10px] font-black uppercase tracking-widest text-white/40">
+                  Guía práctica
+                </span>
+                <h3 className="mt-2 text-lg font-extrabold leading-snug text-white">
+                  Cómo implementar un canal de denuncias efectivo
+                </h3>
+                <p className="mt-2 text-xs leading-relaxed text-white/50">
+                  De la obligación al sistema de confianza.
+                </p>
+                <p className="absolute bottom-5 left-6 text-[10px] text-white/35">
+                  Edición 2026 · LATAM
+                </p>
+              </div>
+
+              {/* Tarjetas de vista previa flotantes */}
+              <motion.div
+                className="absolute -left-8 top-6 hidden w-40 rounded-xl border border-slate-200 bg-white p-3 shadow-lg sm:block"
+                initial={reduced === true ? false : { opacity: 0, x: -12 }}
+                whileInView={reduced === true ? undefined : { opacity: 1, x: 0 }}
+                viewport={LANDING_VIEWPORT}
+                transition={{ duration: 0.5, ease: LANDING_EASE, delay: 0.3 }}
+              >
+                {GUIDE_PREVIEW_ITEMS.map((item) => (
+                  <div
+                    key={item.step}
+                    className="flex items-center gap-2 py-1"
+                  >
+                    <span className="text-[10px] font-black text-slate-300">
+                      {item.step}
+                    </span>
+                    <span className="flex-1 text-[11px] font-semibold text-[#0d212c]">
+                      {item.label}
+                    </span>
+                    <i
+                      className={`${
+                        item.state === "done"
+                          ? "icon-[lucide--check] text-emerald-600"
+                          : "icon-[lucide--arrow-right] text-slate-300"
+                      } h-3 w-3 shrink-0`}
+                      aria-hidden
+                    />
+                  </div>
+                ))}
+              </motion.div>
+
+              <motion.div
+                className="absolute -bottom-4 -right-4 flex flex-col items-center rounded-2xl border border-emerald-100 bg-white px-4 py-3 shadow-lg"
+                initial={reduced === true ? false : { opacity: 0, scale: 0.85 }}
+                whileInView={reduced === true ? undefined : { opacity: 1, scale: 1 }}
+                viewport={LANDING_VIEWPORT}
+                transition={{ duration: 0.5, ease: LANDING_EASE, delay: 0.45 }}
+              >
+                <span className="text-lg font-black text-emerald-700">
+                  100%
+                </span>
+                <span className="text-[9px] font-bold uppercase tracking-wide text-slate-400">
+                  Aplicable
+                </span>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </div>

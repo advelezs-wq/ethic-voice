@@ -299,6 +299,21 @@ const PAIN_POINTS = [
   },
 ] as const;
 
+const FRAUD_LOSS_MONTHS = [
+  { m: "Ene", h: 38 },
+  { m: "Feb", h: 44 },
+  { m: "Mar", h: 40 },
+  { m: "Abr", h: 52 },
+  { m: "May", h: 48 },
+  { m: "Jun", h: 61 },
+  { m: "Jul", h: 55 },
+  { m: "Ago", h: 68 },
+  { m: "Sep", h: 63 },
+  { m: "Oct", h: 74 },
+  { m: "Nov", h: 82 },
+  { m: "Dic", h: 100 },
+] as const;
+
 const COMPARISON_ROWS = [
   "Anonimato real garantizado",
   "Trazabilidad y auditoría completa de cada caso",
@@ -900,10 +915,10 @@ export function PainComparisonSection() {
           ))}
         </div>
 
-        {/* Industry stats */}
-        <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8">
-          <div className="flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
-            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 sm:w-auto">
+        {/* Industry stats + ejemplo de panel de analítica */}
+        <div className="mt-6 sm:mt-8">
+          <div className="grid gap-4 lg:grid-cols-[0.8fr_1.4fr_0.8fr]">
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4">
               <span className="text-2xl font-black text-[#0d212c] sm:text-3xl">
                 ~5%
               </span>
@@ -912,7 +927,47 @@ export function PainComparisonSection() {
                 organizaciones
               </span>
             </div>
-            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 sm:w-auto">
+
+            {/* Mockup del panel de analítica — ejemplo ilustrativo, no una cifra real de ningún cliente */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-5">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                  Ejemplo del panel · Pérdidas por fraude
+                </p>
+                <span className="rounded-full bg-rose-50 px-2.5 py-1 text-[10px] font-bold text-rose-600">
+                  Vista ilustrativa
+                </span>
+              </div>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="text-3xl font-black text-[#0d212c]">
+                  $2.450.000
+                </span>
+                <span className="text-xs font-semibold text-rose-500">
+                  ↑ 5.2% vs. año anterior
+                </span>
+              </div>
+              <div className="mt-4 flex h-16 items-end gap-1">
+                {FRAUD_LOSS_MONTHS.map((d) => (
+                  <div
+                    key={d.m}
+                    className="flex-1 rounded-t-sm bg-rose-200"
+                    style={{ height: `${d.h}%` }}
+                  />
+                ))}
+              </div>
+              <div className="mt-1.5 flex justify-between">
+                {FRAUD_LOSS_MONTHS.map((d, i) => (
+                  <span
+                    key={d.m}
+                    className={`text-[9px] text-slate-400 ${i % 3 === 0 ? "" : "hidden sm:block"}`}
+                  >
+                    {d.m}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4">
               <span className="text-2xl font-black text-[#0d212c] sm:text-3xl">
                 43%
               </span>
@@ -921,8 +976,10 @@ export function PainComparisonSection() {
               </span>
             </div>
           </div>
-          <p className="text-xs text-slate-400">
-            Fuente: ACFE, Report to the Nations.
+          <p className="mt-3 text-center text-xs text-slate-400">
+            Estadísticas de industria: ACFE, Report to the Nations. El panel
+            de pérdidas es una vista de ejemplo del producto, no datos de un
+            cliente real.
           </p>
         </div>
 

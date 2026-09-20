@@ -465,27 +465,27 @@ function repeatIndustries<T>(row: readonly T[]): T[] {
 const TESTIMONIALS = [
   {
     quote:
-      "La implementación fue rápida y el comité ganó visibilidad real del estado de cada caso.",
-    author: "Gerencia de Cumplimiento",
-    company: "Empresa de servicios regional",
-    initials: "GC",
-    highlight: "Implementación rápida",
+      "Un programa de compliance efectivo no depende únicamente de las políticas. Requiere procesos claros, investigaciones imparciales y decisiones oportunas que fortalezcan la confianza en la organización.",
+    author: "Francy Lorena Beltrán Rodríguez",
+    company: "Director of Corporate Risk, Ethics & Compliance",
+    initials: "FL",
+    highlight: "Investigaciones imparciales",
   },
   {
     quote:
-      "Pasamos de correos sueltos a un proceso auditable con seguimiento claro y menos fricción.",
-    author: "Dirección de Auditoría Interna",
-    company: "Grupo corporativo",
-    initials: "DA",
-    highlight: "Proceso 100% auditable",
+      "La cultura ética se construye cuando cada colaborador entiende que su voz es escuchada, respetada y protegida. Esa confianza es el verdadero motor del cumplimiento.",
+    author: "Catalina Zamudio Leiva",
+    company: "Director of Organizational Culture & Sustainability",
+    initials: "CZ",
+    highlight: "Cultura de confianza",
   },
   {
     quote:
-      "La comunicación confidencial con denunciantes mejoró la calidad de las investigaciones.",
-    author: "Responsable de Ética",
-    company: "Compañía multisitio",
-    initials: "RE",
-    highlight: "Mejores investigaciones",
+      "La tecnología debe simplificar el trabajo del Oficial de Cumplimiento, automatizando tareas repetitivas y permitiendo que el equipo concentre sus esfuerzos en el análisis y la toma de decisiones.",
+    author: "Yecid Ávila",
+    company: "Technology Director",
+    initials: "YA",
+    highlight: "Tecnología que simplifica",
   },
 ] as const;
 

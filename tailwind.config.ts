@@ -60,13 +60,30 @@ const config: Config = {
           ignored: "#EA384C",
           influential: "#6936F5",
         },
+        // Paleta de marca EthicVoice — derivada del logotipo (ver BRAND.md).
+        // slate #244850 y signal #98D050 son los dos colores exactos del logo.
         ev: {
-          ink: "#0d212c",
-          forest: "#0a1e14",
-          mint: "#f7faf9",
-          lime: "#a3e635",
-          emerald: "#10b981",
-          sand: "#f5f3ee",
+          night: "#0B1D21",
+          deep: "#12292E",
+          ink: "#16323A",
+          slate: "#244850",
+          mute: "#5A6D70",
+          haze: "#8FA2A5",
+          signal: "#98D050",
+          "signal-soft": "#C6E89A",
+          "signal-wash": "#EEF6E2",
+          moss: "#44731A",
+          paper: "#F4F3EE",
+          bone: "#EAE8E0",
+          line: "#DCDAD1",
+          coral: "#DB4F3A",
+          amber: "#E09A2B",
+          // Alias heredados (usados por componentes anteriores al rebrand)
+          forest: "#0B1D21",
+          mint: "#F4F3EE",
+          lime: "#98D050",
+          emerald: "#44731A",
+          sand: "#F4F3EE",
         },
       },
       borderRadius: {
@@ -78,6 +95,14 @@ const config: Config = {
         sans: ["var(--font-sans)", "Inter", "system-ui", "sans-serif"],
         satoshi: ["Satoshi", "sans-serif"],
         inter: ["var(--font-sans)", "Inter", "sans-serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
+        serif: ["var(--font-serif)", "Georgia", "serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+        wordmark: ["var(--font-wordmark)", "var(--font-display)", "sans-serif"],
+      },
+      transitionTimingFunction: {
+        "ev-out": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "ev-in-out": "cubic-bezier(0.77, 0, 0.175, 1)",
       },
       keyframes: {
         "accordion-down": {

@@ -9,10 +9,14 @@ import {
   formatPriceForUI,
 } from "@/types/subscription.types";
 import { useExchangeRate } from "@/modules/core/hooks/useExchangeRate";
-import { motion } from "framer-motion";
 import CheckoutSidebar from "@/modules/app/components/checkout/CheckoutSidebar";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
-import { MarketingSectionV2 } from "@/modules/landig-page/components/MarketingSectionV2";
+import {
+  Button,
+  Container,
+  buttonClasses,
+  reveal,
+} from "@/modules/brand/components/primitives";
 import { showError } from "@/modules/core/utils/safe-toast";
 
 interface PricingPlansProps {
@@ -233,242 +237,136 @@ Gracias,
   const premiumConfig = PLAN_CONFIGS[PlanType.PREMIUM];
 
   const enterpriseFeatures = [
-    {
-      iconClass: "icon-[lucide--users]",
-      title: "Usuarios Ilimitados",
-      desc: "Sin restricciones de equipo",
-    },
-    {
-      iconClass: "icon-[lucide--mail]",
-      title: "Todos los Canales",
-      desc: "Web, Email, Chatbot, Teléfono",
-    },
-    {
-      iconClass: "icon-[lucide--brain]",
-      title: "IA Avanzada Completa",
-      desc: "Procesamiento y análisis automatizado",
-    },
-    {
-      iconClass: "icon-[lucide--chart-column]",
-      title: "Analíticas Premium",
-      desc: "Reportes detallados y métricas",
-    },
-    {
-      iconClass: "icon-[lucide--shield-check]",
-      title: "Seguridad Empresarial",
-      desc: "Cumplimiento y encriptación",
-    },
-    {
-      iconClass: "icon-[lucide--headphones]",
-      title: "Soporte Prioritario",
-      desc: "Atención personalizada 24/7",
-    },
-    {
-      iconClass: "icon-[lucide--palette]",
-      title: "Personalización Total",
-      desc: "Branding y diseño exclusivo",
-    },
-    {
-      iconClass: "icon-[lucide--graduation-cap]",
-      title: "Capacitación Completa",
-      desc: "Training para investigadores",
-    },
-    {
-      iconClass: "icon-[lucide--scale]",
-      title: "Consultoría Legal",
-      desc: "Asesoría especializada incluida",
-    },
-    {
-      iconClass: "icon-[lucide--cog]",
-      title: "Integración API",
-      desc: "Conecta con tus sistemas existentes",
-    },
-    {
-      iconClass: "icon-[lucide--clock]",
-      title: "SLA Garantizado",
-      desc: "Tiempos de respuesta asegurados",
-    },
-    {
-      iconClass: "icon-[lucide--globe]",
-      title: "Soporte Multiidioma",
-      desc: "Disponible en varios idiomas",
-    },
+    { title: "Usuarios ilimitados", desc: "Sin restricciones de equipo" },
+    { title: "Todos los canales", desc: "Web, correo, chatbot y teléfono" },
+    { title: "IA avanzada completa", desc: "Procesamiento y análisis automatizado" },
+    { title: "Analíticas premium", desc: "Reportes detallados y métricas" },
+    { title: "Seguridad empresarial", desc: "Cumplimiento y encriptación" },
+    { title: "Soporte prioritario", desc: "Atención personalizada 24/7" },
+    { title: "Personalización total", desc: "Branding y diseño exclusivo" },
+    { title: "Capacitación completa", desc: "Formación para investigadores" },
+    { title: "Consultoría legal", desc: "Asesoría especializada incluida" },
+    { title: "Integración API", desc: "Conecta tus sistemas existentes" },
+    { title: "SLA garantizado", desc: "Tiempos de respuesta asegurados" },
+    { title: "Soporte multiidioma", desc: "Disponible en varios idiomas" },
   ];
+
+  const ctaLabel = (planType: PlanType) => {
+    if (isProcessing && selectedPlan === planType) return "Procesando…";
+    const name = PLAN_CONFIGS[planType].displayName.replace("EthicVoice ", "");
+    return isSignedIn ? `Contratar ${name}` : `Empezar con ${name}`;
+  };
 
   return (
     <>
-      <MarketingSectionV2
-        id="planes-precio"
-        eyebrow="Comparar"
-        title="Elige la capacidad que necesitas"
-        subtitle="Precios en USD según ciclo de facturación. Valor en COP orientativo según tipo de cambio del día."
-      >
-        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 md:gap-8">
-          {displayPlans.map((planType) => {
-            const config = PLAN_CONFIGS[planType];
-            const price = getPrice(planType);
-            const isPopular = config.isPopular;
-            const priceDisplay = formatPriceForUI(price ?? 0);
-            const monthlyUsd =
-              billingCycle === BillingCycle.YEARLY
-                ? (price ?? 0) / 12
-                : (price ?? 0);
+      <section id="planes-precio" className="scroll-mt-20 bg-ev-paper pb-24 sm:pb-32">
+        <Container>
+          <div className="grid gap-3 md:grid-cols-3 md:gap-0">
+            {displayPlans.map((planType, i) => {
+              const config = PLAN_CONFIGS[planType];
+              const price = getPrice(planType);
+              const popular = !!config.isPopular;
+              const priceDisplay = formatPriceForUI(price ?? 0);
+              const monthlyUsd =
+                billingCycle === BillingCycle.YEARLY ? (price ?? 0) / 12 : (price ?? 0);
 
-            return (
-              <motion.div
-                key={planType}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.5,
-                  delay: displayPlans.indexOf(planType) * 0.08,
-                }}
-                className={`relative flex min-h-[520px] flex-col rounded-xl border bg-white p-6 transition-all duration-300 sm:min-h-[560px] sm:p-7 md:p-8 ${
-                  isPopular
-                    ? "border-2 border-lime-500 shadow-2xl shadow-lime-900/10"
-                    : "border border-slate-200 shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:border-slate-300 hover:shadow-lg"
-                }`}
-              >
-                {isPopular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="rounded-full bg-lime-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-md">
-                      Recomendado
-                    </span>
+              return (
+                <article
+                  key={planType}
+                  {...reveal(i * 100)}
+                  className={`relative flex flex-col rounded-[1.5rem] p-7 sm:p-9 md:rounded-none ${
+                    popular
+                      ? "z-10 bg-ev-night text-white md:-my-4 md:rounded-[1.5rem] md:py-12 md:shadow-[0_40px_80px_-30px_rgba(11,29,33,0.5)]"
+                      : "border border-ev-line bg-white/50 text-ev-night md:border-0 md:border-t md:border-ev-night md:bg-transparent"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl font-semibold tracking-[-0.025em]">
+                      {config.displayName.replace("EthicVoice ", "")}
+                    </h3>
+                    {popular && (
+                      <span className="ev-label rounded-full bg-ev-signal px-2.5 py-1 text-ev-night">
+                        Recomendado
+                      </span>
+                    )}
                   </div>
-                )}
-
-                <div className="mb-5">
-                  <h3 className="mb-2 text-2xl font-semibold text-[#0d212c]">
-                    {config.displayName}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-[#273c46]">
+                  <p className={`mt-3 min-h-[4.5rem] text-[0.9375rem] leading-relaxed ${popular ? "text-white/60" : "text-ev-mute"}`}>
                     {config.description}
                   </p>
-                </div>
 
-                <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50/80 p-4">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
-                    Precio
-                  </p>
-                  <div className="mt-1 flex flex-wrap items-baseline gap-x-1">
-                    <span
-                      className={`font-extrabold text-[#0d212c] ${
-                        priceDisplay.size === "large"
-                          ? "text-3xl md:text-4xl"
-                          : priceDisplay.size === "medium"
-                            ? "text-2xl md:text-3xl"
-                            : "text-xl md:text-2xl"
-                      }`}
-                    >
+                  <p className="mt-6 flex flex-wrap items-baseline gap-x-2">
+                    <span className="ev-num text-[3.75rem] font-semibold leading-none tracking-[-0.06em]">
                       {priceDisplay.formatted}
                     </span>
-                    <span className="text-sm font-medium text-[#273c46]">
-                      /{billingCycle === BillingCycle.YEARLY ? "año" : "mes"}
+                    <span className={`ev-label ${popular ? "text-white/50" : "text-ev-mute"}`}>
+                      USD/{billingCycle === BillingCycle.YEARLY ? "año" : "mes"}
                     </span>
-                  </div>
-                  <p className="mt-1 text-xs text-slate-500">
+                  </p>
+                  <p className={`ev-label mt-3 min-h-[1rem] ${popular ? "text-white/45" : "text-ev-haze"}`}>
                     {rates?.COP
                       ? `≈ ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(Math.round(monthlyUsd * rates.COP))} COP/mes`
                       : "\u00a0"}
                   </p>
-                </div>
 
-                <button
-                  type="button"
-                  onClick={() => handlePlanSelect(planType)}
-                  disabled={isProcessing && selectedPlan === planType}
-                  className={`mb-6 w-full rounded-lg py-3 px-6 text-sm font-semibold transition-all duration-200 disabled:opacity-60 ${
-                    isPopular
-                      ? "bg-lime-600 text-white shadow-lg hover:bg-lime-700"
-                      : "border-2 border-lime-600 text-lime-800 hover:bg-lime-600 hover:text-white"
-                  }`}
-                >
-                  {isProcessing && selectedPlan === planType
-                    ? "Procesando..."
-                    : "Iniciar sesión y continuar"}
-                </button>
+                  <Button
+                    variant={popular ? "signal" : "outline"}
+                    arrow
+                    className="mt-8 w-full"
+                    onClick={() => handlePlanSelect(planType)}
+                    disabled={isProcessing && selectedPlan === planType}
+                  >
+                    {ctaLabel(planType)}
+                  </Button>
 
-                <div className="flex flex-1 flex-col space-y-3">
-                  {config.features.highlights.map((feature, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <i className="icon-[lucide--circle-check] mt-0.5 h-5 w-5 shrink-0 text-lime-600" />
-                      <span className="text-sm text-[#273c46]">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        <div className="mx-auto mt-14 max-w-5xl">
-          <div className="mb-8 text-center">
-            <h3 className="text-balance text-2xl font-extrabold tracking-tight text-[#0d212c] md:text-3xl">
-              ¿Necesitas algo más específico?
-            </h3>
-            <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-[#273c46]">
-              Si estos planes no se ajustan a tus necesidades, creemos una
-              solución personalizada para tu organización. Desde startups hasta
-              grandes corporaciones.
-            </p>
+                  <ul className={`mt-8 flex-1 space-y-3 border-t pt-6 text-[0.9375rem] ${popular ? "border-white/10 text-white/80" : "border-ev-line text-ev-ink"}`}>
+                    {config.features.highlights.map((feature) => (
+                      <li key={feature} className="flex gap-3 leading-snug">
+                        <svg viewBox="0 0 16 16" className="mt-1 h-3.5 w-3.5 shrink-0" fill="none" aria-hidden>
+                          <path d="M3 8.5 6.5 12 13 4.5" stroke={popular ? "#98D050" : "#44731A"} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              );
+            })}
           </div>
 
-          <motion.article
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="relative overflow-hidden rounded-2xl border border-emerald-400/35 bg-gradient-to-br from-[#051a24] via-[#0d212c] to-[#052b24] p-6 shadow-2xl lg:p-10"
+          {/* Premium */}
+          <article
+            {...reveal(100)}
+            className="ev-grain ev-grain-dark relative mt-20 grid gap-12 overflow-hidden rounded-[1.75rem] bg-ev-night p-7 text-white sm:p-10 lg:grid-cols-12 lg:gap-8 lg:p-14"
           >
-            <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"
-              aria-hidden
-            />
-            <div className="relative grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
-              <div className="lg:col-span-5">
-                <span className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-emerald-200">
-                  Plan personalizado
-                </span>
-                <h4 className="mt-4 text-2xl font-bold text-white md:text-3xl">
-                  {premiumConfig.displayName}
-                </h4>
-                <p className="mt-3 text-base leading-relaxed text-white/80">
-                  {premiumConfig.description}
-                </p>
-                <a
-                  href={generateCustomPlanEmail()}
-                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-lime-400 px-6 py-3.5 text-sm font-bold text-[#052b24] shadow-lg transition-colors hover:bg-lime-500 sm:w-auto"
-                >
-                  <i className="icon-[lucide--calendar] h-5 w-5" aria-hidden />
+            <div className="lg:col-span-5">
+              <p className="ev-label text-ev-signal">¿Necesitas algo más específico?</p>
+              <h3 className="mt-5 text-[clamp(2.5rem,4vw,3.5rem)] font-semibold leading-none tracking-[-0.05em]">
+                {premiumConfig.displayName.replace("EthicVoice ", "")}
+              </h3>
+              <p className="mt-5 text-[1.0625rem] leading-relaxed text-white/65">
+                {premiumConfig.description}
+              </p>
+              <p className="ev-label mt-6 text-white/45">Precio bajo consulta · según alcance</p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Button variant="signal" arrow onClick={() => openCalendly()}>
                   Agendar consulta gratuita
+                </Button>
+                <a href={generateCustomPlanEmail()} className={buttonClasses("outline-dark")}>
+                  Escribir a ventas
                 </a>
               </div>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:col-span-7">
-                {enterpriseFeatures.map((feature, index) => (
-                  <div
-                    key={index}
-                    className="rounded-lg border border-white/20 bg-white/10 p-3 backdrop-blur-sm sm:p-4"
-                  >
-                    <div className="flex items-start gap-3">
-                      <i
-                        className={`${feature.iconClass} mt-0.5 h-5 w-5 shrink-0 text-emerald-300`}
-                      />
-                      <div>
-                        <h5 className="text-sm font-semibold text-white">
-                          {feature.title}
-                        </h5>
-                        <p className="mt-0.5 text-xs leading-snug text-white/75">
-                          {feature.desc}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
-          </motion.article>
-        </div>
-      </MarketingSectionV2>
+            <dl className="grid gap-x-8 sm:grid-cols-2 lg:col-span-7">
+              {enterpriseFeatures.map((f) => (
+                <div key={f.title} className="border-t border-white/10 py-4">
+                  <dt className="text-[0.975rem] font-medium tracking-[-0.01em]">{f.title}</dt>
+                  <dd className="mt-1 text-sm text-white/50">{f.desc}</dd>
+                </div>
+              ))}
+            </dl>
+          </article>
+        </Container>
+      </section>
 
       {checkoutSidebarOpen && subscription && (
         <CheckoutSidebar

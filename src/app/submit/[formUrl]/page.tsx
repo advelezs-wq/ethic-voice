@@ -27,25 +27,31 @@ const SubmitPage = async ({
     const formContent = JSON.parse(form.content) as FormElementInstance[];
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#f7faf9] via-white to-lime-50/40 px-4 py-10 sm:px-6">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 rounded-3xl border border-[#0a1e14]/10 bg-white/85 p-6 shadow-[0_24px_70px_-40px_rgba(10,30,20,0.45)] backdrop-blur sm:p-8">
-          <header className="w-full flex items-center justify-center">
+      <div className="mx-auto w-full max-w-[var(--ev-max)] px-[var(--ev-gutter)] pb-24 pt-10 sm:pt-14">
+        <div className="ev-label flex items-center justify-between border-b border-ev-line pb-4 text-ev-mute">
+          <span>Canal de denuncias</span>
+          <span className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 bg-ev-signal" /> Confidencial · Cifrado
+          </span>
+        </div>
+        <div className="mx-auto mt-12 flex max-w-4xl flex-col gap-10">
+          <header className="flex items-center gap-5">
             {form.organization.logoUrl ? (
               <img
                 src={form.organization.logoUrl}
                 alt={form.organization.name}
-                className="size-32 object-contain"
+                className="h-16 w-16 shrink-0 rounded-xl bg-white object-contain p-1.5 ring-1 ring-ev-line"
               />
             ) : (
-              <div className="size-32 rounded-2xl bg-gray-100 flex items-center justify-center text-3xl font-semibold text-gray-500">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-ev-night font-mono text-xl text-ev-signal">
                 {form.organization.name.charAt(0).toUpperCase()}
               </div>
             )}
+            <h1 className="text-[clamp(1.75rem,3.6vw,3rem)] font-semibold leading-[1.05] tracking-[-0.045em] text-ev-night">
+              Línea ética de {form.organization.name}
+            </h1>
           </header>
-          <main className="w-full flex flex-col gap-6 items-center justify-center">
-            <h2 className="text-center text-3xl font-semibold text-[#0a1e14] sm:text-4xl">
-              Formulario de denuncias de {form.organization.name}
-            </h2>
+          <main className="w-full rounded-[1.75rem] border border-ev-night/10 bg-white p-5 shadow-[0_50px_100px_-50px_rgba(11,29,33,0.35)] sm:p-9">
             <FormSubmitComponent formUrl={formUrl} content={formContent} />
           </main>
         </div>
@@ -78,7 +84,7 @@ const SubmitPage = async ({
   }
 
   return (
-    <div className="min-h-[calc(100dvh-5rem)] bg-gradient-to-br from-[#f7faf9] via-white to-lime-50/30">
+    <div>
       <SubmitPageWrapper initialOrganization={organization} />
     </div>
   );

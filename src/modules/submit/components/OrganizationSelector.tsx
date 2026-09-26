@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@heroui/button";
-import { Card } from "@heroui/card";
-import { Input, Image, Spinner } from "@heroui/react";
+import { Image } from "@heroui/react";
 import { Organization } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { searchOrganizationsPublic } from "@/actions/ethicline.actions";
@@ -55,174 +53,122 @@ export function OrganizationSelector({ onSelect }: OrganizationSelectorProps) {
   };
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-16 md:py-20">
-      <Button
-        onPress={() => router.back()}
-        variant="light"
-        startContent={
-          <i
-            className="icon-[lucide--arrow-left] size-5 group-hover:-translate-x-1 transition-transform"
-            role="img"
-            aria-hidden="true"
-          />
-        }
-        className="group mb-5 text-[#0d212c]"
-      >
-        Volver
-      </Button>
-
-      <div className="mb-8 rounded-3xl border border-[#0a1e14]/10 bg-white/90 p-6 text-center shadow-[0_14px_50px_rgba(10,30,20,0.08)] backdrop-blur-sm md:p-8">
-        <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
-          <span className="rounded-full border border-lime-300 bg-lime-100/70 px-3 py-1 text-xs font-semibold text-[#0a1e14]">
-            Canal confidencial
-          </span>
-          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-[#0a1e14]">
-            Protección de identidad
-          </span>
-          <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-[#0d212c]">
-            Cifrado en tránsito
-          </span>
-        </div>
-        <h1 className="mb-3 text-3xl font-extrabold tracking-tight text-[#0a1e14] md:text-4xl">
-          Seleccionar Organización
-        </h1>
-        <p className="text-base text-[#273c46] md:text-xl">
-          Selecciona tu organización para continuar con el reporte ético
-        </p>
+    <div className="mx-auto w-full max-w-[var(--ev-max)] px-[var(--ev-gutter)] pb-24 pt-10 sm:pt-14">
+      <div className="ev-label flex items-center justify-between border-b border-ev-line pb-4 text-ev-mute">
+        <button type="button" onClick={() => router.back()} className="transition-colors hover:text-ev-night">
+          ← Volver
+        </button>
+        <span className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 bg-ev-signal" /> Canal confidencial · Cifrado
+        </span>
       </div>
 
-      <Card className="rounded-3xl border border-[#0a1e14]/10 bg-white/95 p-6 shadow-[0_20px_60px_rgba(10,30,20,0.1)] md:p-8">
-        <div className="space-y-6">
-          <div>
-            <Input
-              label="Organización"
-              placeholder="Escribe al menos 3 letras del nombre de tu organización"
-              value={query}
-              onValueChange={(value) => {
-                setQuery(value);
-                setSelectedOrg(null);
-              }}
-              size="lg"
-              radius="lg"
-              classNames={{
-                inputWrapper:
-                  "bg-[#f7faf9] border border-[#0a1e14]/10 data-[hover=true]:border-lime-500",
-                input: "text-[#0d212c]",
-                label: "text-[#0a1e14] font-medium",
-              }}
-              startContent={
-                <i
-                  className="icon-[lucide--search] size-5 text-gray-400"
-                  role="img"
-                  aria-hidden="true"
-                />
-              }
-              endContent={isSearching ? <Spinner size="sm" /> : null}
-            />
+      <div className="mt-12 grid gap-14 sm:mt-16 lg:grid-cols-12 lg:gap-8">
+        <div className="lg:col-span-5">
+          <p className="ev-label text-ev-moss">Paso 1 de 2</p>
+          <h1 className="ev-display mt-6 text-ev-night">
+            ¿En qué organización <em className="ev-serif pr-[0.06em]">ocurrió?</em>
+          </h1>
+          <p className="ev-lead mt-6 max-w-md">
+            Busca tu organización para abrir su canal de denuncias. Si lo
+            permite, podrás mantener tu identidad en anonimato durante toda la
+            investigación.
+          </p>
+        </div>
+
+        <div className="lg:col-span-6 lg:col-start-7">
+          <div className="rounded-[1.75rem] border border-ev-night/10 bg-white p-6 shadow-[0_50px_100px_-50px_rgba(11,29,33,0.45)] sm:p-9">
+            <label htmlFor="org-search" className="ev-label text-ev-mute">
+              Organización
+            </label>
+            <div className="relative mt-2">
+              <svg viewBox="0 0 20 20" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-ev-haze" fill="none" aria-hidden>
+                <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.6" />
+                <path d="m13.5 13.5 3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              </svg>
+              <input
+                id="org-search"
+                type="text"
+                autoComplete="off"
+                autoFocus
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setSelectedOrg(null);
+                }}
+                placeholder="Escribe al menos 3 letras"
+                className="h-14 w-full rounded-xl border border-ev-line bg-white pl-12 pr-12 text-base text-ev-night outline-none transition-[border-color,box-shadow] placeholder:text-ev-haze focus:border-ev-night/50 focus:shadow-[0_0_0_4px_rgba(152,208,80,0.3)]"
+              />
+              {isSearching ? (
+                <span className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin rounded-full border-2 border-ev-line border-t-ev-night" aria-label="Buscando" />
+              ) : null}
+            </div>
 
             {!selectedOrg && results.length > 0 && (
-              <div className="mt-2 space-y-1 rounded-2xl border border-[#0a1e14]/10 bg-white p-2 shadow-sm">
+              <ul className="mt-3 divide-y divide-ev-line overflow-hidden rounded-xl border border-ev-line" role="listbox">
                 {results.map((org) => (
-                  <button
-                    key={org.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedOrg(org);
-                      setResults([]);
-                    }}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-lime-50"
-                  >
-                    {org.logoUrl ? (
-                      <div className="relative flex h-6 w-6 items-center justify-center">
-                        <Image
-                          src={org.logoUrl}
-                          alt={org.name}
-                          width={24}
-                          height={24}
-                          className="object-contain"
-                        />
-                      </div>
-                    ) : (
-                      <i
-                        className="icon-[fluent--building-24-regular] size-6 text-gray-400"
-                        role="img"
-                        aria-hidden="true"
-                      />
-                    )}
-                    <span className="text-sm font-medium text-[#0a1e14]">
-                      {org.name}
-                    </span>
-                  </button>
+                  <li key={org.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedOrg(org);
+                        setResults([]);
+                      }}
+                      className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-ev-paper"
+                    >
+                      {org.logoUrl ? (
+                        <Image src={org.logoUrl} alt="" width={24} height={24} className="h-6 w-6 object-contain" />
+                      ) : (
+                        <span className="flex h-6 w-6 items-center justify-center rounded bg-ev-bone font-mono text-[0.625rem] text-ev-mute">
+                          {org.name.slice(0, 2).toUpperCase()}
+                        </span>
+                      )}
+                      <span className="text-[0.9375rem] text-ev-night">{org.name}</span>
+                    </button>
+                  </li>
                 ))}
+              </ul>
+            )}
+
+            {!selectedOrg && !isSearching && hasSearched && results.length === 0 && (
+              <p className="mt-3 text-sm text-ev-mute">
+                No encontramos una organización con ese nombre. Revisa la
+                ortografía o usa el enlace directo que te compartió tu empresa.
+              </p>
+            )}
+
+            {selectedOrg && (
+              <div className="mt-4 flex items-center gap-4 rounded-xl bg-ev-signal-wash p-4">
+                {selectedOrg.logoUrl ? (
+                  <Image src={selectedOrg.logoUrl} alt="" className="h-12 w-12 object-contain" />
+                ) : (
+                  <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-white font-mono text-sm text-ev-mute">
+                    {selectedOrg.name.slice(0, 2).toUpperCase()}
+                  </span>
+                )}
+                <div className="min-w-0">
+                  <p className="truncate text-lg font-semibold tracking-[-0.02em] text-ev-night">{selectedOrg.name}</p>
+                  <p className="ev-label mt-1 text-ev-moss">Seleccionada</p>
+                </div>
               </div>
             )}
 
-            {!selectedOrg &&
-              !isSearching &&
-              hasSearched &&
-              results.length === 0 && (
-                <p className="mt-2 px-1 text-sm text-[#273c46]">
-                  No encontramos una organización con este nombre.
-                </p>
-              )}
-          </div>
+            <button
+              type="button"
+              disabled={!selectedOrg}
+              onClick={handleContinue}
+              className="ev-press mt-6 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-ev-night text-base font-medium text-white hover:bg-ev-slate disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Continuar con la denuncia →
+            </button>
 
-          {selectedOrg && (
-            <div className="rounded-2xl border border-lime-200 bg-lime-50/80 p-4">
-              <div className="flex items-center space-x-4">
-                {selectedOrg.logoUrl ? (
-                  <div className="relative w-16 h-16 flex items-center justify-center">
-                    <Image
-                      src={selectedOrg.logoUrl}
-                      alt={selectedOrg.name}
-                      className="object-contain"
-                    />
-                  </div>
-                ) : (
-                  <i
-                    className="icon-[fluent--building-24-regular] size-16 text-gray-400"
-                    role="img"
-                    aria-hidden="true"
-                  />
-                )}
-                <div>
-                  <h3 className="text-lg font-semibold text-[#0a1e14]">
-                    {selectedOrg.name}
-                  </h3>
-                  <p className="text-sm text-[#273c46]">
-                    Organización seleccionada
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <Button
-            size="lg"
-            color="primary"
-            isDisabled={!selectedOrg}
-            onPress={handleContinue}
-            endContent={
-              <i
-                className="icon-[lucide--chevron-right] size-5"
-                role="img"
-                aria-hidden="true"
-              />
-            }
-            className="w-full bg-[#0a1e14] text-white data-[hover=true]:!bg-[#0f3423]"
-          >
-            Continuar
-          </Button>
-
-          <div className="rounded-xl border border-[#0a1e14]/10 bg-[#f7faf9] p-3">
-            <p className="text-xs leading-relaxed text-[#273c46]">
+            <p className="mt-6 border-t border-ev-line pt-5 text-sm leading-relaxed text-ev-mute">
               La información que envíes se procesa bajo un flujo de
-              confidencialidad. Si tu organización lo permite, puedes mantener
-              tu identidad en anonimato durante toda la investigación.
+              confidencialidad y viaja cifrada.
             </p>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

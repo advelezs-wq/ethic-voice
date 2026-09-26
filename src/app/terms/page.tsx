@@ -9,15 +9,22 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <MarketingPageShell mainClassName="pb-16">
-      <section className="container max-w-7xl px-4 md:mx-auto">
-        <div className="rounded-2xl border border-[#0a1f14]/10 bg-[#f5f3ee] p-6 shadow-sm md:p-10">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Términos y Condiciones
-            </h1>
-            <p className="text-sm text-gray-500 mb-8">Última actualización: 11 de agosto de 2025</p>
-
-            <section className="space-y-6">
+    <MarketingPageShell showFooter={false}>
+      <section className="bg-ev-paper">
+        <div className="mx-auto max-w-[var(--ev-max)] px-[var(--ev-gutter)] pb-16 pt-10 sm:pt-14">
+          <div className="ev-label flex items-center justify-between border-b border-ev-line pb-4 text-ev-mute">
+            <span>
+              <span className="text-ev-moss">(LEGAL)</span> Términos y condiciones
+            </span>
+            <span>Última actualización: 11 de agosto de 2025</span>
+          </div>
+          <h1 className="ev-display mt-14 max-w-4xl text-ev-night">Términos y condiciones</h1>
+        </div>
+      </section>
+      <section className="bg-white py-16 sm:py-24">
+        <div className="mx-auto max-w-[var(--ev-max)] px-[var(--ev-gutter)]">
+          <div className="mx-auto max-w-[44rem]">
+            <section className="ev-prose">
         <p>
           El presente documento regula el acceso y uso de la plataforma EthicVoice
           (la «Plataforma»), un sistema para recepción, gestión y análisis de reportes
@@ -305,7 +312,8 @@ export default function TermsPage() {
         </ul>
             </section>
           </div>
-        </section>
+        </div>
+      </section>
     </MarketingPageShell>
   );
 }

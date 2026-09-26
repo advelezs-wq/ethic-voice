@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Instrument_Serif, Lexend } from "next/font/google";
 import "./globals.css";
 import { JsonLd } from "@/modules/core/components/JsonLd";
 import Script from "next/script";
@@ -15,6 +15,35 @@ const inter = Inter({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+// Sistema tipográfico de marca (ver BRAND.md): Geist para interfaz y titulares,
+// Instrument Serif para la voz humana (itálicas de énfasis), Geist Mono para
+// datos y registros (códigos de caso, métricas), Lexend solo para el wordmark.
+const geist = Geist({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+});
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-serif",
+  display: "swap",
+});
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap",
+});
+const lexend = Lexend({
+  subsets: ["latin"],
+  weight: ["600"],
+  variable: "--font-wordmark",
   display: "swap",
 });
 
@@ -112,7 +141,7 @@ export default async function RootLayout({
         {/* Píxeles GA / Clarity / Meta: solo tras consentimiento (ConsentGatedScripts) */}
       </head>
       <body
-        className={`${inter.variable} font-sans antialiased`}
+        className={`${inter.variable} ${geist.variable} ${instrumentSerif.variable} ${geistMono.variable} ${lexend.variable} font-sans antialiased`}
         suppressHydrationWarning={true}
       >
         {content}

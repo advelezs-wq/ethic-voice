@@ -1,0 +1,385 @@
+/*
+ * EthicVoice — capa de marca para el sitio público.
+ * Tokens y reglas documentados en BRAND.md. Todo lo que vive aquí está
+ * acotado a `.ev-site` para no alterar el dashboard (que sigue en Inter/HeroUI).
+ */
+
+:root {
+  --ev-night: #0b1d21;
+  --ev-deep: #12292e;
+  --ev-ink: #16323a;
+  --ev-slate: #244850;
+  --ev-mute: #5a6d70;
+  --ev-haze: #8fa2a5;
+  --ev-signal: #98d050;
+  --ev-signal-soft: #c6e89a;
+  --ev-signal-wash: #eef6e2;
+  --ev-moss: #44731a;
+  --ev-paper: #f4f3ee;
+  --ev-bone: #eae8e0;
+  --ev-line: #dcdad1;
+  --ev-coral: #db4f3a;
+  --ev-amber: #e09a2b;
+
+  --ev-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ev-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --ev-gutter: clamp(1.25rem, 4vw, 3rem);
+  --ev-max: 84rem;
+}
+
+.ev-site {
+  font-family: var(--font-display), system-ui, sans-serif;
+  color: var(--ev-ink);
+  background: var(--ev-paper);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.ev-site ::selection {
+  background: var(--ev-signal);
+  color: var(--ev-night);
+}
+
+.ev-site :focus-visible {
+  outline: 2px solid var(--ev-signal);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ── Escala tipográfica ─────────────────────────────────────────────── */
+
+.ev-display-xl {
+  font-size: clamp(3rem, 8.6vw, 8.75rem);
+  line-height: 0.92;
+  letter-spacing: -0.058em;
+  font-weight: 600;
+}
+
+.ev-display {
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+  font-weight: 600;
+}
+
+.ev-h2 {
+  font-size: clamp(2.05rem, 4.4vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-weight: 600;
+}
+
+.ev-h3 {
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 600;
+}
+
+.ev-lead {
+  font-size: clamp(1.0625rem, 1.35vw, 1.3125rem);
+  line-height: 1.5;
+  letter-spacing: -0.012em;
+  color: var(--ev-mute);
+}
+
+.ev-body {
+  font-size: 0.975rem;
+  line-height: 1.6;
+  color: var(--ev-mute);
+}
+
+/* Voz humana: la itálica serif marca la palabra que importa. */
+.ev-serif {
+  font-family: var(--font-serif), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+/* Registro: etiquetas, códigos de caso, métricas. */
+.ev-label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ev-num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+
+/* ── Texturas ───────────────────────────────────────────────────────── */
+
+/* Grano de papel: evita el plano digital perfecto. */
+.ev-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.ev-grain-dark::after {
+  mix-blend-mode: screen;
+  opacity: 0.05;
+}
+
+/* Retícula de registro: columnas finas, como un formulario técnico. */
+.ev-rule-grid {
+  background-image: linear-gradient(to right, var(--ev-line) 1px, transparent 1px);
+  background-size: calc(100% / 12) 100%;
+}
+
+/* ── Movimiento ─────────────────────────────────────────────────────── */
+
+/* Revelado al entrar en viewport. Solo se oculta cuando hay JS (html.ev-js),
+   así el contenido nunca queda invisible si el observer no corre. */
+html.ev-js [data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity 700ms var(--ev-ease-out),
+    transform 900ms var(--ev-ease-out);
+  transition-delay: calc(var(--d, 0) * 1ms);
+}
+
+html.ev-js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Titular línea por línea: cada línea sube desde detrás de su máscara. */
+.ev-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.ev-line > span {
+  display: inline-block;
+}
+
+html.ev-js [data-reveal-lines] .ev-line > span {
+  transform: translate3d(0, 105%, 0);
+  transition: transform 1100ms var(--ev-ease-out);
+  transition-delay: calc(var(--i, 0) * 90ms + var(--d, 0) * 1ms);
+}
+
+html.ev-js [data-reveal-lines].is-in .ev-line > span {
+  transform: none;
+}
+
+/* Trazo SVG que se dibuja. Requiere pathLength="1" en el path. */
+html.ev-js [data-draw] {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1600ms var(--ev-ease-in-out);
+  transition-delay: calc(var(--d, 0) * 1ms);
+}
+
+html.ev-js .is-in [data-draw],
+html.ev-js [data-draw].is-in {
+  stroke-dashoffset: 0;
+}
+
+@keyframes ev-marquee {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.ev-marquee {
+  animation: ev-marquee var(--dur, 40s) linear infinite;
+}
+
+@keyframes ev-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.ev-blink {
+  animation: ev-blink 1.6s steps(2, jump-none) infinite;
+}
+
+/* Botones: respuesta inmediata al presionar. */
+.ev-press {
+  transition:
+    transform 160ms var(--ev-ease-out),
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.ev-press:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.ev-js [data-reveal],
+  html.ev-js [data-reveal-lines] .ev-line > span {
+    transform: none !important;
+    transition: opacity 300ms ease !important;
+  }
+
+  html.ev-js [data-draw] {
+    stroke-dashoffset: 0;
+    transition: none;
+  }
+
+  .ev-marquee,
+  .ev-blink {
+    animation: none;
+  }
+}
+
+/* Puntos del isotipo en el hero: aparecen tras escribirse las líneas. */
+html.ev-js .ev-hero-dot {
+  opacity: 0;
+  transition: opacity 400ms var(--ev-ease-out);
+  transition-delay: calc(var(--d, 0) * 1ms);
+}
+
+html.ev-js .is-in .ev-hero-dot {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ev-packet {
+    display: none;
+  }
+}
+
+@keyframes ev-quote {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Acordeón nativo con altura animada donde hay soporte (interpolate-size). */
+.ev-site {
+  interpolate-size: allow-keywords;
+}
+
+.ev-faq::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 420ms var(--ev-ease-out),
+    content-visibility 420ms allow-discrete;
+}
+
+.ev-faq[open]::details-content {
+  block-size: auto;
+}
+
+/* Documentos legales y texto largo. Gana a las utilidades de color/tamaño
+   heredadas porque combina clase + elemento. */
+.ev-prose {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: color-mix(in srgb, var(--ev-ink) 82%, transparent);
+}
+.ev-prose > * + * {
+  margin-top: 1.25rem;
+}
+.ev-prose h2 {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ev-line);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  color: var(--ev-night);
+}
+.ev-prose h3 {
+  margin-top: 2rem;
+  font-size: 1.1875rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ev-night);
+}
+.ev-prose ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+.ev-prose li + li {
+  margin-top: 0.5rem;
+}
+.ev-prose li::marker {
+  color: var(--ev-moss);
+}
+.ev-prose a {
+  color: var(--ev-night);
+  text-decoration: underline;
+  text-decoration-color: var(--ev-signal);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.ev-prose strong {
+  color: var(--ev-night);
+  font-weight: 600;
+}
+
+/* Tachado que se dibuja; funciona en texto de varias líneas porque el fondo
+   de un inline recorre sus fragmentos en orden (box-decoration-break: slice). */
+.ev-strike {
+  background-image: linear-gradient(var(--ev-coral), var(--ev-coral));
+  background-repeat: no-repeat;
+  background-position: 0 58%;
+  background-size: 100% 2px;
+  -webkit-box-decoration-break: slice;
+  box-decoration-break: slice;
+}
+
+html.ev-js .ev-strike {
+  background-size: 0% 2px;
+  transition: background-size 1100ms var(--ev-ease-in-out);
+  transition-delay: calc(var(--d, 0) * 1ms);
+}
+
+html.ev-js .is-in .ev-strike {
+  background-size: 100% 2px;
+}
+
+/* Burbuja del hero: se asienta (opacidad + escala desde la cola) antes de
+   que sus líneas se escriban. Sombra teñida de pizarra, no gris. */
+.ev-hero-bubble {
+  filter: drop-shadow(0 38px 48px rgba(22, 50, 58, 0.22))
+    drop-shadow(0 6px 10px rgba(22, 50, 58, 0.12));
+}
+
+html.ev-js .ev-hero-bubble {
+  opacity: 0;
+  transform: scale(0.965);
+  transform-origin: 8% 96%;
+  transition:
+    opacity 700ms var(--ev-ease-out),
+    transform 1000ms var(--ev-ease-out);
+}
+
+html.ev-js .is-in .ev-hero-bubble {
+  opacity: 1;
+  transform: none;
+}

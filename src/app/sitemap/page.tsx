@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MarketingPageShell } from "@/modules/landig-page/components/MarketingPageShell";
 import prisma from "@/modules/prisma/lib/prisma";
 import { BlogPostStatus } from "@prisma/client";
 import {
@@ -30,21 +31,22 @@ export default async function SitemapPage() {
   });
 
   return (
-    <div className="mx-auto max-w-5xl px-5 py-14 sm:px-6 lg:px-8">
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">
+    <MarketingPageShell showFooter={false} showStickyCta={false}>
+    <div className="mx-auto max-w-5xl px-[var(--ev-gutter)] py-14">
+      <div className="rounded-[1.5rem] border border-ev-line bg-white p-6 sm:p-10">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-ev-moss">
           SEO técnico
         </p>
-        <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[#0d212c] sm:text-4xl">
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-ev-night sm:text-4xl">
           Sitemap de EthicVoice
         </h1>
-        <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
+        <p className="mt-3 text-sm leading-relaxed text-ev-mute sm:text-base">
           Este mapa conecta las páginas públicas del dominio principal y las
           páginas del subdominio de blog.
         </p>
 
-        <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
-          <p className="text-sm font-semibold text-emerald-900">
+        <div className="mt-6 rounded-xl border border-ev-line bg-ev-paper p-4">
+          <p className="text-sm font-semibold text-ev-night">
             XML para buscadores
           </p>
           <ul className="mt-2 space-y-1">
@@ -56,7 +58,7 @@ export default async function SitemapPage() {
               <li key={url}>
                 <a
                   href={url}
-                  className="inline-flex text-sm font-medium text-emerald-700 underline underline-offset-2 hover:text-emerald-800"
+                  className="inline-flex text-sm font-medium text-ev-moss underline underline-offset-2 hover:text-ev-night"
                 >
                   {url}
                 </a>
@@ -67,7 +69,7 @@ export default async function SitemapPage() {
       </div>
 
       <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-        <h2 className="text-xl font-bold text-[#0d212c]">Dominio principal</h2>
+        <h2 className="text-xl font-bold text-ev-night">Dominio principal</h2>
         <ul className="mt-4 grid gap-2 sm:grid-cols-2">
           {PUBLIC_STATIC_ROUTES.map((route) => {
             const href = `${mainBase}${route.path}`;
@@ -75,7 +77,7 @@ export default async function SitemapPage() {
               <li key={route.path}>
                 <Link
                   href={route.path}
-                  className="text-sm text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700"
+                  className="text-sm text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-ev-moss"
                 >
                   {href}
                 </Link>
@@ -86,8 +88,8 @@ export default async function SitemapPage() {
       </section>
 
       <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-        <h2 className="text-xl font-bold text-[#0d212c]">Blog</h2>
-        <p className="mt-2 text-sm text-slate-600">
+        <h2 className="text-xl font-bold text-ev-night">Blog</h2>
+        <p className="mt-2 text-sm text-ev-mute">
           Posts publicados en{" "}
           <span className="font-semibold">{mainBase}/blog</span>.
         </p>
@@ -96,7 +98,7 @@ export default async function SitemapPage() {
             <li key={post.slug} className="flex flex-col gap-0.5">
               <a
                 href={`${mainBase}/blog/${post.slug}`}
-                className="text-sm text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700"
+                className="text-sm text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-ev-moss"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -108,5 +110,6 @@ export default async function SitemapPage() {
         </ul>
       </section>
     </div>
+    </MarketingPageShell>
   );
 }

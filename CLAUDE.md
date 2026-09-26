@@ -54,13 +54,14 @@ Code lives in `src/modules/` organized by feature domain. Import via `@/modules/
 | `modules/app/lib/ai` | Compliance AI processor (LangChain + OpenAI) |
 | `modules/app/services` | Business logic services (analytics, PDF, email, payments, subscriptions, notifications) |
 | `modules/blog` | Marketing blog components |
+| `modules/brand` | Brand system for the public site: `SiteShell` (nav/footer/CTAs), `Logo`, primitives, section patterns, `useDemoCta`. See `BRAND.md` |
 | `modules/core` | Shared providers, hooks (`usePlanPermissions`, `useUserRole`), middleware, utils |
 | `modules/forms/builder` | Drag-and-drop form builder (DnD Kit) |
 | `modules/prisma/lib/prisma` | Prisma client singleton |
 | `modules/store` | Zustand global stores (organization, user) |
 | `modules/submit` | Public report submission multi-step flow |
 | `modules/track` | Anonymous report tracking by code |
-| `modules/landig-page` | Marketing/landing page components (note: typo in folder name) |
+| `modules/landig-page` | Marketing/landing page components (note: typo in folder name). The live home is `components/v5/LandingV5.tsx` |
 
 ### App Router layout
 
@@ -144,5 +145,6 @@ Several features have their own deep-dive setup doc at the repo root — check t
 - **Server Actions** live in `src/actions/` and are imported directly into Server and Client Components.
 - **Schemas** (Zod) are colocated inside the relevant module's `lib/schemas/` directory.
 - **Prisma migrations** use raw SQL files in `prisma/migrations/` — not auto-generated Prisma migrations; run `prisma migrate deploy` to apply them.
+- Public pages follow `BRAND.md` (tokens in `src/styles/brand.css`, `ev-*` Tailwind colors, Geist / Instrument Serif / Geist Mono). Wrap them in `SiteShell` or `MarketingPageShell`; don't add ad-hoc headers, gradients, or AI-generated imagery.
 - All dashboard pages are in Spanish (es-MX locale); Clerk is also localized to `esMX`.
 - `NEXT_PUBLIC_DEMO_MODE=true` swaps real Prisma queries for synthetic demo data in analytics and dashboard views.

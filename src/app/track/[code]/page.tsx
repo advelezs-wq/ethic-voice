@@ -13,7 +13,7 @@ export default async function TrackReportPage({
   const report = await getReportByTrackingCode((await params).code);
 
   return (
-    <div className="min-h-[calc(100dvh-5rem)] bg-gradient-to-br from-[#f5f3ee] via-white to-emerald-50/20">
+    <div>
       <TrackingPageContent
         initialCode={(await params).code}
         initialReport={report}

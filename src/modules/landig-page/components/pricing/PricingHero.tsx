@@ -1,77 +1,73 @@
 "use client";
 
-import React from "react";
 import { BillingCycle } from "@/types/subscription.types";
+import { Container, RevealHeading, Voice, reveal } from "@/modules/brand/components/primitives";
 
 interface PricingHeroProps {
   billingCycle: BillingCycle;
   onBillingCycleChange: (cycle: BillingCycle) => void;
 }
 
-export const PricingHero = ({
-  billingCycle,
-  onBillingCycleChange,
-}: PricingHeroProps) => {
+const CYCLES = [
+  { value: BillingCycle.MONTHLY, label: "Mensual" },
+  { value: BillingCycle.YEARLY, label: "Anual · ahorra 10%" },
+] as const;
+
+export const PricingHero = ({ billingCycle, onBillingCycleChange }: PricingHeroProps) => {
+  const activeIndex = CYCLES.findIndex((c) => c.value === billingCycle);
+
   return (
-    <section className="relative overflow-hidden border-b border-slate-200 bg-white px-5 pb-12 pt-10 md:px-8 md:pb-16 md:pt-14">
-      <div className="pointer-events-none absolute inset-0 hidden md:block" aria-hidden>
-        {[25, 50, 75].map((left) => (
-          <div
-            key={left}
-            className="absolute bottom-0 top-0 w-px bg-black/[0.07]"
-            style={{ left: `${left}%`, transform: "translateX(-50%)" }}
-          />
-        ))}
-      </div>
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(94,210,156,0.14),transparent_55%)]"
-        aria-hidden
-      />
+    <section className="bg-ev-paper">
+      <Container className="pb-16 pt-10 sm:pt-14 lg:pb-24">
+        <div {...reveal(0)} className="ev-label flex items-center justify-between border-b border-ev-line pb-4 text-ev-mute">
+          <span>
+            <span className="text-ev-moss">(EV)</span> Precios
+          </span>
+          <span className="hidden sm:inline">USD · Sin permanencia</span>
+        </div>
+        <div className="mt-12 grid gap-10 sm:mt-16 lg:grid-cols-12 lg:items-end lg:gap-8">
+          <div className="lg:col-span-8">
+            <RevealHeading
+              as="h1"
+              className="ev-display text-ev-night"
+              lines={["Un plan para cada", <>etapa de tu <Voice>organización.</Voice></>]}
+            />
+            <p {...reveal(250)} className="ev-lead mt-8 max-w-xl">
+              Empieza hoy y escala cuando lo necesites. Cambia de plan o cancela
+              la renovación desde tu panel de facturación.
+            </p>
+          </div>
 
-      <div className="relative mx-auto max-w-4xl text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-700">
-          Planes
-        </p>
-        <h1 className="mt-3 text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-[#051a24] md:text-5xl lg:text-6xl">
-          Elige tu plan <span className="text-lime-700">ideal</span>
-        </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[#273c46] md:text-lg">
-          Selecciona entre los mejores planes, asegurando una combinación
-          perfecta. ¿Necesitas más o menos? Personaliza tu suscripción para un
-          ajuste perfecto.
-        </p>
-
-        <div
-          className="mt-8 flex justify-center"
-          role="group"
-          aria-label="Ciclo de facturación"
-        >
-          <div className="inline-flex rounded-full border border-slate-200 bg-white p-1 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
-            <button
-              type="button"
-              onClick={() => onBillingCycleChange(BillingCycle.MONTHLY)}
-              className={`min-h-11 rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-200 sm:px-8 ${
-                billingCycle === BillingCycle.MONTHLY
-                  ? "bg-lime-400 text-[#052b24] shadow-md"
-                  : "text-[#273c46] hover:bg-slate-50"
-              }`}
+          {/* Selector de ciclo: la píldora se desliza entre opciones */}
+          <div {...reveal(300)} className="lg:col-span-4 lg:flex lg:justify-end">
+            <div
+              role="radiogroup"
+              aria-label="Ciclo de facturación"
+              className="relative inline-grid grid-cols-2 rounded-full border border-ev-line bg-white p-1"
             >
-              Mensual
-            </button>
-            <button
-              type="button"
-              onClick={() => onBillingCycleChange(BillingCycle.YEARLY)}
-              className={`min-h-11 rounded-full px-6 py-2.5 text-sm font-semibold transition-all duration-200 sm:px-8 ${
-                billingCycle === BillingCycle.YEARLY
-                  ? "bg-lime-400 text-[#052b24] shadow-md"
-                  : "text-[#273c46] hover:bg-slate-50"
-              }`}
-            >
-              Anual (ahorra 10%)
-            </button>
+              <span
+                aria-hidden
+                className="absolute inset-y-1 left-1 w-[calc(50%-0.25rem)] rounded-full bg-ev-night transition-transform duration-300 ease-ev-out"
+                style={{ transform: `translateX(${activeIndex * 100}%)` }}
+              />
+              {CYCLES.map((c) => (
+                <button
+                  key={c.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={billingCycle === c.value}
+                  onClick={() => onBillingCycleChange(c.value)}
+                  className={`relative z-10 min-h-11 whitespace-nowrap rounded-full px-5 text-sm transition-colors duration-300 ${
+                    billingCycle === c.value ? "text-white" : "text-ev-mute hover:text-ev-night"
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 };

@@ -6,8 +6,6 @@ import { PublicReportData } from "@/actions/submission.actions";
 import { TrackingSearch } from "./TrackingSearch";
 import { ReportStatus } from "./ReportStatus";
 import { TrackingNotFound } from "./TrackingNotFound";
-import { Card } from "@heroui/card";
-import { Button } from "@heroui/react";
 
 interface TrackingPageContentProps {
   initialCode?: string;
@@ -39,80 +37,66 @@ export function TrackingPageContent({
   };
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-16 sm:py-20">
-      <Button
-        onPress={() => router.push("/")}
-        variant="light"
-        startContent={
-          <i
-            className="icon-[lucide--arrow-left] size-5 group-hover:-translate-x-1 transition-transform"
-            role="img"
-            aria-hidden="true"
-          />
-        }
-        className="group mb-4"
-      >
-        Volver
-      </Button>
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="mb-10 rounded-3xl border border-[#0a1e14]/10 bg-white/85 p-6 text-center shadow-[0_20px_60px_-35px_rgba(10,30,20,0.4)]">
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-700">
-            Seguimiento seguro
-          </p>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Seguimiento de Denuncia
+    <div className="mx-auto w-full max-w-[var(--ev-max)] px-[var(--ev-gutter)] pb-24 pt-10 sm:pt-14">
+      <div className="ev-label flex items-center justify-between border-b border-ev-line pb-4 text-ev-mute">
+        <button type="button" onClick={() => router.push("/")} className="transition-colors hover:text-ev-night">
+          ← Inicio
+        </button>
+        <span className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 bg-ev-signal" /> Consulta privada
+        </span>
+      </div>
+
+      <div className="mt-12 grid gap-14 sm:mt-16 lg:grid-cols-12 lg:gap-8">
+        <div className="lg:col-span-5">
+          <p className="ev-label text-ev-moss">Seguimiento seguro</p>
+          <h1 className="ev-display mt-6 text-ev-night">
+            Sigue tu caso <em className="ev-serif pr-[0.06em]">sin exponerte.</em>
           </h1>
-          <p className="text-lg text-gray-600">
-            Ingresa tu código de referencia para consultar el estado de tu
-            denuncia
+          <p className="ev-lead mt-6 max-w-md">
+            Ingresa el código que recibiste al enviar tu denuncia para ver su
+            estado y conversar con el equipo responsable.
           </p>
         </div>
-
-        {/* Search Form */}
-        <TrackingSearch
-          onSearch={handleSearch}
-          initialCode="" // Don't pass initialCode to allow free typing
-          isLoading={pending}
-        />
-
-        {/* Results */}
-        {hasSearched && (
-          <div className="mt-8">
-            {initialReport ? (
-              <ReportStatus report={initialReport} />
-            ) : (
-              <TrackingNotFound code={searchedCode} />
-            )}
-          </div>
-        )}
-
-        {/* Help Section */}
-        <Card className="mt-16 border border-emerald-100 bg-white/95 p-8 shadow-none">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-            ¿Necesitas ayuda?
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-medium text-gray-900 mb-2">
-                ¿No tienes tu código de referencia?
-              </h3>
-              <p className="text-gray-600 text-sm">
-                El código de referencia se genera automáticamente al enviar tu
-                denuncia. Revisa el email de confirmación que recibiste.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-medium text-gray-900 mb-2">
-                ¿Problemas para acceder?
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Si tienes problemas para acceder a tu caso, contacta con nuestro
-                equipo de soporte especializado.
-              </p>
-            </div>
-          </div>
-        </Card>
+        <div className="lg:col-span-6 lg:col-start-7">
+          <TrackingSearch
+            onSearch={handleSearch}
+            initialCode="" // Don't pass initialCode to allow free typing
+            isLoading={pending}
+          />
+        </div>
       </div>
+
+      {hasSearched && (
+        <div className="mt-16">
+          {initialReport ? (
+            <ReportStatus report={initialReport} />
+          ) : (
+            <TrackingNotFound code={searchedCode} />
+          )}
+        </div>
+      )}
+
+      <dl className="mt-24 grid gap-x-8 border-t border-ev-night md:grid-cols-2">
+        <div className="border-b border-ev-line py-7">
+          <dt className="text-[1.1875rem] font-medium tracking-[-0.02em] text-ev-night">
+            ¿No tienes tu código de referencia?
+          </dt>
+          <dd className="mt-2 text-[0.975rem] leading-relaxed text-ev-mute">
+            Se genera automáticamente al enviar tu denuncia. Revisa la pantalla
+            de confirmación o el correo que recibiste.
+          </dd>
+        </div>
+        <div className="border-b border-ev-line py-7">
+          <dt className="text-[1.1875rem] font-medium tracking-[-0.02em] text-ev-night">
+            ¿Problemas para acceder?
+          </dt>
+          <dd className="mt-2 text-[0.975rem] leading-relaxed text-ev-mute">
+            Contacta al equipo de soporte; nunca te pediremos datos que revelen
+            tu identidad.
+          </dd>
+        </div>
+      </dl>
     </div>
   );
 }

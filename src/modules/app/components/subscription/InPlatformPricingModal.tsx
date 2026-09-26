@@ -280,7 +280,7 @@ Gracias,
           </ModalHeader>
 
           <ModalBody className="pb-6 px-6">
-            {/* Pricing Cards — mirrors the landing page's PricingSection (LandingV3) */}
+            {/* Pricing Cards — mirrors the landing pricing (v5/Pricing.tsx) */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {displayPlans.map((planType) => {
                 const config = PLAN_CONFIGS[planType];

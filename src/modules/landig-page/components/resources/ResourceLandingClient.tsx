@@ -15,6 +15,9 @@ import {
   type EbookLeadCaptchaHandle,
 } from "@/modules/landig-page/components/ebook/EbookLeadCaptcha";
 import { trackGA4Event } from "@/lib/google-analytics";
+import { Logo } from "@/modules/brand/components/Logo";
+import { Button, Container } from "@/modules/brand/components/primitives";
+import { RevealController } from "@/modules/brand/components/RevealController";
 
 export interface ResourceLandingData {
   slug: string;
@@ -37,7 +40,7 @@ interface Props {
 }
 
 const inputClass =
-  "w-full rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none transition-colors focus:border-emerald-600";
+  "h-12 w-full rounded-xl border border-ev-line bg-white px-4 text-[0.9375rem] text-ev-night outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-ev-haze focus:border-ev-night/50 focus:shadow-[0_0_0_4px_rgba(152,208,80,0.3)]";
 
 export function ResourceLandingClient({ resource, utm }: Props) {
   const router = useRouter();
@@ -122,31 +125,28 @@ export function ResourceLandingClient({ resource, utm }: Props) {
   );
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-emerald-50/40">
-      {/* Barra superior */}
-      <header className="border-b border-slate-200/70 bg-[#0b1620] px-5 py-4 text-center">
-        <p className="text-sm font-semibold text-emerald-300">
-          Recurso gratuito · EthicVoice
-        </p>
+    <main className="ev-site min-h-screen">
+      <RevealController />
+      <header className="border-b border-ev-line">
+        <Container className="flex h-16 items-center justify-between">
+          <Link href="/" aria-label="EthicVoice — inicio">
+            <Logo markClassName="h-7 w-auto" />
+          </Link>
+          <span className="ev-label text-ev-mute">Recurso gratuito</span>
+        </Container>
       </header>
 
-      <section className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-12 sm:px-6 lg:grid-cols-2 lg:items-start lg:gap-14 lg:py-16">
-        {/* Columna izquierda: título + descripción + portada */}
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700">
-            Recurso gratuito · Descargable
-          </p>
-          <h1 className="mt-3 text-balance text-3xl font-extrabold leading-tight tracking-tight text-[#0d212c] sm:text-4xl lg:text-[2.6rem]">
+      <Container className="grid gap-14 py-14 sm:py-20 lg:grid-cols-12 lg:gap-8">
+        <div className="lg:col-span-6">
+          <p className="ev-label text-ev-moss">(PDF) Recurso descargable</p>
+          <h1 className="mt-6 text-[clamp(2.25rem,5vw,4.25rem)] font-semibold leading-[1.02] tracking-[-0.05em] text-ev-night">
             {resource.title}
           </h1>
           {resource.description ? (
-            <p className="mt-4 max-w-xl whitespace-pre-line text-base leading-relaxed text-slate-600">
-              {resource.description}
-            </p>
+            <p className="ev-lead mt-6 max-w-xl whitespace-pre-line">{resource.description}</p>
           ) : null}
-
           {resource.coverImageUrl ? (
-            <div className="relative mt-8 aspect-[4/3] w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 shadow-[0_18px_50px_-20px_rgba(15,23,42,0.35)]">
+            <div className="relative mt-10 aspect-[4/3] w-full max-w-md overflow-hidden rounded-[1.25rem] bg-ev-bone">
               <Image
                 src={resource.coverImageUrl}
                 alt={resource.title}
@@ -157,22 +157,15 @@ export function ResourceLandingClient({ resource, utm }: Props) {
               />
             </div>
           ) : null}
-
-          <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-slate-400">
-            100% privacidad. No hacemos spam.
-          </p>
         </div>
 
-        {/* Columna derecha: formulario */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_24px_60px_-24px_rgba(15,23,42,0.25)] sm:p-8">
-          <h2 className="text-xl font-bold text-[#0d212c]">
-            Descarga <span className="text-emerald-700">gratuita</span>
+        <div className="lg:col-span-5 lg:col-start-8">
+          <div className="rounded-[1.75rem] border border-ev-night/10 bg-white p-6 shadow-[0_50px_100px_-50px_rgba(11,29,33,0.45)] sm:p-9">
+          <p className="ev-label text-ev-moss">Acceso inmediato</p>
+          <h2 className="mt-3 text-[1.75rem] font-semibold leading-tight tracking-[-0.035em] text-ev-night">
+            Descarga gratuita
           </h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Completa el formulario y accede al recurso al instante.
-          </p>
-
-          <form onSubmit={onSubmit} className="mt-6 space-y-4">
+          <form onSubmit={onSubmit} className="mt-7 space-y-4">
             <input
               type="text"
               required
@@ -225,19 +218,19 @@ export function ResourceLandingClient({ resource, utm }: Props) {
               />
             )}
 
-            <label className="flex items-start gap-2.5 text-xs leading-relaxed text-slate-600">
+            <label className="flex items-start gap-2.5 text-sm leading-relaxed text-ev-mute">
               <input
                 type="checkbox"
                 checked={acceptedPrivacy}
                 onChange={(e) => setAcceptedPrivacy(e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 accent-emerald-600"
+                className="mt-0.5 h-4 w-4 shrink-0 accent-[#0B1D21]"
               />
               <span>
                 Acepto la{" "}
                 <Link
                   href="/privacidad"
                   target="_blank"
-                  className="font-semibold text-emerald-700 underline underline-offset-2"
+                  className="text-ev-night underline decoration-ev-signal decoration-2 underline-offset-4"
                 >
                   Política de Tratamiento de Datos Personales
                 </Link>
@@ -248,36 +241,19 @@ export function ResourceLandingClient({ resource, utm }: Props) {
             <EbookLeadCaptcha ref={captchaRef} onToken={setHcaptchaToken} />
 
             {status === "error" && errorMsg ? (
-              <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              <p role="alert" className="rounded-xl border border-ev-coral/40 bg-[#FBE6E1] px-4 py-3 text-sm text-[#7A2415]">
                 {errorMsg}
               </p>
             ) : null}
 
-            <button
-              type="submit"
-              disabled={status === "loading"}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-[0_10px_30px_-8px_rgba(5,150,105,0.6)] transition hover:brightness-105 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60"
-            >
-              {status === "loading" ? (
-                <>
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Enviando…
-                </>
-              ) : (
-                <>
-                  <i className="icon-[lucide--download] h-4 w-4" aria-hidden />
-                  {resource.ctaLabel || "Quiero descargar el recurso"}
-                </>
-              )}
-            </button>
-
-            <p className="flex items-center justify-center gap-1.5 text-center text-xs text-slate-400">
-              <i className="icon-[lucide--lock] h-3.5 w-3.5" aria-hidden />
-              Tu información está segura. No enviamos spam.
-            </p>
+            <Button type="submit" variant="signal" size="lg" arrow className="w-full" disabled={status === "loading"}>
+              {status === "loading" ? "Enviando…" : resource.ctaLabel || "Descargar el recurso"}
+            </Button>
+            <p className="ev-label text-center text-ev-haze">Sin costo · Sin spam · Acceso inmediato</p>
           </form>
+          </div>
         </div>
-      </section>
+      </Container>
     </main>
   );
 }

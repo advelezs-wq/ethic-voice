@@ -326,8 +326,9 @@ export async function PATCH(
 
     // Advanced customization check
     if (
+      // Desactivar la marca blanca siempre se permite (p. ej. tras bajar de plan).
       (updates.customCSS !== undefined ||
-        updates.whiteLabel !== undefined) &&
+        updates.whiteLabel === true) &&
       (!planPermissions.canAccessUnlimitedCustomization ||
         !planInfo.hasActivePlan)
     ) {

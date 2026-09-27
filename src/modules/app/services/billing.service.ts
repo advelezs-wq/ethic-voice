@@ -28,6 +28,7 @@ import {
   chargePaymentSource,
   createPaymentSource,
   getTransaction,
+  isWompiConfigured,
   WompiError,
   type WompiTransaction,
 } from "@/modules/app/services/wompi.service";
@@ -146,6 +147,8 @@ export async function startSubscription(input: {
   acceptanceToken: unknown;
   personalAuthToken: unknown;
 }) {
+  // Antes de crear nada (organización incluida): sin llaves no hay cobro posible.
+  if (!isWompiConfigured()) throw new ClientAdminError("Los pagos en línea no están disponibles en este momento. Escríbenos a soporte.", 503);
   const planType = String(input.planType || "").toUpperCase() as PlanType;
   const cycle = String(input.billingCycle || "MONTHLY").toUpperCase() === "YEARLY" ? BillingCycle.YEARLY : BillingCycle.MONTHLY;
   const cfg = PLAN_CONFIGS[planType];

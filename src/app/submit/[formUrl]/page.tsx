@@ -7,6 +7,19 @@ import { PlanType } from "@/types/subscription.types";
 import { notFound, redirect } from "next/navigation";
 import { ChannelShell } from "@/modules/submit/components/ChannelShell";
 import { getChannelBrandingByOrgId } from "@/modules/core/utils/org-branding.server";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ formUrl: string }> }): Promise<Metadata> {
+  const { formUrl } = await params;
+  const org =
+    (await prisma.organization.findFirst({ where: { slug: formUrl }, select: { id: true } })) ??
+    (await prisma.form.findFirst({ where: { shareURL: formUrl }, select: { orgId: true } }).then((f) => (f ? { id: f.orgId } : null)));
+  const b = await getChannelBrandingByOrgId(org?.id);
+  if (!b) return { title: "Canal de denuncias" };
+  const title = `Línea ética de ${b.orgName}`;
+  // Con marca blanca el título no lleva "EthicVoice".
+  return { title: b.whiteLabel ? { absolute: title } : title, robots: { index: false } };
+}
 
 const SubmitPage = async ({
   params,

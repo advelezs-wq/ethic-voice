@@ -399,7 +399,7 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
     if (pendingAction.type === "change-plan") {
       return {
         title: "Cambiar plan",
-        description: `El cliente pasará al plan ${PLAN_CONFIGS[pendingAction.targetPlan]?.displayName ?? pendingAction.targetPlan} de inmediato. No se genera ningún cobro adicional; si paga con Mercado Pago, el próximo cobro usará el nuevo precio. Si el plan permite menos usuarios, los que excedan el cupo quedarán bloqueados.`,
+        description: `El cliente pasará al plan ${PLAN_CONFIGS[pendingAction.targetPlan]?.displayName ?? pendingAction.targetPlan} de inmediato. No se genera ningún cobro adicional; si paga con tarjeta, el próximo cobro usará el precio del nuevo plan. Si el plan permite menos usuarios, los que excedan el cupo quedarán bloqueados.`,
         confirmLabel: "Confirmar cambio",
         riskLevel: "medium" as const,
       };
@@ -407,7 +407,7 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
     if (pendingAction.type === "cancel-subscription") {
       return {
         title: "Cancelar suscripción",
-        description: "Se cancela el cobro (también en Mercado Pago si aplica). El cliente conserva el acceso hasta el fin del periodo ya pagado.",
+        description: "No se harán más cobros. El cliente conserva el acceso hasta el fin del periodo ya pagado.",
         confirmLabel: "Confirmar cancelación",
         riskLevel: "high" as const,
       };

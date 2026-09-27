@@ -6,7 +6,7 @@ export const CONSENT_STORAGE_KEY = "ethicvoice_cookie_consent_v1";
 export type ConsentSource = "all" | "essential" | "custom";
 
 export type ConsentCategories = {
-  /** Siempre activo (sesión, seguridad, pago con Mercado Pago, etc.) */
+  /** Siempre activo (sesión, seguridad, pago con Wompi, etc.) */
   necessary: true;
   /** Preferencias de UI, idioma, widgets no publicitarios */
   functional: boolean;

@@ -48,6 +48,7 @@ const isUnrestrictedRoute = createRouteMatcher([
   "/api/upload(.*)", // Upload endpoints for public form submissions
   "/api/payments(.*)", // All payment routes are unrestricted for signup flow
   "/api/subscriptions(.*)", // Subscription management is unrestricted
+  "/api/billing(.*)", // Checkout con Wompi: cada ruta valida la sesión y el rol
   "/api/users/org-status",
   // Onboarding bootstrap APIs (must work even if DB account not yet initialized)
   "/api/organizations(.*)",
@@ -230,7 +231,38 @@ const clerkHandler = clerkMiddleware(async (auth, req) => {
   return nextWithPublicBlogMarker(req);
 });
 
+// ── Dominio propio del canal de denuncias (plan Premium) ─────────────────
+// denuncias.empresa.com → /submit/{slug} de esa organización. El dominio debe
+// apuntar (CNAME) a Vercel y estar agregado al proyecto; ver la pestaña
+// "Marca del canal" en Configuración.
+const OWN_HOSTS = /^(localhost|127\.0\.0\.1|\[::1\]|(www\.|blog\.)?ethicvoice\.co|.*\.vercel\.app)$/i;
+const CHANNEL_PATHS = /^\/(submit|track|api\/submit|api\/track|api\/upload|api\/public|auth|_next|brand|favicon)/;
+const channelDomainCache = new Map<string, { slug: string | null; at: number }>();
+
+async function channelDomainSlug(req: NextRequest, host: string) {
+  const hit = channelDomainCache.get(host);
+  if (hit && Date.now() - hit.at < 5 * 60 * 1000) return hit.slug;
+  try {
+    const url = new URL("/api/public/channel-domain", req.url);
+    url.searchParams.set("host", host);
+    const res = await fetch(url, { headers: { host: req.headers.get("host") || "" } });
+    const slug = res.ok ? ((await res.json()) as { slug: string | null }).slug : null;
+    channelDomainCache.set(host, { slug, at: Date.now() });
+    return slug;
+  } catch {
+    return null;
+  }
+}
+
 export default async function proxy(req: NextRequest, event: NextFetchEvent) {
+  const host = (req.headers.get("host") || "").toLowerCase().replace(/:\d+$/, "");
+  if (host && !OWN_HOSTS.test(host) && !req.nextUrl.pathname.startsWith("/api/public/channel-domain")) {
+    const slug = await channelDomainSlug(req, host);
+    if (slug && !CHANNEL_PATHS.test(req.nextUrl.pathname)) {
+      // Todo el dominio es el canal de denuncias de esa organización.
+      return NextResponse.rewrite(new URL(`/submit/${slug}`, req.url));
+    }
+  }
   const sanitizedRequest = sanitizeRequest(req);
   if (isPublicBlogRoute(sanitizedRequest)) {
     const preflight = await preflightPublicBlog(

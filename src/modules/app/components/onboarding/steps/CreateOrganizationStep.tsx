@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button, Card, CardBody, Input, Divider, Spinner } from "@heroui/react";
-import { useOrganization } from "@/modules/app/hooks/useOrganization";
 import { OnboardingContextType } from "../OnboardingClient";
-import type { OrganizationResource } from "@clerk/types";
 
 interface CreateOrganizationStepProps {
   context: OnboardingContextType;
@@ -15,86 +13,55 @@ export function CreateOrganizationStep({
   context,
 }: CreateOrganizationStepProps) {
   const [organizationCreated, setOrganizationCreated] = useState(false);
-  const { currentOrganization } = useOrganization();
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [slugEdited, setSlugEdited] = useState(false);
 
-  // Handle post-creation logic when organization is detected
-  useEffect(() => {
-    if (currentOrganization && !organizationCreated) {
-      handleOrganizationCreated({ id: currentOrganization.id } as any);
-    }
-  }, [currentOrganization, organizationCreated]);
+  const [error, setError] = useState<{ message: string; toPricing: boolean } | null>(null);
+  const [creating, setCreating] = useState(false);
 
-  const handleOrganizationCreated = async (org: OrganizationResource) => {
-    console.log("🎉 [ONBOARDING] Organization created successfully!", org);
-    setOrganizationCreated(true);
+  // Crea la organización del cliente (el servidor le vincula el plan pagado),
+  // sube el logo si lo eligió y guarda sus preferencias de notificación.
+  const createOrg = async () => {
+    setError(null);
+    setCreating(true);
     context.setIsCreatingOrganization(true);
-
     try {
-      // 1. Save notification settings first
+      const res = await fetch("/api/organizations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError({ message: data?.error || "No se pudo crear la organización.", toPricing: res.status === 402 });
+        return;
+      }
+      const orgId: string = data.organization.id;
+      setOrganizationCreated(true);
+      document.cookie = `ev_org=${orgId}; path=/; max-age=${60 * 60 * 24 * 30}`;
+
+      if (logoFile) {
+        const fd = new FormData();
+        fd.append("logo", logoFile);
+        fd.append("organizationId", orgId);
+        await fetch("/api/organization/logo/upload", { method: "POST", body: fd }).catch(() => undefined);
+      }
       await fetch("/api/notifications/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(context.notificationSettings),
-      });
-      console.log("✅ [ONBOARDING] Notification settings saved");
+      }).catch(() => undefined);
+      localStorage.removeItem("pendingSubscriptionId");
 
-      // 2. Link subscription if present
-      const urlParams = new URLSearchParams(window.location.search);
-      let subscriptionId = urlParams.get("subscription_id");
-      if (!subscriptionId) {
-        subscriptionId = localStorage.getItem("pendingSubscriptionId");
-      }
-
-      if (subscriptionId && org.id) {
-        console.log("🔗 [ONBOARDING] Linking subscription to organization:", {
-          subscriptionId,
-          organizationId: org.id,
-        });
-
-        const linkResponse = await fetch(
-          "/api/organization/link-subscription",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              subscriptionId: parseInt(subscriptionId),
-              organizationId: org.id,
-            }),
-          }
-        );
-
-        if (linkResponse.ok) {
-          const linkResult = await linkResponse.json();
-          console.log(
-            "✅ [ONBOARDING] Subscription linked successfully:",
-            linkResult
-          );
-          localStorage.removeItem("pendingSubscriptionId");
-        } else {
-          const error = await linkResponse.json();
-          console.error("❌ [ONBOARDING] Failed to link subscription:", error);
-        }
-      }
-
-      // 3. Wait a moment for all operations to complete
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // 5. Redirect to the organization
-      console.log("🚀 [ONBOARDING] Redirecting to app dashboard");
-      window.location.href = `/app`;
-    } catch (error) {
-      console.error("❌ [ONBOARDING] Error during organization setup:", error);
-
-      // Still redirect even if some steps failed - don't block the user
-      setTimeout(() => {
-        window.location.href = `/app`;
-      }, 1500);
+      window.location.href = "/app";
+    } catch {
+      setError({ message: "No pudimos conectar con el servidor. Revisa tu conexión e intenta de nuevo.", toPricing: false });
+    } finally {
+      setCreating(false);
+      context.setIsCreatingOrganization(false);
     }
   };
 
@@ -115,11 +82,6 @@ export function CreateOrganizationStep({
       setSlug(toSlug(name));
     }
   }, [name, slugEdited]);
-
-  const createOrg = async () => {
-    // Redirect to Super Admin client creation flow
-    window.location.href = "/superadmin/clients";
-  };
 
   return (
     <motion.div
@@ -192,8 +154,8 @@ export function CreateOrganizationStep({
                     opciones activadas
                   </p>
                   <p>
-                    💳 <strong>Suscripción:</strong> Lista para vincular a tu
-                    organización
+                    💳 <strong>Suscripción:</strong> se vincula automáticamente a
+                    tu organización
                   </p>
                 </div>
               </div>
@@ -211,7 +173,7 @@ export function CreateOrganizationStep({
                 {/* Slug oculto en UI: lo generará el backend; mostramos una vista previa solo informativa */}
                 {name && (
                   <div className="text-xs text-slate-400">
-                    URL: /app/organizations/
+                    Tu formulario de denuncias quedará en: /submit/
                     <span className="font-medium">{toSlug(name)}</span>
                   </div>
                 )}
@@ -248,8 +210,24 @@ export function CreateOrganizationStep({
                   </div>
                 </div>
 
-                <Button color="primary" onPress={createOrg} className="w-full">
-                  Crear cliente (creará organización)
+                {error && (
+                  <div className="rounded-lg border border-[#F0B2A6] bg-[#FCEEEB] p-3 text-sm text-[#862B1D]">
+                    <p>{error.message}</p>
+                    {error.toPricing && (
+                      <a href="/pricing" className="mt-1 inline-block font-medium underline">
+                        Ver planes
+                      </a>
+                    )}
+                  </div>
+                )}
+                <Button
+                  color="primary"
+                  onPress={createOrg}
+                  isLoading={creating}
+                  isDisabled={name.trim().length < 2}
+                  className="w-full"
+                >
+                  Crear mi organización
                 </Button>
               </div>
             </div>

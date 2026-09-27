@@ -41,7 +41,8 @@ export async function PATCH(req: NextRequest, context: Ctx) {
 
 /**
  * Elimina el cliente y todos sus datos. Exige escribir el nombre exacto.
- * Cancela antes el cobro en Mercado Pago y el alias de correo en ImprovMX.
+ * Borra también el alias de correo (ImprovMX, si aplica); los cobros con
+ * tarjeta se detienen al borrar sus suscripciones.
  */
 export async function DELETE(req: NextRequest, context: Ctx) {
   const guard = await requireSuperAdmin();

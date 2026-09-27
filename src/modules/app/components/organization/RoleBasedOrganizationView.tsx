@@ -12,7 +12,7 @@ import { useOrganization } from "@/modules/app/hooks/useOrganization";
 import { DepartmentWithStats } from "@/types/department.types";
 import { Alert } from "@heroui/alert";
 import { CustomOrganizationManagement } from "./CustomOrganizationManagement";
-import { SubscriptionManagement } from "../subscription/SubscriptionManagement";
+import { BillingManager } from "../subscription/BillingManager";
 
 export function RoleBasedOrganizationView() {
   const { permissions, isSuperAdmin } = useUserRole();
@@ -128,7 +128,7 @@ export function RoleBasedOrganizationView() {
 
             <Tab key="billing" title="Plan y facturación">
               <div className="mt-4 sm:mt-6">
-                <SubscriptionManagement />
+                <BillingManager />
               </div>
             </Tab>
           </Tabs>

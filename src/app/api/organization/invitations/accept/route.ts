@@ -25,6 +25,23 @@ export async function GET(req: NextRequest) {
           ? "expired"
           : null;
 
+  // Enlace ya usado por esta misma persona (segundo clic, o el cliente de
+  // correo lo abrió antes): la lleva a su organización en vez de mostrar error.
+  if (invite && invalidReason === "already_accepted") {
+    const { userId: currentUserId } = await auth();
+    const member = currentUserId
+      ? await prisma.organizationMembership.findUnique({
+          where: { userId_orgId: { userId: currentUserId, orgId: invite.orgId } },
+          select: { id: true },
+        })
+      : null;
+    if (member) {
+      const toApp = NextResponse.redirect(new URL("/app", req.url));
+      toApp.cookies.set("ev_org", invite.orgId, { path: "/", maxAge: 60 * 60 * 24 * 30, sameSite: "lax" });
+      return toApp;
+    }
+  }
+
   if (invalidReason || !invite) {
     return NextResponse.redirect(
       new URL(`/auth/invite-status?reason=${invalidReason || "invalid"}`, req.url)

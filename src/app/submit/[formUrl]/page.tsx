@@ -5,6 +5,8 @@ import { SubmitPageWrapper } from "@/modules/submit/components/SubmitPageWrapper
 import prisma from "@/modules/prisma/lib/prisma";
 import { PlanType } from "@/types/subscription.types";
 import { notFound, redirect } from "next/navigation";
+import { ChannelShell } from "@/modules/submit/components/ChannelShell";
+import { getChannelBrandingByOrgId } from "@/modules/core/utils/org-branding.server";
 
 const SubmitPage = async ({
   params,
@@ -25,8 +27,10 @@ const SubmitPage = async ({
 
   if (form) {
     const formContent = JSON.parse(form.content) as FormElementInstance[];
+    const branding = await getChannelBrandingByOrgId(form.organization.id);
 
     return (
+      <ChannelShell branding={branding}>
       <div className="mx-auto w-full max-w-[var(--ev-max)] px-[var(--ev-gutter)] pb-24 pt-10 sm:pt-14">
         <div className="ev-label flex items-center justify-between border-b border-ev-line pb-4 text-ev-mute">
           <span>Canal de denuncias</span>
@@ -56,6 +60,7 @@ const SubmitPage = async ({
           </main>
         </div>
       </div>
+      </ChannelShell>
     );
   }
 
@@ -84,9 +89,9 @@ const SubmitPage = async ({
   }
 
   return (
-    <div>
+    <ChannelShell branding={await getChannelBrandingByOrgId(organization.id)}>
       <SubmitPageWrapper initialOrganization={organization} />
-    </div>
+    </ChannelShell>
   );
 };
 

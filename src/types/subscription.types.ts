@@ -82,6 +82,15 @@ export interface PlanConfig {
     yearly?: number;
     currency: string;
   };
+  /**
+   * Lo que se cobra con Wompi, en pesos colombianos (Wompi solo cobra en COP).
+   * Precio fijo, redondeado desde el precio en USD; el anual con 10% de
+   * descuento, igual que en USD. 0 = plan comercial (no se vende en línea).
+   */
+  priceCop: {
+    monthly: number;
+    yearly: number;
+  };
   description: string;
   targetAudience: string;
   features: PlanFeatures;
@@ -284,6 +293,7 @@ export const PLAN_CONFIGS: Record<PlanType, PlanConfig> = {
       yearly: 540,
       currency: "USD",
     },
+    priceCop: { monthly: 165000, yearly: 1782000 },
     features: {
       // Channel access
       hasWebForm: true,
@@ -353,6 +363,7 @@ export const PLAN_CONFIGS: Record<PlanType, PlanConfig> = {
       yearly: 1296,
       currency: "USD",
     },
+    priceCop: { monthly: 395000, yearly: 4266000 },
     features: {
       // Channel access
       hasWebForm: true,
@@ -423,6 +434,7 @@ export const PLAN_CONFIGS: Record<PlanType, PlanConfig> = {
       yearly: 3240,
       currency: "USD",
     },
+    priceCop: { monthly: 980000, yearly: 10584000 },
     features: {
       // Channel access
       hasWebForm: true,
@@ -494,6 +506,7 @@ export const PLAN_CONFIGS: Record<PlanType, PlanConfig> = {
       yearly: 0,
       currency: "USD",
     },
+    priceCop: { monthly: 0, yearly: 0 },
     features: {
       // Channel access
       hasWebForm: true,
@@ -779,7 +792,7 @@ export interface PendingSubscription {
   userId: string;
   planType: PlanType;
   billingCycle: BillingCycle;
-  paymentProvider: "MERCADO_PAGO";
+  paymentProvider: "WOMPI";
   paymentId?: string;
   status: "PENDING" | "COMPLETED" | "FAILED";
   createdAt: Date;

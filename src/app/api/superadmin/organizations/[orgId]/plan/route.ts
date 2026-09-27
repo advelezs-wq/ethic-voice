@@ -5,7 +5,8 @@ import { BillingCycle } from "@/types/subscription.types";
 
 /**
  * Asigna un plan al cliente sin pasar por pago (contrato gestionado por el
- * equipo comercial). Si el cliente paga con Mercado Pago, actualiza su cobro.
+ * equipo comercial). Si el cliente paga con tarjeta (Wompi), sus próximos
+ * cobros usan el precio del nuevo plan.
  */
 export async function POST(req: NextRequest, context: { params: Promise<{ orgId: string }> }) {
   const guard = await requireSuperAdmin();

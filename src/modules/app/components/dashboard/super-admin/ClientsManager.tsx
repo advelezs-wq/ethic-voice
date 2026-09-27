@@ -30,7 +30,7 @@ type Client = {
   createdAt: string;
   isActive: boolean;
   plan: PlanType | null;
-  subscription: { id: number; status: string; endDate: string | null; billing: "mercadopago" | "manual" } | null;
+  subscription: { id: number; status: string; endDate: string | null; billing: "wompi" | "manual" } | null;
   adminEmail: string | null;
   adminPending: boolean;
   members: number;
@@ -237,7 +237,7 @@ export function ClientsManager() {
                         <p className="font-medium text-ev-night">{planName(c.plan)}</p>
                         {c.subscription && (
                           <p className="mt-0.5 text-xs text-ev-mute">
-                            {c.subscription.billing === "mercadopago" ? "Cobro por Mercado Pago" : "Contrato manual"}
+                            {c.subscription.billing === "wompi" ? "Pago con tarjeta (Wompi)" : "Contrato manual"}
                           </p>
                         )}
                       </td>
@@ -560,7 +560,7 @@ function CreatedDialog({
 
 function PlanDialog({ client, busy, onClose, onSubmit }: { client: Client; busy: boolean; onClose: () => void; onSubmit: (p: PlanType) => void }) {
   const [plan, setPlan] = useState<PlanType>(client.plan ?? PlanType.STARTER);
-  const mp = client.subscription?.billing === "mercadopago";
+  const mp = client.subscription?.billing === "wompi";
   return (
     <Modal isOpen onClose={onClose} size="lg" isDismissable={!busy}>
       <ModalContent>
@@ -572,7 +572,7 @@ function PlanDialog({ client, busy, onClose, onSubmit }: { client: Client; busy:
           <PlanPicker value={plan} onChange={setPlan} />
           <p className="rounded-lg bg-ev-paper px-3 py-2 text-sm text-ev-mute">
             {mp
-              ? "Este cliente paga con Mercado Pago: el próximo cobro se hará con el precio del nuevo plan."
+              ? "Este cliente paga con tarjeta: el próximo cobro se hará con el precio del nuevo plan."
               : "Contrato manual: el cambio es inmediato y no genera ningún cobro."}{" "}
             Si el nuevo plan permite menos usuarios, los que excedan el cupo quedarán bloqueados.
           </p>
@@ -648,23 +648,23 @@ function SubscriptionDialog({
   onClose: () => void;
   onConfirm: () => void;
 }) {
-  const mp = client.subscription?.billing === "mercadopago";
+  const mp = client.subscription?.billing === "wompi";
   const copy = {
     pause: {
       title: "Pausar cobro",
       body: mp
-        ? "Mercado Pago dejará de cobrar hasta que lo reanudes. El cliente conserva el acceso."
+        ? "No se harán cobros a su tarjeta hasta que lo reanudes. El cliente conserva el acceso."
         : "Se marca la suscripción como pausada. El cliente conserva el acceso.",
       cta: "Pausar cobro",
     },
     resume: {
       title: "Reanudar cobro",
-      body: mp ? "Mercado Pago volverá a cobrar en la próxima fecha de pago." : "La suscripción vuelve a quedar activa.",
+      body: mp ? "Se volverá a cobrar a su tarjeta en la próxima fecha de pago." : "La suscripción vuelve a quedar activa.",
       cta: "Reanudar cobro",
     },
     cancel: {
       title: "Cancelar suscripción",
-      body: `${mp ? "Se cancela el cobro en Mercado Pago. " : ""}El cliente conserva el acceso hasta el fin del periodo ya pagado; después quedará sin plan activo.`,
+      body: `${mp ? "No se harán más cobros a su tarjeta. " : ""}El cliente conserva el acceso hasta el fin del periodo ya pagado; después quedará sin plan activo.`,
       cta: "Cancelar suscripción",
     },
   }[action];
@@ -702,7 +702,7 @@ function DeleteDialog({ client, busy, onClose, onConfirm }: { client: Client; bu
             <p className="font-medium">Esto no se puede deshacer.</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li>Se borran sus {client.reports} denuncias, miembros, formularios y configuración.</li>
-              {client.subscription?.billing === "mercadopago" && <li>Se cancela su cobro en Mercado Pago.</li>}
+              {client.subscription?.billing === "wompi" && <li>Se detienen los cobros a su tarjeta.</li>}
               {client.emailChannel && <li>Se elimina la bandeja {client.emailChannel.address}.</li>}
               <li>Las cuentas de sus usuarios siguen existiendo, pero sin acceso a esta organización.</li>
             </ul>

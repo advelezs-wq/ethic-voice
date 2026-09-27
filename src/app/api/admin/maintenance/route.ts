@@ -54,32 +54,8 @@ export async function GET(request: NextRequest) {
       }
 
       if (expiredSince >= threeMonthsMs) {
-        // Cancel any active provider subscription before deleting — the org
-        // and its Subscription rows are gone after this, so this is the last
-        // chance to stop the org from continuing to be billed.
-        try {
-          const subs = await prisma.subscription.findMany({
-            where: { orgId: org.id },
-          });
-          for (const s of subs) {
-            if (s.providerSubscriptionId) {
-              await fetch(
-                "https://api.mercadopago.com/preapproval/" + s.providerSubscriptionId,
-                {
-                  method: "PUT",
-                  headers: {
-                    Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN || ""}`,
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ status: "cancelled" }),
-                }
-              );
-            }
-          }
-        } catch (cancelError) {
-          console.warn(`⚠️ [maintenance] Failed to cancel provider subscription for org ${org.id}:`, cancelError);
-        }
-
+        // Los cobros con tarjeta (Wompi) los hace nuestro cron sobre las
+        // suscripciones de la base: al borrar la organización no se vuelve a cobrar.
         await prisma.organization.delete({ where: { id: org.id } });
         deleted += 1;
       }

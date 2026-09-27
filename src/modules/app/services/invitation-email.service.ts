@@ -27,10 +27,19 @@ export async function sendOrganizationInvitationEmail(
   <p style="margin-top:32px; color:#6b7280; font-size:12px;">Si no esperabas este correo, puedes ignorarlo.</p>
 </body></html>`;
 
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL || "noreply@ethicvoice.co",
-    to: invitation.email,
-    subject: `Invitación a ${orgName} en EthicVoice`,
-    html,
-  });
+  // Resend no lanza: devuelve { error }. Antes se ignoraba y la invitación
+  // figuraba como enviada aunque el correo nunca saliera.
+  try {
+    const { error } = await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL || "noreply@ethicvoice.co",
+      to: invitation.email,
+      subject: `Invitación a ${orgName} en EthicVoice`,
+      html,
+    });
+    if (error) console.error("[invitation-email] rejected", error.message);
+    return { sent: !error, acceptUrl };
+  } catch (e) {
+    console.error("[invitation-email] failed", e);
+    return { sent: false, acceptUrl };
+  }
 }

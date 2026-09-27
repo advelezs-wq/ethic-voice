@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import { verifyCronOrAdminRequest } from "@/lib/security/cron-auth";
+import { runDueCharges } from "@/modules/app/services/billing.service";
 
 // Runs 5 downstream tasks sequentially, including process-queue which now
 // waits up to 50s for AI jobs to complete — give the chain room to finish.
@@ -61,6 +62,14 @@ export async function GET(request: NextRequest) {
   const base = getBaseUrl(request.url);
   const results: Record<string, unknown> = {};
   const adminAuthHeader = { Authorization: `Bearer ${process.env.ADMIN_API_KEY || ""}` };
+
+  // 0) Cobros de suscripciones con Wompi: renovaciones, reintentos y
+  //    cancelaciones al fin del periodo (antes de validar planes).
+  try {
+    results.billing = await runDueCharges();
+  } catch (e) {
+    results.billing = { error: e instanceof Error ? e.message : String(e) };
+  }
 
   // 1) Validación de planes/estado
   results.validatePlans = await callJson(

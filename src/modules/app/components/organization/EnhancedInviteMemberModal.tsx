@@ -164,11 +164,21 @@ export function EnhancedInviteMemberModal({
         );
       }
 
-      addToast({
-        title: "¡Invitación enviada exitosamente!",
-        description: `Se ha enviado una invitación a ${form.email} como ${ROLE_NAME[form.role]}. Recibirá un correo con las instrucciones para unirse.`,
-        color: "success",
-      });
+      const data = await res.json().catch(() => ({}));
+      if (data.emailSent === false && data.acceptUrl) {
+        await navigator.clipboard?.writeText(data.acceptUrl).catch(() => undefined);
+        addToast({
+          title: "Invitación creada, pero el correo no se pudo enviar",
+          description: `Copiamos el enlace de invitación: envíaselo a ${form.email} por otro medio. Vence en 7 días.`,
+          color: "warning",
+        });
+      } else {
+        addToast({
+          title: "Invitación enviada",
+          description: `${form.email} recibirá un correo para unirse como ${ROLE_NAME[form.role]}.`,
+          color: "success",
+        });
+      }
 
       // Reset form and close modal
       setForm({ email: "", role: "MEMBER" });

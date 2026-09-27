@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     // which daily-runner already calls earlier in its sequence — this used
     // to duplicate that logic (without the provider-cancellation step), so
     // any org past the 90-day mark was deleted here first and maintenance's
-    // safer version never got a chance to cancel its MercadoPago preapproval.
+    // safer version never got a chance to stop its provider billing.
 
     // Get final stats
     const finalStats = await getQueueStats();

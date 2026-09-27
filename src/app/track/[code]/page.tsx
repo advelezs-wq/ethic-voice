@@ -1,5 +1,7 @@
 import { getReportByTrackingCode } from "@/actions/tracking.actions";
 import { TrackingPageContent } from "@/modules/track/components/TrackingPageContent";
+import { ChannelShell } from "@/modules/submit/components/ChannelShell";
+import { getChannelBrandingByOrgId } from "@/modules/core/utils/org-branding.server";
 
 interface TrackReportPageProps {
   params: Promise<{
@@ -7,17 +9,15 @@ interface TrackReportPageProps {
   }>;
 }
 
-export default async function TrackReportPage({
-  params,
-}: TrackReportPageProps) {
-  const report = await getReportByTrackingCode((await params).code);
+export default async function TrackReportPage({ params }: TrackReportPageProps) {
+  const { code } = await params;
+  const report = await getReportByTrackingCode(code);
+  const branding = await getChannelBrandingByOrgId(report?.organizationId);
+  const publicReport = report ? { ...report, organizationId: undefined } : report;
 
   return (
-    <div>
-      <TrackingPageContent
-        initialCode={(await params).code}
-        initialReport={report}
-      />
-    </div>
+    <ChannelShell branding={branding}>
+      <TrackingPageContent initialCode={code} initialReport={publicReport} />
+    </ChannelShell>
   );
 }

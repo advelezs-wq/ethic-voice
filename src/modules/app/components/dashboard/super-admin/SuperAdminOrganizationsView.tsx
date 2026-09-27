@@ -5,7 +5,6 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@heroui/react";
 import { Spinner } from "@heroui/spinner";
 import { getAllOrganizationsStats } from "@/actions/superadmin.actions";
-import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
 import { SystemStats } from "./SystemStats";
 import { OrganizationCard } from "./OrganizationCard";
 
@@ -13,7 +12,6 @@ export function SuperAdminOrganizationsView() {
   const [organizations, setOrganizations] = useState<any[]>([]);
   const [systemStats, setSystemStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -53,10 +51,13 @@ export function SuperAdminOrganizationsView() {
         </div>
         <Button
           color="primary"
-          onPress={() => setShowCreateModal(true)}
+          onPress={() => {
+            // Los clientes se crean con su administrador y plan desde Clientes.
+            window.location.href = "/app/superadmin/clients";
+          }}
           startContent={<i className="icon-[tabler--building-plus] size-4" />}
         >
-          Nueva Organización
+          Nuevo cliente
         </Button>
       </div>
 
@@ -75,49 +76,6 @@ export function SuperAdminOrganizationsView() {
         </div>
       </div>
 
-      {/* Create Organization Modal */}
-      <Modal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        size="lg"
-      >
-        <ModalContent>
-          <ModalHeader>Crear Nueva Organización</ModalHeader>
-          <ModalBody className="pb-6">
-            <form
-              className="space-y-3"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const form = e.currentTarget as HTMLFormElement;
-                const formData = new FormData(form);
-                const name = String(formData.get("name") || "");
-                const slug = String(formData.get("slug") || "");
-                const res = await fetch("/api/organizations", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ name, slug }),
-                });
-                if (res.ok) {
-                  setShowCreateModal(false);
-                  await loadData();
-                }
-              }}
-            >
-              <div>
-                <label className="block text-sm font-medium text-slate-600">Nombre</label>
-                <input name="name" required className="mt-1 w-full border rounded px-3 py-2" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-600">Slug (opcional)</label>
-                <input name="slug" className="mt-1 w-full border rounded px-3 py-2" />
-              </div>
-              <div className="pt-2">
-                <Button color="primary" type="submit">Crear</Button>
-              </div>
-            </form>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
     </div>
   );
 }

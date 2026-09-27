@@ -5,6 +5,7 @@ import { getPlanPermissions, PlanType } from "@/types/subscription.types";
 import { PlanRestrictionReason } from "@/types/auth.types";
 import prisma from "@/modules/prisma/lib/prisma";
 import { getUserPermissions } from "@/modules/core/utils/permissions";
+import { DOMAIN_RE, brandingCapabilities } from "@/modules/core/utils/org-branding";
 
 interface OrganizationSettings {
   // Basic settings (all plans)
@@ -16,7 +17,7 @@ interface OrganizationSettings {
   logoUrl?: string;
 
   // Color theme (Grow+)
-  primaryColor?: string;
+  primaryColor?: string | null;
   secondaryColor?: string;
   accentColor?: string;
   backgroundColor?: string;
@@ -153,6 +154,9 @@ export async function GET(
           "auditLogs"
         ] as boolean | undefined) ?? false;
     }
+
+    response.slug = organization.slug;
+    response._branding = brandingCapabilities(planInfo.planType, planInfo.hasActivePlan);
 
     // Include plan information for frontend
     response._planInfo = {
@@ -291,10 +295,38 @@ export async function PATCH(
       );
     }
 
+    // Validación de la marca del canal
+    if (updates.primaryColor !== undefined && updates.primaryColor !== null && !/^#[0-9a-f]{6}$/i.test(String(updates.primaryColor))) {
+      return NextResponse.json({ error: "El color debe tener el formato #RRGGBB." }, { status: 400 });
+    }
+    if (updates.whiteLabel !== undefined && typeof updates.whiteLabel !== "boolean") {
+      return NextResponse.json({ error: "Valor de marca blanca no válido." }, { status: 400 });
+    }
+    if (updates.customDomain !== undefined) {
+      const domain = String(updates.customDomain || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+      if (domain && (!DOMAIN_RE.test(domain) || /(^|\.)ethicvoice\.co$/.test(domain) || domain.split(".").length < 3)) {
+        return NextResponse.json(
+          { error: "Escribe un subdominio de tu empresa, por ejemplo denuncias.tuempresa.com." },
+          { status: 400 },
+        );
+      }
+      if (domain && (planInfo.planType !== "PREMIUM" || !planInfo.hasActivePlan)) {
+        return NextResponse.json({ error: "El dominio propio está disponible en el plan Premium." }, { status: 403 });
+      }
+      if (domain) {
+        const taken = await prisma.organizationSettings.findFirst({
+          where: { organizationId: { not: orgId }, brandingConfig: { path: ["customDomain"], equals: domain } },
+          select: { id: true },
+        });
+        if (taken) return NextResponse.json({ error: "Ese dominio ya está en uso por otra organización." }, { status: 409 });
+      }
+      updates.customDomain = domain || undefined;
+      if (!domain) (updates as Record<string, unknown>).customDomain = "";
+    }
+
     // Advanced customization check
     if (
       (updates.customCSS !== undefined ||
-        updates.customDomain !== undefined ||
         updates.whiteLabel !== undefined) &&
       (!planPermissions.canAccessUnlimitedCustomization ||
         !planInfo.hasActivePlan)

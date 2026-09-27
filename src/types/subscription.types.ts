@@ -195,7 +195,6 @@ export interface SubscriptionMetadata {
   activatedAt?: string;
   pausedAt?: string;
   resumedAt?: string;
-  rebillSubscription?: any;
   pendingPayment?: any;
 }
 

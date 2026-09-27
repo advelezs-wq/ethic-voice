@@ -128,7 +128,6 @@ export async function GET() {
         console.log("🔍 [DEBUG] Super admin check result:", {
           email: debugData.adminStatus.email,
           isAdmin: debugData.adminStatus.isAdmin,
-          superAdminEmails: process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAILS,
         });
       }
     } else {

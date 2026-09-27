@@ -273,7 +273,7 @@ const handlePaymentSuccess = (subscription) => {
 - **Acciones**: Identificar usuario en Clarity + tags de rol
 
 ### 5. Webhooks de Pago
-- **Archivo**: `src/app/api/webhooks/rebill/route.ts` o `mercadopago/route.ts`
+- **Archivo**: `src/app/api/webhooks/mercadopago/route.ts`
 - **Eventos**: `Purchase` (Facebook) + `subscription_created` (Clarity)
 
 ## 🔒 Privacidad y GDPR

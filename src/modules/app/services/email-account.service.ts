@@ -6,10 +6,8 @@ import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils
 import { sanitizeSubmissionText } from "@/lib/security/submission-security";
 import { SubmissionSource } from "@/types/submission.types";
 import { userHasPermission } from "@/modules/core/utils/permissions";
-import {
-  upsertImprovMxAlias,
-  deleteImprovMxAliasByName,
-} from "@/modules/app/lib/improvmx-client";
+import { upsertImprovMxAlias } from "@/modules/app/lib/improvmx-client";
+import { emailRoutingProvider } from "@/modules/app/lib/email-routing";
 import type { Prisma } from "@prisma/client";
 
 /**
@@ -108,18 +106,9 @@ export class EmailAccountService {
       });
 
       if (deactivation.count > 0) {
-        if (existingConfig?.emailAlias) {
-          try {
-            const domain = process.env.FORWARDING_DOMAIN || "ethicvoice.co";
-            await deleteImprovMxAliasByName(domain, existingConfig.emailAlias);
-          } catch (e) {
-            console.error(
-              `Failed to remove ImprovMX alias for org ${orgId} on plan lapse:`,
-              e
-            );
-          }
-        }
-
+        // El alias de ImprovMX se conserva: el webhook ya ignora los correos
+        // de bandejas inactivas, y en la cuenta actual de ImprovMX (no Premium)
+        // un alias con webhook borrado no se puede volver a crear.
         await this.appendEmailAuditEvent(orgId, {
           type: "EMAIL_INBOX_AUTO_DEACTIVATED_PLAN",
           reason: "Plan inactivo o sin canal de correo",
@@ -243,8 +232,13 @@ export class EmailAccountService {
       ? providerConfig.auditEvents
       : [];
 
+    // No exponer forwardingAddress ni providerConfig (pueden contener el
+    // secreto del webhook en configuraciones antiguas).
+    const { forwardingAddress: _fa, providerConfig: _pc, ...safe } = config;
+    void _fa;
+    void _pc;
     return {
-      ...config,
+      ...safe,
       auditEvents,
     };
   }
@@ -293,20 +287,15 @@ export class EmailAccountService {
       // IMPROVMX_API_KEY existed. Marking the channel active without this
       // would let an admin believe email is flowing when every incoming
       // report would actually go nowhere.
-      await upsertImprovMxAlias(domain, config.emailAlias, this.buildWebhookUrl());
-    } else {
-      try {
-        await deleteImprovMxAliasByName(domain, config.emailAlias);
-      } catch (e) {
-        // Don't block deactivation on this — the webhook already checks
-        // plan/isActive and no-ops, so a stray alias left in ImprovMX is a
-        // cleanup miss, not a correctness or security issue.
-        console.error(
-          `Failed to remove ImprovMX alias for org ${orgId}:`,
-          e
-        );
+      // Con Cloudflare Email Routing no hay alias por cliente (catch-all).
+      if (emailRoutingProvider() === "improvmx") {
+        await upsertImprovMxAlias(domain, config.emailAlias, this.buildWebhookUrl());
       }
     }
+    // Al desactivar NO se borra el alias de ImprovMX: el webhook ignora los
+    // correos de bandejas inactivas (isActive=false), y borrar el alias es
+    // irreversible si la cuenta de ImprovMX no es Premium (la API solo deja
+    // crear alias con webhook en Premium; actualizarlos sí).
 
     const updated = await prisma.emailConfiguration.update({
       where: { orgId },
@@ -354,13 +343,27 @@ export class EmailAccountService {
   private async createEmailForwarding(org: any) {
     const domain = process.env.FORWARDING_DOMAIN || "ethicvoice.co";
     const emailAddress = `${org.slug}@${domain}`;
-    const webhookUrl = this.buildWebhookUrl();
 
+    if (emailRoutingProvider() === "cloudflare") {
+      // La regla catch-all de Cloudflare ya entrega cualquier {slug}@dominio al
+      // Worker; no hay nada que crear por cliente.
+      return {
+        address: emailAddress,
+        forwardingAddress: "cloudflare-email-worker",
+        provider: "cloudflare",
+        config: { alias: org.slug, domain, routing: "cloudflare-catch-all" },
+      };
+    }
+
+    const webhookUrl = this.buildWebhookUrl();
     const alias = await upsertImprovMxAlias(domain, org.slug, webhookUrl);
 
     return {
       address: emailAddress,
-      forwardingAddress: webhookUrl,
+      // Sin el secreto: la URL con ?secret= solo se entrega a ImprovMX. Antes se
+      // guardaba completa y la API la devolvía a los administradores de cada
+      // cliente, que podían usarla para fabricar correos entrantes.
+      forwardingAddress: webhookUrl.split("?")[0],
       provider: "improvmx",
       config: {
         alias: org.slug,
@@ -441,7 +444,8 @@ export class EmailWebhookService {
     const emailConfig = await this.identifyOrganization(emailData.to);
     if (!emailConfig) {
       console.log(`Email no reconocido: ${emailData.to}`);
-      return;
+      // El Worker de Cloudflare usa este motivo para rebotar el correo.
+      return { success: false, skipped: true, reason: "unknown_recipient" };
     }
 
     const planInfo = await getOrganizationPlanInfo(emailConfig.orgId);

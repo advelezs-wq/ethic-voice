@@ -30,10 +30,7 @@
     "setup:pricing": "bunx --bun prisma migrate deploy && bun run db:generate && bun run test:pricing",
     "validate:security": "curl -X POST http://localhost:3000/api/admin/security/validate-plans -H 'Authorization: Bearer ${ADMIN_API_SECRET}'",
     "pricing:dev": "bun run dev",
-    "pricing:build": "bun run build && bun run test:pricing",
-    "rebill:test": "echo 'Testing Rebill integration...' && curl -X POST http://localhost:3000/api/webhooks/rebill -H 'Content-Type: application/json' -d '{\"test\": true}'",
-    "create-rebill-plans": "bunx tsx scripts/create-rebill-plans.ts",
-    "test:rebill": "bunx tsx scripts/test-rebill-integration.ts"
+    "pricing:build": "bun run build && bun run test:pricing"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.66",

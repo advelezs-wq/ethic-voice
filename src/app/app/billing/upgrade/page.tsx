@@ -64,7 +64,7 @@ export default function UpgradePage() {
     setIsProcessing(true);
 
     try {
-      // Create Rebill upgrade subscription
+      // Crear la suscripción de mejora en Mercado Pago
       const response = await fetch("/api/subscriptions/create", {
         method: "POST",
         headers: {
@@ -127,7 +127,6 @@ export default function UpgradePage() {
 
   return (
     <>
-      {/* Removed MercadoPago SDK (migrated to Rebill) */}
 
       <div className="min-h-screen bg-white">
         <div className="container mx-auto px-6 py-8 max-w-7xl">

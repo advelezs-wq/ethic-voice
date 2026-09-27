@@ -77,24 +77,14 @@ export const getRolePermissions = (role: UserRole): UserPermissions => {
 };
 
 export const isSuperAdmin = (email: string): boolean => {
-  const superAdminEmails =
-    process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAILS?.split(",") || [];
-
-  // For debugging
-  console.log("🔍 [SUPER-ADMIN-CHECK] Email to check:", email);
-  console.log(
-    "🔍 [SUPER-ADMIN-CHECK] Super admin emails from env:",
-    superAdminEmails
-  );
-  console.log(
-    "🔍 [SUPER-ADMIN-CHECK] Environment variable exists:",
-    !!process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAILS
-  );
-
-  const result = superAdminEmails.includes(email);
-  console.log("🔍 [SUPER-ADMIN-CHECK] Result:", result);
-
-  return result;
+  // Sin logs: esta función corre también en el navegador y antes imprimía la
+  // lista completa de correos de superadmin en la consola de cualquier usuario.
+  if (!email) return false;
+  const superAdminEmails = (process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAILS || "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return superAdminEmails.includes(email.trim().toLowerCase());
 };
 
 // NEW FUNCTION: Get user role from database

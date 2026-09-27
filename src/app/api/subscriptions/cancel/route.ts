@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
         } else {
           console.error("❌ [CANCEL-SUBSCRIPTION] MercadoPago pause failed:", result.error);
 
-          // Don't fail the entire process if Rebill fails, but log it
+          // Don't fail the entire process if Mercado Pago fails, but log it
           console.log(
             "⚠️ [CANCEL-SUBSCRIPTION] Continuing with database cancellation (pause locally) despite provider failure"
           );

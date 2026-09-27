@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
                 currency: pendingPayment.currency,
                 status: pendingPayment.status,
                 providerTransactionId: pendingPayment.paymentId,
-                gateway: "REBILL",
+                gateway: "MERCADO_PAGO",
                 // No metadata field in PaymentTransaction schema
               },
             });

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/modules/prisma/lib/prisma";
-import rebillService from "@/modules/app/services/rebill.service";
 import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
 
@@ -26,7 +25,7 @@ export async function GET(
     }
 
     // Without this, any signed-in user could read any org's billing/plan
-    // details (prices, Rebill customer id, feature limits) by orgId alone.
+    // details (prices, provider ids, feature limits) by orgId alone.
     // Superadmin bypass matters here: this route is also called from the
     // superadmin org-detail panel, where the caller usually has no
     // membership in the org they're inspecting.
@@ -74,23 +73,6 @@ export async function GET(
         subscription: null,
         message: "No active subscription found",
       });
-    }
-
-    // Get additional subscription details from Rebill if possible
-    let rebillSubscriptionData = null;
-    if (activeSubscription.providerSubscriptionId) {
-      try {
-        rebillSubscriptionData = await rebillService.getSubscriptionStatus(
-          activeSubscription.providerSubscriptionId
-        );
-        console.log("✅ [SUBSCRIPTION-DETAILS] Got Rebill subscription data");
-      } catch (error) {
-        console.log(
-          "⚠️ [SUBSCRIPTION-DETAILS] Could not fetch Rebill data:",
-          error
-        );
-        // Continue without Rebill data
-      }
     }
 
     // Calculate trial info
@@ -159,7 +141,6 @@ export async function GET(
       isTrialActive,
       trialDaysRemaining: isTrialActive ? trialDaysRemaining : undefined,
       nextChargeDate:
-        rebillSubscriptionData?.nextChargeDate ||
         activeSubscription.endDate?.toISOString(),
       providerSubscriptionId: activeSubscription.providerSubscriptionId,
 
@@ -185,17 +166,12 @@ export async function GET(
       organizationCurrentPlan: organization.currentPlan,
       organizationHasActivePlan: organization.hasActivePlan,
 
-      // Rebill data if available
-      rebillStatus: rebillSubscriptionData?.status,
-      rebillNextCharge: rebillSubscriptionData?.nextChargeDate,
-      rebillCustomerId: rebillSubscriptionData?.customerId,
     };
 
     console.log("✅ [SUBSCRIPTION-DETAILS] Returning subscription details:", {
       subscriptionId: subscriptionDetails.id,
       planType: subscriptionDetails.planType,
       status: subscriptionDetails.status,
-      hasRebillData: !!rebillSubscriptionData,
     });
 
     return NextResponse.json({

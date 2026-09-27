@@ -406,7 +406,7 @@ export const services: ServiceItem[] = [
     title: "Suscripciones y Pagos",
     groupSlug: "desarrollo-software",
     description:
-      "Gestión de planes, suscripciones y cobros con gateways como Rebill o Mercado Pago.",
+      "Gestión de planes, suscripciones y cobros con Mercado Pago.",
     offerings: [
       "Planes y upgrades",
       "Links de pago y suscripciones",

@@ -1,0 +1,16 @@
+# Worker que recibe los correos de *@ethicvoice.co (regla catch-all de
+# Cloudflare Email Routing) y los entrega al webhook de EthicVoice.
+name = "ethicvoice-email"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+
+[vars]
+WEBHOOK_URL = "https://www.ethicvoice.co/api/webhooks/email/secure"
+# Buzones del equipo de EthicVoice (no de clientes) que deben llegar a un
+# correo real en vez del webhook. Formato: "local=destino,local2=destino2".
+# Cada destino debe estar verificado en Email Routing → Destination addresses.
+# Se configura como secreto para no dejar direcciones personales en el repo:
+#   wrangler secret put STAFF_FORWARDS
+#
+# Secreto obligatorio (el mismo IMPROVMX_WEBHOOK_SECRET de Vercel):
+#   wrangler secret put WEBHOOK_SECRET

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Instrument_Serif, Lexend } from "next/font/google";
 import "./globals.css";
 import { JsonLd } from "@/modules/core/components/JsonLd";
-import Script from "next/script";
 import { headers } from "next/headers";
 import {
   getRequestHost,
@@ -134,10 +133,6 @@ export default async function RootLayout({
     <html lang={publicBlogContext?.locale ?? "en"} className="light">
       <head>
         <JsonLd />
-        <Script
-          src="https://sdk.rebill.com/v3/rebill.js"
-          strategy="beforeInteractive"
-        />
         {/* Píxeles GA / Clarity / Meta: solo tras consentimiento (ConsentGatedScripts) */}
       </head>
       <body

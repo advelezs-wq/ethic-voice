@@ -209,7 +209,7 @@ export async function POST(req: NextRequest) {
           ...((existingSubscription.metadata as Record<string, unknown> | null) ?? {}),
           paymentData,
           paidAt: new Date().toISOString(),
-          rebillPaymentId: paymentData?.id,
+          providerPaymentId: paymentData?.id,
         },
       },
     });

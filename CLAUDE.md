@@ -75,13 +75,13 @@ src/app/
     billing/            ← Subscription management
     superadmin/         ← Superadmin panel (gated by NEXT_PUBLIC_SUPER_ADMIN_EMAILS)
   api/                  ← API routes
-    webhooks/           ← Clerk, MercadoPago, Rebill, email providers
+    webhooks/           ← Clerk, MercadoPago, email providers
     admin/              ← Cron-triggered admin routes (validated via Vercel-cron header or ADMIN_API_KEY)
     ai/                 ← AI processing endpoints
   submit/[formUrl]/     ← Public form submission (unauthenticated)
   track/[code]/         ← Anonymous report tracking (unauthenticated)
   auth/                 ← Clerk sign-in / sign-up pages
-  checkout/             ← Subscription checkout (Rebill SDK)
+  checkout/             ← Legacy URL; redirects to /pricing
 ```
 
 ### Middleware (`src/proxy.ts`)
@@ -100,7 +100,7 @@ Superadmins are identified by email addresses listed in `NEXT_PUBLIC_SUPER_ADMIN
 
 Plans: `STARTER`, `GROW`, `GROW_PRO`, `PREMIUM`. Features like AI processing, email channel, chatbot, and phone channel are toggled as booleans on the `Organization` model. The `SubscriptionGuard` component and `usePlanPermissions` hook enforce plan limits client-side; the middleware enforces them server-side.
 
-Payment gateways: **MercadoPago** (Argentina/LATAM subscriptions) and **Rebill** (subscription management; Rebill SDK loaded via `<Script strategy="beforeInteractive">`). Webhook routes for both live under `src/app/api/webhooks/`.
+Payment gateway: **MercadoPago** is the only gateway (subscriptions via preapprovals; webhook at `src/app/api/webhooks/mercadopago/`). Rebill was removed; the `REBILL` value remains in the Prisma `PaymentGateway` enum only because historical rows may reference it.
 
 ### Background processing
 
@@ -134,11 +134,11 @@ Local dev Redis via Docker (`docker compose up -d`). Production uses two Redis i
 
 ### Testing
 
-There is no automated test suite (no Jest/Vitest configured). `bun run lint` and `bun run build` are the available correctness checks. A few scripts double as manual integration checks against a running dev server: `test:pricing` (runs `scripts/test-pricing-system.ts` directly), and `test:rebill` / `rebill:test` (hit local webhook/API endpoints via curl — requires `bun run dev` running).
+There is no automated test suite (no Jest/Vitest configured). `bun run lint` and `bun run build` are the available correctness checks. A few scripts double as manual integration checks against a running dev server: `test:pricing` (runs `scripts/test-pricing-system.ts` directly).
 
 ### Feature setup docs
 
-Several features have their own deep-dive setup doc at the repo root — check these before re-deriving how a subsystem is wired: `PRICING_SETUP_GUIDE.md` / `PRICING_QUICKSTART.md`, `REBILL_SETUP_GUIDE.md` / `REBILL_SUBSCRIPTION_SETUP.md` / `REBILL_IMPLEMENTATION_STATUS.md`, `QUEUE_SETUP.md`, `ANALYTICS_SETUP.md` / `GA4_SETUP.md` / `CLARITY_SETUP.md`, `NOTIFICATIONS_SETUP.md`, `DEMO_MODE_SETUP.md`, `MULTIMEDIA_ATTACHMENTS_SETUP.md`, `BOT_PROTECTION_SETUP.md`, `DIGEST_SETUP.md`, `ERROR_PAGES_SETUP.md`, and `ENVIRONMENT_SETUP.md`.
+Several features have their own deep-dive setup doc at the repo root — check these before re-deriving how a subsystem is wired: `PRICING_SETUP_GUIDE.md` / `PRICING_QUICKSTART.md`, `QUEUE_SETUP.md`, `ANALYTICS_SETUP.md` / `GA4_SETUP.md` / `CLARITY_SETUP.md`, `NOTIFICATIONS_SETUP.md`, `DEMO_MODE_SETUP.md`, `MULTIMEDIA_ATTACHMENTS_SETUP.md`, `BOT_PROTECTION_SETUP.md`, `EMAIL_ROUTING_SETUP.md`, `DIGEST_SETUP.md`, `ERROR_PAGES_SETUP.md`, and `ENVIRONMENT_SETUP.md`.
 
 ### Key conventions
 

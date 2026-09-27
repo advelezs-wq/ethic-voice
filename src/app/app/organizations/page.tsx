@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { Card, CardBody, CardHeader, Button, Spinner } from "@heroui/react";
-// Replaced standalone org creation with manual client creation flow
-import SuperAdminManualClient from "@/modules/app/components/dashboard/super-admin/ManualClientCreator";
+
+import { ClientsManager } from "@/modules/app/components/dashboard/super-admin/ClientsManager";
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import { SuperAdminOrganizationsView } from "@/modules/app/components/dashboard/super-admin/SuperAdminOrganizationsView";
 
@@ -150,7 +150,7 @@ export default function OrganizationsPage() {
     const userEmail = user?.primaryEmailAddress?.emailAddress;
     const isUserSuperAdmin = userEmail && isSuperAdmin(userEmail);
     if (isUserSuperAdmin) {
-      return <SuperAdminManualClient />;
+      return <ClientsManager />;
     }
     // Regular users are redirected to pricing/onboarding elsewhere; keep a minimal message
     return (

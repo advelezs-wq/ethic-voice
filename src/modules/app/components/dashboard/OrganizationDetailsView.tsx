@@ -30,6 +30,14 @@ import { getDepartmentsWithStats } from "@/actions/department.actions";
 import { StatsCards } from "../analytics/StatsCards";
 import { StatisticsChart } from "../dashboard/StatisticsChart";
 import { WeeklyTrendChart } from "../dashboard/WeeklyTrendChart";
+
+const SUB_STATUS_LABEL: Record<string, string> = {
+  ACTIVE: "Activa",
+  TRIALING: "En prueba",
+  INACTIVE: "Cobro pausado",
+  PAST_DUE: "Pago pendiente",
+  CANCELED: "Cancelada",
+};
 import { SeverityIndicator } from "../dashboard/SeverityIndicator";
 
 type OrgSection = "resumen" | "denuncias" | "plan" | "miembros" | "analitica";
@@ -323,23 +331,15 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
         showSuccess("Miembro eliminado");
         await loadMembers();
       } else if (pendingAction.type === "change-plan") {
-        const res = await fetch("/api/subscriptions/change-plan", {
+        const res = await fetch(`/api/superadmin/organizations/${organization.id}/plan`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            organizationId: organization.id,
-            newPlanType: pendingAction.targetPlan,
-            newBillingCycle: targetBillingCycle,
-            prorationMode: "immediate",
-          }),
+          body: JSON.stringify({ planType: pendingAction.targetPlan, billingCycle: targetBillingCycle }),
         });
         const payload = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(payload?.error || "No se pudo cambiar plan");
-        showSuccess(`Cambio a ${pendingAction.targetPlan} iniciado`);
-        if (payload?.payment?.paymentUrl) {
-          window.location.href = payload.payment.paymentUrl;
-          return;
-        }
+        if (!res.ok) throw new Error(payload?.error || "No se pudo cambiar el plan");
+        showSuccess(`Plan ${PLAN_CONFIGS[pendingAction.targetPlan]?.displayName ?? pendingAction.targetPlan} aplicado`);
+        (payload?.warnings || []).forEach((w: string) => showError(w));
         await loadPlanData();
       } else {
         const endpoint =
@@ -399,7 +399,7 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
     if (pendingAction.type === "change-plan") {
       return {
         title: "Cambiar plan",
-        description: `Vas a cambiar al plan ${pendingAction.targetPlan}.`,
+        description: `El cliente pasará al plan ${PLAN_CONFIGS[pendingAction.targetPlan]?.displayName ?? pendingAction.targetPlan} de inmediato. No se genera ningún cobro adicional; si paga con Mercado Pago, el próximo cobro usará el nuevo precio. Si el plan permite menos usuarios, los que excedan el cupo quedarán bloqueados.`,
         confirmLabel: "Confirmar cambio",
         riskLevel: "medium" as const,
       };
@@ -407,14 +407,17 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
     if (pendingAction.type === "cancel-subscription") {
       return {
         title: "Cancelar suscripción",
-        description: "La suscripción se cancelará al final del periodo vigente.",
+        description: "Se cancela el cobro (también en Mercado Pago si aplica). El cliente conserva el acceso hasta el fin del periodo ya pagado.",
         confirmLabel: "Confirmar cancelación",
         riskLevel: "high" as const,
       };
     }
     return {
-      title: pendingAction.type === "pause-subscription" ? "Pausar suscripción" : "Reanudar suscripción",
-      description: "Se aplicará el cambio de estado a la suscripción.",
+      title: pendingAction.type === "pause-subscription" ? "Pausar cobro" : "Reanudar cobro",
+      description:
+        pendingAction.type === "pause-subscription"
+          ? "Se detienen los cobros hasta que los reanudes. El cliente conserva el acceso."
+          : "Los cobros vuelven a la normalidad en la próxima fecha de pago.",
       confirmLabel: "Confirmar",
       riskLevel: "medium" as const,
     };
@@ -661,7 +664,7 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
                       <div className="space-y-3">
                         <div className="flex flex-wrap gap-2">
                           <Chip color="primary" variant="flat">{subscription.planName}</Chip>
-                          <Chip color={subscription.status === "ACTIVE" ? "success" : "warning"} variant="flat">{subscription.status}</Chip>
+                          <Chip color={subscription.status === "ACTIVE" ? "success" : "warning"} variant="flat">{SUB_STATUS_LABEL[subscription.status] ?? subscription.status}</Chip>
                           <Chip variant="flat">{subscription.billingCycle === "YEARLY" ? "Anual" : "Mensual"}</Chip>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -670,9 +673,9 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
                           <SummaryKpi label="Empleados límite" value={formatPlanLimit(subscription.maxEmployees)} />
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          <Button size="sm" color="warning" variant="flat" isDisabled={subscription.status === "PAUSED"} onPress={() => setPendingAction({ type: "pause-subscription", subscriptionId: subscription.id })}>Pausar</Button>
-                          <Button size="sm" color="success" variant="flat" isDisabled={subscription.status === "ACTIVE"} onPress={() => setPendingAction({ type: "resume-subscription", subscriptionId: subscription.id })}>Reanudar</Button>
-                          <Button size="sm" color="danger" variant="flat" onPress={() => setPendingAction({ type: "cancel-subscription", subscriptionId: subscription.id })}>Cancelar</Button>
+                          <Button size="sm" color="warning" variant="flat" isDisabled={subscription.status !== "ACTIVE"} onPress={() => setPendingAction({ type: "pause-subscription", subscriptionId: subscription.id })}>Pausar cobro</Button>
+                          <Button size="sm" color="success" variant="flat" isDisabled={subscription.status !== "INACTIVE"} onPress={() => setPendingAction({ type: "resume-subscription", subscriptionId: subscription.id })}>Reanudar cobro</Button>
+                          <Button size="sm" color="danger" variant="flat" isDisabled={subscription.status === "CANCELED"} onPress={() => setPendingAction({ type: "cancel-subscription", subscriptionId: subscription.id })}>Cancelar suscripción</Button>
                         </div>
                       </div>
                     )}

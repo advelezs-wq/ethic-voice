@@ -261,7 +261,7 @@ export default function InPlatformPricingTable() {
 
       <div className="text-center mt-8">
         <p className="text-sm text-slate-500">
-          🔒 Pagos seguros procesados por Rebill
+          🔒 Pagos seguros procesados por Mercado Pago
         </p>
       </div>
     </div>

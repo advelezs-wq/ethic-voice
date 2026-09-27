@@ -1,8 +1,7 @@
 import { isSuperAdmin } from "@/modules/core/utils/permissions";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import ManualClientCreator from "@/modules/app/components/dashboard/super-admin/ManualClientCreator";
-import SuperAdminClientsTable from "@/modules/app/components/dashboard/super-admin/SuperAdminClientsTable";
+import { ClientsManager } from "@/modules/app/components/dashboard/super-admin/ClientsManager";
 import { SuperAdminPanelShell } from "@/modules/app/components/dashboard/super-admin/SuperAdminPanelShell";
 
 export default async function SuperAdminClientsPage() {
@@ -14,15 +13,10 @@ export default async function SuperAdminClientsPage() {
 
   return (
     <SuperAdminPanelShell
-      title="Clientes y Suscripciones"
-      subtitle="Crea cuentas, revisa estado comercial y ejecuta acciones de suscripción con claridad."
+      title="Clientes"
+      subtitle="Crea clientes, asígnales un plan y administra su suscripción y su acceso desde un solo lugar."
     >
-      <div className="space-y-6">
-        <ManualClientCreator />
-        <SuperAdminClientsTable />
-      </div>
+      <ClientsManager />
     </SuperAdminPanelShell>
   );
 }
-
-

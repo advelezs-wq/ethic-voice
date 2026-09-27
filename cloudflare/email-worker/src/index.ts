@@ -73,7 +73,9 @@ export default {
 
     // 429 (límite de tasa) o 5xx: rechazo temporal; el servidor de origen
     // reintenta más tarde y la denuncia no se pierde.
-    if (res.status === 429 || res.status >= 500) {
+    // 401/403 = secreto mal configurado: también temporal, para no perder
+    // denuncias mientras se corrige (aparece en `wrangler tail`).
+    if (res.status === 401 || res.status === 403 || res.status === 429 || res.status >= 500) {
       throw new Error(`Webhook respondió ${res.status}`);
     }
 

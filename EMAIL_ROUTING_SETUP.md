@@ -14,7 +14,7 @@ activar/desactivar una bandeja solo cambia `EmailConfiguration.isActive`.
 
 ## Variables
 
-- Vercel: `EMAIL_ROUTING_PROVIDER=cloudflare` (sin ella se usa el flujo legado de ImprovMX).
+- Vercel: nada que configurar; Cloudflare es el valor por defecto (`EMAIL_ROUTING_PROVIDER=improvmx` vuelve al flujo legado).
 - Worker: `WEBHOOK_SECRET` (= `IMPROVMX_WEBHOOK_SECRET` de Vercel) y `STAFF_FORWARDS`
   (`info=destino@gmail.com,...`), ambos con `wrangler secret put`.
 
@@ -30,7 +30,6 @@ activar/desactivar una bandeja solo cambia `EmailConfiguration.isActive`.
 4. `cd cloudflare/email-worker && bun install && bunx wrangler login && bunx wrangler deploy`,
    luego `bunx wrangler secret put WEBHOOK_SECRET` y `bunx wrangler secret put STAFF_FORWARDS`.
 5. Email Routing → Routing rules → Catch-all → Action "Send to a Worker" → `ethicvoice-email`.
-6. Vercel → `EMAIL_ROUTING_PROVIDER=cloudflare` → redeploy.
 7. Probar: correo a `{slug}@ethicvoice.co` de un cliente Grow+ con bandeja activa → aparece la
    denuncia; correo a una dirección inventada → rebota; correo a `info@` → llega al Gmail.
    Logs en vivo: `bunx wrangler tail`.

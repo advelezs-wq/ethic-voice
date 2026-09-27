@@ -2,6 +2,7 @@
 # Cloudflare Email Routing) y los entrega al webhook de EthicVoice.
 name = "ethicvoice-email"
 main = "src/index.ts"
+account_id = "96da4cc6bc1248861c3e2a32266c1acf"
 compatibility_date = "2025-09-01"
 
 [vars]

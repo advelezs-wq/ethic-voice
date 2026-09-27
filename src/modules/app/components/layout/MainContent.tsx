@@ -51,15 +51,13 @@ export function MainContent({ children }: MainContentProps) {
     })();
   }, []);
   return (
-    <div className="ev-app-shell flex-1 min-w-0 w-0 mb-16">
+    <div className="ev-app-shell min-w-0 flex-1">
       <Header />
-
-      <div className="overflow-auto w-full h-full max-h-[calc(100vh-102px)] overflow-y-auto p-3 sm:p-5 md:p-6 lg:p-8">
-        <div className="relative ev-content-surface p-4 sm:p-6 md:p-7">
+      <main className="flex-1 overflow-y-auto">
+        <div className="ev-content-surface relative px-4 pb-16 pt-6 sm:px-6 md:px-8 lg:pt-8">
           {children}
         </div>
-        {/* <SentryFeedbackWidget /> */}
-      </div>
+      </main>
     </div>
   );
 }

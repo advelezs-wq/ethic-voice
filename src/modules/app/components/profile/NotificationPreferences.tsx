@@ -210,7 +210,7 @@ export function NotificationPreferences() {
           <div className="space-y-3 pl-6">
             {relevantNotifications?.reportCreated && (
               <div className="flex items-center justify-between">
-                <span className="text-sm">Nuevo reporte creado</span>
+                <span className="text-sm">Nueva denuncia recibida</span>
                 <Switch
                   isSelected={localSettings.emailReportCreated ?? false}
                   onValueChange={(checked) => handleSettingChange('emailReportCreated', checked)}
@@ -220,7 +220,7 @@ export function NotificationPreferences() {
             )}
             
             <div className="flex items-center justify-between">
-              <span className="text-sm">Reporte asignado a mí</span>
+              <span className="text-sm">Denuncia asignada a mí</span>
               <Switch
                 isSelected={localSettings.emailReportAssigned ?? false}
                 onValueChange={(checked) => handleSettingChange('emailReportAssigned', checked)}
@@ -229,7 +229,7 @@ export function NotificationPreferences() {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm">Cambios de estado en reportes</span>
+              <span className="text-sm">Cambios de estado en denuncias</span>
               <Switch
                 isSelected={localSettings.emailReportStatusChanged ?? false}
                 onValueChange={(checked) => handleSettingChange('emailReportStatusChanged', checked)}
@@ -238,7 +238,7 @@ export function NotificationPreferences() {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm">Nuevos comentarios en reportes</span>
+              <span className="text-sm">Nuevos comentarios en denuncias</span>
               <Switch
                 isSelected={localSettings.emailReportComment ?? false}
                 onValueChange={(checked) => handleSettingChange('emailReportComment', checked)}
@@ -271,7 +271,7 @@ export function NotificationPreferences() {
           <div className="space-y-3 pl-6">
             {relevantNotifications?.reportCreated && (
               <div className="flex items-center justify-between">
-                <span className="text-sm">Nuevo reporte creado</span>
+                <span className="text-sm">Nueva denuncia recibida</span>
                 <Switch
                   isSelected={localSettings.inAppReportCreated ?? false}
                   onValueChange={(checked) => handleSettingChange('inAppReportCreated', checked)}
@@ -281,7 +281,7 @@ export function NotificationPreferences() {
             )}
             
             <div className="flex items-center justify-between">
-              <span className="text-sm">Reporte asignado a mí</span>
+              <span className="text-sm">Denuncia asignada a mí</span>
               <Switch
                 isSelected={localSettings.inAppReportAssigned ?? false}
                 onValueChange={(checked) => handleSettingChange('inAppReportAssigned', checked)}
@@ -290,7 +290,7 @@ export function NotificationPreferences() {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm">Cambios de estado en reportes</span>
+              <span className="text-sm">Cambios de estado en denuncias</span>
               <Switch
                 isSelected={localSettings.inAppReportStatusChanged ?? false}
                 onValueChange={(checked) => handleSettingChange('inAppReportStatusChanged', checked)}
@@ -299,7 +299,7 @@ export function NotificationPreferences() {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm">Nuevos comentarios en reportes</span>
+              <span className="text-sm">Nuevos comentarios en denuncias</span>
               <Switch
                 isSelected={localSettings.inAppReportComment ?? false}
                 onValueChange={(checked) => handleSettingChange('inAppReportComment', checked)}

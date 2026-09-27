@@ -109,10 +109,12 @@ export async function getFullDashboardData(
 
   // Monthly chart data (last 6 months)
   const chartData: Array<{ name: string; reports: number }> = [];
-  const monthLabels = ["feb", "mar", "abr", "may", "jun", "jul"];
+  // Etiquetas con el mes real (antes estaban fijas "feb"…"jul" y no
+  // correspondían a los datos). Día 1 para evitar el desborde de setMonth en
+  // meses cortos (31 → mes siguiente).
+  const now = new Date();
   for (let i = 5; i >= 0; i--) {
-    const date = new Date();
-    date.setMonth(date.getMonth() - i);
+    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const monthReports = reports.filter((r) => {
       const d = new Date(r.submittedAt);
       return (
@@ -121,7 +123,7 @@ export async function getFullDashboardData(
       );
     });
     chartData.push({
-      name: monthLabels[5 - i] || `mes-${5 - i}`,
+      name: date.toLocaleDateString("es-CO", { month: "short" }).replace(".", ""),
       reports: monthReports.length,
     });
   }
@@ -150,7 +152,8 @@ export async function getFullDashboardData(
     {} as Record<string, number>
   );
 
-  const colors = ["#999999", "#777777", "#555555", "#333333", "#bbbbbb"];
+  // Paleta categórica de marca (BRAND.md § Producto).
+  const colors = ["#244850", "#98D050", "#E09A2B", "#7A6FA8", "#DB4F3A", "#3F8A95", "#5E9427", "#C2577A"];
   const categoryData = Object.entries(categoryCounts).map(
     ([name, value], index) => ({
       name,

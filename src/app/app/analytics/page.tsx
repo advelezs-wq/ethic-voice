@@ -32,9 +32,9 @@ export default async function AnalyticsPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <PageHero
-        kicker="Reportes"
-        title="Analíticas e Informes"
-        description="Visualiza métricas detalladas y descarga reportes personalizados sobre las denuncias de tu organización"
+        kicker="Indicadores"
+        title="Analíticas e informes"
+        description="Indicadores de tu canal de denuncias e informes descargables para el comité."
       />
 
       <AnalyticsContent organizationId={orgId} />

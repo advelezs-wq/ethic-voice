@@ -107,7 +107,7 @@ export function FinalStep({ context }: FinalStepProps) {
         <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-2xl">{organizationCreated ? "✅" : "🏢"}</span>
         </div>
-        <h2 className="text-2xl font-bold text-[#0d212c] mb-2">
+        <h2 className="text-2xl font-bold text-ev-night mb-2">
           {organizationCreated
             ? "¡Organización creada!"
             : "Crear tu organización"}
@@ -135,7 +135,7 @@ export function FinalStep({ context }: FinalStepProps) {
           <Card>
             <CardBody className="p-6">
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-[#0d212c] mb-2">
+                <h3 className="text-lg font-semibold text-ev-night mb-2">
                   Información de tu organización
                 </h3>
                 {context.organizationData && (
@@ -194,14 +194,14 @@ export function FinalStep({ context }: FinalStepProps) {
             <CardBody className="p-6">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-[#0d212c] mb-4">
+                  <h3 className="text-lg font-semibold text-ev-night mb-4">
                     Notificaciones por Email
                   </h3>
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-[#0d212c]">
+                        <p className="font-medium text-ev-night">
                           Casos asignados
                         </p>
                         <p className="text-sm text-slate-500">
@@ -219,7 +219,7 @@ export function FinalStep({ context }: FinalStepProps) {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-[#0d212c]">
+                        <p className="font-medium text-ev-night">
                           Cambios de estado
                         </p>
                         <p className="text-sm text-slate-500">
@@ -239,7 +239,7 @@ export function FinalStep({ context }: FinalStepProps) {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-[#0d212c]">
+                        <p className="font-medium text-ev-night">
                           Nuevos comentarios
                         </p>
                         <p className="text-sm text-slate-500">
@@ -258,14 +258,14 @@ export function FinalStep({ context }: FinalStepProps) {
 
                   <Divider className="my-6" />
 
-                  <h3 className="text-lg font-semibold text-[#0d212c] mb-4">
+                  <h3 className="text-lg font-semibold text-ev-night mb-4">
                     Notificaciones en la Plataforma
                   </h3>
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-[#0d212c]">
+                        <p className="font-medium text-ev-night">
                           Casos asignados
                         </p>
                         <p className="text-sm text-slate-500">
@@ -283,7 +283,7 @@ export function FinalStep({ context }: FinalStepProps) {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-[#0d212c]">
+                        <p className="font-medium text-ev-night">
                           Cambios de estado
                         </p>
                         <p className="text-sm text-slate-500">
@@ -303,7 +303,7 @@ export function FinalStep({ context }: FinalStepProps) {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-[#0d212c]">
+                        <p className="font-medium text-ev-night">
                           Nuevos comentarios
                         </p>
                         <p className="text-sm text-slate-500">
@@ -322,14 +322,14 @@ export function FinalStep({ context }: FinalStepProps) {
 
                   <Divider className="my-6" />
 
-                  <h3 className="text-lg font-semibold text-[#0d212c] mb-4">
+                  <h3 className="text-lg font-semibold text-ev-night mb-4">
                     Resúmenes
                   </h3>
 
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-[#0d212c]">
+                        <p className="font-medium text-ev-night">
                           Resumen diario
                         </p>
                         <p className="text-sm text-slate-500">
@@ -347,7 +347,7 @@ export function FinalStep({ context }: FinalStepProps) {
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-[#0d212c]">
+                        <p className="font-medium text-ev-night">
                           Resumen semanal
                         </p>
                         <p className="text-sm text-slate-500">
@@ -366,7 +366,7 @@ export function FinalStep({ context }: FinalStepProps) {
                 </div>
 
                 {/* Finish Button in Notifications Tab */}
-                <div className="pt-6 border-t border-emerald-100">
+                <div className="pt-6 border-t border-ev-line">
                   <Button
                     color="primary"
                     size="lg"

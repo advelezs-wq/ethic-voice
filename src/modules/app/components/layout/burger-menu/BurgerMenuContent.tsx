@@ -32,13 +32,13 @@ export const BurgerMenuContent = ({
 
   return (
     <div
-      className={`fixed top-0 left-0 h-screen z-40 bg-background transition-transform duration-300 transform ${
+      className={`fixed top-0 left-0 h-screen z-40 bg-ev-night transition-transform duration-300 ease-ev-out transform ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       } lg:hidden`}
       aria-hidden={!isOpen}
     >
       <div className="flex justify-end p-4">
-        <button onClick={closeMenu} className="p-2" aria-label="Close menu">
+        <button onClick={closeMenu} className="p-2 text-white/70 hover:text-white" aria-label="Cerrar menú">
           <i
             className="icon-[heroicons-solid--x] size-6"
             role="img"

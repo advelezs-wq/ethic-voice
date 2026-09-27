@@ -115,11 +115,11 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
       [ACTIVITY_TYPES.STATUS_CHANGED]: "bg-purple-100 text-purple-900",
       [ACTIVITY_TYPES.PRIORITY_CHANGED]: "bg-orange-100 text-orange-900",
       [ACTIVITY_TYPES.COMMENT_ADDED]: "bg-indigo-100 text-indigo-900",
-      [ACTIVITY_TYPES.ATTACHMENT_UPLOADED]: "bg-emerald-50 text-[#0d212c]",
+      [ACTIVITY_TYPES.ATTACHMENT_UPLOADED]: "bg-emerald-50 text-ev-night",
       [ACTIVITY_TYPES.NOTE_ADDED]: "bg-yellow-100 text-yellow-900",
       [ACTIVITY_TYPES.CUSTOM_EVENT]: "bg-pink-100 text-pink-900",
     };
-    return colors[action] || "bg-emerald-50 text-[#0d212c]";
+    return colors[action] || "bg-emerald-50 text-ev-night";
   };
 
   const getTitle = (action: string, details?: any) => {
@@ -130,7 +130,7 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
       CREATED_MANUALLY: "Actividad creada manualmente",
       ai_analysis_completed: "Análisis de IA completado",
       urgent_action_required: "Acción urgente requerida",
-      report_created: "Reporte creado por IA",
+      report_created: "Denuncia creada por IA",
       auto_assigned_critical: "Asignación automática (crítico)",
       auto_assigned: "Asignación automática",
       CLOSURE_APPROVED: "Cierre aprobado",
@@ -140,7 +140,7 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
     };
     if (EXTRA_ACTION_TITLES[action]) return EXTRA_ACTION_TITLES[action];
     const titles = {
-      [ACTIVITY_TYPES.CREATED]: "Reporte creado",
+      [ACTIVITY_TYPES.CREATED]: "Denuncia registrada",
       [ACTIVITY_TYPES.ASSIGNED]: "Caso asignado",
       [ACTIVITY_TYPES.STATUS_CHANGED]: "Estado cambiado",
       [ACTIVITY_TYPES.PRIORITY_CHANGED]: "Prioridad cambiada",
@@ -188,7 +188,7 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
       return details?.reason || "Se requiere acción urgente";
     }
     if (action === "report_created") {
-      return "Reporte creado automáticamente";
+      return "Denuncia creada automáticamente";
     }
     if (action === "auto_assigned_critical") {
       return "El caso fue asignado automáticamente por prioridad crítica";
@@ -307,8 +307,8 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
     <div>
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h2 className="text-base font-semibold text-[#0d212c]">
-            Cronología del caso
+          <h2 className="text-base font-semibold text-ev-night">
+            Historial del caso
           </h2>
           {isReportClosed && (
             <p className="text-xs text-slate-400 mt-0.5">
@@ -426,9 +426,9 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                 </div>
 
                 {/* Card */}
-                <div className="flex-1 min-w-0 bg-emerald-50/40 border border-emerald-100 rounded-xl p-4 shadow-sm">
+                <div className="flex-1 min-w-0 bg-ev-paper border border-ev-line rounded-xl p-4 shadow-sm">
                   <div className="flex items-start justify-between gap-2 mb-1.5">
-                    <h3 className="text-sm font-semibold text-[#0d212c]">
+                    <h3 className="text-sm font-semibold text-ev-night">
                       {getTitle(activity.action, activity.details)}
                     </h3>
                     <div className="text-right shrink-0">
@@ -467,7 +467,7 @@ export const ReportTimeline: React.FC<ReportTimelineProps> = ({
                     typeof activity.details === "object" &&
                     Object.keys(activity.details).length > 0 &&
                     !activity.details.taskId && (
-                      <div className="mt-3 pt-3 border-t border-emerald-100 grid grid-cols-2 gap-x-4 gap-y-1">
+                      <div className="mt-3 pt-3 border-t border-ev-line grid grid-cols-2 gap-x-4 gap-y-1">
                         {Object.entries(activity.details).map(([key, value]) => {
                           // Keys already shown in title/description or purely internal — skip
                           const SKIP_KEYS = new Set([

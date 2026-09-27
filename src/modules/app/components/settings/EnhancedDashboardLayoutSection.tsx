@@ -25,7 +25,7 @@ const DEFAULT_ELEMENTS: DashboardElement[] = [
     id: "stats-cards",
     name: "Tarjetas de Estadísticas",
     description:
-      "Resumen de métricas principales (total reportes, pendientes, etc.)",
+      "Resumen de cifras principales (total de denuncias, pendientes, etc.)",
     icon: "icon-[lucide--bar-chart-3]",
     isVisible: true,
     position: 1,
@@ -33,8 +33,8 @@ const DEFAULT_ELEMENTS: DashboardElement[] = [
   },
   {
     id: "recent-reports",
-    name: "Reportes Recientes",
-    description: "Lista de los últimos reportes recibidos",
+    name: "Denuncias recientes",
+    description: "Lista de las últimas denuncias recibidas",
     icon: "icon-[lucide--file-text]",
     isVisible: true,
     position: 2,
@@ -70,7 +70,7 @@ const DEFAULT_ELEMENTS: DashboardElement[] = [
   {
     id: "severity-indicator",
     name: "Indicador de Severidad",
-    description: "Distribución de reportes por nivel de severidad",
+    description: "Distribución de denuncias por severidad",
     icon: "icon-[lucide--alert-triangle]",
     isVisible: true,
     position: 6,
@@ -79,7 +79,7 @@ const DEFAULT_ELEMENTS: DashboardElement[] = [
   {
     id: "category-distribution",
     name: "Distribución por Categoría",
-    description: "Reportes organizados por tipo de incidencia",
+    description: "Denuncias organizadas por tipo de conducta",
     icon: "icon-[lucide--tag]",
     isVisible: true,
     position: 7,
@@ -287,7 +287,7 @@ export function EnhancedDashboardLayoutSection({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-[#0d212c]">
+          <h3 className="text-lg font-semibold text-ev-night">
             Personalización del Dashboard
           </h3>
           <p className="text-slate-500 text-sm mt-1">
@@ -319,7 +319,7 @@ export function EnhancedDashboardLayoutSection({
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <i className="icon-[lucide--eye] size-5 text-green-600" />
-          <h4 className="font-medium text-[#0d212c]">
+          <h4 className="font-medium text-ev-night">
             Elementos Visibles ({visibleElements.length})
           </h4>
         </div>
@@ -355,7 +355,7 @@ export function EnhancedDashboardLayoutSection({
                       className={`
                         cursor-move hover:shadow-md transition-all duration-200
                         ${dragOverElement === element.id ? "bg-sky-50 border-sky-300 border-dashed" : ""}
-                        ${draggedElement === element.id ? "bg-[#f7faf9]" : ""}
+                        ${draggedElement === element.id ? "bg-ev-paper" : ""}
                       `}
                     >
                       <CardBody className="p-4">
@@ -378,13 +378,13 @@ export function EnhancedDashboardLayoutSection({
 
                             {/* Element Info */}
                             <div className="flex items-center gap-3 flex-1">
-                              <div className="p-2 bg-secondary rounded-lg">
+                              <div className="p-2 bg-ev-paper rounded-lg">
                                 <i
                                   className={`${element.icon} size-5 text-slate-500`}
                                 />
                               </div>
                               <div>
-                                <h5 className="font-medium text-[#0d212c]">
+                                <h5 className="font-medium text-ev-night">
                                   {element.name}
                                 </h5>
                                 <p className="text-sm text-slate-500">

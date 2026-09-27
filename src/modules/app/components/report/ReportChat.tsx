@@ -224,7 +224,7 @@ export function ReportChat({
             {!isScrolledToBottom && (
               <button
                 onClick={scrollToBottom}
-                className="absolute bottom-20 right-4 bg-white border border-emerald-100 shadow-lg rounded-full p-2 hover:bg-emerald-50/40 transition-colors"
+                className="absolute bottom-20 right-4 bg-white border border-ev-line shadow-lg rounded-full p-2 hover:bg-ev-paper transition-colors"
                 aria-label="Ir al mensaje más reciente"
                 title="Ir al mensaje más reciente"
               >

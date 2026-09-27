@@ -17,13 +17,13 @@ export function ChatHeader({
   onRefresh,
 }: ChatHeaderProps) {
   return (
-    <div className="px-4 py-3 border-b bg-emerald-50/40 flex items-center justify-between gap-3 flex-wrap">
+    <div className="px-4 py-3 border-b bg-ev-paper flex items-center justify-between gap-3 flex-wrap">
       <div className="flex items-center gap-2.5 min-w-0">
         <div className="p-1.5 bg-sky-100 rounded-lg shrink-0">
           <i className="icon-[lucide--message-circle] size-4 text-sky-700" />
         </div>
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold text-[#0d212c] leading-tight">
+          <h2 className="text-sm font-semibold text-ev-night leading-tight">
             Comunicación del caso #{reportId}
           </h2>
           <p className="text-xs text-slate-400">

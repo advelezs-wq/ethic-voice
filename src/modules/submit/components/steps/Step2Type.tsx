@@ -10,7 +10,7 @@ export function Step2Type() {
 
   return (
     <div className="space-y-6">
-      <p className="text-[#273c46]">
+      <p className="text-ev-mute">
         Seleccione la irregularidad que desea denunciar. Si desea reportar
         varios temas, realice un reporte por cada tipo o seleccione
         &quot;Reporte Libre&quot;.
@@ -26,9 +26,9 @@ export function Step2Type() {
                 <Card
                   key={type.id}
                   isPressable
-                  className={`cursor-pointer border border-[#0a1e14]/10 p-6 transition-all hover:border-lime-400 hover:bg-lime-50 ${
+                  className={`cursor-pointer border border-ev-night/10 p-6 transition-all hover:border-lime-400 hover:bg-lime-50 ${
                     field.value === type.id
-                      ? "ring-2 ring-[#0a1e14] bg-lime-50"
+                      ? "ring-2 ring-ev-night bg-lime-50"
                       : ""
                   } ${
                     fieldState.error ? "ring-2 ring-red-500" : ""
@@ -36,10 +36,10 @@ export function Step2Type() {
                   onPress={() => field.onChange(type.id)}
                 >
                   <div className="text-center">
-                    <h3 className="mb-2 font-semibold text-[#0a1e14]">
+                    <h3 className="mb-2 font-semibold text-ev-night">
                       {type.title}
                     </h3>
-                    <p className="text-sm text-[#273c46]">{type.subtitle}</p>
+                    <p className="text-sm text-ev-mute">{type.subtitle}</p>
                   </div>
                 </Card>
               ))}

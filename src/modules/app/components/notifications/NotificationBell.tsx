@@ -46,8 +46,8 @@ export const NotificationBell = () => {
       </PopoverTrigger>
 
       <PopoverContent className="w-96 p-0">
-        <div className="border-b border-emerald-100 px-4 py-3 flex items-center justify-between w-full">
-          <h3 className="font-semibold text-[#0d212c]">Notificaciones</h3>
+        <div className="border-b border-ev-line px-4 py-3 flex items-center justify-between w-full">
+          <h3 className="font-semibold text-ev-night">Notificaciones</h3>
           {unreadCount > 0 && (
             <Button
               size="sm"

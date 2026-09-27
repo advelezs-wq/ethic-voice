@@ -425,11 +425,11 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
       title={`Organización: ${organization.name}`}
       subtitle="Gestiona todo de la organización desde un solo lugar."
     >
-      <Card className="border border-emerald-200/60 bg-white/95 mb-5">
+      <Card className="border border-ev-line bg-white mb-5">
         <CardBody className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl font-semibold text-[#0d212c]">{organization.name}</h2>
+              <h2 className="text-xl font-semibold text-ev-night">{organization.name}</h2>
               <Chip color={organization.isActive ? "success" : "danger"} size="sm" variant="flat">
                 {organization.isActive ? "Activa" : "Inactiva"}
               </Chip>
@@ -443,7 +443,7 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
                 <Button
                   size="sm"
                   variant="flat"
-                  className="border border-emerald-200 bg-white"
+                  className="border border-ev-line bg-white"
                   onPress={async () => {
                     try {
                       await navigator.clipboard.writeText(
@@ -460,7 +460,7 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
                 <Button
                   size="sm"
                   variant="flat"
-                  className="border border-emerald-200 bg-white"
+                  className="border border-ev-line bg-white"
                   as="a"
                   href={`${origin}/submit/${organization.slug}`}
                   target="_blank"
@@ -472,7 +472,7 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="flat" className="border border-emerald-200 bg-white" onPress={quickOpenReportsWithOrgScope}>
+            <Button variant="flat" className="border border-ev-line bg-white" onPress={quickOpenReportsWithOrgScope}>
               Ver denuncias de esta org
             </Button>
             <Button as={Link} href="/app/organizations" variant="light">
@@ -482,18 +482,18 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
         </CardBody>
       </Card>
 
-      <Card className="border border-emerald-200/60 bg-white/95 mb-5">
+      <Card className="border border-ev-line bg-white mb-5">
         <CardBody className="grid grid-cols-1 gap-3 lg:grid-cols-4">
-          <Button variant="flat" className="justify-start border border-emerald-200 bg-emerald-50 text-[#0d212c]" onPress={() => setSection("denuncias")}>
+          <Button variant="flat" className="justify-start border border-ev-line bg-emerald-50 text-ev-night" onPress={() => setSection("denuncias")}>
             Gestionar denuncias de esta org
           </Button>
-          <Button variant="flat" className="justify-start border border-emerald-200 bg-white text-[#0d212c]" onPress={() => setSection("plan")}>
+          <Button variant="flat" className="justify-start border border-ev-line bg-white text-ev-night" onPress={() => setSection("plan")}>
             Ajustar plan y facturación
           </Button>
-          <Button variant="flat" className="justify-start border border-emerald-200 bg-white text-[#0d212c]" onPress={() => setSection("miembros")}>
+          <Button variant="flat" className="justify-start border border-ev-line bg-white text-ev-night" onPress={() => setSection("miembros")}>
             Administrar miembros
           </Button>
-          <Button variant="flat" className="justify-start border border-emerald-200 bg-white text-[#0d212c]" onPress={quickOpenReportsWithOrgScope}>
+          <Button variant="flat" className="justify-start border border-ev-line bg-white text-ev-night" onPress={quickOpenReportsWithOrgScope}>
             Abrir módulo completo de reportes
           </Button>
         </CardBody>
@@ -511,10 +511,10 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
 
         <Tab key="denuncias" title="Denuncias">
           <div className="space-y-4 mt-5">
-            <Card className="border border-emerald-200/60 bg-white/95">
+            <Card className="border border-ev-line bg-white">
               <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="font-semibold text-[#0d212c]">Denuncias por organización</h3>
+                  <h3 className="font-semibold text-ev-night">Denuncias por organización</h3>
                   <p className="text-xs text-default-500">
                     Gestiona estado y abre cada caso con contexto asegurado de esta organización.
                   </p>
@@ -574,7 +574,7 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
                       >
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
-                            <p className="text-sm font-semibold text-[#0d212c]">
+                            <p className="text-sm font-semibold text-ev-night">
                               REP-{String(report.id).padStart(6, "0")}
                             </p>
                             <Chip size="sm" variant="flat">
@@ -649,9 +649,9 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
               <div className="py-10 flex justify-center"><Spinner color="primary" /></div>
             ) : (
               <>
-                <Card className="border border-emerald-200/60 bg-white/95">
+                <Card className="border border-ev-line bg-white">
                   <CardHeader className="flex items-center justify-between">
-                    <h3 className="font-semibold text-[#0d212c]">Suscripción</h3>
+                    <h3 className="font-semibold text-ev-night">Suscripción</h3>
                     <Button size="sm" variant="light" onPress={loadPlanData}>Refrescar</Button>
                   </CardHeader>
                   <CardBody>
@@ -679,9 +679,9 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
                   </CardBody>
                 </Card>
 
-                <Card className="border border-emerald-200/60 bg-white/95">
+                <Card className="border border-ev-line bg-white">
                   <CardHeader className="flex items-center justify-between">
-                    <h3 className="font-semibold text-[#0d212c]">Cambio de plan</h3>
+                    <h3 className="font-semibold text-ev-night">Cambio de plan</h3>
                     <div className="flex gap-2">
                       <Button size="sm" variant={targetBillingCycle === "MONTHLY" ? "solid" : "flat"} color="primary" onPress={() => setTargetBillingCycle("MONTHLY")}>Mensual</Button>
                       <Button size="sm" variant={targetBillingCycle === "YEARLY" ? "solid" : "flat"} color="primary" onPress={() => setTargetBillingCycle("YEARLY")}>Anual</Button>
@@ -692,9 +692,9 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
                       const cfg = PLAN_CONFIGS[plan];
                       const isCurrent = subscription?.planType === plan;
                       return (
-                        <Card key={plan} className={`border ${isCurrent ? "border-emerald-300 bg-emerald-50/70" : "border-default-200 bg-white"}`}>
+                        <Card key={plan} className={`border ${isCurrent ? "border-emerald-300 bg-ev-paper" : "border-default-200 bg-white"}`}>
                           <CardBody className="space-y-2">
-                            <p className="font-semibold text-[#0d212c]">{cfg.displayName}</p>
+                            <p className="font-semibold text-ev-night">{cfg.displayName}</p>
                             <p className="text-sm text-default-500">{targetBillingCycle === "YEARLY" ? cfg.price.yearly : cfg.price.monthly} {cfg.price.currency}</p>
                             <Button size="sm" color={isCurrent ? "success" : "primary"} variant={isCurrent ? "flat" : "solid"} isDisabled={isCurrent} onPress={() => setPendingAction({ type: "change-plan", targetPlan: plan })}>
                               {isCurrent ? "Plan actual" : "Cambiar"}
@@ -706,15 +706,15 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
                   </CardBody>
                 </Card>
 
-                <Card className="border border-emerald-200/60 bg-white/95">
-                  <CardHeader><h3 className="font-semibold text-[#0d212c]">Facturación reciente</h3></CardHeader>
+                <Card className="border border-ev-line bg-white">
+                  <CardHeader><h3 className="font-semibold text-ev-night">Facturación reciente</h3></CardHeader>
                   <CardBody>
                     {billingItems.length === 0 ? <p className="text-sm text-default-500">Sin movimientos de facturación.</p> : (
                       <div className="space-y-2">
                         {billingItems.slice(0, 8).map((item) => (
                           <div key={item.id} className="flex items-center justify-between rounded-lg border border-default-200 px-3 py-2">
                             <div>
-                              <p className="text-sm font-medium text-[#0d212c]">{item.description}</p>
+                              <p className="text-sm font-medium text-ev-night">{item.description}</p>
                               <p className="text-xs text-default-500">{new Date(item.createdAt).toLocaleDateString("es-ES")}</p>
                             </div>
                             <div className="text-right">
@@ -739,9 +739,9 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
               <SummaryKpi label="Admins" value={membersSummary.admins} tone="primary" />
               <SummaryKpi label="Investigadores" value={membersSummary.investigators} tone="success" />
             </div>
-            <Card className="border border-emerald-200/60 bg-white/95">
+            <Card className="border border-ev-line bg-white">
               <CardHeader className="flex items-center justify-between">
-                <h3 className="font-semibold text-[#0d212c]">Gestión de miembros</h3>
+                <h3 className="font-semibold text-ev-night">Gestión de miembros</h3>
                 <Button size="sm" variant="light" onPress={loadMembers}>Refrescar</Button>
               </CardHeader>
               <CardBody>
@@ -824,13 +824,13 @@ function SummaryKpi({
   tone?: "default" | "primary" | "success" | "warning";
 }) {
   const colorMap: Record<string, string> = {
-    default: "text-[#0d212c]",
+    default: "text-ev-night",
     primary: "text-primary-600",
     success: "text-emerald-600",
     warning: "text-amber-600",
   };
   return (
-    <Card className="border border-emerald-200/60 bg-white/95">
+    <Card className="border border-ev-line bg-white">
       <CardBody>
         <p className="text-xs font-semibold uppercase tracking-wide text-default-500">{label}</p>
         <p className={`mt-2 text-2xl font-semibold ${colorMap[tone]}`}>{value}</p>

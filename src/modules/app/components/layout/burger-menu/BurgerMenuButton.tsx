@@ -15,7 +15,7 @@ export const BurgerMenuButton = ({
       size="sm"
       aria-label={isOpen ? "Close menu" : "Open menu"}
       onPress={toggleMenu}
-      className="lg:hidden px-0 m-0 min-w-max absolute top-4 left-4 md:left-8 z-10"
+      className="lg:hidden px-0 m-0 min-w-max absolute top-3 left-3 md:left-7 z-30 text-ev-night"
     >
       {isOpen ? (
         <i

@@ -18,7 +18,7 @@ export const CardStats = ({
   icon,
 }: CardStatsProps) => {
   return (
-    <div className={`rounded-xl border border-emerald-100 bg-white p-4 ${className}`}>
+    <div className={`rounded-xl border border-ev-line bg-white p-4 ${className}`}>
       <div className="flex-col items-start">
         {icon}
         <h3 className="text-sm text-slate-600 font-medium">{title}</h3>

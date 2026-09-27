@@ -96,11 +96,11 @@ export default function AISystemDebugPage() {
             <CardBody>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <p className="text-sm text-gray-600">Redis</p>
+                  <p className="ev-label mt-1 text-ev-mute">Redis</p>
                   <StatusBadge status={health.redis} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Workers</p>
+                  <p className="ev-label mt-1 text-ev-mute">Workers</p>
                   <StatusBadge
                     status={health.workersRunning ? "ok" : "error"}
                   />
@@ -109,11 +109,11 @@ export default function AISystemDebugPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">OpenAI</p>
+                  <p className="ev-label mt-1 text-ev-mute">OpenAI</p>
                   <StatusBadge status={health.env.hasOpenAI ? "ok" : "error"} />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Google</p>
+                  <p className="ev-label mt-1 text-ev-mute">Google</p>
                   <StatusBadge
                     status={health.env.hasGoogleCreds ? "ok" : "error"}
                   />
@@ -209,7 +209,7 @@ export default function AISystemDebugPage() {
                     >
                       <div>
                         <p className="font-medium">{job.source}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="ev-label mt-1 text-ev-mute">
                           {new Date(job.createdAt).toLocaleString()}
                         </p>
                       </div>
@@ -227,7 +227,7 @@ export default function AISystemDebugPage() {
                           {job.status}
                         </Badge>
                         {job.errorMessage && (
-                          <span className="text-xs text-red-600">
+                          <span className="ev-label mt-1 text-ev-mute">
                             {job.errorMessage}
                           </span>
                         )}

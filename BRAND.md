@@ -166,7 +166,49 @@ nunca decora algo que se ve cien veces al día.
 
 ---
 
-## 10. Checklist antes de publicar una página
+## 10. Producto (dashboard `/app`)
+
+El dashboard usa el mismo sistema, adaptado a una herramienta de uso diario:
+
+- **Escalas re-ancladas**: en `tailwind.config.ts`, `slate/gray/zinc` son neutrales de marca (papel → tinta), `emerald/green/lime` van del lima al musgo del logo, `blue/sky/teal/cyan` son la escala pizarra (información), `purple/violet/indigo` un malva apagado, `amber/orange/yellow` el ámbar y `red/rose/pink` el coral. Cualquier clase de color de Tailwind ya cae dentro de la paleta.
+- **HeroUI y variables shadcn** (`--primary` y compañía en `variables.css`): primario en tinta, secundario en lima, foco en lima, radios 8/12/16.
+- **Shell**: navegación lateral en tinta con grupos (Casos, Organización, Plataforma, Cuenta) y la barra lima del isotipo en el ítem activo; header translúcido sobre papel con la organización en mono y la sección actual.
+- **Encabezado de página**: `<PageHero>` (o la clase `.ev-page-hero`) — etiqueta mono, titular Geist, regla fina. Sin bandas oscuras.
+- **Métricas**: `<MetricStrip>` — una superficie dividida por reglas, cifras tabulares grandes, punto de color por estado. Nada de chips pastel con iconos.
+- **Tarjetas**: blanco sobre papel, borde `ev-line`, sin sombra (las sombras quedan para modales y popovers).
+- **Gráficos**: serie principal pizarra `#244850`, éxito musgo `#5E9427`, advertencia `#E09A2B`, riesgo `#DB4F3A`, rejillas `#DCDAD1`/`#EAE8E0`, ejes `#5A6D70`.
+- **Botones** (`ui/Button`): `primary` tinta, `secondary` lima, `outline`, `ghost`, `danger` coral.
+
+### Lenguaje del producto
+
+El dashboard lo usan oficiales de cumplimiento, RR. HH. y comités, no equipos
+técnicos. Cada pantalla debe responder *qué pasa* y *qué hago ahora*.
+
+| Usar | Evitar |
+|---|---|
+| denuncia(s) | reporte(s), caso(s) como sinónimo en la misma vista |
+| informe (el PDF/Excel que se descarga) | reporte |
+| Registrar denuncia | Crear reporte |
+| Inicio | Dashboard |
+| Plazo de respuesta · Vencida · Por vencer · A tiempo | SLA, semáforo rojo/naranja |
+| Retención legal | Legal hold |
+| Responsable | Asignado, owner |
+| Canal (Línea ética, Correo, Formulario, Registro manual) | Fuente, source |
+| Prioritarias (prioridad alta/urgente o severidad alta) | Críticos |
+| Administrador · Investigador · Observador | Workspace admin, ORG_MEMBER |
+| "Hace 2 horas", "Ayer", "Quedan 3 días" | "Hace 0h", "3d" |
+| Plan Grow Pro | GROW_PRO |
+
+- Estilo oración en títulos y navegación ("Analíticas e informes", no "Analíticas e Informes").
+- Cada bloque de cifras dice qué significa en una línea ("Desde que llega hasta que se cierra").
+- Los estados vacíos explican cómo llenarlos ("Asigna un departamento a cada denuncia para…").
+- Nada de textos automáticos que opinen sobre los datos ("distribución balanceada").
+- Pendiente es trabajo por hacer (ámbar), no un error (rojo). El rojo se reserva para lo vencido o de riesgo.
+- Acciones de flujo normal (cerrar un caso) nunca en rojo; el rojo es solo para eliminar.
+
+---
+
+## 11. Checklist antes de publicar una página
 
 - [ ] Usa `SiteShell` (o `MarketingPageShell`) — nada de headers propios.
 - [ ] Titular con `RevealHeading` y, como máximo, una palabra en `<Voice>`.

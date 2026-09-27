@@ -75,9 +75,9 @@ export function CaseRetentionSection() {
           description="Cuenta desde la fecha de cierre aprobado. Los casos con legal hold nunca se ven afectados por esta política, sin importar el valor."
         />
 
-        <div className="flex items-start justify-between gap-4 p-4 bg-[#f7faf9] rounded-xl border border-emerald-100">
+        <div className="flex items-start justify-between gap-4 p-4 bg-ev-paper rounded-xl border border-ev-line">
           <div>
-            <p className="text-sm font-medium text-[#0d212c]">
+            <p className="text-sm font-medium text-ev-night">
               Eliminar automáticamente al vencer la retención
             </p>
             <p className="text-xs text-slate-500 mt-1">
@@ -99,9 +99,9 @@ export function CaseRetentionSection() {
         </Button>
       </div>
 
-      <div className="border-t border-emerald-100 pt-5">
+      <div className="border-t border-ev-line pt-5">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-semibold text-[#0d212c]">
+          <h4 className="text-sm font-semibold text-ev-night">
             Casos pendientes de revisión de retención
           </h4>
           {pending.length > 0 && (

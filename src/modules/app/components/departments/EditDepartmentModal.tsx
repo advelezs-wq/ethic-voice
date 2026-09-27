@@ -86,7 +86,7 @@ export function EditDepartmentModal({
               isRequired
             />
 
-            <div className="bg-[#f7faf9] p-3 rounded-lg space-y-2">
+            <div className="bg-ev-paper p-3 rounded-lg space-y-2">
               <p className="text-sm font-medium text-slate-600">
                 Información del Departamento:
               </p>

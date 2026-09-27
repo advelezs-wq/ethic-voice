@@ -70,7 +70,7 @@ export function DepartmentList({
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[#0d212c]">Departamentos</h2>
+            <h2 className="text-xl font-bold text-ev-night">Departamentos</h2>
             <p className="text-sm text-slate-500">
               Gestiona los departamentos de tu organización
             </p>
@@ -108,7 +108,7 @@ export function DepartmentList({
                       <p className="font-bold">{department.memberCount}</p>
                     </div>
                     <div>
-                      <p className="text-slate-500">Reportes totales</p>
+                      <p className="text-slate-500">Denuncias totales</p>
                       <p className="font-bold">{department.reportCount}</p>
                     </div>
                   </div>

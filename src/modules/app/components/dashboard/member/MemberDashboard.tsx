@@ -36,7 +36,7 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({
   );
 
   return (
-    <div className="md:p-6 space-y-6 bg-[#f7faf9] min-h-screen">
+    <div className="md:p-6 space-y-6 bg-ev-paper min-h-screen">
       <PageHero
         kicker="Panel de trabajo"
         title="Bienvenido a tu Panel de Trabajo"
@@ -48,11 +48,11 @@ export const MemberDashboard: React.FC<MemberDashboardProps> = ({
               data={{
                 dashboardData: data,
                 userId,
-                organization: { name: 'Mi Organización' }, // This would need organization data
+                organization: { name: 'Mi organización' }, // This would need organization data
                 averageResolutionTime: 0 // This would need to be calculated
               }}
               filename={`mi-reporte-${format(new Date(), 'yyyy-MM-dd', { locale: es })}`}
-              buttonText="Mi Reporte PDF"
+              buttonText="Mi informe PDF"
               size="sm"
               memberName="Mi Usuario" // This would need actual user name
             />

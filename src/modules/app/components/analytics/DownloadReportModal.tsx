@@ -115,7 +115,7 @@ export function DownloadReportModal({
       window.URL.revokeObjectURL(url);
 
       addToast({
-        title: "Reporte descargado",
+        title: "Informe descargado",
         description: `El reporte "${reportTitle}" ha sido descargado exitosamente`,
         color: "success",
       });
@@ -124,7 +124,7 @@ export function DownloadReportModal({
     } catch {
       addToast({
         title: "Error al descargar",
-        description: "No se pudo generar el reporte. Intenta nuevamente",
+        description: "No se pudo generar el informe. Intenta nuevamente",
         color: "danger",
       });
     } finally {
@@ -157,7 +157,7 @@ export function DownloadReportModal({
               <i className="icon-[lucide--download] size-5 text-sky-700" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold">Descargar Reporte</h3>
+              <h3 className="text-lg font-semibold">Descargar informe</h3>
               <p className="text-sm text-slate-500">{reportTitle}</p>
             </div>
           </div>
@@ -166,7 +166,7 @@ export function DownloadReportModal({
         <ModalBody className="space-y-6">
           {/* Quick Date Range Buttons */}
           <div>
-            <label className="text-sm font-medium text-[#0d212c] block mb-3">
+            <label className="text-sm font-medium text-ev-night block mb-3">
               Rangos rápidos
             </label>
             <div className="flex flex-wrap gap-2">
@@ -227,7 +227,7 @@ export function DownloadReportModal({
 
           {/* Format Selection */}
           <div>
-            <label className="text-sm font-medium text-[#0d212c] block mb-3">
+            <label className="text-sm font-medium text-ev-night block mb-3">
               Formato de descarga
             </label>
             <RadioGroup
@@ -252,7 +252,7 @@ export function DownloadReportModal({
 
           {/* Preview filename */}
           {dateFrom && dateTo && (
-            <div className="bg-emerald-50/40 rounded-lg p-3">
+            <div className="bg-ev-paper rounded-lg p-3">
               <p className="text-sm text-slate-500 mb-1">
                 El archivo se descargará como:
               </p>
@@ -266,8 +266,8 @@ export function DownloadReportModal({
           <div className="bg-sky-50 border border-sky-200 rounded-lg p-4">
             <div className="flex items-start gap-3">
               <i className="icon-[lucide--info] size-4 text-sky-700 mt-0.5" />
-              <div className="text-sm text-sky-700">
-                <p className="font-medium mb-1">Información del reporte</p>
+              <div className="ev-label mt-1 text-ev-mute">
+                <p className="font-medium mb-1">Información de la denuncia</p>
                 <ul className="space-y-1 text-sky-700">
                   <li>
                     • Los datos se filtrarán según el rango de fechas

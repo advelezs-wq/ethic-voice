@@ -76,12 +76,12 @@ export function MessageActions({
   }
 
   return (
-    <div className="absolute -top-9 right-0 flex items-center gap-0.5 bg-white border border-emerald-100 rounded-xl shadow-lg px-1.5 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+    <div className="absolute -top-9 right-0 flex items-center gap-0.5 bg-white border border-ev-line rounded-xl shadow-lg px-1.5 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
       {quickReactions.map((emoji) => (
         <Tooltip key={emoji} content={emoji} placement="top">
           <button
             onClick={() => onReact(emoji)}
-            className="p-1 hover:bg-emerald-50 rounded-lg transition-colors text-sm leading-none"
+            className="p-1 hover:bg-ev-paper rounded-lg transition-colors text-sm leading-none"
             aria-label={`Reaccionar con ${emoji}`}
           >
             {emoji}
@@ -94,7 +94,7 @@ export function MessageActions({
       <Tooltip content="Responder" placement="top">
         <button
           onClick={onReply}
-          className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-emerald-50 rounded-lg transition-colors"
+          className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-ev-paper rounded-lg transition-colors"
           aria-label="Responder"
         >
           <i className="icon-[lucide--reply] size-3.5" />
@@ -104,7 +104,7 @@ export function MessageActions({
       <Dropdown>
         <DropdownTrigger asChild>
           <button
-            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-emerald-50 rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-ev-paper rounded-lg transition-colors"
             aria-label="Más opciones"
           >
             <i className="icon-[lucide--more-vertical] size-3.5" />

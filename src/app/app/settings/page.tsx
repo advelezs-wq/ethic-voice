@@ -33,7 +33,7 @@ export default async function SettingsPage() {
     <div className="max-w-6xl mx-auto space-y-6">
       <PageHero
         kicker="Organización"
-        title="Configuración del Sistema"
+        title="Configuración"
         description="Personaliza la apariencia y configuración de tu dashboard organizacional"
       />
 

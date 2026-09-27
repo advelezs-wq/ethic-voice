@@ -127,7 +127,7 @@ export function CreateReportModal({
         router.refresh();
         window.dispatchEvent(new CustomEvent("manual-report-created"));
         addToast({
-          title: "Reporte creado exitosamente",
+          title: "Denuncia registrada",
           description: `Código de seguimiento: ${result.trackingCode} — compártelo con quien reportó para que pueda consultar el estado del caso.`,
           color: "success",
           duration: 15000,
@@ -170,8 +170,8 @@ export function CreateReportModal({
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col h-full min-h-0"
         >
-          <ModalHeader className="flex flex-col gap-1 shrink-0 border-b border-emerald-100">
-            <h2 className="text-lg font-semibold">Crear Reporte Manual</h2>
+          <ModalHeader className="flex flex-col gap-1 shrink-0 border-b border-ev-line">
+            <h2 className="text-lg font-semibold">Registrar denuncia manual</h2>
             <p className="text-sm text-slate-400">
               Registra denuncias recibidas por teléfono, WhatsApp u otros
               canales
@@ -268,7 +268,7 @@ export function CreateReportModal({
 
               <div className="space-y-4">
                 <Input
-                  label="Título del Reporte"
+                  label="Asunto de la denuncia"
                   placeholder="Breve descripción del problema"
                   {...register("title")}
                   errorMessage={errors.title?.message}
@@ -397,7 +397,7 @@ export function CreateReportModal({
             </div>
           </ModalBody>
 
-          <ModalFooter className="shrink-0 border-t border-emerald-100 gap-3">
+          <ModalFooter className="shrink-0 border-t border-ev-line gap-3">
             <Button
               color="danger"
               variant="light"

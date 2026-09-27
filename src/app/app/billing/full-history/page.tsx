@@ -87,10 +87,10 @@ export default function FullBillingHistoryPage() {
         <div className="space-y-8">
           {grouped.map((group) => (
             <div key={group.key} className="space-y-2">
-              <h2 className="text-lg font-semibold text-[#0d212c]">{group.key}</h2>
-              <div className="overflow-x-auto rounded-2xl border border-emerald-100">
-                <table className="min-w-full divide-y divide-emerald-100">
-                  <thead className="bg-emerald-50/60">
+              <h2 className="text-lg font-semibold text-ev-night">{group.key}</h2>
+              <div className="overflow-x-auto rounded-2xl border border-ev-line">
+                <table className="min-w-full divide-y divide-ev-line">
+                  <thead className="bg-ev-paper">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-emerald-800 uppercase tracking-wide">
                         Fecha
@@ -109,16 +109,16 @@ export default function FullBillingHistoryPage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-emerald-50">
+                  <tbody className="bg-white divide-y divide-ev-line">
                     {group.items.map((inv) => (
-                      <tr key={inv.id} className="hover:bg-emerald-50/30 transition-colors">
+                      <tr key={inv.id} className="hover:bg-ev-paper transition-colors">
                         <td className="px-4 py-3 text-sm text-slate-600">
                           {formatDate(inv.createdAt)}
                         </td>
                         <td className="px-4 py-3 text-sm text-slate-600">
                           {inv.description || "Pago"}
                         </td>
-                        <td className="px-4 py-3 text-right text-sm font-semibold text-[#0d212c]">
+                        <td className="px-4 py-3 text-right text-sm font-semibold text-ev-night">
                           {formatPrice(inv.amount, inv.currency)}
                         </td>
                         <td className="px-4 py-3 text-right text-sm">

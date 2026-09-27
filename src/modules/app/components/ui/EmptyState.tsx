@@ -11,22 +11,22 @@ export interface EmptyStateProps {
   className?: string;
 }
 
-/** Consistent empty/zero-state block for lists and tables. */
+/** Estado vacío consistente para listas y tablas. */
 export function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/40 px-6 py-12 text-center",
+        "flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-ev-line bg-white/50 px-6 py-14 text-center",
         className,
       )}
     >
       {icon ? (
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-ev-bone text-ev-mute [&_i]:size-5">
           {icon}
         </div>
       ) : null}
-      <p className="text-base font-semibold text-[#0d212c]">{title}</p>
-      {description ? <p className="max-w-sm text-sm text-slate-500">{description}</p> : null}
+      <p className="text-base font-semibold tracking-[-0.015em] text-ev-night">{title}</p>
+      {description ? <p className="max-w-sm text-sm leading-relaxed text-ev-mute">{description}</p> : null}
       {action ? <div className="mt-2">{action}</div> : null}
     </div>
   );

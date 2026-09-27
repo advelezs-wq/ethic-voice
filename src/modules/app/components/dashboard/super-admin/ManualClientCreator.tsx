@@ -144,14 +144,14 @@ export default function ManualClientCreator() {
   return (
     <div className="mx-auto max-w-3xl">
       <div className="mb-4">
-        <h2 className="text-2xl font-semibold text-[#0d212c]">
+        <h2 className="text-2xl font-semibold text-ev-night">
           Crear cliente manualmente
         </h2>
         <p className="mt-1 text-sm text-default-500">
           Alta asistida de cliente, organización, plan y logo inicial.
         </p>
       </div>
-      <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
+      <Card className="border border-ev-line bg-white shadow-sm">
         <CardBody className="space-y-4">
           <Input
             label="Nombre del cliente"

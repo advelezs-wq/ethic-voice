@@ -252,7 +252,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
             {evidenceFiles.map((file, i) => (
               <div
                 key={`${file.name}-${i}`}
-                className="flex items-center justify-between bg-emerald-50/40 border border-emerald-100 rounded-lg px-3 py-1.5 text-xs"
+                className="flex items-center justify-between bg-ev-paper border border-ev-line rounded-lg px-3 py-1.5 text-xs"
               >
                 <span className="truncate text-slate-600">{file.name}</span>
                 <div className="flex items-center gap-2 shrink-0">
@@ -279,14 +279,14 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
   // (it's what stops the retention cron from deleting them), but can be set
   // proactively before closure too.
   const legalHoldControl = report.legalHold ? (
-    <div className="flex items-start justify-between gap-3 bg-red-50 border border-red-200 rounded-xl p-3.5">
+    <div className="flex items-start justify-between gap-3 rounded-xl border border-ev-line bg-ev-paper p-3.5">
       <div className="flex items-start gap-2.5">
-        <i className="icon-[lucide--scale] size-4 text-red-600 mt-0.5 shrink-0" />
+        <i className="icon-[lucide--scale] size-4 text-ev-slate mt-0.5 shrink-0" />
         <div>
-          <p className="text-sm font-semibold text-red-800">
-            Legal hold activo
+          <p className="text-sm font-medium text-ev-night">
+            Retención legal activa · no se eliminará
           </p>
-          <p className="text-xs text-red-600 mt-0.5">
+          <p className="text-xs text-ev-mute mt-0.5">
             {report.legalHoldReason}
             {report.legalHoldSetByName && ` — activado por ${report.legalHoldSetByName}`}
           </p>
@@ -299,14 +299,15 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
       )}
     </div>
   ) : isAdmin ? (
-    <Button
-      size="sm"
-      variant="bordered"
-      onPress={onLegalHoldOpen}
-      startContent={<i className="icon-[lucide--scale] size-3.5" />}
-    >
-      Activar legal hold
-    </Button>
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-ev-line px-3.5 py-2.5">
+      <p className="text-xs leading-snug text-ev-mute">
+        <span className="font-medium text-ev-night">Retención legal:</span> evita que el
+        caso se borre automáticamente si hay un proceso legal en curso.
+      </p>
+      <Button size="sm" variant="light" className="shrink-0 text-ev-night" onPress={onLegalHoldOpen}>
+        Activar
+      </Button>
+    </div>
   ) : null;
 
   const legalHoldModal = (
@@ -332,7 +333,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
         <Card className="border-l-4 border-l-sky-500">
           <CardHeader>
             <div className="flex items-center justify-between w-full">
-              <h3 className="text-lg font-semibold text-[#0d212c]">
+              <h3 className="text-lg font-semibold text-ev-night">
                 Solicitud de Cierre
               </h3>
               <Chip color="primary" variant="flat">
@@ -358,7 +359,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
             )}
 
             {report.closureSummary && (
-              <div className="p-3 bg-emerald-50/40 rounded-lg border border-emerald-100">
+              <div className="p-3 bg-ev-paper rounded-lg border border-ev-line">
                 <p className="text-sm font-medium text-slate-600 mb-1">
                   Resumen de lo actuado
                 </p>
@@ -468,66 +469,62 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
   if (!isClosed) {
     return (
       <>
-        <Card className="border-l-4 border-l-orange-500">
-          <CardHeader>
-            <div className="flex items-center justify-between w-full">
-              <h3 className="text-lg font-semibold text-[#0d212c]">
-                Estado del Caso
-              </h3>
-              <Chip color="warning" variant="flat">
-                Activo
+        <Card>
+          <CardHeader className="pb-0">
+            <div className="flex w-full items-center justify-between">
+              <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">Estado del caso</h3>
+              <Chip color={report.status === "PENDING" ? "warning" : "primary"} variant="flat" size="sm">
+                {getDashboardStatusLabel(report.status)}
               </Chip>
             </div>
           </CardHeader>
           <CardBody className="space-y-4">
+            <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-ev-line bg-ev-line text-sm">
+              <div className="bg-white p-3">
+                <dt className="ev-label text-ev-mute">Abierto hace</dt>
+                <dd className="ev-num mt-1 text-2xl font-semibold text-ev-night">
+                  {caseStats.daysOpen} {caseStats.daysOpen === 1 ? "día" : "días"}
+                </dd>
+              </div>
+              <div className="bg-white p-3">
+                <dt className="ev-label text-ev-mute">Próximo paso</dt>
+                <dd className="mt-1 text-sm font-medium leading-snug text-ev-night">
+                  {report.status === "PENDING"
+                    ? "Revisar y asignar responsable"
+                    : "Investigar y documentar hallazgos"}
+                </dd>
+              </div>
+            </dl>
+
             {legalHoldControl}
 
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="font-medium text-slate-500">Días abierto</p>
-                <p className="text-2xl font-bold text-orange-600">
-                  {caseStats.daysOpen}
-                </p>
-              </div>
-              <div>
-                <p className="font-medium text-slate-500">Estado</p>
-                <p className="text-lg font-semibold text-[#0d212c]">
-                  {getDashboardStatusLabel(report.status)}
-                </p>
-              </div>
-            </div>
-
             {report.closureRejectionReason && (
-              <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl p-3.5">
-                <i className="icon-[lucide--x-circle] size-4 text-red-500 mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3 rounded-xl border border-[#F0B2A6] bg-[#FCEEEB] p-3.5">
+                <i className="icon-[lucide--x-circle] size-4 text-[#B23A28] mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-sm font-medium text-red-800">
+                  <p className="text-sm font-medium text-[#862B1D]">
                     La última solicitud de cierre fue rechazada
                   </p>
-                  <p className="text-sm text-red-600 mt-0.5">
+                  <p className="text-sm text-[#B23A28] mt-0.5">
                     {report.closureRejectionReason}
                   </p>
                 </div>
               </div>
             )}
 
-            <div className="pt-4 border-t">
+            <div className="border-t border-ev-line pt-4">
               <Button
-                color="danger"
-                variant="solid"
+                className="w-full bg-ev-night font-medium text-white"
                 onPress={onCloseModalOpen}
-                startContent={
-                  <i className="icon-[lucide--check-circle] size-4" />
-                }
+                startContent={<i className="icon-[lucide--check-circle] size-4" />}
               >
-                {isAdmin ? "Cerrar Caso" : "Solicitar Cierre"}
+                {isAdmin ? "Cerrar caso con conclusiones" : "Solicitar cierre"}
               </Button>
-              {!isAdmin && (
-                <p className="text-xs text-slate-400 mt-2">
-                  Un administrador deberá aprobar el cierre antes de que el
-                  caso quede cerrado.
-                </p>
-              )}
+              <p className="mt-2 text-xs leading-snug text-ev-mute">
+                {isAdmin
+                  ? "Registrarás el resultado de la investigación. El chat con el denunciante quedará cerrado."
+                  : "Un administrador deberá aprobar el cierre antes de que el caso quede cerrado."}
+              </p>
             </div>
           </CardBody>
         </Card>
@@ -542,7 +539,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
             {(onClose) => (
               <>
                 <ModalHeader>
-                  {isAdmin ? "Cerrar Caso" : "Solicitar Cierre del Caso"}
+                  {isAdmin ? "Cerrar caso" : "Solicitar cierre del caso"}
                 </ModalHeader>
                 <ModalBody>
                   <div className="space-y-4">
@@ -572,11 +569,11 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
                     Cancelar
                   </Button>
                   <Button
-                    color="danger"
+                    className="bg-ev-night font-medium text-white"
                     onPress={handleSubmitClosure}
                     isLoading={isSubmitting}
                   >
-                    {isAdmin ? "Cerrar Caso" : "Enviar Solicitud"}
+                    {isAdmin ? "Cerrar caso" : "Enviar solicitud"}
                   </Button>
                 </ModalFooter>
               </>
@@ -595,7 +592,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
       <Card className="border-l-4 border-l-green-500">
         <CardHeader>
           <div className="flex items-center justify-between w-full">
-            <h3 className="text-lg font-semibold text-[#0d212c]">
+            <h3 className="text-lg font-semibold text-ev-night">
               Caso Cerrado
             </h3>
             <Chip color="success" variant="flat">
@@ -625,8 +622,8 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
           )}
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="text-center p-3 bg-emerald-50/40 rounded-lg">
-              <p className="text-2xl font-bold text-[#0d212c]">
+            <div className="text-center p-3 bg-ev-paper rounded-lg">
+              <p className="text-2xl font-bold text-ev-night">
                 {caseStats.daysOpen}
               </p>
               <p className="text-slate-500">Días totales</p>
@@ -714,7 +711,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
             </div>
           </div>
 
-          <div className="bg-emerald-50/40 border border-emerald-100 rounded-lg p-4">
+          <div className="bg-ev-paper border border-ev-line rounded-lg p-4">
             <div className="flex items-center">
               <i className="icon-[lucide--message-square-off] size-5 text-slate-400 mr-3" />
               <div>

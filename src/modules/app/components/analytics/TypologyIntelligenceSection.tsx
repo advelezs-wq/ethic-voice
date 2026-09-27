@@ -38,15 +38,15 @@ interface TypologyIntelligenceSectionProps {
 }
 
 const PALETTE = [
-  "#059669", // emerald-600
-  "#3b82f6", // blue-500
-  "#8b5cf6", // violet-500
-  "#f59e0b", // amber-500
-  "#ef4444", // red-500
-  "#06b6d4", // cyan-500
-  "#ec4899", // pink-500
-  "#84cc16", // lime-500
-  "#6b7280", // gray-500
+  "#44731A", // emerald-600
+  "#244850", // blue-500
+  "#7A6FA8", // violet-500
+  "#E09A2B", // amber-500
+  "#DB4F3A", // red-500
+  "#3F8A95", // cyan-500
+  "#C2577A", // pink-500
+  "#98D050", // lime-500
+  "#5A6D70", // gray-500
 ];
 
 function colorFor(index: number) {
@@ -84,8 +84,8 @@ export function TypologyIntelligenceSection({
     if (props.active && props.payload && props.payload.length) {
       const d = props.payload[0].payload;
       return (
-        <div className="bg-white p-3 border border-emerald-100 rounded-lg shadow-lg">
-          <p className="font-medium text-[#0d212c]">{d.name}</p>
+        <div className="bg-white p-3 border border-ev-line rounded-lg shadow-lg">
+          <p className="font-medium text-ev-night">{d.name}</p>
           <p className="text-sm text-slate-500">
             Denuncias: <span className="font-medium">{d.value}</span> (
             {d.percentage}%)
@@ -135,7 +135,7 @@ export function TypologyIntelligenceSection({
         {/* Doughnut: distribución por tipología */}
         <div className="bg-white border rounded-lg p-6">
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-[#0d212c]">
+            <h4 className="text-lg font-semibold text-ev-night">
               Distribución por Tipología
             </h4>
             <p className="text-sm text-slate-500">
@@ -165,7 +165,7 @@ export function TypologyIntelligenceSection({
             </ResponsiveContainer>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
-                <div className="text-3xl font-bold text-[#0d212c]">
+                <div className="text-3xl font-bold text-ev-night">
                   {data.totalReports}
                 </div>
                 <div className="text-sm text-slate-500">Total</div>
@@ -179,7 +179,7 @@ export function TypologyIntelligenceSection({
                   className="w-2.5 h-2.5 rounded-full"
                   style={{ backgroundColor: entry.fill }}
                 />
-                <span className="text-xs text-slate-600">
+                <span className="ev-label mt-1 text-ev-mute">
                   {entry.name} · {entry.percentage}%
                 </span>
               </div>
@@ -190,7 +190,7 @@ export function TypologyIntelligenceSection({
         {/* Ranking de tipologías */}
         <div className="bg-white border rounded-lg p-6">
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-[#0d212c]">
+            <h4 className="text-lg font-semibold text-ev-night">
               Ranking de Tipologías
             </h4>
             <p className="text-sm text-slate-500">
@@ -204,17 +204,17 @@ export function TypologyIntelligenceSection({
                 layout="vertical"
                 margin={{ top: 5, right: 24, left: 8, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#EAE8E0" horizontal={false} />
                 <XAxis
                   type="number"
                   allowDecimals={false}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
+                  tick={{ fontSize: 12, fill: "#5A6D70" }}
                 />
                 <YAxis
                   type="category"
                   dataKey="name"
                   width={130}
-                  tick={{ fontSize: 12, fill: "#374151" }}
+                  tick={{ fontSize: 12, fill: "#16323A" }}
                 />
                 <Tooltip
                   formatter={(value: any, _name, props: any) => [
@@ -236,7 +236,7 @@ export function TypologyIntelligenceSection({
       {/* Tendencia mensual por tipología */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-[#0d212c]">
+          <h4 className="text-lg font-semibold text-ev-night">
             Tendencia Mensual por Tipología
           </h4>
           <p className="text-sm text-slate-500">
@@ -249,12 +249,12 @@ export function TypologyIntelligenceSection({
               data={trendData}
               margin={{ top: 10, right: 20, left: 0, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#EAE8E0" />
               <XAxis
                 dataKey="month"
-                tick={{ fontSize: 12, fill: "#6b7280" }}
+                tick={{ fontSize: 12, fill: "#5A6D70" }}
               />
-              <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: "#6b7280" }} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: "#5A6D70" }} />
               <Tooltip />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               {monthlyTrend.series.map((s, i) => (

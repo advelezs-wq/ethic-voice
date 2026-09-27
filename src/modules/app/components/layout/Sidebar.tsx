@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { SignedIn, SignOutButton, useUser } from "@clerk/nextjs";
-import { Button, User } from "@heroui/react";
 import { useUserStore } from "@/modules/store/user-store";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import { Logo, LogoMark } from "@/modules/brand/components/Logo";
 import { SidebarItem } from "./SidebarItem";
 import { useSidebar } from "../../context/SidebarContext";
 import { useUserRole } from "@/modules/core/hooks/useUserRole";
@@ -17,7 +16,7 @@ export const Sidebar: React.FC = () => {
   const isLoading = useUserStore((state) => state.isLoading);
   const { isCollapsed } = useSidebar();
   const { user } = useUser();
-  const { permissions, isSuperAdmin } = useUserRole();
+  const { permissions, isSuperAdmin, isLoading: roleLoading } = useUserRole();
   const [superAdminScope, setSuperAdminScope] = useState<"all" | "org">("all");
 
   useEffect(() => {
@@ -63,7 +62,7 @@ export const Sidebar: React.FC = () => {
           aria-hidden="true"
         />
       ),
-      text: "Dashboard",
+      text: "Inicio",
       to: "/app",
     },
     {
@@ -138,7 +137,7 @@ export const Sidebar: React.FC = () => {
                 aria-hidden="true"
               />
             ),
-            text: "Analíticas e Informes",
+            text: "Analíticas e informes",
             to: "/app/analytics",
           },
           {
@@ -160,7 +159,7 @@ export const Sidebar: React.FC = () => {
                 aria-hidden="true"
               />
             ),
-            text: "Configuración del Sistema",
+            text: "Configuración",
             to: "/app/settings",
           },
         ]
@@ -177,7 +176,7 @@ export const Sidebar: React.FC = () => {
               aria-hidden="true"
             />
           ),
-          text: "Mi Organización",
+          text: "Mi organización",
           to: "/app/organization",
         },
       ]
@@ -195,7 +194,7 @@ export const Sidebar: React.FC = () => {
               aria-hidden="true"
             />
           ),
-          text: "Todas las Organizaciones",
+          text: "Todas las organizaciones",
           to: "/app/organizations",
         },
         {
@@ -280,142 +279,140 @@ export const Sidebar: React.FC = () => {
     to: "/app/profile",
   };
 
-  const navigationItems = [
-    ...baseItems,
-    ...adminItems,
-    ...memberItems,
-    ...superAdminItems,
-    profileItem,
-  ];
+  // Grupos con etiqueta de registro (BRAND.md § Layout): casos → organización
+  // → plataforma (superadmin) → cuenta.
+  const navGroups = [
+    { label: "Casos", items: baseItems },
+    { label: "Organización", items: [...adminItems, ...memberItems] },
+    { label: "Plataforma", items: superAdminItems },
+    { label: "Cuenta", items: [profileItem] },
+  ].filter((g) => g.items.length > 0);
 
   return (
     <aside
-      className={`
-      ${isCollapsed ? "w-20" : "w-[270px] 2xl:w-[283px]"} 
-      ev-sidebar-surface h-screen flex flex-col transition-[width] duration-300 ease-in-out overflow-hidden relative z-10
-    `}
+      className={`${
+        isCollapsed ? "w-[76px]" : "w-[264px]"
+      } ev-sidebar-surface relative z-10 flex h-screen flex-col overflow-hidden transition-[width] duration-300 ease-ev-out`}
     >
-      {/* Header */}
+      {/* Marca: siempre EthicVoice, nunca el logo de la organización en contexto
+          (organizationLogoUrl es para superficies de la organización, como /submit). */}
       <div
-        className={`h-[89px] flex items-center border-b border-emerald-100 ${
-          isCollapsed ? "justify-center" : "justify-start p-6"
+        className={`flex h-16 shrink-0 items-center ${
+          isCollapsed ? "justify-center" : "px-5"
         }`}
       >
-        <Link
-          href="/app"
-          className={`flex items-center min-w-0 ${
-            isCollapsed ? "justify-center w-full" : "justify-start gap-2"
-          }`}
-          aria-label="EthicVoice — inicio"
-        >
-          {/* This is the app's own home/brand link, shared by every org and
-              by superadmins — it must always show the EthicVoice mark, not
-              whichever org's logo happens to be in context (organizationLogoUrl
-              is for org-branded surfaces like /submit, not this nav link). */}
-          <Image
-            src="/brand/logo-nobg.png"
-            alt="EthicVoice"
-            width={170}
-            height={40}
-            className={`object-contain ${
-              isCollapsed ? "h-8 w-8" : "h-10 w-auto max-w-[10.5rem]"
-            }`}
-            priority
-          />
+        <Link href="/app" aria-label="EthicVoice — inicio" className="flex items-center">
+          {isCollapsed ? (
+            <LogoMark tone="dark" className="h-7 w-auto" />
+          ) : (
+            <Logo tone="dark" markClassName="h-7 w-auto" />
+          )}
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 overflow-y-auto">
-        <div className="mb-8">
-          {isSuperAdminOrgWorkspace && !isCollapsed && (
-            <Button
-              size="sm"
-              variant="flat"
-              className="mb-3 w-full justify-start border border-emerald-200 bg-emerald-50 text-[#0d212c]"
-              startContent={<i className="icon-[lucide--arrow-left] size-4" />}
-              onPress={returnToSuperAdminPanel}
-            >
-              Volver a Super Admin
-            </Button>
-          )}
-          <p
-            className={`text-xs font-semibold text-emerald-700/70 uppercase mb-3 px-3 transition-opacity duration-200 ${
-              isCollapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto"
-            }`}
+      <nav className="flex-1 overflow-y-auto px-3 pb-6 pt-3" aria-label="Aplicación">
+        {isSuperAdminOrgWorkspace && !isCollapsed && (
+          <button
+            type="button"
+            onClick={returnToSuperAdminPanel}
+            className="ev-press mb-4 flex w-full items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-left text-sm text-white/75 hover:border-white/25 hover:text-white"
           >
-            Navegación por rol
-          </p>
-          <div className="space-y-1">
-            {navigationItems.map((item) => (
-              <SidebarItem
-                key={item.to}
-                icon={item.icon}
-                text={item.text}
-                to={item.to}
-                isActive={isActive(item.to)}
-                isCollapsed={isCollapsed}
-              />
+            <i className="icon-[lucide--arrow-left] size-4" aria-hidden />
+            Volver a Super Admin
+          </button>
+        )}
+        {/* Mientras cargan los permisos no mostramos el menú de otro rol
+            (antes aparecía por un instante la vista de investigador). */}
+        {roleLoading && (
+          <div className="space-y-2 px-3 pt-2" aria-hidden>
+            {[70, 55, 62, 48, 58, 66].map((w, i) => (
+              <div key={i} className="flex h-10 items-center gap-3">
+                <span className="h-4 w-4 rounded bg-white/10" />
+                {!isCollapsed && <span className="h-2.5 rounded-full bg-white/10" style={{ width: `${w}%` }} />}
+              </div>
             ))}
           </div>
-        </div>
+        )}
+        {!roleLoading && navGroups.map((group, gi) => (
+          <div key={group.label} className={gi > 0 ? "mt-6" : ""}>
+            <p
+              className={`ev-label mb-2 px-3 text-white/35 transition-opacity duration-200 ${
+                isCollapsed ? "h-0 overflow-hidden opacity-0" : "opacity-100"
+              }`}
+            >
+              {group.label}
+            </p>
+            <div className="space-y-0.5">
+              {group.items.map((item) => (
+                <SidebarItem
+                  key={item.to}
+                  icon={item.icon}
+                  text={item.text}
+                  to={item.to}
+                  isActive={isActive(item.to)}
+                  isCollapsed={isCollapsed}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
       </nav>
 
-      {/* User Info & Logout */}
-      <div
-        className={` border-t border-emerald-100 p-4 ${
-          isCollapsed ? "" : "mt-auto"
-        }`}
-      >
+      {/* Usuario y salida */}
+      <div className="shrink-0 border-t border-white/10 p-3">
         <SignedIn>
           <div
-            className={`mb-3 transition-opacity duration-200 ${
-              isCollapsed ? "opacity-0 h-0 overflow-hidden pointer-events-none" : "opacity-100 h-auto"
+            className={`flex items-center gap-3 rounded-xl px-2 py-2 ${
+              isCollapsed ? "justify-center" : ""
             }`}
           >
-            <User
-              name={user?.fullName}
-              description={user?.emailAddresses[0].emailAddress}
-              avatarProps={{
-                src: user?.imageUrl,
-                size: "sm",
-                icon: (
-                  <i
-                    className="icon-[heroicons-solid--user] size-4"
-                    role="img"
-                    aria-hidden="true"
-                  />
-                ),
-              }}
-            />
-          </div>
-
-          <SignOutButton redirectUrl={`/auth/sign-in`}>
-            <Button
-              variant="light"
-              className={`w-full text-slate-500 hover:text-[#0d212c] transition-colors duration-200 px-0 min-w-0 ${
-                isCollapsed ? "justify-center" : "justify-start"
-              }`}
-              isLoading={isLoading}
-              startContent={
-                !isLoading && (
-                  <i
-                    className="icon-[lucide--log-out] size-5"
-                    role="img"
-                    aria-hidden="true"
-                  />
-                )
-              }
-            >
-              <span
-                className={`transition-[opacity,width] duration-200 ${
-                  isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100"
-                } overflow-hidden whitespace-nowrap`}
-              >
-                Cerrar Sesión
+            {user?.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.imageUrl}
+                alt=""
+                className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-white/15"
+              />
+            ) : (
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ev-slate font-mono text-xs text-ev-signal">
+                {(user?.firstName?.[0] ?? "E").toUpperCase()}
               </span>
-            </Button>
-          </SignOutButton>
+            )}
+            {!isCollapsed && (
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-white">
+                  {user?.fullName || "Usuario"}
+                </p>
+                <p className="truncate text-xs text-white/45">
+                  {user?.emailAddresses[0]?.emailAddress}
+                </p>
+              </div>
+            )}
+            {!isCollapsed && (
+              <SignOutButton redirectUrl="/auth/sign-in">
+                <button
+                  type="button"
+                  disabled={isLoading}
+                  className="ev-press flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white/45 hover:bg-white/10 hover:text-white"
+                  aria-label="Cerrar sesión"
+                  title="Cerrar sesión"
+                >
+                  <i className="icon-[lucide--log-out] size-4" aria-hidden />
+                </button>
+              </SignOutButton>
+            )}
+          </div>
+          {isCollapsed && (
+            <SignOutButton redirectUrl="/auth/sign-in">
+              <button
+                type="button"
+                className="ev-press mt-1 flex h-9 w-full items-center justify-center rounded-lg text-white/45 hover:bg-white/10 hover:text-white"
+                aria-label="Cerrar sesión"
+              >
+                <i className="icon-[lucide--log-out] size-4" aria-hidden />
+              </button>
+            </SignOutButton>
+          )}
         </SignedIn>
       </div>
     </aside>

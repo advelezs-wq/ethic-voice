@@ -180,7 +180,7 @@ export interface PDFOrHTMLResult {
 export function withPrintFallbackBanner(html: string): string {
   const banner = `
     <div style="background:#eff6ff;border:1px solid #0ea5e9;border-radius:8px;padding:16px 20px;margin:12px;font-family:Arial,sans-serif;line-height:1.6;color:#0c4a6e;">
-      <strong>📄 Reporte generado</strong><br/>
+      <strong>📄 Informe generado</strong><br/>
       La generación de PDF en el servidor no está disponible en este momento, así que abrimos el reporte aquí mismo.<br/><br/>
       <strong>💾 Para guardarlo como PDF:</strong> presiona <kbd style="background:#e5e7eb;border:1px solid #d1d5db;border-radius:4px;padding:2px 6px;font-family:monospace;">Ctrl+P</kbd> (Windows/Linux) o <kbd style="background:#e5e7eb;border:1px solid #d1d5db;border-radius:4px;padding:2px 6px;font-family:monospace;">Cmd+P</kbd> (Mac) y selecciona "Guardar como PDF".
     </div>
@@ -520,7 +520,7 @@ export class ModernPDFGeneratorService {
       title: "Dashboard de Análisis Organizacional",
       subtitle: `Reporte de rendimiento e inteligencia de datos - ${format(new Date(), "MMMM yyyy", { locale: es })}`,
       reportId: `ORG-${organization.id || Date.now()}`,
-      organizationName: String(organization.name || "Mi Organización"),
+      organizationName: String(organization.name || "Mi organización"),
       organizationLogo,
       ethicVoiceLogo,
       generatedAt: new Date(),

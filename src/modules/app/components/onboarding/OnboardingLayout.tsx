@@ -88,7 +88,7 @@ export function OnboardingLayout({
   return (
     <div className="h-screen w-screen grid grid-cols-[18rem_1fr] overflow-hidden">
       {/* Left Sidebar - Fixed full height */}
-      <div className="h-screen w-72 bg-white/90 backdrop-blur-sm border-r border-emerald-100/50 p-6 flex flex-col">
+      <div className="h-screen w-72 bg-white backdrop-blur-sm border-r border-ev-line p-6 flex flex-col">
         <div className="flex items-center justify-between mb-6">
           <Link href="/" className="flex min-w-0 flex-col gap-1">
             <Image
@@ -139,9 +139,9 @@ export function OnboardingLayout({
                 key={step.step}
                 className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 ${
                   status === "current"
-                    ? "bg-emerald-50 border border-emerald-200"
+                    ? "bg-emerald-50 border border-ev-line"
                     : status === "completed"
-                      ? "bg-emerald-50/50"
+                      ? "bg-ev-paper"
                       : "bg-transparent"
                 }`}
               >
@@ -226,7 +226,7 @@ export function OnboardingLayout({
       {/* Main Content - scrollable area only */}
       <div
         id="onboarding-content"
-        className="h-screen overflow-y-auto p-8 bg-[#f7faf9]"
+        className="h-screen overflow-y-auto p-8 bg-ev-paper"
       >
         <div className="w-full max-w-3xl mx-auto">{children}</div>
       </div>

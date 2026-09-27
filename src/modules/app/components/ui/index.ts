@@ -6,3 +6,4 @@ export { StatTile, type StatTileProps, type StatTileTone } from "./StatTile";
 export { EmptyState, type EmptyStateProps } from "./EmptyState";
 export { SectionReveal, SectionRevealX } from "./SectionReveal";
 export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";
+export { MetricStrip, type Metric, type MetricTone } from "./MetricStrip";

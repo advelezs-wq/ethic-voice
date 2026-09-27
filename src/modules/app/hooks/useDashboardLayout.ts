@@ -77,7 +77,7 @@ function getDefaultElements(): DashboardElement[] {
       id: "stats-cards",
       name: "Tarjetas de Estadísticas",
       description:
-        "Resumen de métricas principales (total reportes, pendientes, etc.)",
+        "Resumen de cifras principales (total de denuncias, pendientes, etc.)",
       icon: "icon-[lucide--bar-chart-3]",
       isVisible: true,
       position: 1,
@@ -94,8 +94,8 @@ function getDefaultElements(): DashboardElement[] {
     },
     {
       id: "recent-reports",
-      name: "Reportes Recientes",
-      description: "Lista de los últimos reportes recibidos",
+      name: "Denuncias recientes",
+      description: "Lista de las últimas denuncias recibidas",
       icon: "icon-[lucide--file-text]",
       isVisible: true,
       position: 3,
@@ -131,7 +131,7 @@ function getDefaultElements(): DashboardElement[] {
     {
       id: "severity-indicator",
       name: "Indicador de Severidad",
-      description: "Distribución de reportes por nivel de severidad",
+      description: "Distribución de denuncias por severidad",
       icon: "icon-[lucide--alert-triangle]",
       isVisible: true,
       position: 7,
@@ -140,7 +140,7 @@ function getDefaultElements(): DashboardElement[] {
     {
       id: "category-distribution",
       name: "Distribución por Categoría",
-      description: "Reportes organizados por tipo de incidencia",
+      description: "Denuncias organizadas por tipo de conducta",
       icon: "icon-[lucide--tag]",
       isVisible: true,
       position: 8,

@@ -1,59 +1,37 @@
 import React from "react";
-import { CardHeader, CardBody } from "@heroui/card";
-import { Card } from "@/modules/app/components/ui";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-  CartesianGrid,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { ChartDataPoint } from "@/types/dashboard.types";
+import { AXIS_TICK, ChartCard, CountTooltip, GRID_STROKE } from "./ChartCard";
 
 interface StatisticsChartProps {
   chartData: ChartDataPoint[];
   totalReports: number;
 }
 
-export const StatisticsChart: React.FC<StatisticsChartProps> = ({
-  chartData,
-  totalReports,
-}) => {
+/** Denuncias por mes (últimos 6). El mes en curso se resalta en lima. */
+export const StatisticsChart: React.FC<StatisticsChartProps> = ({ chartData, totalReports }) => {
   return (
-    <Card>
-      <CardHeader>
-        <h3 className="text-lg font-semibold text-[#0d212c]">Estadísticas Mensuales</h3>
-      </CardHeader>
-      <CardBody>
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-slate-500">Total de Reportes</span>
-            <span className="text-2xl font-bold text-[#0d212c]">{totalReports}</span>
-          </div>
-          <div className="text-xs text-slate-400">Últimos 6 meses</div>
-        </div>
-
-        <div className="h-[200px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ecfdf5" />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} tickLine={false} />
-              <YAxis tick={{ fontSize: 12 }} tickLine={false} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#fff",
-                  border: "1px solid #d1fae5",
-                  borderRadius: "8px",
-                  fontSize: "12px",
-                }}
-              />
-              <Bar dataKey="reports" fill="#a3e635" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </CardBody>
-    </Card>
+    <ChartCard
+      title="Denuncias por mes"
+      description="Últimos 6 meses · el mes actual en verde"
+      figure={totalReports}
+      figureLabel="Total histórico"
+    >
+      <div className="h-[220px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+            <CartesianGrid vertical={false} stroke={GRID_STROKE} />
+            <XAxis dataKey="name" tick={AXIS_TICK} tickLine={false} axisLine={false} />
+            <YAxis allowDecimals={false} tick={AXIS_TICK} tickLine={false} axisLine={false} width={40} />
+            <Tooltip content={<CountTooltip />} cursor={{ fill: "#F4F3EE" }} />
+            <Bar dataKey="reports" radius={[6, 6, 0, 0]} maxBarSize={44}>
+              {chartData.map((_, i) => (
+                <Cell key={i} fill={i === chartData.length - 1 ? "#98D050" : "#244850"} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </ChartCard>
   );
 };

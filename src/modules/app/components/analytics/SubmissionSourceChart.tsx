@@ -25,7 +25,7 @@ export function SubmissionSourceChart({ analytics }: { analytics: any }) {
     },
   ];
 
-  const COLORS = ["#8b5cf6", "#3b82f6"];
+  const COLORS = ["#7A6FA8", "#244850"];
 
   return (
     <Card className="p-6">
@@ -40,7 +40,7 @@ export function SubmissionSourceChart({ analytics }: { analytics: any }) {
             labelLine={false}
             label={({ percentage }) => `${(percentage ?? 0).toFixed(1)}%`}
             outerRadius={80}
-            fill="#8884d8"
+            fill="#7A6FA8"
             dataKey="value"
           >
             {chartData.map((entry, index) => (

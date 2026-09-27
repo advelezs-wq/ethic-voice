@@ -68,7 +68,7 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
   const roleData = Object.entries(roleDistribution).map(([role, count]) => ({
     name: role,
     value: count,
-    fill: role === "Admin" ? "#3b82f6" : "#10b981",
+    fill: role === "Admin" ? "#244850" : "#5E9427",
   }));
 
   // Performance categories
@@ -88,22 +88,22 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
     {
       name: "Excelente (80%+)",
       value: performanceCategories.excellent,
-      fill: "#10b981",
+      fill: "#5E9427",
     },
     {
       name: "Bueno (60-79%)",
       value: performanceCategories.good,
-      fill: "#3b82f6",
+      fill: "#244850",
     },
     {
       name: "Promedio (40-59%)",
       value: performanceCategories.average,
-      fill: "#f59e0b",
+      fill: "#E09A2B",
     },
     {
       name: "Necesita Mejora (<40%)",
       value: performanceCategories.needsImprovement,
-      fill: "#ef4444",
+      fill: "#DB4F3A",
     },
   ].filter((item) => item.value > 0);
 
@@ -112,16 +112,16 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
     if (props.active && props.payload && props.payload.length) {
       const data = props.payload[0].payload;
       return (
-        <div className="bg-white p-3 border border-emerald-100 rounded-lg shadow-lg">
-          <p className="font-medium text-[#0d212c]">{data.fullName}</p>
+        <div className="bg-white p-3 border border-ev-line rounded-lg shadow-lg">
+          <p className="font-medium text-ev-night">{data.fullName}</p>
           <p className="text-sm text-slate-500">Email: {data.email}</p>
           <p className="text-sm text-slate-500">
             Rol: {data.role === "ADMIN" ? "Administrador" : "Miembro"}
           </p>
-          <p className="text-sm text-slate-500">Asignados: {data.assigned}</p>
-          <p className="text-sm text-slate-500">Resueltos: {data.resolved}</p>
+          <p className="text-sm text-slate-500">Asignadas: {data.assigned}</p>
+          <p className="text-sm text-slate-500">Resueltas: {data.resolved}</p>
           <p className="text-sm text-slate-500">
-            Tiempo Promedio: {data.avgTime}d
+            Tiempo promedio: {data.avgTime} días
           </p>
           <p className="text-sm text-slate-500">
             Productividad: {data.productivity}%
@@ -136,26 +136,26 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
     <div className="space-y-6">
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-sky-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-sky-800">
+        <div className="rounded-xl border border-ev-line bg-white p-4 text-center">
+          <div className="ev-num text-2xl font-semibold text-ev-night">
             {activeInvestigators}
           </div>
-          <div className="text-sm text-sky-700">Investigadores Activos</div>
+          <div className="ev-label mt-1 text-ev-mute">Investigadores con casos</div>
         </div>
-        <div className="bg-green-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-green-900">
-            {averageResolutionTime}d
+        <div className="rounded-xl border border-ev-line bg-white p-4 text-center">
+          <div className="ev-num text-2xl font-semibold text-ev-night">
+            {averageResolutionTime} días
           </div>
-          <div className="text-sm text-green-600">
-            Tiempo Promedio de Resolución
+          <div className="ev-label mt-1 text-ev-mute">
+            Días promedio para resolver
           </div>
         </div>
-        <div className="bg-purple-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-purple-900">
+        <div className="rounded-xl border border-ev-line bg-white p-4 text-center">
+          <div className="ev-num text-2xl font-semibold text-ev-night">
             {productivityScore}%
           </div>
-          <div className="text-sm text-purple-600">
-            Score Global de Productividad
+          <div className="ev-label mt-1 text-ev-mute">
+            Casos resueltos del total asignado
           </div>
         </div>
       </div>
@@ -166,7 +166,7 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
           {/* Individual Performance Bar Chart */}
           <div className="bg-white border rounded-lg p-6">
             <div className="mb-4">
-              <h4 className="text-lg font-semibold text-[#0d212c]">
+              <h4 className="text-lg font-semibold text-ev-night">
                 Productividad Individual
               </h4>
               <p className="text-sm text-slate-500">
@@ -181,20 +181,20 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
                   margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
                   layout="horizontal"
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EAE8E0" />
                   <XAxis
                     type="number"
                     domain={[0, 100]}
-                    tick={{ fontSize: 12, fill: "#6b7280" }}
-                    tickLine={{ stroke: "#d1d5db" }}
-                    axisLine={{ stroke: "#d1d5db" }}
+                    tick={{ fontSize: 12, fill: "#5A6D70" }}
+                    tickLine={{ stroke: "#DCDAD1" }}
+                    axisLine={{ stroke: "#DCDAD1" }}
                   />
                   <YAxis
                     type="category"
                     dataKey="name"
-                    tick={{ fontSize: 12, fill: "#6b7280" }}
-                    tickLine={{ stroke: "#d1d5db" }}
-                    axisLine={{ stroke: "#d1d5db" }}
+                    tick={{ fontSize: 12, fill: "#5A6D70" }}
+                    tickLine={{ stroke: "#DCDAD1" }}
+                    axisLine={{ stroke: "#DCDAD1" }}
                     width={80}
                   />
                   <Tooltip content={renderTooltip} />
@@ -209,12 +209,12 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
                         key={`cell-${index}`}
                         fill={
                           entry.productivity >= 80
-                            ? "#10b981"
+                            ? "#5E9427"
                             : entry.productivity >= 60
-                              ? "#3b82f6"
+                              ? "#244850"
                               : entry.productivity >= 40
-                                ? "#f59e0b"
-                                : "#ef4444"
+                                ? "#E09A2B"
+                                : "#DB4F3A"
                         }
                       />
                     ))}
@@ -227,7 +227,7 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
           {/* Performance Distribution Pie Chart */}
           <div className="bg-white border rounded-lg p-6">
             <div className="mb-4">
-              <h4 className="text-lg font-semibold text-[#0d212c]">
+              <h4 className="text-lg font-semibold text-ev-night">
                 Distribución de Performance
               </h4>
               <p className="text-sm text-slate-500">
@@ -277,7 +277,7 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
           {/* Role Distribution */}
           <div className="bg-white border rounded-lg p-6">
             <div className="mb-4">
-              <h4 className="text-lg font-semibold text-[#0d212c]">
+              <h4 className="text-lg font-semibold text-ev-night">
                 Distribución por Rol
               </h4>
               <p className="text-sm text-slate-500">
@@ -311,7 +311,7 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
           {/* Workload Distribution */}
           <div className="bg-white border rounded-lg p-6">
             <div className="mb-4">
-              <h4 className="text-lg font-semibold text-[#0d212c]">
+              <h4 className="text-lg font-semibold text-ev-night">
                 Distribución de Carga de Trabajo
               </h4>
               <p className="text-sm text-slate-500">
@@ -325,29 +325,29 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
                   data={performanceData}
                   margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EAE8E0" />
                   <XAxis
                     dataKey="name"
-                    tick={{ fontSize: 12, fill: "#6b7280" }}
-                    tickLine={{ stroke: "#d1d5db" }}
-                    axisLine={{ stroke: "#d1d5db" }}
+                    tick={{ fontSize: 12, fill: "#5A6D70" }}
+                    tickLine={{ stroke: "#DCDAD1" }}
+                    axisLine={{ stroke: "#DCDAD1" }}
                   />
                   <YAxis
-                    tick={{ fontSize: 12, fill: "#6b7280" }}
-                    tickLine={{ stroke: "#d1d5db" }}
-                    axisLine={{ stroke: "#d1d5db" }}
+                    tick={{ fontSize: 12, fill: "#5A6D70" }}
+                    tickLine={{ stroke: "#DCDAD1" }}
+                    axisLine={{ stroke: "#DCDAD1" }}
                     allowDecimals={false}
                   />
                   <Tooltip content={renderTooltip} />
                   <Bar
                     dataKey="assigned"
-                    fill="#93c5fd"
+                    fill="#9FB8BD"
                     radius={[4, 4, 0, 0]}
                     name="Asignados"
                   />
                   <Bar
                     dataKey="resolved"
-                    fill="#10b981"
+                    fill="#5E9427"
                     radius={[4, 4, 0, 0]}
                     name="Resueltos"
                   />
@@ -362,7 +362,7 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
       {assignments.length > 0 && (
         <div className="bg-white border rounded-lg p-6">
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-[#0d212c]">
+            <h4 className="text-lg font-semibold text-ev-night">
               Rendimiento Individual Detallado
             </h4>
             <p className="text-sm text-slate-500">
@@ -405,13 +405,13 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold`}
                         style={{
-                          backgroundColor: index < 3 ? "#10b981" : "#6b7280",
+                          backgroundColor: index < 3 ? "#5E9427" : "#5A6D70",
                         }}
                       >
                         #{index + 1}
                       </div>
                       <div>
-                        <span className="font-medium text-[#0d212c]">
+                        <span className="font-medium text-ev-night">
                           {member.investigator}
                         </span>
                         <span className="ml-2 text-xs px-2 py-1 bg-emerald-100 rounded-full">
@@ -429,25 +429,25 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div className="text-center">
-                      <div className="font-semibold text-[#0d212c]">
+                      <div className="font-semibold text-ev-night">
                         {member.assignedCount}
                       </div>
                       <div className="text-slate-500">Asignados</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-semibold text-[#0d212c]">
+                      <div className="font-semibold text-ev-night">
                         {member.resolvedCount}
                       </div>
                       <div className="text-slate-500">Resueltos</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-semibold text-[#0d212c]">
+                      <div className="font-semibold text-ev-night">
                         {member.avgTime}d
                       </div>
                       <div className="text-slate-500">Tiempo Prom.</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-semibold text-[#0d212c]">
+                      <div className="font-semibold text-ev-night">
                         {(efficiencyRate ?? 0).toFixed(1)}%
                       </div>
                       <div className="text-slate-500">Eficiencia</div>
@@ -463,12 +463,12 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
                           width: `${member.productivityScore}%`,
                           backgroundColor:
                             member.productivityScore >= 80
-                              ? "#10b981"
+                              ? "#5E9427"
                               : member.productivityScore >= 60
-                                ? "#3b82f6"
+                                ? "#244850"
                                 : member.productivityScore >= 40
-                                  ? "#f59e0b"
-                                  : "#ef4444",
+                                  ? "#E09A2B"
+                                  : "#DB4F3A",
                         }}
                       />
                     </div>
@@ -484,12 +484,11 @@ export function TeamPerformanceMetrics({ data }: TeamPerformanceMetricsProps) {
       {assignments.length === 0 && (
         <div className="bg-white border rounded-lg p-12 text-center">
           <i className="icon-[lucide--users] size-16 mx-auto mb-4 text-slate-400" />
-          <h3 className="text-lg font-medium text-[#0d212c] mb-2">
-            No hay datos de rendimiento disponibles
+          <h3 className="text-lg font-medium text-ev-night mb-2">
+            Aún no hay investigadores con casos
           </h3>
           <p className="text-slate-500">
-            Los datos de rendimiento aparecerán cuando haya miembros con
-            reportes asignados.
+            Aparecerá aquí cuando asignes denuncias a investigadores de tu equipo.
           </p>
         </div>
       )}

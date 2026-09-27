@@ -141,11 +141,11 @@ export default function SuperAdminClientsTable() {
 
   return (
     <>
-      <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
+      <Card className="border border-ev-line bg-white shadow-sm">
         <CardBody>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-semibold text-[#0d212c]">Clientes</h2>
+            <h2 className="text-xl font-semibold text-ev-night">Clientes</h2>
             <p className="text-sm text-default-500">
               {scope === "all"
                 ? "Vista general de clientes: estado comercial y acciones globales."
@@ -182,7 +182,7 @@ export default function SuperAdminClientsTable() {
               {rows.map((r) => (
                 <tr key={r.id} className="border-t border-default-100">
                   <td className="py-2 pr-4">
-                    <a href={`/app/organizations/${r.id}`} className="font-medium text-[#0d212c] hover:underline">{r.name}</a>
+                    <a href={`/app/organizations/${r.id}`} className="font-medium text-ev-night hover:underline">{r.name}</a>
                     <div className="text-xs text-default-500">{new Date(r.createdAt).toLocaleString()}</div>
                   </td>
                   <td className="py-2 pr-4">{r.plan || "-"}</td>

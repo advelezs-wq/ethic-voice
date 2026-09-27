@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export const FormCard = ({ form }: { form: Form }) => {
   return (
-    <div className="rounded-xl border border-emerald-100 bg-white">
+    <div className="rounded-xl border border-ev-line bg-white">
       <div className="flex-col items-start p-4">
         <div className="flex items-center gap-2 justify-between w-full">
           <span className="truncate font-bold">{form.title}</span>

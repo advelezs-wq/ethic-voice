@@ -158,10 +158,11 @@ export async function GET(request: NextRequest) {
 
     // Generate monthly chart data (last 6 months)
     const chartData = [];
-    const months = ["feb", "mar", "abr", "may", "jun", "jul"];
+    // Mes real de cada barra (antes estaban fijos "feb"…"jul"). Día 1 para
+    // evitar el desborde de setMonth en meses cortos.
+    const today = new Date();
     for (let i = 5; i >= 0; i--) {
-      const date = new Date();
-      date.setMonth(date.getMonth() - i);
+      const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
       const monthReports = reports.filter((r) => {
         const reportDate = new Date(r.submittedAt);
         return (
@@ -170,7 +171,7 @@ export async function GET(request: NextRequest) {
         );
       });
       chartData.push({
-        name: months[5 - i] || `mes-${5 - i}`,
+        name: date.toLocaleDateString("es-CO", { month: "short" }).replace(".", ""),
         reports: monthReports.length,
       });
     }
@@ -202,7 +203,8 @@ export async function GET(request: NextRequest) {
       {} as Record<string, number>
     );
 
-    const colors = ["#f59e0b", "#ef4444", "#8b5cf6", "#10b981", "#3b82f6"];
+    // Paleta categórica de marca (BRAND.md § Producto).
+    const colors = ["#244850", "#98D050", "#E09A2B", "#7A6FA8", "#DB4F3A", "#3F8A95", "#5E9427", "#C2577A"];
     const categoryData = Object.entries(categoryCounts).map(
       ([name, value], index) => ({
         name,

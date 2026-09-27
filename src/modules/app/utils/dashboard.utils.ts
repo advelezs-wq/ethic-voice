@@ -29,6 +29,20 @@ export function getSeverityColor(
   }
 }
 
+// El dashboard usa dos vocabularios de estado: el de la base de datos
+// (PENDING, IN_PROGRESS…) y el de la vista resumida (new, progress…).
+const STATUS_ALIASES: Record<string, string> = {
+  new: "PENDING",
+  progress: "IN_PROGRESS",
+  closed: "CLOSED",
+  archived: "ARCHIVED",
+  resolved: "RESOLVED",
+};
+
+function normalizeStatus(status: string): string {
+  return STATUS_ALIASES[status] ?? status;
+}
+
 // For Report Status (status field from database)
 export function getStatusColor(
   status: ReportStatus | string
@@ -40,11 +54,12 @@ export function getStatusColor(
   | "warning"
   | "danger"
   | undefined {
-  switch (status) {
+  // Pendiente no es un error: es trabajo por hacer (ámbar), no rojo.
+  switch (normalizeStatus(status)) {
     case "PENDING":
-      return "danger";
-    case "IN_PROGRESS":
       return "warning";
+    case "IN_PROGRESS":
+      return "primary";
     case "RESOLVED":
       return "success";
     case "CLOSED":
@@ -93,7 +108,7 @@ export function getSeverityLabel(severity: AISeverity | string): string {
     case "UNKNOWN":
       return "Desconocida";
     default:
-      return "Desconocida";
+      return "Sin prioridad";
   }
 }
 
@@ -109,25 +124,25 @@ export function getPriorityLabel(priority: Priority | string): string {
     case "LOW":
       return "Baja";
     default:
-      return "Desconocida";
+      return "Sin prioridad";
   }
 }
 
 // For Report Status labels
 export function getStatusLabel(status: ReportStatus | string): string {
-  switch (status) {
+  switch (normalizeStatus(status)) {
     case "PENDING":
       return "Pendiente";
     case "IN_PROGRESS":
       return "En progreso";
     case "RESOLVED":
-      return "Resuelto";
+      return "Resuelta";
     case "CLOSED":
-      return "Cerrado";
+      return "Cerrada";
     case "ARCHIVED":
-      return "Archivado";
+      return "Archivada";
     default:
-      return "Desconocido";
+      return "Sin estado";
   }
 }
 
@@ -310,7 +325,7 @@ export function getSourceLabel(source: string): string {
     EMAIL: "Correo electrónico",
     ETHIC_LINE: "Línea ética",
     CUSTOM_FORM: "Formulario personalizado",
-    API: "Reporte manual",
+    API: "Registro manual",
   };
 
   return sourceLabels[source] || source;

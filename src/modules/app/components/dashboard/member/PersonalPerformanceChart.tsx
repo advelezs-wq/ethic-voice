@@ -62,7 +62,7 @@ export const PersonalPerformanceChart: React.FC<
   return (
     <Card>
       <CardHeader className="flex flex-col items-start px-6 pt-6">
-        <h3 className="text-lg font-semibold text-[#0d212c]">
+        <h3 className="text-lg font-semibold text-ev-night">
           Mi Rendimiento Semanal
         </h3>
         <div className="flex items-center gap-4 mt-2">
@@ -74,7 +74,7 @@ export const PersonalPerformanceChart: React.FC<
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
             <span className="text-sm text-slate-500">Completados</span>
           </div>
-          <div className="text-sm font-medium text-[#0d212c]">
+          <div className="text-sm font-medium text-ev-night">
             Tasa de éxito: {(completionRate ?? 0).toFixed(1)}%
           </div>
         </div>
@@ -96,17 +96,17 @@ export const PersonalPerformanceChart: React.FC<
             <Line
               type="monotone"
               dataKey="asignados"
-              stroke="#3b82f6"
+              stroke="#244850"
               strokeWidth={2}
-              dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+              dot={{ fill: "#244850", strokeWidth: 2, r: 4 }}
               activeDot={{ r: 6 }}
             />
             <Line
               type="monotone"
               dataKey="completados"
-              stroke="#10b981"
+              stroke="#5E9427"
               strokeWidth={2}
-              dot={{ fill: "#10b981", strokeWidth: 2, r: 4 }}
+              dot={{ fill: "#5E9427", strokeWidth: 2, r: 4 }}
               activeDot={{ r: 6 }}
             />
           </LineChart>

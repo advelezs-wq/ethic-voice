@@ -70,16 +70,16 @@ export function ReportsContentWithTabs({
     <div className="space-y-6">
       <div className="ev-page-hero">
         <p className="ev-page-hero-kicker">
-          {isSuperAdmin ? "Centro de operaciones · Super Admin" : "Centro de casos · Organización"}
+          {isSuperAdmin ? "Super administrador" : "Canal de denuncias"}
         </p>
         <h1 className="ev-page-hero-title">
           {isSuperAdmin
             ? superAdminScope === "all"
-              ? "Gestión Global de Reportes"
-              : "Reportes por Organización"
+              ? "Denuncias de todas las organizaciones"
+              : "Denuncias por organización"
             : userRole === "ORG_ADMIN"
-              ? "Gestión de Reportes"
-              : "Mis Reportes Asignados"}
+              ? "Denuncias"
+              : "Mis denuncias asignadas"}
         </h1>
         <p className="ev-page-hero-description">
           {isSuperAdmin
@@ -87,12 +87,12 @@ export function ReportsContentWithTabs({
               ? "Administra reportes de todas las organizaciones en una sola vista."
               : `Estás viendo únicamente la organización seleccionada${selectedOrganizationName ? `: ${selectedOrganizationName}` : ""}.`
             : userRole === "ORG_ADMIN"
-              ? "Administra y da seguimiento a todas las denuncias de tu organización"
-              : "Revisa y gestiona los reportes que tienes asignados"}
+              ? "Todas las denuncias de tu organización: revisa, asigna y da seguimiento hasta el cierre."
+              : "Revisa y gestiona las denuncias que tienes asignadas"}
         </p>
       </div>
 
-      <Card className="border border-emerald-100 shadow-none">
+      <Card className="border border-ev-line shadow-none">
         <CardBody className="p-0">
           <Tabs
             selectedKey={selectedTab}
@@ -112,7 +112,7 @@ export function ReportsContentWithTabs({
               title={
                 <div className="flex items-center gap-2">
                   <i className="icon-[lucide--file-text] size-4" />
-                  <span>Reportes Activos</span>
+                  <span>Abiertas</span>
                   <span className="text-xs px-2 py-0.5 rounded-full border border-default-200 text-foreground-600">
                     {activeReports.totalCount}
                   </span>
@@ -124,7 +124,7 @@ export function ReportsContentWithTabs({
               title={
                 <div className="flex items-center gap-2">
                   <i className="icon-[lucide--archive] size-4" />
-                  <span>Reportes Archivados</span>
+                  <span>Archivadas</span>
                   <span className="text-xs px-2 py-0.5 rounded-full border border-default-200 text-foreground-600">
                     {archivedReports.totalCount}
                   </span>
@@ -136,7 +136,7 @@ export function ReportsContentWithTabs({
               title={
                 <div className="flex items-center gap-2">
                   <i className="icon-[lucide--lock] size-4" />
-                  <span>Reportes Cerrados</span>
+                  <span>Cerradas</span>
                   <span className="text-xs px-2 py-0.5 rounded-full border border-default-200 text-foreground-600">
                     {closedReports.totalCount}
                   </span>

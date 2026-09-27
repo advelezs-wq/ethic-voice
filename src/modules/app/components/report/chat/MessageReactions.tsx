@@ -42,7 +42,7 @@ export function MessageReactions({
           <span className="font-medium">{reaction.count}</span>
 
           {showTooltip === reaction.emoji && (
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-[#0d212c] text-white text-xs rounded whitespace-nowrap z-10">
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-ev-night text-white text-xs rounded whitespace-nowrap z-10">
               {reaction.users
                 .slice(0, 3)
                 .map((u) => u.userName)
@@ -60,7 +60,7 @@ export function MessageReactions({
       <div className="relative">
         <button
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="p-1 text-slate-400 hover:text-slate-500 hover:bg-emerald-50 rounded transition-colors"
+          className="p-1 text-slate-400 hover:text-slate-500 hover:bg-ev-paper rounded transition-colors"
           title="Añadir reacción"
         >
           <svg

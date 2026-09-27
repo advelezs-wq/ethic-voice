@@ -467,8 +467,8 @@ export default function CheckoutSidebar({
         {subscription && (
           <>
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-emerald-100 flex-shrink-0">
-              <h2 className="text-xl font-semibold text-[#0d212c]">
+            <div className="flex items-center justify-between p-6 border-b border-ev-line flex-shrink-0">
+              <h2 className="text-xl font-semibold text-ev-night">
                 Completar Pago
               </h2>
               <span className="text-sm text-slate-400 capitalize">
@@ -476,7 +476,7 @@ export default function CheckoutSidebar({
               </span>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-emerald-50 rounded-full transition-colors"
+                className="p-2 hover:bg-ev-paper rounded-full transition-colors"
                 disabled={paymentProcessing}
                 aria-label="Close checkout"
               >
@@ -525,10 +525,10 @@ export default function CheckoutSidebar({
 
               {/* Payment Processing Overlay */}
               {paymentProcessing && (
-                <div className="fixed inset-0 bg-white/90 flex items-center justify-center z-60">
+                <div className="fixed inset-0 bg-white flex items-center justify-center z-60">
                   <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto mb-4"></div>
-                    <h3 className="text-lg font-semibold text-[#0d212c] mb-2">
+                    <h3 className="text-lg font-semibold text-ev-night mb-2">
                       Processing Payment...
                     </h3>
                     <p className="text-slate-500">
@@ -562,7 +562,7 @@ export default function CheckoutSidebar({
                       ></path>
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2 text-[#0d212c]">
+                  <h3 className="text-lg font-semibold mb-2 text-ev-night">
                     Preparing Payment
                   </h3>
                   <p className="text-slate-500">
@@ -581,7 +581,7 @@ export default function CheckoutSidebar({
                   {/* Backup form - shown by default, hidden when Rebill form loads */}
                   <div
                     id="rebill-fallback-form"
-                    className="w-full bg-[#f7faf9] rounded-lg p-6 text-center"
+                    className="w-full bg-ev-paper rounded-lg p-6 text-center"
                     style={{ display: "block" }}
                   >
                     <div className="mb-6">
@@ -712,7 +712,7 @@ export default function CheckoutSidebar({
                         />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-semibold text-[#0d212c] mb-2">
+                    <h3 className="text-xl font-semibold text-ev-night mb-2">
                       ¡Orden confirmada!
                     </h3>
                     <p className="text-slate-500 text-sm mb-4">

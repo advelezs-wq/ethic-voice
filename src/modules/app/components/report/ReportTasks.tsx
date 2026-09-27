@@ -187,7 +187,7 @@ function TaskFormModal({
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader className="flex items-start gap-3 pb-0 border-b border-emerald-50">
+            <ModalHeader className="flex items-start gap-3 pb-0 border-b border-ev-line">
               <div
                 className={`p-2 rounded-xl mt-0.5 shrink-0 ${
                   isEdit
@@ -208,7 +208,7 @@ function TaskFormModal({
                 />
               </div>
               <div className="min-w-0">
-                <p className="text-base font-semibold text-[#0d212c] leading-tight">
+                <p className="text-base font-semibold text-ev-night leading-tight">
                   {isEdit
                     ? "Editar tarea"
                     : parentTask
@@ -328,7 +328,7 @@ function TaskFormModal({
               />
             </ModalBody>
 
-            <ModalFooter className="border-t border-emerald-50 pt-3">
+            <ModalFooter className="border-t border-ev-line pt-3">
               <Button variant="light" onPress={onClose} isDisabled={isSaving}>
                 Cancelar
               </Button>
@@ -389,7 +389,7 @@ function CompleteTaskModal({
                 <i className="icon-[lucide--circle-check] size-4 text-green-700" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#0d212c]">Cerrar tarea</p>
+                <p className="text-sm font-semibold text-ev-night">Cerrar tarea</p>
                 <p className="text-xs text-slate-400 font-normal">
                   Documenta los hallazgos antes de cerrar
                 </p>
@@ -398,9 +398,9 @@ function CompleteTaskModal({
 
             <ModalBody className="gap-4">
               {/* Task card */}
-              <div className="bg-emerald-50/40 border border-emerald-100 rounded-xl p-3">
+              <div className="bg-ev-paper border border-ev-line rounded-xl p-3">
                 <p className="text-xs text-slate-400 mb-1">Tarea a cerrar</p>
-                <p className="text-sm font-semibold text-[#0d212c]">{task?.title}</p>
+                <p className="text-sm font-semibold text-ev-night">{task?.title}</p>
                 {task?.description && (
                   <p className="text-xs text-slate-400 mt-1 line-clamp-2">{task.description}</p>
                 )}
@@ -580,7 +580,7 @@ function TaskCard({
     <motion.div layout transition={{ duration: 0.15 }}>
       <div
         className={`group rounded-xl border bg-white shadow-sm transition-all hover:shadow-md ${
-          status === "completed" ? "border-green-200 bg-green-50/20" : "border-emerald-100"
+          status === "completed" ? "border-green-200 bg-green-50/20" : "border-ev-line"
         } ${depth > 0 ? "border-l-4 border-l-blue-200" : ""}`}
       >
         {/* Main row */}
@@ -607,7 +607,7 @@ function TaskCard({
                   </span>
                   <span
                     className={`text-sm font-semibold leading-snug ${
-                      status === "completed" ? "line-through text-slate-400" : "text-[#0d212c]"
+                      status === "completed" ? "line-through text-slate-400" : "text-ev-night"
                     }`}
                   >
                     {task.title}
@@ -717,7 +717,7 @@ function TaskCard({
               className="overflow-hidden"
             >
               <Divider />
-              <div className="px-4 py-3 space-y-3 bg-emerald-50/40/50 rounded-b-xl">
+              <div className="px-4 py-3 space-y-3 bg-ev-paper/50 rounded-b-xl">
                 {task.description && (
                   <div>
                     <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">
@@ -1074,7 +1074,7 @@ export const ReportTasks: React.FC<ReportTasksProps> = ({ reportId }) => {
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h2 className="text-base font-semibold text-[#0d212c] flex items-center gap-2">
+            <h2 className="text-base font-semibold text-ev-night flex items-center gap-2">
               <i className="icon-[lucide--check-square] size-4 text-sky-700" />
               Tareas de investigación
             </h2>
@@ -1115,11 +1115,11 @@ export const ReportTasks: React.FC<ReportTasksProps> = ({ reportId }) => {
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 rounded-xl border border-emerald-100 bg-emerald-50 animate-pulse" />
+              <div key={i} className="h-16 rounded-xl border border-ev-line bg-emerald-50 animate-pulse" />
             ))}
           </div>
         ) : tasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 rounded-xl border-2 border-dashed border-emerald-100 bg-emerald-50/40 text-center">
+          <div className="flex flex-col items-center justify-center py-16 rounded-xl border-2 border-dashed border-ev-line bg-ev-paper text-center">
             <div className="p-4 bg-sky-50 rounded-2xl mb-4">
               <i className="icon-[lucide--clipboard-list] size-10 text-sky-400" />
             </div>

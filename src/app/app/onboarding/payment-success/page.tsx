@@ -248,7 +248,7 @@ Please help me resolve this issue.`);
   const config = getStatusConfig();
 
   return (
-    <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-ev-paper flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -262,7 +262,7 @@ Please help me resolve this issue.`);
                 className={`${config.icon} w-16 h-16 ${config.color} ${status === "loading" ? "animate-spin" : ""}`}
               />
             </div>
-            <h1 className="text-2xl font-bold text-[#0d212c]">{config.title}</h1>
+            <h1 className="text-2xl font-bold text-ev-night">{config.title}</h1>
           </CardHeader>
           <CardBody className="text-center flex flex-col items-center">
             <p className="text-slate-500 mb-6 leading-relaxed">
@@ -315,7 +315,7 @@ Please help me resolve this issue.`);
 
             {(status === "success" || status === "pending") && (
               <div className="bg-sky-50 rounded-lg p-4 mt-6">
-                <p className="text-sm text-sky-700">
+                <p className="ev-label mt-1 text-ev-mute">
                   <strong>¿Qué sigue?</strong>
                   <br />
                   Crea tu organización y empieza a configurar tu canal de

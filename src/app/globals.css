@@ -16,7 +16,7 @@ html {
 }
 
 body {
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
 }
 
 @keyframes fadeInUp {
@@ -63,46 +63,47 @@ body {
 
 @layer components {
 
+  /* Dashboard — superficies de marca (BRAND.md). Papel para el contenido,
+     tinta para la navegación; sin degradados ni halos. */
   .ev-app-shell {
-    @apply relative overflow-hidden bg-gradient-to-br from-[#f8fbfa] via-white to-[#f2f9f5];
-  }
-
-  .ev-app-shell::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-      radial-gradient(circle at 0% 0%, rgba(94, 210, 156, 0.16), transparent 38%),
-      radial-gradient(circle at 100% 0%, rgba(163, 230, 53, 0.1), transparent 32%);
+    @apply relative flex h-screen flex-col overflow-hidden bg-ev-paper;
+    font-family: var(--font-display), system-ui, sans-serif;
   }
 
   .ev-header-surface {
-    @apply border-b border-emerald-100/80 bg-white/85 backdrop-blur;
+    @apply sticky top-0 z-20 border-b border-ev-line/80 bg-ev-paper/85 backdrop-blur-xl backdrop-saturate-150;
   }
 
   .ev-sidebar-surface {
-    @apply border-r border-emerald-100/80 bg-white/95 backdrop-blur;
+    @apply bg-ev-night text-white;
+    font-family: var(--font-display), system-ui, sans-serif;
   }
 
   .ev-content-surface {
-    @apply rounded-3xl border border-emerald-100 bg-white/90 shadow-[0_22px_50px_-34px_rgba(5,26,36,0.45)];
+    @apply mx-auto w-full max-w-[96rem];
   }
 
+  /* Encabezado de página (mismo lenguaje que <PageHero>): etiqueta mono con
+     el cuadro lima, titular Geist y regla fina — sobre papel, no banda oscura. */
   .ev-page-hero {
-    @apply rounded-3xl border border-emerald-200/70 bg-gradient-to-br from-[#051a24] via-[#0d212c] to-[#041018] px-5 py-5 text-white shadow-[0_20px_60px_-36px_rgba(5,26,36,0.72)] sm:px-7 sm:py-6;
+    @apply relative mb-2 border-b border-ev-line pb-6 text-ev-night;
   }
 
   .ev-page-hero-kicker {
-    @apply text-[11px] font-bold uppercase tracking-[0.2em] text-lime-300;
+    @apply flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.06em] text-ev-mute;
+  }
+
+  .ev-page-hero-kicker::before {
+    content: "";
+    @apply h-1.5 w-1.5 shrink-0 bg-ev-signal;
   }
 
   .ev-page-hero-title {
-    @apply mt-2 text-xl font-semibold sm:text-2xl;
+    @apply mt-3 text-[clamp(1.625rem,2.6vw,2.25rem)] font-semibold leading-[1.08] tracking-[-0.035em] text-ev-night;
   }
 
   .ev-page-hero-description {
-    @apply mt-1 text-sm text-slate-200 sm:text-base;
+    @apply mt-2 max-w-2xl text-[0.9375rem] leading-relaxed text-ev-mute;
   }
 
   /* SIDEBAR */
@@ -260,4 +261,13 @@ body {
   .ev-floating-whatsapp .floating-whatsapp-button {
     bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)) !important;
   }
+}
+/* Dashboard: las Card de HeroUI traen sombra por defecto; el sistema de marca
+   separa superficies con una regla fina, no con sombras (BRAND.md § Layout).
+   Solo dentro del shell: modales y popovers (en portal) conservan su sombra. */
+.ev-app-shell .bg-content1.shadow-small,
+.ev-app-shell .bg-content1.shadow-medium,
+.ev-app-shell .bg-content1.shadow-large {
+  box-shadow: none;
+  border: 1px solid var(--ev-line);
 }

@@ -217,7 +217,7 @@ export function IPRequestTreeChart({
         </div>
 
         {data.length > 20 && (
-          <div className="text-center pt-4 border-t border-emerald-100">
+          <div className="text-center pt-4 border-t border-ev-line">
             <p className="text-sm text-slate-400">
               Mostrando top 20 de {data.length} IPs activas
             </p>

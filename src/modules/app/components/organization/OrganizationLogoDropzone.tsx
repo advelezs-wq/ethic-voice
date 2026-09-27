@@ -205,7 +205,7 @@ export function OrganizationLogoDropzone({
           {currentLogo ? (
             <div className="space-y-4">
               {/* Current Logo Preview */}
-              <div className="border-2 border-dashed border-emerald-200 rounded-lg p-6 bg-[#f7faf9]">
+              <div className="border-2 border-dashed border-ev-line rounded-lg p-6 bg-ev-paper">
                 <div className="flex items-center justify-center">
                   <div className="max-w-xs mx-auto bg-white rounded-lg p-4 shadow-sm">
                     <Image
@@ -247,7 +247,7 @@ export function OrganizationLogoDropzone({
                 "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all",
                 isDragActive
                   ? "border-primary bg-primary-50 border-solid"
-                  : "border-emerald-200 hover:border-slate-400 hover:bg-[#f7faf9]",
+                  : "border-ev-line hover:border-slate-400 hover:bg-ev-paper",
                 uploading && "pointer-events-none opacity-50"
               )}
             >
@@ -261,7 +261,7 @@ export function OrganizationLogoDropzone({
                   )}
                 </div>
                 <div>
-                  <h4 className="text-lg font-medium text-[#0d212c]">
+                  <h4 className="text-lg font-medium text-ev-night">
                     {isDragActive
                       ? "Suelta el archivo aquí"
                       : "Arrastra el logo aquí o haz clic para seleccionar"}

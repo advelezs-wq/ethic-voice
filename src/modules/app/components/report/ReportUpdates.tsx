@@ -223,11 +223,11 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h2 className="text-base font-semibold text-[#0d212c]">
-              Actualizaciones del caso
+            <h2 className="text-base font-semibold text-ev-night">
+              Avances de la investigación
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              Registro de hitos, avances y decisiones
+              Registra hitos, hallazgos y decisiones. Quedan en el expediente para auditoría.
             </p>
           </div>
           {!isReportClosed && (
@@ -237,7 +237,7 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
               onPress={openAdd}
               startContent={<i className="icon-[lucide--plus] size-3.5" />}
             >
-              Nueva actualización
+              Registrar avance
             </Button>
           )}
         </div>
@@ -256,11 +256,11 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={i} className="h-24 rounded-xl border border-emerald-100 bg-emerald-50 animate-pulse" />
+              <div key={i} className="h-24 rounded-xl border border-ev-line bg-emerald-50 animate-pulse" />
             ))}
           </div>
         ) : updates.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-14 rounded-xl border-2 border-dashed border-emerald-100 bg-emerald-50/40 text-center">
+          <div className="flex flex-col items-center justify-center py-14 rounded-xl border-2 border-dashed border-ev-line bg-ev-paper text-center">
             <i className="icon-[lucide--list-checks] size-10 text-slate-300 mb-3" />
             <p className="text-sm font-semibold text-slate-400">Sin actualizaciones</p>
             <p className="text-xs text-slate-400 mt-1">
@@ -296,7 +296,7 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
                           placement="left"
                         >
                           <button
-                            className="p-1.5 rounded-lg hover:bg-emerald-50 transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-ev-paper transition-colors"
                             onClick={() => {
                               const next: Record<UpdateStatus, UpdateStatus> = {
                                 pending: "in_progress",
@@ -334,7 +334,7 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
                             className={`text-sm font-semibold ${
                               u.status === "completed"
                                 ? "line-through text-slate-400"
-                                : "text-[#0d212c]"
+                                : "text-ev-night"
                             }`}
                           >
                             {u.title}
@@ -421,8 +421,8 @@ export const ReportUpdates: React.FC<ReportUpdatesProps> = ({ reportId, report }
                               disabled={isSaving || u.status === key}
                               className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-colors border ${
                                 u.status === key
-                                  ? "bg-emerald-50 border-emerald-100 text-slate-400 cursor-default"
-                                  : "border-transparent hover:bg-emerald-50 text-slate-400 hover:text-[#0d212c]"
+                                  ? "bg-emerald-50 border-ev-line text-slate-400 cursor-default"
+                                  : "border-transparent hover:bg-ev-paper text-slate-400 hover:text-ev-night"
                               }`}
                             >
                               <i className={`${cfg.icon} size-3`} />

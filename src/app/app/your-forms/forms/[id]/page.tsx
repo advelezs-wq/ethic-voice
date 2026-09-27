@@ -31,18 +31,18 @@ const FormDetailPage = async ({
 
   return (
     <>
-      <div className="py-10 border-y border-emerald-100">
+      <div className="py-10 border-y border-ev-line">
         <div className="flex justify-between container">
           <h1 className="text-4xl font-bold truncate">{form.title}</h1>
           <VisitBtn shareUrl={form.shareURL} />
         </div>
       </div>
-      <div className="py-4 border-b border-emerald-100">
+      <div className="py-4 border-b border-ev-line">
         <div className="container flex gap-2 items-center justify-between">
           <FormLinkShare shareUrl={form.shareURL} />
           <Link
             href={`/app/your-forms/forms/${form.id}/poster`}
-            className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm text-emerald-900 hover:bg-emerald-50 transition-all shrink-0"
+            className="inline-flex items-center gap-1.5 rounded-full border border-ev-line bg-white px-3.5 py-1.5 text-sm text-emerald-900 hover:bg-ev-paper transition-all shrink-0"
           >
             <i className="icon-[lucide--qr-code] size-4" />
             Póster QR

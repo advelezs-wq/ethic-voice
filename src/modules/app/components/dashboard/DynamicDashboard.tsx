@@ -50,12 +50,13 @@ export const DynamicDashboard: React.FC<DynamicDashboardProps> = ({
   // Helper function to get grid class based on size
   const getGridClass = (size: string) => {
     switch (size) {
+      // Retícula de 2 columnas: los gráficos "medium" y "small" van en pareja,
+      // los bloques "large" ocupan el ancho completo. Sin huecos a la derecha.
       case "small":
-        return "col-span-1";
       case "medium":
-        return "col-span-1 lg:col-span-2";
+        return "col-span-1";
       case "large":
-        return "col-span-1 lg:col-span-3";
+        return "col-span-1 lg:col-span-2";
       default:
         return "col-span-1";
     }
@@ -132,7 +133,7 @@ export const DynamicDashboard: React.FC<DynamicDashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {visibleElements.map((element) => renderElement(element))}
       </div>
     </div>

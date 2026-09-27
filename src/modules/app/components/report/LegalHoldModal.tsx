@@ -43,13 +43,13 @@ export function LegalHoldModal({
       await setLegalHold(reportId, !currentlyOnHold, reason);
       showSuccess(
         currentlyOnHold
-          ? "Legal hold retirado — el caso vuelve a seguir la política de retención normal"
-          : "Legal hold activado — este caso no se eliminará automáticamente"
+          ? "Retención legal retirada: el caso vuelve a la política de conservación normal"
+          : "Retención legal activada: este caso no se eliminará automáticamente"
       );
       onSuccess?.();
       handleClose();
     } catch (e) {
-      showError(e instanceof Error ? e.message : "No se pudo actualizar el legal hold");
+      showError(e instanceof Error ? e.message : "No se pudo actualizar la retención legal");
     } finally {
       setIsSubmitting(false);
     }
@@ -62,7 +62,7 @@ export function LegalHoldModal({
           <>
             <ModalHeader className="flex flex-col gap-1">
               <h3 className="text-lg font-semibold">
-                {currentlyOnHold ? "Retirar Legal Hold" : "Activar Legal Hold"}
+                {currentlyOnHold ? "Retirar retención legal" : "Activar retención legal"}
               </h3>
               <p className="text-sm text-slate-500 font-normal">
                 {currentlyOnHold
@@ -92,7 +92,7 @@ export function LegalHoldModal({
                 isLoading={isSubmitting}
                 isDisabled={!currentlyOnHold && !reason.trim()}
               >
-                {currentlyOnHold ? "Retirar Legal Hold" : "Activar Legal Hold"}
+                {currentlyOnHold ? "Retirar retención legal" : "Activar retención legal"}
               </Button>
             </ModalFooter>
           </>

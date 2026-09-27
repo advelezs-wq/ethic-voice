@@ -140,7 +140,7 @@ export function EmojiPicker({
                     onSelect(emoji);
                     onClose();
                   }}
-                  className="p-2 hover:bg-emerald-50 rounded transition-colors text-lg"
+                  className="p-2 hover:bg-ev-paper rounded transition-colors text-lg"
                   title={emoji}
                 >
                   {emoji}

@@ -5,24 +5,25 @@ import React from "react";
 import { Tabs, Tab } from "@heroui/tabs";
 import { NotificationPreferences } from "@/modules/app/components/profile/NotificationPreferences";
 import { PageHero } from "@/modules/app/components/ui";
+import { ethicvoiceAuthAppearance } from "@/lib/ethicvoice-clerk-appearance";
 
 const Profile = () => {
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="space-y-6">
       <PageHero
         kicker="Cuenta"
-        title="Mi Perfil"
-        description="Administra tu información personal y preferencias de notificaciones"
+        title="Mi perfil"
+        description="Tus datos de acceso y los avisos que quieres recibir por correo."
       />
 
       <Tabs aria-label="Opciones del perfil" className="w-full">
-        <Tab key="profile" title="Ajustes del Perfil">
-          <div className="mt-6 flex justify-center">
-            <UserProfile />
+        <Tab key="profile" title="Datos y seguridad">
+          <div className="mt-6">
+            <UserProfile routing="hash" appearance={ethicvoiceAuthAppearance} />
           </div>
         </Tab>
 
-        <Tab key="notifications" title="Preferencias de Notificaciones">
+        <Tab key="notifications" title="Notificaciones">
           <div className="mt-6 max-h-[70vh] overflow-y-auto">
             <NotificationPreferences />
           </div>

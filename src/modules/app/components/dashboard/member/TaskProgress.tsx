@@ -52,7 +52,7 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
   return (
     <Card>
       <CardHeader>
-        <h3 className="text-lg font-semibold text-[#0d212c]">
+        <h3 className="text-lg font-semibold text-ev-night">
           Estado de Mis Tareas
         </h3>
       </CardHeader>
@@ -87,7 +87,7 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
                 <span className="text-sm text-slate-500">{item.label}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-[#0d212c]">
+                <span className="text-sm font-medium text-ev-night">
                   {item.count}
                 </span>
                 <Chip
@@ -109,7 +109,7 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
           </h4>
           <div className="grid grid-cols-2 gap-3">
             <div className="text-center p-3 bg-red-50 rounded-lg">
-              <div className="text-2xl font-bold text-red-600">
+              <div className="ev-num text-2xl font-semibold text-ev-night">
                 {priorityCounts.urgent}
               </div>
               <div className="text-xs text-red-600 font-medium">
@@ -117,7 +117,7 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
               </div>
             </div>
             <div className="text-center p-3 bg-orange-50 rounded-lg">
-              <div className="text-2xl font-bold text-orange-600">
+              <div className="ev-num text-2xl font-semibold text-ev-night">
                 {priorityCounts.high}
               </div>
               <div className="text-xs text-orange-600 font-medium">
@@ -125,7 +125,7 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
               </div>
             </div>
             <div className="text-center p-3 bg-yellow-50 rounded-lg">
-              <div className="text-2xl font-bold text-yellow-600">
+              <div className="ev-num text-2xl font-semibold text-ev-night">
                 {priorityCounts.normal}
               </div>
               <div className="text-xs text-yellow-600 font-medium">
@@ -133,7 +133,7 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
               </div>
             </div>
             <div className="text-center p-3 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">
+              <div className="ev-num text-2xl font-semibold text-ev-night">
                 {priorityCounts.low}
               </div>
               <div className="text-xs text-green-600 font-medium">
@@ -144,7 +144,7 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
         </div>
 
         {/* Quick Actions */}
-        <div className="pt-4 border-t border-emerald-100">
+        <div className="pt-4 border-t border-ev-line">
           <div className="text-sm text-slate-400 text-center">
             {statusCounts.new > 0
               ? `Tienes ${statusCounts.new} caso${statusCounts.new > 1 ? 's' : ''} nuevo${statusCounts.new > 1 ? 's' : ''} por revisar`

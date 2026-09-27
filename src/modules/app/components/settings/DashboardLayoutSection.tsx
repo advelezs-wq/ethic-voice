@@ -23,7 +23,7 @@ const DEFAULT_ELEMENTS: DashboardElement[] = [
     id: "stats-cards",
     name: "Tarjetas de Estadísticas",
     description:
-      "Resumen de métricas principales (total reportes, pendientes, etc.)",
+      "Resumen de cifras principales (total de denuncias, pendientes, etc.)",
     icon: "icon-[lucide--bar-chart-3]",
     isVisible: true,
     position: 1,
@@ -31,8 +31,8 @@ const DEFAULT_ELEMENTS: DashboardElement[] = [
   },
   {
     id: "recent-reports",
-    name: "Reportes Recientes",
-    description: "Lista de los últimos reportes recibidos",
+    name: "Denuncias recientes",
+    description: "Lista de las últimas denuncias recibidas",
     icon: "icon-[lucide--file-text]",
     isVisible: true,
     position: 2,
@@ -40,8 +40,8 @@ const DEFAULT_ELEMENTS: DashboardElement[] = [
   },
   {
     id: "assigned-reports",
-    name: "Reportes Asignados",
-    description: "Reportes asignados al usuario actual",
+    name: "Denuncias asignadas",
+    description: "Denuncias asignadas a ti",
     icon: "icon-[lucide--user-check]",
     isVisible: true,
     position: 3,
@@ -59,7 +59,7 @@ const DEFAULT_ELEMENTS: DashboardElement[] = [
   {
     id: "severity-chart",
     name: "Gráfico de Severidad",
-    description: "Distribución de reportes por nivel de severidad",
+    description: "Distribución de denuncias por severidad",
     icon: "icon-[lucide--alert-triangle]",
     isVisible: true,
     position: 5,
@@ -258,7 +258,7 @@ export function DashboardLayoutSection({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-lg font-medium text-[#0d212c]">
+          <h4 className="text-lg font-medium text-ev-night">
             Elementos del Dashboard
           </h4>
           <div className="flex gap-2">
@@ -286,7 +286,7 @@ export function DashboardLayoutSection({
                 draggedElement === element.id
                   ? "opacity-50 transform rotate-2"
                   : ""
-              } ${!element.isVisible ? "opacity-60 bg-[#f7faf9]" : ""}`}
+              } ${!element.isVisible ? "opacity-60 bg-ev-paper" : ""}`}
             >
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-3 flex-1">
@@ -296,7 +296,7 @@ export function DashboardLayoutSection({
 
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h5 className="font-medium text-[#0d212c]">
+                      <h5 className="font-medium text-ev-night">
                         {element.name}
                       </h5>
                       <Chip
@@ -362,7 +362,7 @@ export function DashboardLayoutSection({
       <div className="border-t pt-6">
         <div className="flex items-center justify-between">
           <div>
-            <h5 className="font-medium text-[#0d212c]">Guardar Configuración</h5>
+            <h5 className="font-medium text-ev-night">Guardar Configuración</h5>
             <p className="text-sm text-slate-500">
               Los cambios se aplicarán a tu dashboard inmediatamente
             </p>

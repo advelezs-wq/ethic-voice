@@ -441,7 +441,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
         <div className="flex items-center gap-3">
           <i className="icon-[lucide--shield-check] size-8 text-green-600" />
           <div>
-            <h1 className="text-2xl font-bold text-[#0d212c]">Dashboard de Seguridad</h1>
+            <h1 className="text-2xl font-bold text-ev-night">Dashboard de Seguridad</h1>
             <p className="text-slate-500">
               Monitoreo y gestión de protecciones contra bots y ataques
             </p>
@@ -471,7 +471,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
 
       {/* Debug Information */}
       {showDebug && debugInfo && (
-        <Card className="p-6 bg-[#f7faf9] border-2 border-emerald-100">
+        <Card className="p-6 bg-ev-paper border-2 border-ev-line">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <i className="icon-[lucide--bug] size-5 text-slate-500" />
@@ -554,7 +554,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               <i className="icon-[lucide--shield-alert] size-6 text-red-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#0d212c]">{stats.blockedIPs.length}</p>
+              <p className="text-2xl font-bold text-ev-night">{stats.blockedIPs.length}</p>
               <p className="text-sm text-slate-500">IPs Bloqueadas</p>
             </div>
           </div>
@@ -566,7 +566,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               <i className="icon-[lucide--eye] size-6 text-yellow-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#0d212c]">{stats.suspiciousIPs.length}</p>
+              <p className="text-2xl font-bold text-ev-night">{stats.suspiciousIPs.length}</p>
               <p className="text-sm text-slate-500">IPs Sospechosas</p>
             </div>
           </div>
@@ -578,7 +578,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               <i className="icon-[lucide--zap] size-6 text-sky-700" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#0d212c]">{stats.rateLimitStats.captchaRequired}</p>
+              <p className="text-2xl font-bold text-ev-night">{stats.rateLimitStats.captchaRequired}</p>
               <p className="text-sm text-slate-500">Captchas Requeridos</p>
             </div>
           </div>
@@ -590,7 +590,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               <i className="icon-[lucide--check-circle] size-6 text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#0d212c]">
+              <p className="text-2xl font-bold text-ev-night">
                 {Math.round((stats.rateLimitStats.captchaPassed / stats.rateLimitStats.captchaRequired) * 100) || 0}%
               </p>
               <p className="text-sm text-slate-500">Tasa de Éxito</p>
@@ -604,7 +604,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               <i className="icon-[lucide--file-warning] size-6 text-purple-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#0d212c]">{stats.quarantineFiles.length}</p>
+              <p className="text-2xl font-bold text-ev-night">{stats.quarantineFiles.length}</p>
               <p className="text-sm text-slate-500">Archivos en Cuarentena</p>
             </div>
           </div>
@@ -616,7 +616,7 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               <i className="icon-[lucide--repeat] size-6 text-indigo-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#0d212c]">{stats.idempotencyStats.collisions}</p>
+              <p className="text-2xl font-bold text-ev-night">{stats.idempotencyStats.collisions}</p>
               <p className="text-sm text-slate-500">Colisiones Idempotencia</p>
             </div>
           </div>
@@ -632,21 +632,21 @@ export function SecurityDashboard({ userRole }: SecurityDashboardProps) {
               Métricas de Idempotencia
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="rounded-lg bg-[#f7faf9] p-3">
+              <div className="rounded-lg bg-ev-paper p-3">
                 <p className="text-xs text-slate-400">Intentos</p>
                 <p className="text-xl font-bold">{stats.idempotencyStats.attempts}</p>
               </div>
               <div className="rounded-lg bg-green-50 p-3">
                 <p className="text-xs text-slate-400">Locks OK</p>
-                <p className="text-xl font-bold text-green-700">{stats.idempotencyStats.acquired}</p>
+                <p className="ev-num text-xl font-semibold text-ev-night">{stats.idempotencyStats.acquired}</p>
               </div>
               <div className="rounded-lg bg-orange-50 p-3">
                 <p className="text-xs text-slate-400">Colisiones</p>
-                <p className="text-xl font-bold text-orange-700">{stats.idempotencyStats.collisions}</p>
+                <p className="ev-num text-xl font-semibold text-ev-night">{stats.idempotencyStats.collisions}</p>
               </div>
               <div className="rounded-lg bg-red-50 p-3">
                 <p className="text-xs text-slate-400">Invalid Key</p>
-                <p className="text-xl font-bold text-red-700">{stats.idempotencyStats.invalid}</p>
+                <p className="ev-num text-xl font-semibold text-ev-night">{stats.idempotencyStats.invalid}</p>
               </div>
             </div>
           </div>

@@ -50,7 +50,7 @@ export function Step3Questions() {
   if (isReporteLibre) {
     return (
       <div className="space-y-6">
-        <p className="text-[#273c46]">
+        <p className="text-ev-mute">
           Redacte el caso con el mayor detalle posible para una mejor
           investigación.
         </p>
@@ -79,26 +79,26 @@ export function Step3Questions() {
   const checkboxCardClassNames = {
     base: "m-0 w-full max-w-full items-center rounded-lg border-2 border-slate-300 bg-white px-3 py-2 transition-colors hover:border-emerald-500 data-[selected=true]:border-emerald-600 data-[selected=true]:bg-emerald-50",
     wrapper: "before:border-2 before:border-slate-400 after:bg-emerald-600",
-    label: "text-sm text-[#273c46]",
+    label: "text-sm text-ev-mute",
   } as const;
 
   const radioCardClassNames = {
     base: "m-0 w-full max-w-full rounded-lg border-2 border-slate-300 bg-white px-3 py-2 transition-colors hover:border-emerald-500 data-[selected=true]:border-emerald-600 data-[selected=true]:bg-emerald-50",
     wrapper: "border-2 border-slate-400 group-data-[selected=true]:border-emerald-600",
     control: "bg-emerald-600",
-    label: "text-sm text-[#273c46]",
+    label: "text-sm text-ev-mute",
   } as const;
 
   return (
     <div className="space-y-8">
-      <p className="text-[#273c46]">
+      <p className="text-ev-mute">
         Complete las siguientes preguntas para ayudarnos a entender mejor la
         situación.
       </p>
 
       {/* Question 1: What happened - Multiple selection with individual checkboxes */}
-      <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
-        <label className="text-sm font-semibold text-[#0a1e14]">
+      <div className="space-y-2 rounded-2xl border border-ev-night/10 bg-ev-paper p-4">
+        <label className="text-sm font-semibold text-ev-night">
           ¿En qué consistió el hecho? * (Seleccione todas las que apliquen)
         </label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -127,8 +127,8 @@ export function Step3Questions() {
       </div>
 
       {/* Question 2: How it happened - Multiple selection with individual checkboxes */}
-      <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
-        <label className="text-sm font-semibold text-[#0a1e14]">
+      <div className="space-y-2 rounded-2xl border border-ev-night/10 bg-ev-paper p-4">
+        <label className="text-sm font-semibold text-ev-night">
           ¿Cómo se llevó a cabo? * (Seleccione todas las que apliquen)
         </label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -158,8 +158,8 @@ export function Step3Questions() {
 
       {/* Question 3: Where and When - Split into two parts */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
-          <label className="text-sm font-semibold text-[#0a1e14]">
+        <div className="space-y-2 rounded-2xl border border-ev-night/10 bg-ev-paper p-4">
+          <label className="text-sm font-semibold text-ev-night">
             ¿Dónde sucedió? *
           </label>
           <Controller
@@ -188,8 +188,8 @@ export function Step3Questions() {
           />
         </div>
 
-        <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
-          <label className="text-sm font-semibold text-[#0a1e14]">
+        <div className="space-y-2 rounded-2xl border border-ev-night/10 bg-ev-paper p-4">
+          <label className="text-sm font-semibold text-ev-night">
             ¿Cuándo sucedió? *
           </label>
           <Controller
@@ -220,8 +220,8 @@ export function Step3Questions() {
       </div>
 
       {/* Question 4: Other involved - Radio + Text */}
-      <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
-        <label className="text-sm font-semibold text-[#0a1e14]">
+      <div className="space-y-2 rounded-2xl border border-ev-night/10 bg-ev-paper p-4">
+        <label className="text-sm font-semibold text-ev-night">
           ¿Considera que existen otros involucrados?
         </label>
         <Controller
@@ -253,7 +253,7 @@ export function Step3Questions() {
       </div>
 
       {/* Additional details - Always show */}
-      <div className="space-y-2 rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
+      <div className="space-y-2 rounded-2xl border border-ev-night/10 bg-ev-paper p-4">
         <Controller
           name="questionnaire.additionalDetails"
           control={control}

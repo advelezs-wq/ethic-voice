@@ -67,7 +67,7 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
   return (
     <Card className="w-full">
       {/* Header - Always visible */}
-      <div className="p-4 border-b border-emerald-100">
+      <div className="p-4 border-b border-ev-line">
         <Button
           variant="light"
           className="w-full justify-between p-0 h-auto"
@@ -76,7 +76,7 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
           <div className="flex items-center gap-3">
             <span className="text-xl">📎</span>
             <div className="text-left">
-              <h3 className="font-semibold text-[#0d212c]">
+              <h3 className="font-semibold text-ev-night">
                 Archivos Adjuntos ({attachments.length})
               </h3>
               <p className="text-sm text-slate-400">
@@ -105,7 +105,7 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
           {/* Images Section */}
           {imageAttachments.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-medium text-[#0d212c] flex items-center gap-2">
+              <h4 className="font-medium text-ev-night flex items-center gap-2">
                 <span>🖼️</span>
                 Imágenes ({imageAttachments.length})
               </h4>
@@ -155,7 +155,7 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
           {/* Media Section (Audio/Video) */}
           {mediaAttachments.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-medium text-[#0d212c] flex items-center gap-2">
+              <h4 className="font-medium text-ev-night flex items-center gap-2">
                 <span>🎬</span>
                 Multimedia ({mediaAttachments.length})
               </h4>
@@ -169,7 +169,7 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
                             {getFileIcon(attachment.mimeType)}
                           </span>
                           <div>
-                            <h5 className="font-medium text-[#0d212c]">{attachment.filename}</h5>
+                            <h5 className="font-medium text-ev-night">{attachment.filename}</h5>
                             <p className="text-sm text-slate-400">
                               {getFileTypeLabel(attachment.mimeType)} • {formatFileSize(attachment.fileSize)}
                             </p>
@@ -228,20 +228,20 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
           {/* Documents Section */}
           {documentAttachments.length > 0 && (
             <div className="space-y-3">
-              <h4 className="font-medium text-[#0d212c] flex items-center gap-2">
+              <h4 className="font-medium text-ev-night flex items-center gap-2">
                 <span>📄</span>
                 Documentos ({documentAttachments.length})
               </h4>
               <div className="space-y-2">
                 {documentAttachments.map((attachment) => (
-                  <Card key={attachment.id} className="p-4 hover:bg-emerald-50/40 transition-colors">
+                  <Card key={attachment.id} className="p-4 hover:bg-ev-paper transition-colors">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">
                           {getFileIcon(attachment.mimeType)}
                         </span>
                         <div>
-                          <h5 className="font-medium text-[#0d212c]">{attachment.filename}</h5>
+                          <h5 className="font-medium text-ev-night">{attachment.filename}</h5>
                           <p className="text-sm text-slate-400">
                             {getFileTypeLabel(attachment.mimeType)} • {formatFileSize(attachment.fileSize)}
                           </p>
@@ -274,7 +274,7 @@ export function ReportAttachments({ attachments }: ReportAttachmentsProps) {
           )}
 
           {/* Quick actions */}
-          <div className="pt-4 border-t border-emerald-100">
+          <div className="pt-4 border-t border-ev-line">
             <div className="flex justify-between items-center">
               <p className="text-xs text-slate-400">
                 💡 Haz clic en los archivos para ver o descargar

@@ -9,6 +9,7 @@ import { ReportsHeader } from "./ReportsHeader";
 import { ReportsStats } from "./ReportsStats";
 import { ReportsFilters } from "./ReportsFilters";
 import { ReportsTable } from "./ReportsTable";
+import { getDeadlineInfo } from "../../utils/dashboard.utils";
 import { useAnalytics } from "../../context/AnalyticsContext";
 import { useSafeToast } from "../../hooks/useSafeToast";
 
@@ -82,6 +83,19 @@ export function ReportsContent({
     };
   }, [refreshReportsStats, router]);
 
+  // El plazo se calcula por tipología y fecha (getDeadlineInfo), así que el
+  // filtro "Plazo de respuesta" se aplica aquí, sobre la página cargada.
+  const slaFilter = searchParams.get("sla");
+  const visibleReports =
+    slaFilter && slaFilter !== "all"
+      ? initialReports.filter(
+          (r) =>
+            getDeadlineInfo(r.priority, r.submittedAt, r.type).semaphore === slaFilter &&
+            r.status !== "CLOSED" &&
+            r.status !== "ARCHIVED",
+        )
+      : initialReports;
+
   const handleFiltersChange = (filters: ReportFilters) => {
     const params = new URLSearchParams(searchParams);
 
@@ -113,7 +127,7 @@ export function ReportsContent({
     }
 
     if (selectedReports.length === 0) {
-      showError("Selecciona al menos un reporte");
+      showError("Selecciona al menos una denuncia");
       return;
     }
 
@@ -124,10 +138,10 @@ export function ReportsContent({
         setSelectedReports([]);
 
         const actionMessages = {
-          assign: "Reportes asignados correctamente",
+          assign: "Responsable asignado",
           status: "Estado actualizado correctamente",
           priority: "Prioridad actualizada correctamente",
-          archive: "Reportes archivados correctamente",
+          archive: "Denuncias archivadas",
         };
 
         showSuccess(
@@ -160,34 +174,26 @@ export function ReportsContent({
         ? "Administra reportes de todas las organizaciones"
         : `Vista filtrada por organización${selectedOrganizationName ? `: ${selectedOrganizationName}` : ""}`;
     } else if (userRole === "ORG_ADMIN") {
-      return "Administra y da seguimiento a todas las denuncias de tu organización";
+      return "Todas las denuncias de tu organización: revisa, asigna y da seguimiento hasta el cierre.";
     } else {
-      return "Revisa y gestiona únicamente los reportes que tienes asignados";
+      return "Revisa y gestiona únicamente las denuncias que tienes asignadas";
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-emerald-100 bg-emerald-50/40 p-3 sm:p-4">
-        <div className="flex items-start sm:items-center justify-between gap-3 flex-wrap">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-800">
-            Contexto activo
-          </p>
-          <p className="text-sm md:text-base text-slate-600 mt-1">
-            {getPageDescription()}
-          </p>
-        </div>
-
-        {/* Refresh button for stats */}
+      {/* La descripción de la vista ya está en el encabezado de la página; aquí solo la acción. */}
+      <div className="-mt-2 flex justify-end">
         <Button
+          size="sm"
+          variant="light"
           onPress={handleRefreshStats}
-          disabled={reportsStatsLoading}
-          className="px-3 md:px-4 py-2 text-xs md:text-sm border border-emerald-200 bg-white text-emerald-800 rounded-lg hover:bg-emerald-50 disabled:opacity-50"
+          isDisabled={reportsStatsLoading}
+          className="text-ev-mute"
+          startContent={<i className="icon-[lucide--refresh-ccw] size-3.5" aria-hidden />}
         >
-          {reportsStatsLoading ? "Actualizando..." : "Actualizar Estadísticas"}
+          {reportsStatsLoading ? "Actualizando…" : "Actualizar estadísticas"}
         </Button>
-      </div>
       </div>
 
       <ReportsHeader
@@ -235,7 +241,7 @@ export function ReportsContent({
 
       <div className={isPending ? "opacity-50 pointer-events-none" : ""}>
         <ReportsTable
-          reports={initialReports}
+          reports={visibleReports}
           filters={initialFilters}
           selectedReports={selectedReports}
           onSelectionChange={setSelectedReports}

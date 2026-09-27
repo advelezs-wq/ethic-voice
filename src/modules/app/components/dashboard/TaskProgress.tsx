@@ -64,9 +64,9 @@ export const TaskProgress: React.FC<TaskProgressProps> = ({ reports }) => {
           </div>
         </div>
 
-        <div className="mt-4 p-4 bg-[#f7faf9] rounded-lg">
+        <div className="mt-4 p-4 bg-ev-paper rounded-lg">
           <p className="text-sm text-slate-500">Tiempo promedio de resolución</p>
-          <p className="text-xl font-bold text-[#0d212c]">3.5 días</p>
+          <p className="text-xl font-bold text-ev-night">3.5 días</p>
         </div>
       </CardBody>
     </Card>

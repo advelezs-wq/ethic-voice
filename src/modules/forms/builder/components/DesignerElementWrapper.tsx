@@ -95,7 +95,7 @@ export const DesignerElementWrapper = ({
       )}
       <div
         className={cn(
-          "flex w-full h-[120px] items-center rounded-md px-4 py-2 pointer-events-none bg-[#f4f4f5] opacity-100",
+          "flex w-full h-[120px] items-center rounded-md px-4 py-2 pointer-events-none bg-ev-paper opacity-100",
           isMouseOver && "opacity-30"
         )}
       >

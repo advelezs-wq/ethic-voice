@@ -44,7 +44,7 @@ export function SuperAdminOrganizationsView() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#0d212c]">
+          <h1 className="text-2xl font-bold text-ev-night">
             Gestión de Organizaciones
           </h1>
           <p className="text-slate-500">

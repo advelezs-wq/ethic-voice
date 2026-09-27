@@ -107,8 +107,8 @@ export default function InPlatformPricingTable() {
     <div className="container mx-auto px-4 py-12">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold text-[#0d212c] mb-4">Plan</h2>
-        <p className="text-lg text-slate-500 max-w-2xl mx-auto mb-8">
+        <h2 className="text-[1.75rem] font-semibold tracking-[-0.03em] text-ev-night">Elige tu plan</h2>
+        <p className="mx-auto mb-8 mt-2 max-w-2xl text-[0.9375rem] text-ev-mute">
           {planInfo?.isTrialActive
             ? "Tu período de prueba está activo. Elige un plan para continuar cuando termine."
             : "Para continuar usando EthicVoice, selecciona el plan que mejor se adapte a tus necesidades."}
@@ -122,18 +122,17 @@ export default function InPlatformPricingTable() {
               handleBillingToggle(key as BillingCycle)
             }
             variant="solid"
-            color="success"
             size="lg"
             className="w-auto"
             classNames={{
-              tabList: "bg-emerald-50 rounded-full p-1",
-              cursor: "bg-green-600 rounded-full shadow-lg",
-              tab: "px-8 py-3 text-sm font-medium rounded-full transition-all duration-300",
-              tabContent: "group-data-[selected=true]:text-white text-slate-500",
+              tabList: "rounded-full border border-ev-line bg-white p-1",
+              cursor: "rounded-full bg-ev-night",
+              tab: "px-6 text-sm font-medium rounded-full",
+              tabContent: "group-data-[selected=true]:text-white text-ev-mute",
             }}
           >
             <Tab key={BillingCycle.MONTHLY} title="Mensual" />
-            <Tab key={BillingCycle.YEARLY} title="Anual (10% descuento)" />
+            <Tab key={BillingCycle.YEARLY} title="Anual · ahorra 10%" />
           </Tabs>
         </div>
       </div>
@@ -156,16 +155,18 @@ export default function InPlatformPricingTable() {
                 duration: 0.6,
                 delay: displayPlans.indexOf(planType) * 0.1,
               }}
-              className={`relative bg-white rounded-xl p-6 min-h-[500px] transition-all duration-300 hover:transform hover:-translate-y-1 ${
-                isPopular
-                  ? "border-2 border-green-500 shadow-2xl"
-                  : "border border-emerald-100 shadow-lg hover:shadow-xl"
+              className={`relative flex min-h-[500px] flex-col rounded-2xl bg-white p-6 ${
+                isCurrent
+                  ? "border-2 border-ev-night"
+                  : isPopular
+                    ? "border-2 border-ev-signal"
+                    : "border border-ev-line"
               }`}
             >
               {/* Recommended Chip */}
               {isPopular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-green-600 text-white text-xs px-3 py-1 rounded-full font-semibold shadow-md">
+                  <span className="rounded-full bg-ev-signal px-3 py-1 text-xs font-medium text-ev-night">
                     Recomendado
                   </span>
                 </div>
@@ -173,36 +174,27 @@ export default function InPlatformPricingTable() {
               {/* Current Plan Badge */}
               {isCurrent && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-sky-600 text-white text-xs px-3 py-1 rounded-full font-medium">
-                    Plan Actual
+                  <div className="rounded-full bg-ev-night px-3 py-1 text-xs font-medium text-white">
+                    Tu plan actual
                   </div>
                 </div>
               )}
 
               {/* Title */}
               <div className="mb-6">
-                <h3 className="text-xl font-semibold text-[#0d212c] mb-2">
-                  {config.displayName}
+                <h3 className="text-xl font-semibold text-ev-night mb-2">
+                  {config.displayName.replace("EthicVoice ", "")}
                 </h3>
                 <p className="text-sm text-slate-500 leading-relaxed">
                   {config.description}
                 </p>
               </div>
-              {price && (
-                <div className="text-xs text-slate-400">
-                  {rates?.USD
-                    ? `≈ $${(price * rates.USD).toFixed(2)} USD/${
-                        billingCycle === BillingCycle.YEARLY ? "year" : "mo"
-                      }`
-                    : ""}
-                </div>
-              )}
 
               {/* Price */}
               <div className="mb-6">
                 <div className="flex items-baseline flex-wrap">
                   <span
-                    className={`font-extrabold text-[#0d212c] ${
+                    className={`ev-num font-semibold text-ev-night ${
                       priceDisplay.size === "large"
                         ? "text-2xl md:text-3xl"
                         : priceDisplay.size === "medium"
@@ -236,8 +228,8 @@ export default function InPlatformPricingTable() {
               <div className="space-y-3 mb-6">
                 {config.features.highlights.map((feature, index) => (
                   <div key={index} className="flex items-center gap-3">
-                    <i className="icon-[lucide--check] w-4 h-4 text-green-600 flex-shrink-0" />
-                    <span className="text-sm text-slate-600">{feature}</span>
+                    <i className="icon-[lucide--check] w-4 h-4 text-ev-moss flex-shrink-0" />
+                    <span className="text-sm text-ev-ink">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -249,17 +241,17 @@ export default function InPlatformPricingTable() {
                   disabled={isProcessing && selectedPlan === planType}
                   className={`w-full py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isCurrent
-                      ? "bg-sky-600 text-white hover:bg-sky-700"
+                      ? "rounded-full bg-ev-night text-white hover:bg-ev-slate"
                       : isPopular
-                        ? "bg-green-600 text-white hover:bg-green-700 shadow-lg"
-                        : "border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                        ? "rounded-full bg-ev-signal text-ev-night hover:bg-[#a9dc66]"
+                        : "rounded-full border border-ev-night/20 bg-white text-ev-night hover:border-ev-night/50"
                   }`}
                 >
                   {isProcessing && selectedPlan === planType
                     ? "Procesando..."
                     : isCurrent
                       ? "Reactivar suscripción"
-                      : "Suscribirse"}
+                      : `Elegir ${config.displayName.replace("EthicVoice ", "")}`}
                 </Button>
               </div>
             </motion.div>

@@ -35,7 +35,7 @@ export function WelcomeStep({ context }: WelcomeStepProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <h1 className="text-3xl font-bold text-[#0d212c] mb-3">
+          <h1 className="text-3xl font-bold text-ev-night mb-3">
             ¡Gracias por tu compra!
           </h1>
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
@@ -49,7 +49,7 @@ export function WelcomeStep({ context }: WelcomeStepProps) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="bg-white rounded-xl p-6 shadow-sm border border-emerald-100 max-w-2xl mx-auto"
+        className="bg-white rounded-xl p-6 shadow-sm border border-ev-line max-w-2xl mx-auto"
       >
         <p className="text-slate-600 leading-relaxed mb-4">
           Has dado el primer paso hacia una experiencia increíble. Ahora vamos a
@@ -69,7 +69,7 @@ export function WelcomeStep({ context }: WelcomeStepProps) {
         transition={{ delay: 0.8 }}
         className="bg-gradient-to-r from-blue-50 to-emerald-50 rounded-xl p-6 max-w-2xl mx-auto"
       >
-        <h3 className="text-lg font-semibold text-[#0d212c] mb-4">
+        <h3 className="text-lg font-semibold text-ev-night mb-4">
           ¿Qué configuraremos?
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
@@ -77,21 +77,21 @@ export function WelcomeStep({ context }: WelcomeStepProps) {
             <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
               🎨
             </div>
-            <p className="font-medium text-[#0d212c]">Personalización</p>
+            <p className="font-medium text-ev-night">Personalización</p>
             <p className="text-slate-500">Tema y estilo</p>
           </div>
           <div className="text-center">
             <div className="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center mx-auto mb-2">
               🔔
             </div>
-            <p className="font-medium text-[#0d212c]">Notificaciones</p>
+            <p className="font-medium text-ev-night">Notificaciones</p>
             <p className="text-slate-500">Tus preferencias</p>
           </div>
           <div className="text-center">
             <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center mx-auto mb-2">
               🏢
             </div>
-            <p className="font-medium text-[#0d212c]">Tu organización</p>
+            <p className="font-medium text-ev-night">Tu organización</p>
             <p className="text-slate-500">Crear tu espacio</p>
           </div>
         </div>
@@ -101,7 +101,7 @@ export function WelcomeStep({ context }: WelcomeStepProps) {
       </motion.div>
 
       {/* Action Button (kept visible without scrolling) */}
-      <div className="sticky bottom-0 bg-white/80 backdrop-blur border-t border-emerald-100 pt-4">
+      <div className="sticky bottom-0 bg-white backdrop-blur border-t border-ev-line pt-4">
         <Button
           color="primary"
           size="lg"

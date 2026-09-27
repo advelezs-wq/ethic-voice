@@ -47,7 +47,7 @@ export function MessageActions({
           <button
             key={emoji}
             onClick={() => onReact(emoji)}
-            className="p-1 hover:bg-emerald-50 rounded transition-colors"
+            className="p-1 hover:bg-ev-paper rounded transition-colors"
             title={`React with ${emoji}`}
           >
             <span className="text-sm">{emoji}</span>
@@ -59,7 +59,7 @@ export function MessageActions({
       {canUserReply && (
         <button
           onClick={onReply}
-          className="p-1 text-slate-400 hover:text-slate-600 hover:bg-emerald-50 rounded transition-colors"
+          className="p-1 text-slate-400 hover:text-slate-600 hover:bg-ev-paper rounded transition-colors"
           title="Responder"
         >
           <svg
@@ -80,7 +80,7 @@ export function MessageActions({
 
       <Dropdown>
         <DropdownTrigger asChild>
-          <button className="p-1 text-slate-400 hover:text-slate-600 hover:bg-emerald-50 rounded transition-colors">
+          <button className="p-1 text-slate-400 hover:text-slate-600 hover:bg-ev-paper rounded transition-colors">
             <svg
               className="w-4 h-4"
               fill="none"

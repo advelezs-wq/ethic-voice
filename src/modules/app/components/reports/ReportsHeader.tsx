@@ -114,7 +114,7 @@ export function ReportsHeader({
         pendingTab?.close();
         addToast({
           title: "Error en la descarga",
-          description: "No se pudo generar el reporte. Intenta nuevamente",
+          description: "No se pudo generar el informe. Intenta nuevamente",
           color: "danger",
         });
         return;
@@ -133,9 +133,9 @@ export function ReportsHeader({
           window.open(url, "_blank");
         }
         addToast({
-          title: "Reporte generado",
+          title: "Informe generado",
           description:
-            "El reporte se abrió en una nueva pestaña. Puedes guardarlo como PDF usando Ctrl+P",
+            "El informe se abrió en una nueva pestaña. Puedes guardarlo como PDF con Ctrl+P",
           color: "success",
         });
         return;
@@ -159,7 +159,7 @@ export function ReportsHeader({
       pendingTab?.close();
       addToast({
         title: "Error en la descarga",
-        description: "No se pudo generar el reporte. Intenta nuevamente",
+        description: "No se pudo generar el informe. Intenta nuevamente",
         color: "danger",
       });
     } finally {
@@ -183,7 +183,7 @@ export function ReportsHeader({
       if (!res.ok) {
         addToast({
           title: "Error en la descarga",
-          description: "No se pudo generar el reporte. Intenta nuevamente",
+          description: "No se pudo generar el informe. Intenta nuevamente",
           color: "danger",
         });
         return;
@@ -205,7 +205,7 @@ export function ReportsHeader({
     } catch {
       addToast({
         title: "Error en la descarga",
-        description: "No se pudo generar el reporte. Intenta nuevamente",
+        description: "No se pudo generar el informe. Intenta nuevamente",
         color: "danger",
       });
     } finally {
@@ -218,7 +218,7 @@ export function ReportsHeader({
       case "assign":
         return (
           <>
-            <ModalHeader>Asignar reportes seleccionados</ModalHeader>
+            <ModalHeader>Asignar responsable</ModalHeader>
             <ModalBody>
               <p className="mb-4">
                 Selecciona un investigador para asignar los {selectedCount}{" "}
@@ -251,7 +251,7 @@ export function ReportsHeader({
       case "status":
         return (
           <>
-            <ModalHeader>Cambiar estado de reportes</ModalHeader>
+            <ModalHeader>Cambiar estado</ModalHeader>
             <ModalBody>
               <p className="mb-4">
                 Cambiar el estado de los {selectedCount} reportes seleccionados
@@ -277,7 +277,7 @@ export function ReportsHeader({
       case "priority":
         return (
           <>
-            <ModalHeader>Cambiar prioridad de reportes</ModalHeader>
+            <ModalHeader>Cambiar prioridad</ModalHeader>
             <ModalBody>
               <p className="mb-4">
                 Cambiar la prioridad de los {selectedCount} reportes
@@ -312,7 +312,7 @@ export function ReportsHeader({
       case "archive":
         return (
           <>
-            <ModalHeader>Archivar reportes</ModalHeader>
+            <ModalHeader>Archivar</ModalHeader>
             <ModalBody>
               <p className="text-danger">
                 ¿Estás seguro de que deseas archivar los {selectedCount}{" "}
@@ -333,7 +333,7 @@ export function ReportsHeader({
   return (
     <div className="mb-6 flex items-start sm:items-center justify-between gap-3 flex-wrap">
       <div className="flex items-center gap-2 sm:gap-3">
-        <h1 className="text-2xl font-bold text-[#0d212c]">Denuncias</h1>
+        <h2 className="text-base font-semibold tracking-[-0.015em] text-ev-night">Listado</h2>
         {(processingCount > 0 || pendingCount > 0) && (
           <Tooltip content="Procesamiento en curso (ETA aprox.)">
             <Chip size="sm" variant="solid" color="primary">

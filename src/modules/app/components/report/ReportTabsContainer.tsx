@@ -27,19 +27,21 @@ const TABS: {
   icon: string;
   adminOnly?: boolean;
 }[] = [
-  { key: "overview", label: "Resumen", icon: "icon-[lucide--file-text]" },
-  { key: "timeline", label: "Cronología", icon: "icon-[lucide--clock]" },
+  // Orden del trabajo real: leer la denuncia → hablar con quien reporta →
+  // repartir tareas → registrar avances. El historial automático va al final.
+  { key: "overview", label: "Denuncia", icon: "icon-[lucide--file-text]" },
   {
     key: "chat",
-    label: "Comunicación",
+    label: "Chat con el denunciante",
     icon: "icon-[lucide--message-circle]",
   },
   { key: "tasks", label: "Tareas", icon: "icon-[lucide--check-square]" },
   {
     key: "updates",
-    label: "Actualizaciones",
+    label: "Avances",
     icon: "icon-[lucide--list-checks]",
   },
+  { key: "timeline", label: "Historial", icon: "icon-[lucide--history]" },
 ];
 
 export const ReportTabsContainer: React.FC<ReportTabsContainerProps> = ({
@@ -67,9 +69,9 @@ export const ReportTabsContainer: React.FC<ReportTabsContainerProps> = ({
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white/95 shadow-none">
+    <div className="overflow-hidden rounded-2xl border border-ev-line bg-white shadow-none">
       {/* Tab Navigation */}
-      <div className="overflow-x-auto border-b border-emerald-100 bg-emerald-50/45">
+      <div className="overflow-x-auto border-b border-ev-line bg-ev-paper">
         <nav className="flex px-2 pt-2 gap-1 min-w-max" aria-label="Secciones del caso">
           {TABS.map((tab) => {
             const isActive = activeTab === tab.key;

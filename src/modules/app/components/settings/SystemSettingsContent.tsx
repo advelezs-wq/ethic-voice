@@ -40,20 +40,20 @@ export function SystemSettingsContent({
         className="w-full"
         variant="solid"
         classNames={{
-          tabContent: "hover:bg:secondary data-[hover=true]:bg-secondary",
+          tabContent: "data-[hover=true]:bg-ev-paper",
           tab: "rounded-sm data-[hover=true]:bg-transparent",
         }}
       >
-        <Tab key="appearance" title="Apariencia">
+        <Tab key="appearance" title="Logo">
           <div className="space-y-6 pt-6">
             <Card>
               <CardHeader>
                 <div>
-                  <h3 className="text-xl font-semibold text-[#0d212c]">
+                  <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
                     Logo de la Organización
                   </h3>
-                  <p className="text-slate-500 text-sm">
-                    Personaliza el logo que aparece en el header del dashboard
+                  <p className="text-sm text-ev-mute">
+                    Tu logo aparece en el panel y en el formulario público de denuncias.
                   </p>
                 </div>
               </CardHeader>
@@ -64,17 +64,16 @@ export function SystemSettingsContent({
           </div>
         </Tab>
 
-        <Tab key="layout" title="Diseño del Dashboard">
+        <Tab key="layout" title="Panel de inicio">
           <div className="space-y-6 pt-6">
             <Card>
               <CardHeader>
                 <div>
-                  <h3 className="text-xl font-semibold text-[#0d212c]">
-                    Configuración de Elementos
+                  <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+                    Qué se muestra en el inicio
                   </h3>
-                  <p className="text-slate-500 text-sm">
-                    Personaliza la disposición y orden de los elementos del
-                    dashboard
+                  <p className="text-sm text-ev-mute">
+                    Elige y ordena los bloques del panel de inicio.
                   </p>
                 </div>
               </CardHeader>
@@ -84,24 +83,23 @@ export function SystemSettingsContent({
                     organizationId={organizationId}
                   />
                 ) : (
-                  <UpgradeBlock message="Tu plan no permite cambiar el diseño del dashboard. Disponible en GROW o superior." />
+                  <UpgradeBlock message="Personalizar el panel de inicio está disponible desde el plan Grow." />
                 )}
               </CardBody>
             </Card>
           </div>
         </Tab>
 
-        <Tab key="retention" title="Retención y Cumplimiento">
+        <Tab key="retention" title="Conservación de casos">
           <div className="space-y-6 pt-6">
             <Card>
               <CardHeader>
                 <div>
-                  <h3 className="text-xl font-semibold text-[#0d212c]">
-                    Retención de casos
+                  <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+                    Cuánto tiempo se conservan los casos
                   </h3>
-                  <p className="text-slate-500 text-sm">
-                    Define cuánto tiempo se conservan los casos cerrados y
-                    revisa los que ya vencieron su período de retención
+                  <p className="text-sm text-ev-mute">
+                    Define por cuánto tiempo guardar los casos cerrados, según tu política o la ley aplicable.
                   </p>
                 </div>
               </CardHeader>
@@ -116,7 +114,7 @@ export function SystemSettingsContent({
           key="ethics-context"
           title={
             <div className="flex items-center gap-2">
-              <span>Contexto Ético</span>
+              <span>Contexto para la IA</span>
               <Chip size="sm" color="secondary" variant="flat">
                 Plan Premium
               </Chip>
@@ -127,12 +125,11 @@ export function SystemSettingsContent({
             <Card>
               <CardHeader>
                 <div>
-                  <h3 className="text-xl font-semibold text-[#0d212c]">
-                    Contexto Ético Organizacional
+                  <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+                    Contexto de tu organización para la IA
                   </h3>
-                  <p className="text-slate-500 text-sm">
-                    Configura el contexto ético que utiliza la IA antes de
-                    generar el triage de cada denuncia
+                  <p className="text-sm text-ev-mute">
+                    Cuéntale a la IA sobre tu código de ética, políticas y riesgos para que clasifique mejor cada denuncia.
                   </p>
                 </div>
               </CardHeader>
@@ -140,24 +137,23 @@ export function SystemSettingsContent({
                 {permissions?.canUseEthicalContext ? (
                   <EthicsContextSection organizationId={organizationId} />
                 ) : (
-                  <UpgradeBlock message="El Contexto Ético Organizacional es exclusivo del Plan Premium." />
+                  <UpgradeBlock message="Disponible en el plan Premium." />
                 )}
               </CardBody>
             </Card>
           </div>
         </Tab>
 
-        <Tab key="advanced" title="Configuración Avanzada">
+        <Tab key="advanced" title="Áreas y cargos">
           <div className="space-y-6 pt-6">
             <Card>
               <CardHeader>
                 <div>
-                  <h3 className="text-xl font-semibold text-[#0d212c]">
-                    Estructura de la organización
+                  <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+                    Áreas y cargos del formulario
                   </h3>
-                  <p className="text-slate-500 text-sm">
-                    Personaliza las áreas y cargos que ven los denunciantes en
-                    el formulario público
+                  <p className="text-sm text-ev-mute">
+                    Las opciones que ven los denunciantes al indicar dónde ocurrió y quién está involucrado.
                   </p>
                 </div>
               </CardHeader>
@@ -165,7 +161,7 @@ export function SystemSettingsContent({
                 {isLoading ? null : permissions?.canAccessAreasPositionsCatalog ? (
                   <OrganizationStructureSection organizationId={organizationId} />
                 ) : (
-                  <UpgradeBlock message="Tu plan no permite personalizar áreas y cargos. Disponible en GROW o superior." />
+                  <UpgradeBlock message="Personalizar áreas y cargos está disponible desde el plan Grow." />
                 )}
               </CardBody>
             </Card>

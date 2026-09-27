@@ -1,61 +1,33 @@
 import React from "react";
-import { Card, CardHeader, CardBody } from "@heroui/card";
-import { Progress } from "@heroui/progress";
 import type { DepartmentData } from "@/types/dashboard.types";
+import { ChartCard } from "./ChartCard";
+import { DistributionList } from "./DistributionList";
 
 interface DepartmentAnalysisProps {
   departments: DepartmentData[];
 }
 
-export const DepartmentAnalysis: React.FC<DepartmentAnalysisProps> = ({
-  departments,
-}) => {
+/** En qué áreas de la organización se concentran las denuncias. */
+export const DepartmentAnalysis: React.FC<DepartmentAnalysisProps> = ({ departments }) => {
+  const onlyUnassigned =
+    departments.length === 1 && /sin departamento/i.test(departments[0]?.name ?? "");
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <i
-            className="icon-[lucide--building-2] size-5 text-slate-500"
-            role="img"
-            aria-hidden="true"
-          />
-          <h3 className="text-lg font-semibold">Análisis por Departamento</h3>
-        </div>
-      </CardHeader>
-      <CardBody>
-        <div className="space-y-4">
-          {departments.length === 0 ? (
-            <p className="text-sm text-slate-400 text-center py-4">
-              No hay datos de departamentos disponibles
-            </p>
-          ) : (
-            departments.map((dept, index) => (
-              <div key={dept.name}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-slate-600">
-                    {dept.name}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-500">
-                      {dept.count} reportes
-                    </span>
-                    <span className="text-sm font-medium">
-                      {(dept.percentage ?? 0).toFixed(1)}%
-                    </span>
-                  </div>
-                </div>
-                <Progress
-                  value={dept.percentage}
-                  color={
-                    index === 0 ? "danger" : index === 1 ? "warning" : "primary"
-                  }
-                  size="md"
-                />
-              </div>
-            ))
-          )}
-        </div>
-      </CardBody>
-    </Card>
+    <ChartCard
+      title="Denuncias por departamento"
+      description={
+        onlyUnassigned
+          ? "Asigna un departamento a cada denuncia para ver dónde se concentran."
+          : "Áreas de la organización donde se concentran los casos"
+      }
+    >
+      <DistributionList
+        emptyText="Aún no hay denuncias con departamento asignado."
+        rows={departments.map((d) => ({
+          label: d.name,
+          count: d.count,
+          color: /sin departamento/i.test(d.name) ? "#8FA2A5" : "#244850",
+        }))}
+      />
+    </ChartCard>
   );
 };

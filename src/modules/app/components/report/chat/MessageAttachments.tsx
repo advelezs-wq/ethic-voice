@@ -63,7 +63,7 @@ export function MessageAttachments({
                 {getFileIcon(attachment.mimeType)}
               </span>
               <div className="text-sm">
-                <div className="font-medium text-[#0d212c]">
+                <div className="font-medium text-ev-night">
                   {attachment.filename}
                 </div>
                 <div className="text-slate-400">

@@ -30,6 +30,7 @@ interface ReportsPageProps {
     departmentId?: string;
     reportType?: string;
     anonymous?: string;
+    sla?: string;
   }>;
 }
 
@@ -40,7 +41,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-[#0d212c]">
+          <h2 className="text-xl font-semibold text-ev-night">
             No authenticated
           </h2>
           <p className="text-slate-500">Please sign in to access reports.</p>
@@ -62,7 +63,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-[#0d212c]">
+          <h2 className="text-xl font-semibold text-ev-night">
             No organization selected
           </h2>
           <p className="text-slate-500">
@@ -101,6 +102,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     departmentId,
     reportType,
     anonymous,
+    sla,
   } = params;
 
   const filters: ReportFilters = {
@@ -114,6 +116,7 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
     departmentId: departmentId || "all",
     reportType: reportType || "all",
     anonymous: anonymous || "all",
+    sla: (sla as ReportFilters["sla"]) || "all",
   };
 
   const currentPage = parseInt(page || "1", 10);

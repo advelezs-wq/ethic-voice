@@ -42,10 +42,10 @@ export default function SuperAdminTools() {
 
   return (
     <>
-      <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
+      <Card className="border border-ev-line bg-white shadow-sm">
         <CardBody className="space-y-5">
         <div>
-          <h2 className="text-xl font-semibold text-[#0d212c]">Herramientas operativas</h2>
+          <h2 className="text-xl font-semibold text-ev-night">Herramientas operativas</h2>
           <p className="mt-1 text-sm text-default-500">
             Ejecuta procesos internos con retroalimentación inmediata de respuesta API.
           </p>

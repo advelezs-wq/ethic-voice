@@ -285,7 +285,7 @@ export function AssignMembersModal({
                   <div className="space-y-2">
                     {currentAssignments.map((assignment) => (
                       <div key={assignment.userId}>
-                        <div className="flex items-center justify-between p-3 bg-[#f7faf9] rounded-lg">
+                        <div className="flex items-center justify-between p-3 bg-ev-paper rounded-lg">
                           <User
                             name={assignment.userName}
                             description="Investigador asignado"
@@ -449,7 +449,7 @@ export function AssignMembersModal({
                                 ? "border-primary bg-primary-50"
                                 : reason
                                   ? "border-amber-200 bg-amber-50/40 hover:bg-amber-50"
-                                  : "border-emerald-100 hover:bg-[#f7faf9]"
+                                  : "border-ev-line hover:bg-ev-paper"
                             }`}
                             onClick={() => toggleMember(member.userId)}
                           >

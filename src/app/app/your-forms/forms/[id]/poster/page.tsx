@@ -26,7 +26,7 @@ export default async function FormPosterPage({ params }: PosterPageProps) {
     <div className="container mx-auto px-4 py-8 print:p-0">
       <div className="print:hidden mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#0d212c]">
+          <h1 className="text-2xl font-bold text-ev-night">
             Póster de la Línea Ética
           </h1>
           <p className="text-sm text-slate-500">
@@ -53,7 +53,7 @@ export default async function FormPosterPage({ params }: PosterPageProps) {
 
       <div
         id="ethics-poster"
-        className="mx-auto max-w-2xl border border-[#0a1e14]/10 rounded-3xl bg-white p-12 text-center shadow-[0_20px_60px_-35px_rgba(10,30,20,0.4)] print:max-w-none print:border-0 print:rounded-none print:shadow-none print:h-[297mm] print:flex print:flex-col print:justify-center"
+        className="mx-auto max-w-2xl border border-ev-night/10 rounded-3xl bg-white p-12 text-center shadow-none print:max-w-none print:border-0 print:rounded-none print:shadow-none print:h-[297mm] print:flex print:flex-col print:justify-center"
       >
         {poster.orgLogoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
@@ -67,10 +67,10 @@ export default async function FormPosterPage({ params }: PosterPageProps) {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 mb-2">
           {poster.orgName}
         </p>
-        <h2 className="text-4xl font-bold text-[#0a1e14] mb-4">
+        <h2 className="text-4xl font-bold text-ev-night mb-4">
           Línea Ética
         </h2>
-        <p className="text-lg text-[#273c46] mb-8 max-w-lg mx-auto">
+        <p className="text-lg text-ev-mute mb-8 max-w-lg mx-auto">
           ¿Fuiste testigo de algo que no está bien? Repórtalo de forma
           confidencial. Escanea el código o visita el enlace.
         </p>
@@ -82,12 +82,12 @@ export default async function FormPosterPage({ params }: PosterPageProps) {
           className="mx-auto mb-6 w-64 h-64"
         />
 
-        <p className="text-sm font-mono text-[#0a1e14] break-all mb-8">
+        <p className="text-sm font-mono text-ev-night break-all mb-8">
           {reportUrl}
         </p>
 
-        <div className="border-t border-[#0a1e14]/10 pt-6">
-          <p className="text-sm text-[#273c46]">
+        <div className="border-t border-ev-night/10 pt-6">
+          <p className="text-sm text-ev-mute">
             Tu identidad se protege. Puedes reportar de forma anónima.
           </p>
         </div>

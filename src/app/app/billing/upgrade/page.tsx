@@ -99,7 +99,7 @@ export default function UpgradePage() {
 
   if (isProcessing) {
     return (
-      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
+      <div className="min-h-screen bg-ev-paper flex items-center justify-center">
         <Spinner size="lg" color="primary" />
       </div>
     );
@@ -107,7 +107,7 @@ export default function UpgradePage() {
 
   if (!planInfo) {
     return (
-      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
+      <div className="min-h-screen bg-ev-paper flex items-center justify-center">
         <Card>
           <CardBody>
             <p className="text-center text-slate-400">
@@ -149,7 +149,7 @@ export default function UpgradePage() {
                 <p className="mb-1 text-xs font-bold uppercase tracking-widest text-emerald-700">
                   Planes y precios
                 </p>
-                <h1 className="text-4xl font-extrabold text-[#0d212c]">Plan</h1>
+                <h1 className="text-4xl font-extrabold text-ev-night">Plan</h1>
                 <p className="text-slate-500 mt-1">
                   {feature ? (
                     <>
@@ -175,10 +175,10 @@ export default function UpgradePage() {
                 className="w-auto"
                 classNames={{
                   tabList: "bg-emerald-50 rounded-full p-1",
-                  cursor: "bg-[#0d212c] rounded-full shadow-lg",
+                  cursor: "bg-ev-night rounded-full shadow-lg",
                   tab: "px-6 py-2 text-sm font-medium rounded-full transition-all duration-300",
                   tabContent:
-                    "group-data-[selected=true]:text-white text-[#0d212c]",
+                    "group-data-[selected=true]:text-white text-ev-night",
                 }}
               >
                 <Tab key={BillingCycle.MONTHLY} title="Mensual" />
@@ -222,7 +222,7 @@ export default function UpgradePage() {
                 <Card className="text-center py-12">
                   <CardBody>
                     <i className="icon-[lucide--crown] w-16 h-16 text-lime-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-[#0d212c] mb-2">
+                    <h3 className="text-xl font-semibold text-ev-night mb-2">
                       ¡Ya estás en el nivel más alto!
                     </h3>
                     <p className="text-slate-500 mb-6">
@@ -252,12 +252,12 @@ export default function UpgradePage() {
                           className={`relative flex min-h-[600px] flex-col rounded-2xl p-8 transition-transform duration-300 hover:-translate-y-1 ${
                             isPopular
                               ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-lime-400"
-                              : "border border-slate-200 bg-white hover:border-emerald-200 hover:shadow-xl"
+                              : "border border-slate-200 bg-white hover:border-ev-line hover:shadow-xl"
                           }`}
                         >
                           {isPopular && (
                             <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                              <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#052b24] shadow-[0_8px_18px_rgba(163,230,53,0.35)]">
+                              <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-ev-night shadow-[0_8px_18px_rgba(163,230,53,0.35)]">
                                 Más popular
                               </span>
                             </div>
@@ -265,7 +265,7 @@ export default function UpgradePage() {
 
                           {/* Title */}
                           <div className="mb-6">
-                            <h3 className={`text-2xl font-extrabold mb-2 ${isPopular ? "text-white" : "text-[#0d212c]"}`}>
+                            <h3 className={`text-2xl font-extrabold mb-2 ${isPopular ? "text-white" : "text-ev-night"}`}>
                               {plan.displayName}
                             </h3>
                             <p className={`text-sm leading-relaxed ${isPopular ? "text-white/55" : "text-slate-500"}`}>
@@ -276,13 +276,13 @@ export default function UpgradePage() {
                           {/* Price */}
                           <div className="mb-6">
                             {plan.isEnterprise ? (
-                              <div className={`text-3xl font-black ${isPopular ? "text-white" : "text-[#0d212c]"}`}>
+                              <div className={`text-3xl font-black ${isPopular ? "text-white" : "text-ev-night"}`}>
                                 Contactar
                               </div>
                             ) : (
                               <div className="flex items-baseline flex-wrap">
                                 <span
-                                  className={`font-black ${isPopular ? "text-white" : "text-[#0d212c]"} ${
+                                  className={`font-black ${isPopular ? "text-white" : "text-ev-night"} ${
                                     priceDisplay.size === "large"
                                       ? "text-3xl md:text-4xl"
                                       : priceDisplay.size === "medium"
@@ -352,8 +352,8 @@ export default function UpgradePage() {
                               }
                               className={`w-full rounded-xl py-3.5 px-6 text-sm font-bold transition-all duration-200 ${
                                 isPopular
-                                  ? "bg-lime-400 text-[#052b24] shadow-[0_6px_20px_rgba(163,230,53,0.3)] hover:bg-lime-300"
-                                  : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
+                                  ? "bg-lime-400 text-ev-night shadow-[0_6px_20px_rgba(163,230,53,0.3)] hover:bg-lime-300"
+                                  : "border-2 border-ev-night text-ev-night hover:bg-ev-night hover:text-white"
                               }`}
                             >
                               {isProcessing && selectedPlan === plan.type

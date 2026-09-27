@@ -19,15 +19,15 @@ export function Step4Evidence({ organizationId }: Step4EvidenceProps) {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
-        <p className="text-sm leading-relaxed text-[#273c46]">
+      <div className="rounded-xl border border-ev-night/10 bg-ev-paper p-4">
+        <p className="text-sm leading-relaxed text-ev-mute">
           Opcional: adjunta evidencias que ayuden en la investigación (máx.
           50MB por archivo). Evita incluir datos sensibles no relacionados con
           el caso.
         </p>
       </div>
 
-      <p className="text-xs text-[#273c46]">
+      <p className="text-xs text-ev-mute">
         Validamos tipo y tamaño de archivo antes del almacenamiento para reducir
         riesgos de seguridad.
       </p>
@@ -53,13 +53,13 @@ export function Step4Evidence({ organizationId }: Step4EvidenceProps) {
                   "before:border-2 before:border-slate-400 after:bg-emerald-600",
               }}
             >
-              <span className="text-sm leading-relaxed text-[#0d212c]">
+              <span className="text-sm leading-relaxed text-ev-night">
                 Declaro que la información proporcionada es verídica y autorizo
                 su uso para la investigación correspondiente, de acuerdo con la{" "}
                 <Link
                   href="/privacidad"
                   target="_blank"
-                  className="font-semibold text-[#0a1e14] underline underline-offset-2"
+                  className="font-semibold text-ev-night underline underline-offset-2"
                 >
                   política de privacidad
                 </Link>{" "}
@@ -67,7 +67,7 @@ export function Step4Evidence({ organizationId }: Step4EvidenceProps) {
                 <Link
                   href="/terms"
                   target="_blank"
-                  className="font-semibold text-[#0a1e14] underline underline-offset-2"
+                  className="font-semibold text-ev-night underline underline-offset-2"
                 >
                   términos de uso
                 </Link>

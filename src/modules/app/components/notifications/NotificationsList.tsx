@@ -73,7 +73,7 @@ export const NotificationsList = ({ onClose }: NotificationsListProps) => {
       case "SYSTEM_ALERT":
         return "border-l-yellow-500 bg-yellow-50";
       default:
-        return "border-l-slate-400 bg-[#f7faf9]";
+        return "border-l-slate-400 bg-ev-paper";
     }
   };
 
@@ -117,11 +117,11 @@ export const NotificationsList = ({ onClose }: NotificationsListProps) => {
 
   return (
     <ScrollShadow className="max-h-96">
-      <div className="divide-y divide-emerald-100">
+      <div className="divide-y divide-ev-line">
         {notifications.slice(0, 10).map((notification) => (
           <div
             key={notification.id}
-            className={`p-4 cursor-pointer hover:bg-[#f7faf9] transition-colors border-l-4 ${
+            className={`p-4 cursor-pointer hover:bg-ev-paper transition-colors border-l-4 ${
               !notification.readAt ? "bg-sky-50" : "bg-white"
             } ${getPriorityColor(notification.type)}`}
             onClick={() => handleNotificationClick(notification)}
@@ -135,7 +135,7 @@ export const NotificationsList = ({ onClose }: NotificationsListProps) => {
                 <div className="flex items-center justify-between">
                   <p
                     className={`text-sm font-medium ${
-                      !notification.readAt ? "text-[#0d212c]" : "text-slate-600"
+                      !notification.readAt ? "text-ev-night" : "text-slate-600"
                     }`}
                   >
                     {notification.title}

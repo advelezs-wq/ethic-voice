@@ -6,6 +6,55 @@ import { UserRole, RoleContext } from "@/types/auth.types";
 import { getRolePermissions, isSuperAdmin } from "../utils/permissions";
 import { useOrganization } from "@/modules/app/hooks/useOrganization";
 
+// Una sola petición por (usuario, organización), compartida entre todos los
+// componentes que usan el hook (menú, header, página), y recordada durante la
+// sesión. Antes cada instancia pedía los permisos por separado y, si tardaban
+// más de 6 s, mostraba la vista de investigador por defecto.
+type CachedRole = { role: UserRole; permissions: RoleContext["permissions"] };
+const inflight = new Map<string, Promise<CachedRole | null>>();
+const memoryCache = new Map<string, CachedRole>();
+
+function readCache(key: string): CachedRole | null {
+  const mem = memoryCache.get(key);
+  if (mem) return mem;
+  try {
+    const raw = sessionStorage.getItem(`ev_role:${key}`);
+    if (raw) {
+      const parsed = JSON.parse(raw) as CachedRole;
+      memoryCache.set(key, parsed);
+      return parsed;
+    }
+  } catch {}
+  return null;
+}
+
+function writeCache(key: string, value: CachedRole) {
+  memoryCache.set(key, value);
+  try {
+    sessionStorage.setItem(`ev_role:${key}`, JSON.stringify(value));
+  } catch {}
+}
+
+function fetchRole(orgId: string, key: string): Promise<CachedRole | null> {
+  const existing = inflight.get(key);
+  if (existing) return existing;
+  const p = fetch(`/api/organization/${orgId}/my-permissions`, { cache: "no-store" })
+    .then(async (res) => {
+      if (!res.ok) return null;
+      const data = await res.json();
+      const value: CachedRole = {
+        role: data.role as UserRole,
+        permissions: data.permissions || getRolePermissions(UserRole.ORG_MEMBER),
+      };
+      writeCache(key, value);
+      return value;
+    })
+    .catch(() => null)
+    .finally(() => inflight.delete(key));
+  inflight.set(key, p);
+  return p;
+}
+
 export function useUserRole(): RoleContext & { isLoading: boolean } {
   const { user, isLoaded: userLoaded } = useUser();
   const { currentOrganization, isLoading: orgLoading } = useOrganization();
@@ -49,17 +98,17 @@ export function useUserRole(): RoleContext & { isLoading: boolean } {
           return;
         }
 
-        const res = await fetch(`/api/organization/${orgId}/my-permissions`, {
-          cache: "no-store",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setRoleContext({
-            role: data.role as UserRole,
-            permissions: data.permissions || getRolePermissions(UserRole.ORG_MEMBER),
-            isSuperAdmin: false,
-          });
-        } else {
+        const key = `${user?.id ?? "anon"}:${orgId}`;
+        const cached = readCache(key);
+        if (cached) {
+          setRoleContext({ ...cached, isSuperAdmin: false });
+          if (!cancelled) setIsLoading(false);
+        }
+        const fresh = await fetchRole(orgId, key);
+        if (cancelled) return;
+        if (fresh) {
+          setRoleContext({ ...fresh, isSuperAdmin: false });
+        } else if (!cached) {
           setRoleContext({
             role: UserRole.ORG_MEMBER,
             permissions: getRolePermissions(UserRole.ORG_MEMBER),
@@ -71,10 +120,11 @@ export function useUserRole(): RoleContext & { isLoading: boolean } {
       }
     })();
 
-    // Safety timeout so UI never hangs
+    // Salvaguarda: si la respuesta nunca llega, no bloquear la interfaz para
+    // siempre (queda con permisos mínimos, que es lo seguro).
     const t = setTimeout(() => {
       if (!cancelled) setIsLoading(false);
-    }, 6000);
+    }, 20000);
 
     return () => {
       cancelled = true;

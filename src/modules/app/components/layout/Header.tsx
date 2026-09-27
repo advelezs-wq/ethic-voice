@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import { Logo } from "@/modules/brand/components/Logo";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useOrganization } from "@/modules/app/hooks/useOrganization";
 import {
@@ -21,10 +21,33 @@ import { NotificationBell } from "../notifications/NotificationBell";
 import { CreateReportModal } from "../reports/CreateReportModal";
 import { Button as AppButton } from "@/modules/app/components/ui";
 
+// Nombre de la sección actual (el título grande de cada página vive en su PageHero).
+const SECTIONS: Array<[string, string]> = [
+  ["/app/reports", "Denuncias"],
+  ["/app/organizations", "Organizaciones"],
+  ["/app/organization", "Organización"],
+  ["/app/email", "Correo"],
+  ["/app/team", "Equipo"],
+  ["/app/analytics", "Analíticas e informes"],
+  ["/app/billing", "Plan y facturación"],
+  ["/app/settings", "Configuración"],
+  ["/app/profile", "Perfil"],
+  ["/app/security", "Seguridad"],
+  ["/app/your-forms", "Formularios"],
+  ["/app/superadmin/clients", "Clientes"],
+  ["/app/superadmin/tools", "Herramientas"],
+  ["/app/superadmin/blog", "Blog"],
+  ["/app/superadmin/leads", "Leads"],
+  ["/app/superadmin/lead-magnets", "Recursos descargables"],
+  ["/app/onboarding", "Configuración inicial"],
+];
+
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
+  const section = SECTIONS.find(([prefix]) => pathname?.startsWith(prefix))?.[1];
   const { toggleSidebar } = useSidebar();
-  const { permissions, isSuperAdmin } = useUserRole();
+  const { permissions, isSuperAdmin, isLoading: roleLoading } = useUserRole();
   const { currentOrganization, organizations, switchOrganization, setCurrentOrganization } =
     useOrganization();
   const { isLoaded: _userLoaded } = useUser();
@@ -74,7 +97,9 @@ export function Header() {
         <Button
           isIconOnly
           variant="light"
-          className="hidden lg:flex"
+          size="sm"
+          aria-label="Contraer o expandir la navegación"
+          className="hidden text-ev-mute lg:flex"
           onPress={toggleSidebar}
         >
           <i
@@ -91,43 +116,35 @@ export function Header() {
         >
           {/* Shared home/brand link for every org and superadmins — always
               EthicVoice's own mark, never the org-in-context's uploaded logo. */}
-          <Image
-            src="/brand/logo-nobg.png"
-            alt="EthicVoice"
-            width={160}
-            height={38}
-            className="h-8 w-auto max-w-[9.5rem] object-contain"
-            priority
-          />
+          <Logo markClassName="h-7 w-auto" />
         </Link>
 
         <div className="hidden lg:block">
-          <h1 className="text-xl font-semibold text-[#0d212c]">
-            {isSuperAdmin
-              ? superAdminScope === "org"
-                ? "Workspace de Organización"
-                : "Panel de Super Administrador"
-              : permissions.canViewAllReports
-                ? "Panel de Control"
-                : "Mi Espacio de Trabajo"}
-          </h1>
-          <p className="text-sm text-slate-400">
-            {isSuperAdmin
-              ? superAdminScope === "org"
-                ? "Operando dentro de la organización seleccionada"
-                : "Gestión global del sistema"
-              : permissions.canViewAllReports
-                ? "Gestión de denuncias y reportes"
-                : "Gestión de casos asignados"}
+          <p className="ev-label text-ev-mute">
+            {isSuperAdmin && superAdminScope === "all"
+              ? "EthicVoice · Global"
+              : currentOrganization?.name || "EthicVoice"}
+          </p>
+          <p className="mt-0.5 text-[1.0625rem] font-semibold tracking-[-0.02em] text-ev-night">
+            {section ??
+              (roleLoading ? "\u00a0" : null) ??
+              (isSuperAdmin
+                ? superAdminScope === "org"
+                  ? "Vista de organización"
+                  : "Panel de super administrador"
+                : permissions.canViewAllReports
+                  ? "Inicio"
+                  : "Mi espacio de trabajo")}
           </p>
         </div>
       </div>
 
       {/* Actions and Navigation */}
       <div className="flex items-center gap-2 md:gap-3 flex-wrap justify-end min-w-0">
-        {!isSuperAdmin && (
-          <span className="hidden xl:inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-800">
-            {permissions.canManageOrganization ? "Workspace Admin" : "Workspace Investigador"}
+        {!isSuperAdmin && !roleLoading && (
+          <span className="ev-label hidden items-center gap-2 text-ev-mute xl:inline-flex">
+            <span className="h-1.5 w-1.5 bg-ev-signal" aria-hidden />
+            {permissions.canManageOrganization ? "Administrador" : "Investigador"}
           </span>
         )}
         {/* Create Report Button - Only for Admins */}
@@ -143,7 +160,7 @@ export function Header() {
               />
             }
           >
-            <span className="hidden sm:inline">Crear Reporte</span>
+            <span className="hidden sm:inline">Registrar denuncia</span>
           </AppButton>
         )}
 
@@ -152,7 +169,7 @@ export function Header() {
             {superAdminScope === "org" && (
               <Button
                 variant="flat"
-                className="border border-emerald-200 bg-white text-[#0d212c]"
+                className="border border-ev-line bg-white text-ev-night"
                 onPress={goBackToSuperAdminPanel}
                 startContent={<i className="icon-[lucide--arrow-left] size-4" />}
               >
@@ -163,19 +180,19 @@ export function Header() {
               <DropdownTrigger>
                 <Button
                   variant="flat"
-                  className="min-w-0 sm:min-w-[230px] max-w-[280px] justify-start border border-emerald-200 bg-emerald-50/60"
+                  className="min-w-0 max-w-[280px] justify-start border border-ev-line bg-white sm:min-w-[230px]"
                 >
                   <span className="inline-flex min-w-0 items-center gap-2">
                     <span
                       className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${
                         superAdminScope === "all"
-                          ? "bg-lime-300 text-[#052b24]"
+                          ? "bg-lime-300 text-ev-night"
                           : "bg-emerald-200 text-emerald-900"
                       }`}
                     >
                       {superAdminScope === "all" ? "Global" : "Por org"}
                     </span>
-                    <span className="truncate max-w-[130px] sm:max-w-[160px] text-sm font-medium text-[#0d212c]">
+                    <span className="truncate max-w-[130px] sm:max-w-[160px] text-sm font-medium text-ev-night">
                       {superAdminScope === "all"
                         ? "Todas las organizaciones"
                         : currentOrganization?.name || "Seleccionar organización"}
@@ -244,7 +261,7 @@ export function Header() {
             <Tooltip
               content={
                 superAdminScope === "all"
-                  ? "Ver reportes globales"
+                  ? "Ver denuncias de todas las organizaciones"
                   : `Ver reportes de ${currentOrganization?.name || "la organización seleccionada"}`
               }
             >
@@ -252,12 +269,12 @@ export function Header() {
                 as={Link}
                 href="/app/reports"
                 variant="flat"
-                className="border border-emerald-200 bg-white text-[#0d212c]"
+                className="border border-ev-line bg-white text-ev-night"
                 startContent={
                   <i className="icon-[lucide--file-text] size-4" aria-hidden="true" />
                 }
               >
-                <span className="hidden sm:inline">Ir a reportes</span>
+                <span className="hidden sm:inline">Ir a denuncias</span>
               </Button>
             </Tooltip>
           </div>

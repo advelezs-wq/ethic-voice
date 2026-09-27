@@ -1,68 +1,33 @@
 import React from "react";
-import { CardHeader, CardBody } from "@heroui/card";
-import { Card } from "@/modules/app/components/ui";
-import {
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-  CartesianGrid,
-  Area,
-  AreaChart,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { ChartDataPoint } from "@/types/dashboard.types";
+import { AXIS_TICK, ChartCard, CountTooltip, GRID_STROKE } from "./ChartCard";
 
 interface WeeklyTrendChartProps {
   weeklyData: ChartDataPoint[];
 }
 
-export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({
-  weeklyData,
-}) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-2 shadow-lg rounded-lg border border-emerald-100">
-          <p className="text-sm font-medium">{payload[0].payload.name}</p>
-          <p className="text-sm text-slate-500">{payload[0].value} reportes</p>
-        </div>
-      );
-    }
-    return null;
-  };
-
+/** Denuncias recibidas por día en la última semana (barras: son conteos). */
+export const WeeklyTrendChart: React.FC<WeeklyTrendChartProps> = ({ weeklyData }) => {
+  const total = weeklyData.reduce((sum, d) => sum + (d.reports || 0), 0);
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between w-full">
-          <h3 className="text-lg font-semibold text-[#0d212c]">Tendencia Semanal</h3>
-          <i
-            className="icon-[lucide--trending-up] size-5 text-emerald-600"
-            role="img"
-            aria-hidden="true"
-          />
-        </div>
-      </CardHeader>
-      <CardBody>
-        <div className="h-[250px] mt-8">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={weeklyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#ecfdf5" />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} tickLine={false} />
-              <YAxis tick={{ fontSize: 12 }} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Area
-                type="monotone"
-                dataKey="reports"
-                stroke="#10b981"
-                fill="#d1fae5"
-                strokeWidth={2}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </CardBody>
-    </Card>
+    <ChartCard
+      title="Denuncias recibidas por día"
+      description="Últimos 7 días"
+      figure={total}
+      figureLabel="Esta semana"
+    >
+      <div className="h-[220px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={weeklyData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+            <CartesianGrid vertical={false} stroke={GRID_STROKE} />
+            <XAxis dataKey="name" tick={AXIS_TICK} tickLine={false} axisLine={false} />
+            <YAxis allowDecimals={false} tick={AXIS_TICK} tickLine={false} axisLine={false} width={40} />
+            <Tooltip content={<CountTooltip />} cursor={{ fill: "#F4F3EE" }} />
+            <Bar dataKey="reports" fill="#244850" radius={[6, 6, 0, 0]} maxBarSize={36} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </ChartCard>
   );
 };

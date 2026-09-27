@@ -238,7 +238,7 @@ function PropertiesComponent({
           control={form.control}
           name="required"
           render={({ field }) => (
-            <div className="bg-[#f4f4f5] py-2 px-2 rounded-lg flex items-center justify-between">
+            <div className="bg-ev-paper py-2 px-2 rounded-lg flex items-center justify-between">
               <h3>¿Es obligatorio?</h3>
               <Switch checked={field.value} onValueChange={field.onChange} />
             </div>

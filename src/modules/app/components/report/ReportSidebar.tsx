@@ -78,11 +78,11 @@ function SidebarSection({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-emerald-100 bg-white/95 shadow-none">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-100 bg-emerald-50/40 px-4 py-3">
+    <div className="overflow-hidden rounded-2xl border border-ev-line bg-white shadow-none">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-ev-line bg-ev-paper px-4 py-3">
         <div className="flex items-center gap-2">
           <i className={`${icon} size-4 text-emerald-700`} />
-          <span className="text-sm font-semibold text-[#0d212c]">{title}</span>
+          <span className="text-sm font-semibold text-ev-night">{title}</span>
         </div>
         {action && <div className="flex flex-wrap items-center gap-1.5">{action}</div>}
       </div>
@@ -99,9 +99,9 @@ function MetaRow({
   value: React.ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-3 py-2 border-b border-emerald-50 last:border-0">
+    <div className="flex items-start justify-between gap-3 py-2 border-b border-ev-line last:border-0">
       <span className="text-xs text-slate-400 shrink-0 pt-0.5">{label}</span>
-      <span className="text-xs font-medium text-[#0d212c] text-right">
+      <span className="text-xs font-medium text-ev-night text-right">
         {value}
       </span>
     </div>
@@ -366,7 +366,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
                 <Button
                   size="sm"
                   variant="flat"
-                  color={report.isConfidential ? "default" : "danger"}
+                  color="default"
                   onPress={handleToggleConfidential}
                   isLoading={confidentialLoading}
                   startContent={
@@ -377,12 +377,12 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
                     )
                   }
                 >
-                  {report.isConfidential ? "Quitar confidencial" : "Confidencial"}
+                  {report.isConfidential ? "Quitar confidencial" : "Marcar confidencial"}
                 </Button>
                 <Button
                   size="sm"
                   variant="flat"
-                  color="warning"
+                  color="default"
                   onPress={onEscalateOpen}
                   startContent={
                     <i className="icon-[lucide--arrow-up-circle] size-3.5" />
@@ -393,13 +393,13 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
                 <Button
                   size="sm"
                   variant="flat"
-                  color="primary"
+                  color="default"
                   onPress={onAssignOpen}
                   startContent={
                     <i className="icon-[lucide--user-round-plus] size-3.5" />
                   }
                 >
-                  Asignar
+                  Asignar responsable
                 </Button>
               </div>
             ) : undefined
@@ -438,7 +438,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
               onChange={(e) => handlePriorityChange(e.target.value)}
               isLoading={priorityLoading}
               isDisabled={priorityLoading}
-              aria-label="Prioridad del reporte"
+              aria-label="Prioridad de la denuncia"
             >
               {Object.values(REPORT_PRIORITY).map((p) => (
                 <SelectItem key={p}>{getPriorityLabel(p)}</SelectItem>
@@ -455,7 +455,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
                   type="text"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="flex-1 min-w-0 px-3 py-1.5 text-sm border border-emerald-200 rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent"
+                  className="flex-1 min-w-0 px-3 py-1.5 text-sm border border-ev-line rounded-lg focus:ring-2 focus:ring-blue-900 focus:border-transparent"
                   placeholder="Escribe un asunto breve…"
                 />
                 <Button
@@ -532,7 +532,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
                   <Tooltip
                     content={
                       report.legalHold
-                        ? "No se puede anonimizar mientras el caso esté en legal hold"
+                        ? "No se puede anonimizar mientras el caso tenga retención legal"
                         : "Elimina permanentemente el nombre, correo y teléfono del denunciante identificado. No se puede deshacer."
                     }
                   >
@@ -593,10 +593,16 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
       )}
 
       {/* ── 3. SLA / Deadline ── */}
-      <SidebarSection title="Tiempo límite" icon="icon-[lucide--timer]">
+      <SidebarSection title="Plazo de respuesta" icon="icon-[lucide--timer]">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-500">Días restantes</span>
+            <span className="text-sm text-ev-night">
+              {deadlineInfo.isOverdue
+                ? `Vencido hace ${Math.abs(deadlineInfo.daysRemaining)} ${Math.abs(deadlineInfo.daysRemaining) === 1 ? "día" : "días"}`
+                : deadlineInfo.daysRemaining === 0
+                  ? "Vence hoy"
+                  : `Quedan ${deadlineInfo.daysRemaining} ${deadlineInfo.daysRemaining === 1 ? "día" : "días"}`}
+            </span>
             <Chip
               size="sm"
               variant="flat"
@@ -608,9 +614,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
                     : "success"
               }
             >
-              {deadlineInfo.isOverdue
-                ? `${Math.abs(deadlineInfo.daysRemaining)}d tarde`
-                : `${deadlineInfo.daysRemaining}d`}
+              {deadlineInfo.isOverdue ? "Vencido" : deadlineInfo.daysRemaining <= 1 ? "Por vencer" : "A tiempo"}
             </Chip>
           </div>
           <Progress
@@ -631,7 +635,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
           {deadlineInfo.isOverdue && (
             <p className="text-xs text-red-600 flex items-center gap-1">
               <i className="icon-[lucide--alert-circle] size-3" />
-              Plazo vencido — requiere atención inmediata
+              Priorízala o deja registrado en las notas por qué se extiende.
             </p>
           )}
         </div>
@@ -745,7 +749,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-slate-500">Confianza</span>
-                  <span className="text-xs font-semibold text-[#0d212c]">
+                  <span className="text-xs font-semibold text-ev-night">
                     {aiAnalysis.confidence}%
                   </span>
                 </div>
@@ -777,10 +781,10 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
         icon="icon-[lucide--info]"
       >
         <div className="space-y-0">
-          <MetaRow label="Referencia" value={<span className="font-mono">{reportRef}</span>} />
-          <MetaRow label="Enviado" value={formatDate(report.submittedAt)} />
+          <MetaRow label="Número" value={<span className="font-mono">{reportRef}</span>} />
+          <MetaRow label="Recibida" value={formatDate(report.submittedAt)} />
           <MetaRow
-            label="Fuente"
+            label="Canal"
             value={
               <Chip size="sm" variant="flat">
                 {getSourceLabel(report.source)}
@@ -788,7 +792,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
             }
           />
           <MetaRow
-            label="Tipo"
+            label="Identidad"
             value={
               <Chip
                 size="sm"
@@ -829,7 +833,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
 
       {/* ── 9. Read-only notice for members ── */}
       {!permissions.canEditReports && !permissions.canAssignReports && (
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+        <div className="rounded-2xl border border-ev-line bg-emerald-50 p-4 text-center">
           <i className="icon-[lucide--eye] mx-auto mb-2 size-7 text-emerald-600" />
           <p className="text-sm font-semibold text-emerald-900">Vista de solo lectura</p>
           <p className="mt-1 text-xs text-emerald-800">

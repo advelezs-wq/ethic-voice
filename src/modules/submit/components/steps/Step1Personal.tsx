@@ -52,10 +52,10 @@ export function Step1Personal({ organizationId }: Step1PersonalProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="mb-4 text-lg font-semibold text-[#0a1e14]">Denunciante</h3>
+        <h3 className="mb-4 text-lg font-semibold text-ev-night">Denunciante</h3>
 
         <div className="mb-4 rounded-xl border border-lime-200 bg-lime-50/80 p-3">
-          <p className="text-xs leading-relaxed text-[#1f3d31]">
+          <p className="text-xs leading-relaxed text-ev-ink">
             Puedes activar el anonimato para ocultar tu identidad durante el
             proceso. Solo comparte datos personales si deseas recibir contacto
             de seguimiento directo.
@@ -71,7 +71,7 @@ export function Step1Personal({ organizationId }: Step1PersonalProps) {
               onValueChange={field.onChange}
               classNames={{
                 base: "max-w-full",
-                wrapper: "bg-gray-300 group-data-[selected=true]:bg-[#0a1e14]",
+                wrapper: "bg-gray-300 group-data-[selected=true]:bg-ev-night",
                 thumb: "bg-white",
               }}
               className="mb-6"
@@ -180,8 +180,8 @@ export function Step1Personal({ organizationId }: Step1PersonalProps) {
       </div>
 
       <div>
-        <h3 className="mb-2 text-lg font-semibold text-[#0a1e14]">Denunciado</h3>
-        <p className="mb-4 text-sm text-[#273c46]">
+        <h3 className="mb-2 text-lg font-semibold text-ev-night">Denunciado</h3>
+        <p className="mb-4 text-sm text-ev-mute">
           Si no conoce al denunciado, escriba &quot;No especificado&quot; en los
           campos de nombre.
         </p>
@@ -264,7 +264,7 @@ export function Step1Personal({ organizationId }: Step1PersonalProps) {
       </div>
 
       <div>
-        <h3 className="mb-4 text-lg font-semibold text-[#0a1e14]">
+        <h3 className="mb-4 text-lg font-semibold text-ev-night">
           Información adicional
         </h3>
 
@@ -344,8 +344,8 @@ export function Step1Personal({ organizationId }: Step1PersonalProps) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#0a1e14]/10 bg-[#f7faf9] p-3">
-        <p className="text-xs leading-relaxed text-[#273c46]">
+      <div className="rounded-xl border border-ev-night/10 bg-ev-paper p-3">
+        <p className="text-xs leading-relaxed text-ev-mute">
           Recomendación de seguridad: evita incluir contraseñas, datos
           bancarios completos o información de terceros no relacionada con el
           hecho reportado.

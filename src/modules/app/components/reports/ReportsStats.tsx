@@ -1,5 +1,7 @@
 "use client";
 
+import { MetricStrip, type MetricTone } from "@/modules/app/components/ui";
+
 import React from "react";
 import { ReportsStats as ReportsStatsType } from "@/types/reports";
 import { Card, CardBody, Progress } from "@heroui/react";
@@ -45,7 +47,7 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
 
   const statsData = [
     {
-      title: "Informes totales",
+      title: "Total de denuncias",
       value: stats.totalReports.toString(),
       subtitle: `${stats.totalReportsChange} frente al periodo anterior`,
       icon: (
@@ -82,7 +84,7 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
         : "0",
     },
     {
-      title: "En Progreso",
+      title: "En investigación",
       value: (stats.inProgressReports || 0).toString(),
       subtitle: `${inProgressRate}% del total`,
       icon: (
@@ -97,9 +99,9 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
       textColor: "text-secondary-600",
     },
     {
-      title: "Resueltos",
+      title: "Resueltas",
       value: stats.resolvedReports.toString(),
-      subtitle: `${resolutionRate}% tasa de resolución`,
+      subtitle: `${resolutionRate}% del total`,
       icon: (
         <i
           className="icon-[lucide--circle-check-big] size-5"
@@ -114,9 +116,9 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
       progress: parseFloat(resolutionRate),
     },
     {
-      title: "Alta Severidad",
+      title: "Severidad alta",
       value: (stats.highSeverityReports || 0).toString(),
-      subtitle: `${stats.highPriorityReports} urgentes`,
+      subtitle: `${stats.highPriorityReports} con prioridad urgente`,
       icon: (
         <i
           className="icon-[lucide--triangle-alert] size-5"
@@ -129,7 +131,7 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
       textColor: "text-danger-600",
     },
     {
-      title: "Reportes Anónimos",
+      title: "Denuncias anónimas",
       value: (stats.anonymousReports || 0).toString(),
       subtitle: `${anonymousRate}% del total`,
       icon: (
@@ -154,7 +156,7 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
       trendType: "positive" as const,
     },
     {
-      label: "Nuevos Reportes (7 días)",
+      label: "Nuevas en los últimos 7 días",
       value: stats.newReportsLast7Days?.toString() || "0",
       trend: stats.newReportsLast7DaysChange || "+0%",
       trendType: stats.newReportsLast7DaysChange?.includes("+")
@@ -177,75 +179,45 @@ export function ReportsStats({ stats }: ReportsStatsProps) {
     );
   };
 
+  const TONE: Record<string, MetricTone> = {
+    primary: "slate",
+    warning: "amber",
+    secondary: "signal",
+    success: "moss",
+    danger: "coral",
+    default: "haze",
+  };
+
   return (
     <div className="space-y-4">
-      {/* Main Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-        {statsData.map((stat, index) => (
-          <Card
-            key={index}
-            className="hover:shadow-md transition-shadow min-w-0"
-          >
-            <CardBody className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                  <div className={stat.textColor}>{stat.icon}</div>
-                </div>
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-slate-500 mb-1 whitespace-normal break-words text-pretty">
-                  {stat.title}
-                </p>
-                <p className="text-2xl font-bold text-[#0d212c] tabular-nums">
-                  {stat.value}
-                </p>
-                <p className="text-xs text-slate-400 mt-1 whitespace-normal break-words text-pretty">
-                  {stat.subtitle}
-                </p>
-                {stat.showProgress && (
-                  <Progress
-                    value={Number(stat.progress)}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    color={stat.color as any}
-                    className="mt-2"
-                    size="sm"
-                  />
-                )}
-              </div>
-            </CardBody>
-          </Card>
-        ))}
-      </div>
-
-      {/* KPI Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {kpiData.map((kpi, index) => (
-          <Card key={index} className="bg-emerald-50/40">
-            <CardBody className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-500">{kpi.label}</p>
-                  <p className="text-xl font-bold text-[#0d212c] mt-1">
-                    {kpi.value}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1">
-                  {getTrendIcon(kpi.trendType as "positive" | "negative")}
+      <MetricStrip
+        size="md"
+        // En la lista solo lo que ayuda a decidir qué abrir; el resto vive en Analíticas.
+        metrics={statsData
+          .filter((stat) => ["Pendientes", "En investigación", "Severidad alta", "Resueltas"].includes(stat.title))
+          .map((stat) => ({
+          key: stat.title,
+          label: stat.title,
+          value: stat.value,
+          tone: TONE[stat.color] ?? "haze",
+          caption: (
+            <>
+              <span className="text-[0.8125rem]">{stat.subtitle}</span>
+              {stat.showProgress && (
+                <span className="mt-2.5 block h-1 overflow-hidden rounded-full bg-ev-bone">
                   <span
-                    className={`text-sm font-medium ${
-                      kpi.trendType === "positive"
-                        ? "text-green-600"
-                        : "text-red-600"
+                    className={`block h-full rounded-full ${
+                      stat.color === "success" ? "bg-ev-moss" : stat.color === "warning" ? "bg-ev-amber" : "bg-ev-slate"
                     }`}
-                  >
-                    {kpi.trend}
-                  </span>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        ))}
-      </div>
+                    style={{ width: `${Math.min(100, Math.max(0, Number(stat.progress) || 0))}%` }}
+                  />
+                </span>
+              )}
+            </>
+          ),
+        }))}
+      />
+
     </div>
   );
 }

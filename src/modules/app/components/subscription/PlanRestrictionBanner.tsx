@@ -142,8 +142,8 @@ export function PlanRestrictionBanner({
         };
       default:
         return {
-          bg: "bg-[#f7faf9] border-emerald-100",
-          text: "text-[#0d212c]",
+          bg: "bg-ev-paper border-ev-line",
+          text: "text-ev-night",
           icon: "text-slate-500",
           button: "default",
         };

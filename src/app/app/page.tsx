@@ -38,9 +38,9 @@ export default function AppDashboard() {
   if (!isLoaded || !user || roleLoading) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center">
-        <div className="text-center rounded-2xl border border-emerald-100 bg-white px-8 py-7 shadow-sm">
+        <div className="text-center rounded-2xl border border-ev-line bg-white px-8 py-7 shadow-sm">
           <Spinner size="lg" color="primary" className="mb-4" />
-          <p className="text-slate-500">Preparando tu workspace...</p>
+          <p className="text-slate-500">Cargando tu panel…</p>
         </div>
       </div>
     );
@@ -73,7 +73,7 @@ export default function AppDashboard() {
         </p>
         <a
           href="/app/onboarding"
-          className="mt-4 inline-block rounded-full bg-[#0d212c] px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-[#0d212c]/90"
+          className="mt-4 inline-block rounded-full bg-ev-night px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-ev-night/90"
         >
           Crear mi organización
         </a>

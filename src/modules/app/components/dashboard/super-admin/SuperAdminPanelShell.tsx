@@ -74,12 +74,12 @@ export function SuperAdminPanelShell({
   children,
 }: SuperAdminPanelShellProps) {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-[#f7faf9]">
+    <section className="relative min-h-screen overflow-hidden bg-ev-paper">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_0%,rgba(94,210,156,0.16),transparent_46%)]" />
       <div className="pointer-events-none absolute right-[-220px] top-[-120px] h-[420px] w-[420px] rounded-full bg-lime-300/20 blur-3xl" />
 
       <div className="relative mx-auto w-full max-w-[1500px] space-y-6 px-4 py-6 sm:px-6 lg:px-10">
-        <header className="overflow-hidden rounded-3xl border border-emerald-200/70 bg-gradient-to-br from-[#051a24] via-[#0d212c] to-[#041018] p-6 text-white shadow-[0_24px_60px_-30px_rgba(5,26,36,0.75)] sm:p-8">
+        <header className="overflow-hidden rounded-3xl border border-ev-line bg-gradient-to-br from-ev-night via-ev-night to-ev-night p-6 text-white shadow-none sm:p-8">
           <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-lime-300">
             EthicVoice · Super Admin
           </p>
@@ -119,7 +119,7 @@ export function SuperAdminPanelShell({
                         ? "bg-danger-400/70 text-white"
                         : action.hint === "Operativo"
                           ? "bg-primary-400/70 text-white"
-                          : "bg-lime-300/70 text-[#052b24]"
+                          : "bg-lime-300/70 text-ev-night"
                     }`}
                   >
                     {action.hint}

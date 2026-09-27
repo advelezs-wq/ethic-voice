@@ -10,7 +10,7 @@ const OrganizationPage = async () => {
   if (!userId) {
     return (
       <section className="flex items-center justify-center min-h-[60vh]">
-        <div className="rounded-2xl border border-emerald-100 bg-white px-6 py-5 text-center shadow-sm">
+        <div className="rounded-2xl border border-ev-line bg-white px-6 py-5 text-center shadow-sm">
           <p className="text-sm font-medium text-slate-700">Sesión no válida</p>
         </div>
       </section>

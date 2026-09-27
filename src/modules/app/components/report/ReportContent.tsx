@@ -33,13 +33,13 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <Card className="border border-emerald-100 bg-white/95 shadow-none">
+    <Card className="border border-ev-line bg-white shadow-none">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
           <div className={`p-1.5 ${colorClass} rounded-lg`}>
             <i className={`${icon} size-4 text-white`} />
           </div>
-          <h2 className="text-base font-semibold text-[#0d212c]">{title}</h2>
+          <h2 className="text-base font-semibold text-ev-night">{title}</h2>
         </div>
       </CardHeader>
       <CardBody className="pt-0">{children}</CardBody>
@@ -49,9 +49,9 @@ function SectionCard({
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="py-2.5 border-b border-emerald-50 last:border-0">
+    <div className="py-2.5 border-b border-ev-line last:border-0">
       <p className="text-xs font-medium text-slate-400 mb-0.5">{label}</p>
-      <p className="text-sm text-[#0d212c]">{value}</p>
+      <p className="text-sm text-ev-night">{value}</p>
     </div>
   );
 }
@@ -170,7 +170,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
               <p className="text-xs font-semibold text-slate-400 mb-0.5">
                 {label}
               </p>
-              <p className="text-sm text-[#0d212c] whitespace-pre-wrap">
+              <p className="text-sm text-ev-night whitespace-pre-wrap">
                 {displayValue}
               </p>
             </div>
@@ -225,7 +225,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
               <p className="text-xs font-semibold text-slate-400 mb-0.5">
                 {field.label}
               </p>
-              <p className="text-sm text-[#0d212c] whitespace-pre-wrap">
+              <p className="text-sm text-ev-night whitespace-pre-wrap">
                 {field.value}
               </p>
             </div>
@@ -240,14 +240,14 @@ export const ReportContent: React.FC<ReportContentProps> = ({
 
       {/* ── AI Analysis ── */}
       {hasAiAnalysis && (
-        <div className="overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/55 to-lime-50/35">
+        <div className="overflow-hidden rounded-2xl border border-ev-line bg-white">
           {/* Header */}
-          <div className="flex items-center gap-3 border-b border-emerald-200 bg-white/70 px-5 py-4">
+          <div className="flex items-center gap-3 border-b border-ev-line bg-white/70 px-5 py-4">
             <div className="rounded-xl bg-emerald-700 p-2">
               <i className="icon-[lucide--sparkles] size-5 text-white" />
             </div>
             <div>
-              <h2 className="font-bold text-[#0d212c]">
+              <h2 className="font-bold text-ev-night">
                 Análisis de Inteligencia Artificial
               </h2>
               <p className="text-xs text-slate-400">
@@ -278,7 +278,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
                 <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-emerald-800">
                   Resumen ejecutivo
                 </h3>
-                <p className="text-sm text-[#0d212c] leading-relaxed">
+                <p className="text-sm text-ev-night leading-relaxed">
                   {aiAnalysis?.summary || report.aiSummary}
                 </p>
               </div>
@@ -291,7 +291,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
                   <span className="text-xs font-medium text-slate-400">
                     Confianza del análisis
                   </span>
-                  <span className="text-xs font-bold text-[#0d212c]">
+                  <span className="text-xs font-bold text-ev-night">
                     {aiAnalysis.confidence}%
                   </span>
                 </div>
@@ -392,9 +392,9 @@ export const ReportContent: React.FC<ReportContentProps> = ({
                     (party: any, idx: number) => (
                       <div
                         key={idx}
-                        className="bg-white rounded-xl border border-emerald-100 p-3"
+                        className="bg-white rounded-xl border border-ev-line p-3"
                       >
-                        <p className="text-sm font-semibold text-[#0d212c]">
+                        <p className="text-sm font-semibold text-ev-night">
                           {party.name}
                         </p>
                         <p className="text-xs text-slate-400">{party.role}</p>
@@ -547,7 +547,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
 
       {/* ── No AI analysis state ── */}
       {!hasAiAnalysis && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/35 py-10 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-ev-line bg-ev-paper py-10 text-center">
           <i className="icon-[lucide--brain] size-10 text-slate-300 mb-3" />
           <p className="text-sm font-semibold text-slate-400">
             Sin análisis de IA
@@ -562,18 +562,18 @@ export const ReportContent: React.FC<ReportContentProps> = ({
       {/* ── Reporter ── */}
       <SectionCard
         icon="icon-[lucide--user]"
-        title="Información del denunciante"
-        colorClass={parsedContent.isAnonymous ? "bg-slate-400" : "bg-emerald-600"}
+        title="Quién reporta"
+        colorClass={(report.isAnonymous ?? parsedContent.isAnonymous) ? "bg-slate-400" : "bg-emerald-600"}
       >
-        {parsedContent.isAnonymous ? (
-          <div className="flex items-center gap-3 bg-emerald-50/40 rounded-xl p-4">
+        {(report.isAnonymous ?? parsedContent.isAnonymous) ? (
+          <div className="flex items-center gap-3 bg-ev-paper rounded-xl p-4">
             <i className="icon-[lucide--user-x] size-5 text-slate-400" />
             <div>
               <p className="text-sm font-semibold text-slate-600">
-                Reporte anónimo
+                Denuncia anónima
               </p>
               <p className="text-xs text-slate-400 mt-0.5">
-                El denunciante eligió mantener su identidad en el anonimato.
+                La persona eligió no identificarse. Puedes escribirle por el chat sin conocer su identidad.
               </p>
             </div>
           </div>
@@ -618,9 +618,9 @@ export const ReportContent: React.FC<ReportContentProps> = ({
             )}
           </div>
         ) : (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-            <p className="text-sm text-yellow-800">
-              Datos del denunciante no disponibles.
+          <div className="rounded-xl border border-ev-line bg-ev-paper p-4">
+            <p className="text-sm text-ev-mute">
+              La persona no dejó datos de contacto. Puedes comunicarte por el chat de la denuncia.
             </p>
           </div>
         )}
@@ -630,7 +630,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
       {parsedContent.reported?.firstName && (
         <SectionCard
           icon="icon-[lucide--user-round-x]"
-          title="Información del denunciado"
+          title="Persona denunciada"
           colorClass="bg-red-600"
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
@@ -654,7 +654,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
       {/* ── Report Details ── */}
       <SectionCard
         icon="icon-[lucide--file-text]"
-        title="Detalles del reporte"
+        title="Lo que se reportó"
         colorClass="bg-indigo-600"
       >
         {renderQuestionnaire(parsedContent.questionnaire)}
@@ -664,9 +664,9 @@ export const ReportContent: React.FC<ReportContentProps> = ({
       {report.attachments && report.attachments.length > 0 ? (
         <ReportAttachments attachments={report.attachments} />
       ) : (
-        <div className="flex items-center gap-2 p-4 rounded-xl border border-dashed border-emerald-100 text-sm text-slate-400">
+        <div className="flex items-center gap-2 p-4 rounded-xl border border-dashed border-ev-line text-sm text-slate-400">
           <i className="icon-[lucide--paperclip] size-4" />
-          Este reporte no tiene archivos adjuntos.
+          Esta denuncia no tiene archivos adjuntos.
         </div>
       )}
 
@@ -677,7 +677,7 @@ export const ReportContent: React.FC<ReportContentProps> = ({
           title="Contenido original del email"
           colorClass="bg-sky-500"
         >
-          <div className="bg-emerald-50/40 rounded-xl border border-emerald-100 p-4 overflow-auto max-h-72">
+          <div className="bg-ev-paper rounded-xl border border-ev-line p-4 overflow-auto max-h-72">
             <pre className="text-xs text-slate-600 whitespace-pre-wrap font-mono leading-relaxed">
               {(() => {
                 try {

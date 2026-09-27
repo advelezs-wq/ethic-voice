@@ -16,7 +16,7 @@ export default function FormErrorPage({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f7faf9] to-emerald-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-ev-paper to-emerald-50 p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center space-y-6">
         {/* Header icon without logos */}
         <div className="flex justify-center">
@@ -34,7 +34,7 @@ export default function FormErrorPage({
 
         {/* Mensaje de disculpa */}
         <div className="space-y-3">
-          <h1 className="text-2xl font-bold text-[#0d212c]">
+          <h1 className="text-2xl font-bold text-ev-night">
             ¡Ups! Algo salió mal
           </h1>
           <p className="text-slate-500 text-base">
@@ -67,7 +67,7 @@ export default function FormErrorPage({
         </div>
 
         {/* Información de contacto */}
-        <div className="pt-4 border-t border-emerald-100">
+        <div className="pt-4 border-t border-ev-line">
           <p className="text-sm text-slate-400">
             Si el problema persiste, por favor{" "}
             <a

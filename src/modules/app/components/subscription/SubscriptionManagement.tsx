@@ -356,7 +356,7 @@ export function SubscriptionManagement({
             <div className="flex items-start gap-3">
               <i className="icon-[lucide--alert-triangle] size-6 text-orange-600 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold text-[#0d212c]">
+                <h3 className="text-lg font-semibold text-ev-night">
                   {cancellation?.daysRemaining != null && cancellation.daysRemaining <= 31
                     ? "Cuenta próxima a desactivarse"
                     : "No hay suscripción activa"}
@@ -411,7 +411,7 @@ export function SubscriptionManagement({
                 <h4 className="text-xl font-bold text-primary">
                   {subscription.planName}
                 </h4>
-                <p className="text-2xl font-bold text-[#0d212c] mt-1">
+                <p className="text-2xl font-bold text-ev-night mt-1">
                   {formatPrice(
                     subscription.billingCycle === "YEARLY"
                       ? (subscription.yearlyPrice as unknown as number) || subscription.monthlyPrice
@@ -424,7 +424,7 @@ export function SubscriptionManagement({
               </div>
 
               {subscription.isTrialActive && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+                <div className="bg-emerald-50 border border-ev-line rounded-xl p-3">
                   <div className="flex items-center gap-2">
                     <i className="icon-[lucide--clock] size-4 text-emerald-600" />
                     <span className="text-sm font-medium text-emerald-900">
@@ -453,7 +453,7 @@ export function SubscriptionManagement({
 
             <div className="space-y-4">
               <div>
-                <h5 className="font-semibold text-[#0d212c] mb-2">
+                <h5 className="font-semibold text-ev-night mb-2">
                   Características incluidas:
                 </h5>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
@@ -469,7 +469,7 @@ export function SubscriptionManagement({
               </div>
 
               <div>
-                <h5 className="font-semibold text-[#0d212c] mb-2">Límites:</h5>
+                <h5 className="font-semibold text-ev-night mb-2">Límites:</h5>
                 <div className="space-y-1 text-sm text-slate-500">
                   <p>
                     <strong>Administradores:</strong> {subscription.maxUsers}
@@ -488,7 +488,7 @@ export function SubscriptionManagement({
             </div>
           </div>
 
-          <div className="flex gap-3 mt-6 pt-4 border-t border-emerald-100">
+          <div className="flex gap-3 mt-6 pt-4 border-t border-ev-line">
             {subscription.status === "ACTIVE" && (
               <>
                 <Button
@@ -560,7 +560,7 @@ export function SubscriptionManagement({
                 {recentInvoices.map((invoice) => (
                 <div
                   key={invoice.id}
-                  className="flex items-center justify-between p-4 border border-emerald-100 rounded-xl hover:bg-emerald-50/40 transition-colors"
+                  className="flex items-center justify-between p-4 border border-ev-line rounded-xl hover:bg-ev-paper transition-colors"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3">

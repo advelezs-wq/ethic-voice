@@ -1,5 +1,7 @@
 "use client";
 
+import { PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
+
 import React, { useState, useEffect } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Tabs, Tab } from "@heroui/tabs";
@@ -387,18 +389,20 @@ export function CustomOrganizationManagement({
     <div className={className}>
       <div className="overflow-x-auto pb-1 -mb-px">
         <Tabs aria-label="Gestión de organización" className="w-full min-w-max">
-          <Tab key="members" title="Miembros">
+          <Tab key="members" title="Equipo">
             <div className="space-y-4 sm:space-y-6">
               {/* Plan Limits Info */}
               <Card>
                 <CardHeader>
                   <div className="flex justify-between items-center w-full gap-2 flex-wrap">
-                    <h3 className="text-base sm:text-lg font-semibold">
-                      Límites del Plan
+                    <h3 className="text-base font-semibold text-ev-night">
+                      Cupos de tu plan
                     </h3>
                     {orgPlanLimits && (
-                      <Chip color="primary" variant="flat">
-                        {orgPlanLimits.planType}
+                      <Chip variant="flat" size="sm">
+                        Plan{" "}
+                        {PLAN_CONFIGS[orgPlanLimits.planType as PlanType]?.displayName.replace("EthicVoice ", "") ??
+                          orgPlanLimits.planType}
                       </Chip>
                     )}
                   </div>
@@ -413,22 +417,24 @@ export function CustomOrganizationManagement({
                   {orgPlanLimits && !membersLoading ? (
                     <div className="grid grid-cols-2 gap-4">
                       <div className="text-center">
-                        <p className="text-xl sm:text-2xl font-bold text-primary">
-                          {members.filter((m) => m.role === "ADMIN").length} /{" "}
-                          {orgPlanLimits.maxUsers === -1
-                            ? "∞"
-                            : orgPlanLimits.maxUsers}
+                        <p className="ev-num text-2xl font-semibold text-ev-night">
+                          {members.filter((m) => m.role === "ADMIN").length}
+                          <span className="text-base font-normal text-ev-mute">
+                            {" "}
+                            de {orgPlanLimits.maxUsers === -1 ? "ilimitados" : orgPlanLimits.maxUsers}
+                          </span>
                         </p>
-                        <p className="text-sm text-slate-500">Administradores</p>
+                        <p className="text-sm text-ev-mute">Administradores</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-xl sm:text-2xl font-bold text-primary">
-                          {members.filter((m) => m.role === "MEMBER").length} /{" "}
-                          {orgPlanLimits.maxInvestigators === -1
-                            ? "∞"
-                            : orgPlanLimits.maxInvestigators}
+                        <p className="ev-num text-2xl font-semibold text-ev-night">
+                          {members.filter((m) => m.role === "MEMBER").length}
+                          <span className="text-base font-normal text-ev-mute">
+                            {" "}
+                            de {orgPlanLimits.maxInvestigators === -1 ? "ilimitados" : orgPlanLimits.maxInvestigators}
+                          </span>
                         </p>
-                        <p className="text-sm text-slate-500">Investigadores</p>
+                        <p className="text-sm text-ev-mute">Investigadores</p>
                       </div>
                     </div>
                   ) : (
@@ -454,7 +460,7 @@ export function CustomOrganizationManagement({
                           <i className="icon-[lucide--user-plus] size-4" />
                         }
                       >
-                        Invitar Miembro
+                        Invitar miembro
                       </Button>
                     )}
                   </div>
@@ -641,7 +647,7 @@ export function CustomOrganizationManagement({
           </Tab>
 
           {rolePermissions.canManageOrganization && (
-            <Tab key="settings" title="Configuración">
+            <Tab key="settings" title="Datos de la organización">
               <Card>
                 <CardHeader>
                   <h3 className="text-base sm:text-lg font-semibold">

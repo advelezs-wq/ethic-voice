@@ -47,10 +47,10 @@ export function RoleBasedOrganizationView() {
     <section className="h-full w-full space-y-6">
       <div className="ev-page-hero">
         <p className="ev-page-hero-kicker">
-          {isSuperAdmin ? "Workspace de organización" : "Gestión interna"}
+          {isSuperAdmin ? "Vista de organización" : "Organización"}
         </p>
         <h1 className="ev-page-hero-title">
-          {isSuperAdmin ? "Organización" : "Mi Organización"}
+          {isSuperAdmin ? "Organización" : "Mi organización"}
         </h1>
         <p className="ev-page-hero-description">
           {permissions.canManageOrganization
@@ -60,41 +60,42 @@ export function RoleBasedOrganizationView() {
       </div>
 
       {permissions.canManageOrganization ? (
-        <div className="overflow-x-auto pb-1 -mb-px rounded-2xl border border-emerald-100 bg-white p-3 sm:p-4">
+        <div className="overflow-x-auto pb-1 -mb-px rounded-2xl border border-ev-line bg-white p-3 sm:p-4">
           <Tabs aria-label="Opciones de organización" className="min-w-max">
-            <Tab key="profile" title="Configuración y Miembros">
+            <Tab key="profile" title="Equipo y datos">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mt-4 sm:mt-6">
                 <div className="col-span-2">
                   <CustomOrganizationManagement />
                 </div>
                 <div className="space-y-4 col-span-1">
-                  <Card className="border border-emerald-100 shadow-none">
+                  <Card className="border border-ev-line shadow-none">
                     <CardBody className="p-6">
-                      <h3 className="text-lg font-semibold mb-4">
-                        Invitar Miembros
+                      <h3 className="text-base font-semibold text-ev-night">
+                        Roles del equipo
                       </h3>
-                      <div className="space-y-3">
-                        <p className="text-sm text-slate-500">
-                          Para invitar nuevos miembros desde la plataforma:
-                        </p>
-                        <ol className="text-sm text-slate-500 space-y-2 list-decimal list-inside">
-                          <li>
-                            Haz clic en "Invitar Miembro" en la parte superior
-                            derecha de esta sección
-                          </li>
-                          <li>
-                            Ingresa el correo electrónico del nuevo miembro
-                          </li>
-                          <li>
-                            Selecciona el rol: <strong>Administrador</strong> o{" "}
-                            <strong>Investigador</strong>
-                          </li>
-                          <li>
-                            Si es Investigador, será asignado por defecto al
-                            departamento General (puedes moverlo luego)
-                          </li>
-                        </ol>
-                      </div>
+                      <p className="mt-1 text-sm text-ev-mute">
+                        Usa “Invitar miembro” y elige el rol según lo que la persona deba hacer.
+                      </p>
+                      <dl className="mt-4 space-y-3 text-sm">
+                        <div>
+                          <dt className="font-medium text-ev-night">Administrador</dt>
+                          <dd className="text-ev-mute">
+                            Ve todas las denuncias, asigna responsables y configura la organización.
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="font-medium text-ev-night">Investigador</dt>
+                          <dd className="text-ev-mute">
+                            Trabaja solo en las denuncias que se le asignan.
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="font-medium text-ev-night">Observador</dt>
+                          <dd className="text-ev-mute">
+                            Consulta todo (por ejemplo, auditoría o comité) sin poder modificar nada.
+                          </dd>
+                        </div>
+                      </dl>
                     </CardBody>
                   </Card>
 
@@ -102,7 +103,7 @@ export function RoleBasedOrganizationView() {
                     <Alert
                       color="warning"
                       description={
-                        "Recomendación: Crea departamentos antes de invitar miembros para una mejor organización de los reportes."
+                        "Recomendación: crea los departamentos antes de invitar miembros; así cada denuncia llega al área correcta."
                       }
                     />
                   )}
@@ -125,7 +126,7 @@ export function RoleBasedOrganizationView() {
               </div>
             </Tab>
 
-            <Tab key="billing" title="Facturación">
+            <Tab key="billing" title="Plan y facturación">
               <div className="mt-4 sm:mt-6">
                 <SubscriptionManagement />
               </div>
@@ -138,7 +139,7 @@ export function RoleBasedOrganizationView() {
             <CustomOrganizationManagement />
           </div>
           <div className="space-y-4 col-span-1">
-            <Card className="border border-emerald-100 shadow-none">
+            <Card className="border border-ev-line shadow-none">
               <CardBody className="p-4 sm:p-6">
                 <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">
                   Información

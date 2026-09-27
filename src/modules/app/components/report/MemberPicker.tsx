@@ -202,7 +202,7 @@ export function MemberPicker({
   const dropdownContent = (
     <div
       ref={dropdownRef}
-      className="bg-white border border-emerald-100 rounded-xl shadow-2xl overflow-hidden flex flex-col"
+      className="bg-white border border-ev-line rounded-xl shadow-2xl overflow-hidden flex flex-col"
       style={{
         position: "fixed",
         zIndex: 99999,
@@ -216,8 +216,8 @@ export function MemberPicker({
       }}
     >
       {/* Search */}
-      <div className="p-2 border-b border-emerald-50 shrink-0">
-        <div className="flex items-center gap-2 bg-emerald-50/40 rounded-lg px-2.5 py-1.5">
+      <div className="p-2 border-b border-ev-line shrink-0">
+        <div className="flex items-center gap-2 bg-ev-paper rounded-lg px-2.5 py-1.5">
           <i className="icon-[lucide--search] size-3.5 text-slate-400 shrink-0" />
           <input
             ref={inputRef}
@@ -225,7 +225,7 @@ export function MemberPicker({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar por nombre o departamento…"
-            className="flex-1 bg-transparent text-sm text-[#0d212c] placeholder-gray-400 outline-none min-w-0"
+            className="flex-1 bg-transparent text-sm text-ev-night placeholder-gray-400 outline-none min-w-0"
           />
           {query && (
             <button
@@ -246,7 +246,7 @@ export function MemberPicker({
           <button
             type="button"
             onClick={() => handleSelect("")}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-400 hover:bg-emerald-50/40 transition-colors border-b border-emerald-50"
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-slate-400 hover:bg-ev-paper transition-colors border-b border-ev-line"
           >
             <i className="icon-[lucide--user-x] size-4 text-slate-400" />
             Sin asignar
@@ -266,7 +266,7 @@ export function MemberPicker({
           <>
             {admins.length > 0 && (
               <div>
-                <div className="px-3 py-1.5 bg-emerald-50/40 border-b border-emerald-50 sticky top-0">
+                <div className="px-3 py-1.5 bg-ev-paper border-b border-ev-line sticky top-0">
                   <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
                     Administradores
                   </p>
@@ -284,7 +284,7 @@ export function MemberPicker({
 
             {investigators.length > 0 && (
               <div>
-                <div className="px-3 py-1.5 bg-emerald-50/40 border-b border-emerald-50 sticky top-0">
+                <div className="px-3 py-1.5 bg-ev-paper border-b border-ev-line sticky top-0">
                   <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
                     Investigadores
                   </p>
@@ -305,7 +305,7 @@ export function MemberPicker({
 
       {/* Footer: count */}
       {members.length > 0 && (
-        <div className="px-3 py-1.5 bg-emerald-50/40 border-t border-emerald-50 shrink-0">
+        <div className="px-3 py-1.5 bg-ev-paper border-t border-ev-line shrink-0">
           <p className="text-[10px] text-slate-400">
             {filtered.length} de {members.filter((m) => !m.isBlocked).length}{" "}
             miembro{members.filter((m) => !m.isBlocked).length !== 1 ? "s" : ""}
@@ -333,11 +333,11 @@ export function MemberPicker({
           "w-full flex items-center gap-2 px-3 rounded-xl border transition-all text-left",
           heightClass,
           disabled
-            ? "opacity-50 cursor-not-allowed bg-emerald-50/40"
+            ? "opacity-50 cursor-not-allowed bg-ev-paper"
             : "bg-white cursor-pointer hover:border-sky-400 hover:bg-sky-50/20",
           open
             ? "border-sky-500 ring-2 ring-sky-100"
-            : "border-emerald-200",
+            : "border-ev-line",
         ].join(" ")}
       >
         {value ? (
@@ -349,7 +349,7 @@ export function MemberPicker({
             >
               {initials(value)}
             </span>
-            <span className="flex-1 truncate text-[#0d212c] text-sm">{value}</span>
+            <span className="flex-1 truncate text-ev-night text-sm">{value}</span>
             <button
               type="button"
               onClick={(e) => {
@@ -399,7 +399,7 @@ function MemberRow({
       aria-selected={isSelected}
       onClick={onSelect}
       className={`w-full flex items-center gap-2.5 px-3 py-2.5 transition-colors text-left ${
-        isSelected ? "bg-sky-50" : "hover:bg-emerald-50/40"
+        isSelected ? "bg-sky-50" : "hover:bg-ev-paper"
       }`}
     >
       {/* Avatar */}
@@ -413,7 +413,7 @@ function MemberRow({
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-[#0d212c] truncate">
+        <p className="text-sm font-medium text-ev-night truncate">
           {member.userName}
         </p>
         {member.department && (

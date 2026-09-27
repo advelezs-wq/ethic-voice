@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { MetricStrip } from "@/modules/app/components/ui";
+
 import React, { useState, useEffect } from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
@@ -112,61 +114,32 @@ export function TeamMembersView({
   const viewers = members.filter((m) => m.role === "VIEWER");
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <section className="ev-page-hero">
         <p className="ev-page-hero-kicker">Equipo</p>
-        <h1 className="ev-page-hero-title">Equipo de Investigadores</h1>
+        <h1 className="ev-page-hero-title">Equipo</h1>
         <p className="ev-page-hero-description">
-          Gestiona y revisa el rendimiento de tu equipo por departamento
+          Quién trabaja en tu canal de denuncias, con qué rol y cuántos casos lleva cada persona.
         </p>
       </section>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <Card>
-          <CardBody className="text-center">
-            <p className="text-2xl font-bold">{members.length}</p>
-            <p className="text-sm text-slate-500">Total Miembros</p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody className="text-center">
-            <p className="text-2xl font-bold text-sky-700">{admins.length}</p>
-            <p className="text-sm text-slate-500">Administradores</p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody className="text-center">
-            <p className="text-2xl font-bold text-green-600">
-              {regularMembers.length}
-            </p>
-            <p className="text-sm text-slate-500">Investigadores</p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody className="text-center">
-            <p className="text-2xl font-bold text-slate-500">
-              {viewers.length}
-            </p>
-            <p className="text-sm text-slate-500">Observadores</p>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody className="text-center">
-            <p className="text-2xl font-bold text-purple-600">
-              {departments.length}
-            </p>
-            <p className="text-sm text-slate-500">Departamentos</p>
-          </CardBody>
-        </Card>
-      </div>
+      {/* Resumen */}
+      <MetricStrip
+        size="md"
+        metrics={[
+          { key: "admins", label: "Administradores", value: admins.length, tone: "slate" },
+          { key: "investigators", label: "Investigadores", value: regularMembers.length, tone: "signal" },
+          { key: "viewers", label: "Observadores", value: viewers.length, tone: "haze" },
+          { key: "departments", label: "Departamentos", value: departments.length, tone: "amber" },
+        ]}
+      />
 
       {/* Team Members Grid */}
       <div className="space-y-6">
         {/* Administrators */}
         {admins.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold mb-4">Administradores</h2>
+            <h2 className="mb-4 text-base font-semibold text-ev-night">Administradores</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {admins.map((member) => (
                 <Card
@@ -195,7 +168,7 @@ export function TeamMembersView({
 
                       <div className="flex justify-between">
                         <span className="text-sm text-slate-500">
-                          Casos Totales
+                          Denuncias asignadas
                         </span>
                         <span className="font-semibold">
                           {member.assignedReports}
@@ -210,7 +183,7 @@ export function TeamMembersView({
                         size="sm"
                         className="w-full mt-4"
                       >
-                        Ver Detalles
+                        Ver ficha
                       </Button>
                     </div>
                   </CardBody>
@@ -223,7 +196,7 @@ export function TeamMembersView({
         {/* Regular Members */}
         {regularMembers.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold mb-4">Investigadores</h2>
+            <h2 className="mb-4 text-base font-semibold text-ev-night">Investigadores</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {regularMembers.map((member) => (
                 <Card
@@ -318,7 +291,7 @@ export function TeamMembersView({
                           size="sm"
                           className="flex-1"
                         >
-                          Ver Detalles
+                          Ver ficha
                         </Button>
                       </div>
                     </div>
@@ -332,7 +305,7 @@ export function TeamMembersView({
         {/* Viewers (read-only oversight) */}
         {viewers.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold mb-4">Observadores</h2>
+            <h2 className="mb-4 text-base font-semibold text-ev-night">Observadores</h2>
             <p className="text-sm text-slate-500 -mt-2 mb-4">
               Acceso de solo lectura a todos los casos — sin permisos de edición
             </p>
@@ -364,7 +337,7 @@ export function TeamMembersView({
                       size="sm"
                       className="w-full"
                     >
-                      Ver Detalles
+                      Ver ficha
                     </Button>
                   </CardBody>
                 </Card>

@@ -133,33 +133,33 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
     optimisticQueued || submissionIdToStatus.get(report.id) === "processing";
 
   return (
-    <div className="mb-6 overflow-hidden rounded-2xl border border-emerald-100 bg-white/95 shadow-[0_20px_55px_-42px_rgba(5,26,36,0.72)]">
+    <div className="mb-6 overflow-hidden rounded-2xl border border-ev-line bg-white">
       {/* Urgent action banner */}
       {requiresUrgentAction && (
-        <div className="flex items-center gap-2.5 bg-red-500 px-5 py-2.5 text-sm font-semibold text-white">
+        <div className="flex items-center gap-2.5 bg-[#FBE6E1] px-5 py-2.5 text-sm font-medium text-[#862B1D]">
           <i className="icon-[lucide--alert-triangle] size-4 shrink-0" />
-          Este reporte requiere acción urgente — revisa las acciones recomendadas
+          Esta denuncia requiere acción urgente. Revisa las acciones recomendadas en el análisis.
         </div>
       )}
 
-      <div className="bg-gradient-to-r from-emerald-50/65 to-lime-50/40 px-5 py-5 sm:px-7">
+      <div className="px-5 py-6 sm:px-7">
         <div className="flex items-start gap-4 flex-wrap">
           {/* Left: reference + title */}
           <div className="min-w-0 flex-1">
             {/* Reference badge row */}
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="font-mono text-xs font-bold tracking-wide text-sky-800 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-full">
+              <span className="font-mono text-xs font-medium tracking-wide text-ev-night bg-ev-paper border border-ev-line px-2.5 py-1 rounded-full">
                 {generateReportReference(report.id)}
               </span>
 
               {hasAIAnalysis && (
                 <Tooltip
-                  content={`Procesado por IA con ${confidenceForChip}% de confianza`}
+                  content={`La IA clasificó esta denuncia y está ${confidenceForChip}% segura de su análisis. Revísalo siempre antes de decidir.`}
                   placement="bottom"
                 >
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-violet-700 bg-violet-50 border border-violet-200 px-2.5 py-1 rounded-full cursor-default">
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-ev-moss bg-ev-signal-wash px-2.5 py-1 rounded-full cursor-help">
                     <i className="icon-[lucide--sparkles] size-3" />
-                    IA {confidenceForChip}%
+                    Analizada por IA · {confidenceForChip}% de confianza
                   </span>
                 </Tooltip>
               )}
@@ -174,28 +174,31 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
             </div>
 
             {/* Title */}
-            <h1 className="text-xl sm:text-2xl font-bold text-[#0d212c] leading-tight">
+            <h1 className="text-[1.75rem] font-semibold leading-tight tracking-[-0.03em] text-ev-night">
               {getReportTypeLabel(
                 report.type || parsedContent.irregularityType
               )}
             </h1>
 
             {/* Metadata inline row */}
-            <div className="mt-2.5 flex items-center gap-4 text-sm text-slate-400 flex-wrap">
+            <div className="mt-2.5 flex items-center gap-4 text-sm text-ev-mute flex-wrap">
               <span className="flex items-center gap-1.5">
                 <i className="icon-[lucide--calendar] size-3.5" />
                 {formatDate(report.submittedAt)}
               </span>
               <span className="flex items-center gap-1.5">
-                {parsedContent.isAnonymous ? (
+                {/* La columna isAnonymous es la fuente de verdad; el contenido del
+                    formulario no siempre la incluye (antes decía "Identificado"
+                    en denuncias anónimas). */}
+                {(report.isAnonymous ?? parsedContent.isAnonymous) ? (
                   <>
                     <i className="icon-[lucide--user-x] size-3.5" />
-                    Anónimo
+                    Denuncia anónima
                   </>
                 ) : (
                   <>
                     <i className="icon-[lucide--user] size-3.5" />
-                    Identificado
+                    Denunciante identificado
                   </>
                 )}
               </span>

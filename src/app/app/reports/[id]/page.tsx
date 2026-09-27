@@ -29,10 +29,10 @@ export default async function ReportDetailsPage({
 
     if (!parsedContent) {
       return (
-        <div className="min-h-screen bg-[#f7faf9]">
+        <div className="min-h-screen bg-ev-paper">
           <main className="pt-20">
             <ReportError
-              error="No se pudo procesar el contenido del reporte"
+              error="No se pudo procesar el contenido de la denuncia"
               showGoBack
             />
           </main>
@@ -41,13 +41,13 @@ export default async function ReportDetailsPage({
     }
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#f8fbfa] via-white to-emerald-50/35">
-        <main className="pt-6 sm:pt-8">
-          <div className="container mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div>
+        <main>
+          <div className="mx-auto max-w-[1600px]">
             {/* Back link */}
             <Link
               href="/app/reports"
-              className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white px-3.5 py-1.5 text-sm text-emerald-900 hover:bg-emerald-50 transition-all"
+              className="ev-label mb-5 inline-flex items-center gap-1.5 text-ev-mute transition-colors hover:text-ev-night"
             >
               <i className="icon-[lucide--arrow-left] size-4" />
               Todas las denuncias
@@ -78,7 +78,7 @@ export default async function ReportDetailsPage({
     );
   } catch (error) {
     return (
-      <div className="min-h-screen bg-[#f7faf9]">
+      <div className="min-h-screen bg-ev-paper">
         <main className="pt-20">
           <ReportError
             error={

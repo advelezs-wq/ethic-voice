@@ -90,7 +90,7 @@ export function AssignDepartmentModal({
               onSelectionChange={(keys) =>
                 setSelectedDepartment(Array.from(keys)[0] as string)
               }
-              description="Los reportes del departamento serán visibles para este miembro"
+              description="Las denuncias del departamento serán visibles para este miembro"
             >
               {departments.map((dept) => (
                 <SelectItem key={dept.id}>

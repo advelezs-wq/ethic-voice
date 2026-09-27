@@ -153,7 +153,7 @@ export function ChatMessage({
               isOwnMessage && "flex-row-reverse"
             )}
           >
-            <span className="font-medium text-sm text-[#0d212c]">
+            <span className="font-medium text-sm text-ev-night">
               {message.authorName}
             </span>
             <span className="text-xs text-slate-400">
@@ -187,9 +187,9 @@ export function ChatMessage({
               ? message.isInternal
                 ? "bg-yellow-100 text-yellow-900"
                 : "bg-sky-500 text-white"
-              : "bg-emerald-50 text-[#0d212c]",
+              : "bg-emerald-50 text-ev-night",
             !isFirstInGroup && "mt-0.5",
-            message.parentId && "ml-4 border-l-2 border-emerald-200"
+            message.parentId && "ml-4 border-l-2 border-ev-line"
           )}
         >
           {message.parentId && (

@@ -23,7 +23,7 @@ export default function Loading() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
+    <div className="min-h-screen bg-ev-paper flex items-center justify-center">
       <div className="text-center">
         <div className="mx-auto w-20 h-20 rounded-2xl bg-emerald-100 text-slate-500 flex items-center justify-center">
           <i className="icon-[lucide--layout-dashboard] size-8" />

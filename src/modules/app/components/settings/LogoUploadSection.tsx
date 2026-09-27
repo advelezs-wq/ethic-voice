@@ -145,7 +145,7 @@ export function LogoUploadSection({ organizationId }: LogoUploadSectionProps) {
     <div className="space-y-6">
       <div className="flex items-start gap-6">
         <div className="flex-1">
-          <div className="border-2 border-dashed border-emerald-200 rounded-lg p-6 text-center hover:border-slate-400 transition-colors">
+          <div className="border-2 border-dashed border-ev-line rounded-lg p-6 text-center hover:border-slate-400 transition-colors">
             {currentLogo ? (
               <div className="space-y-4">
                 <div className="max-w-xs mx-auto">
@@ -182,7 +182,7 @@ export function LogoUploadSection({ organizationId }: LogoUploadSectionProps) {
                   <i className="icon-[lucide--image] size-8 text-slate-400" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-medium text-[#0d212c]">
+                  <h4 className="text-lg font-medium text-ev-night">
                     Sube el logo de tu organización
                   </h4>
                   <p className="text-sm text-slate-500 mt-1">
@@ -226,8 +226,8 @@ export function LogoUploadSection({ organizationId }: LogoUploadSectionProps) {
         </div>
 
         <div className="w-80">
-          <div className="bg-secondary rounded-lg p-4">
-            <h5 className="font-medium text-[#0d212c] mb-3">
+          <div className="rounded-xl border border-ev-line bg-ev-paper p-4">
+            <h5 className="font-medium text-ev-night mb-3">
               <i className="icon-[lucide--info] size-4 mr-2 inline" />
               Recomendaciones
             </h5>

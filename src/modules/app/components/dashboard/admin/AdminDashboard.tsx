@@ -2,9 +2,10 @@
 
 import React from "react";
 import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
+import { PageHero } from "@/modules/app/components/ui";
 import { DashboardData } from "@/types/dashboard.types";
 import { DynamicDashboard } from "../DynamicDashboard";
+import { AttentionPanel } from "../AttentionPanel";
 import { DownloadPDFButton } from "../../analytics/DownloadPDFButton";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -25,67 +26,57 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   refreshing,
   isSuperAdmin,
 }) => {
+  const today = format(new Date(), "EEEE d 'de' MMMM", { locale: es });
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start sm:items-center justify-between gap-4 flex-wrap">
-        <div>
-          <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
-            <h1 className="text-xl md:text-2xl font-bold text-[#0d212c]">
-              {isSuperAdmin
-                ? "Panel de Super Administrador"
-                : "Panel de Control"}
-            </h1>
-            {DEMO_MODE && (
-              <Chip
-                color="warning"
-                variant="flat"
-                size="sm"
-                startContent={<i className="icon-[lucide--test-tube] size-3" />}
-              >
-                Modo Demo
-              </Chip>
-            )}
-          </div>
-          <p className="text-slate-500 text-sm md:text-base">
-            {isSuperAdmin
-              ? "Gestión global del sistema"
-              : "Gestión de denuncias y reportes de tu organización"}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          <Button
-            variant="light"
-            size="sm"
-            isIconOnly
-            onPress={onRefresh}
-            isLoading={refreshing}
-          >
-            <i className="icon-[lucide--refresh-ccw] size-4" />
-          </Button>
-          <Button variant="bordered" size="sm" className="border-emerald-200 text-[#0d212c]">
-            <i className="icon-[lucide--filter] size-4 mr-2" />
-            Filtrar
-          </Button>
-          <DownloadPDFButton
-            reportType="organization"
-            data={{
-              organization: {
-                name: isSuperAdmin
-                  ? "Todas las Organizaciones"
-                  : "Mi Organización",
-              },
-              dashboardData: data,
-              teamPerformance: [], // This would need to be passed from parent component
-            }}
-            filename={`reporte-organizacion-${format(new Date(), "yyyy-MM-dd", {
-              locale: es,
-            })}`}
-            buttonText="Exportar PDF"
-            size="sm"
-          />
-        </div>
-      </div>
+      <PageHero
+        className="!mb-2"
+        kicker={
+          <>
+            Resumen · <span className="normal-case">{today}</span>
+            {DEMO_MODE ? <span className="ml-2 rounded bg-ev-amber/20 px-1.5 text-[#8C5C15]">Modo demo</span> : null}
+          </>
+        }
+        title={isSuperAdmin ? "Panel de super administrador" : "Panel de control"}
+        description={
+          isSuperAdmin
+            ? "Gestión global del sistema."
+            : "Estado de las denuncias de tu organización, en tiempo real."
+        }
+        actions={
+          <>
+            <Button
+              variant="light"
+              size="sm"
+              isIconOnly
+              aria-label="Actualizar"
+              className="text-ev-mute"
+              onPress={onRefresh}
+              isLoading={refreshing}
+            >
+              <i className="icon-[lucide--refresh-ccw] size-4" />
+            </Button>
+            <DownloadPDFButton
+              reportType="organization"
+              data={{
+                organization: {
+                  name: isSuperAdmin ? "Todas las organizaciones" : "Mi organización",
+                },
+                dashboardData: data,
+                teamPerformance: [], // This would need to be passed from parent component
+              }}
+              filename={`reporte-organizacion-${format(new Date(), "yyyy-MM-dd", {
+                locale: es,
+              })}`}
+              buttonText="Exportar PDF"
+              size="sm"
+            />
+          </>
+        }
+      />
+
+      <AttentionPanel data={data} />
 
       {/* Dynamic Dashboard Content */}
       <DynamicDashboard data={data} organizationId={data.organizationId} />

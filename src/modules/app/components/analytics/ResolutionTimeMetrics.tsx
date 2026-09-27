@@ -93,8 +93,8 @@ export function ResolutionTimeMetrics({
     if (props.active && props.payload && props.payload.length) {
       const data = props.payload[0].payload;
       return (
-        <div className="bg-white p-3 border border-emerald-100 rounded-lg shadow-lg">
-          <p className="font-medium text-[#0d212c]">
+        <div className="bg-white p-3 border border-ev-line rounded-lg shadow-lg">
+          <p className="font-medium text-ev-night">
             {data.range || data.month}
           </p>
           {data.count && (
@@ -160,30 +160,30 @@ export function ResolutionTimeMetrics({
             {efficiency.level}
           </div>
         </div>
-        <div className="bg-green-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-green-900">
+        <div className="rounded-xl border border-ev-line bg-white p-4 text-center">
+          <div className="ev-num text-2xl font-semibold text-ev-night">
             {data.fastestResolution}d
           </div>
-          <div className="text-sm text-green-600">Más Rápido</div>
+          <div className="ev-label mt-1 text-ev-mute">Más Rápido</div>
         </div>
-        <div className="bg-orange-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-orange-900">
+        <div className="rounded-xl border border-ev-line bg-white p-4 text-center">
+          <div className="ev-num text-2xl font-semibold text-ev-night">
             {data.slowestResolution}d
           </div>
-          <div className="text-sm text-orange-600">Más Lento</div>
+          <div className="ev-label mt-1 text-ev-mute">Más Lento</div>
         </div>
-        <div className="bg-sky-50 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-sky-800">
+        <div className="rounded-xl border border-ev-line bg-white p-4 text-center">
+          <div className="ev-num text-2xl font-semibold text-ev-night">
             {data.totalResolved}
           </div>
-          <div className="text-sm text-sky-700">Total Resueltos</div>
+          <div className="ev-label mt-1 text-ev-mute">Total Resueltos</div>
         </div>
       </div>
 
       {/* Time Distribution Bar Chart */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-[#0d212c]">
+          <h4 className="text-lg font-semibold text-ev-night">
             Distribución por Tiempo de Resolución
           </h4>
           <p className="text-sm text-slate-500">
@@ -197,17 +197,17 @@ export function ResolutionTimeMetrics({
               data={data.timeDistribution}
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#EAE8E0" />
               <XAxis
                 dataKey="range"
-                tick={{ fontSize: 12, fill: "#6b7280" }}
-                tickLine={{ stroke: "#d1d5db" }}
-                axisLine={{ stroke: "#d1d5db" }}
+                tick={{ fontSize: 12, fill: "#5A6D70" }}
+                tickLine={{ stroke: "#DCDAD1" }}
+                axisLine={{ stroke: "#DCDAD1" }}
               />
               <YAxis
-                tick={{ fontSize: 12, fill: "#6b7280" }}
-                tickLine={{ stroke: "#d1d5db" }}
-                axisLine={{ stroke: "#d1d5db" }}
+                tick={{ fontSize: 12, fill: "#5A6D70" }}
+                tickLine={{ stroke: "#DCDAD1" }}
+                axisLine={{ stroke: "#DCDAD1" }}
                 allowDecimals={false}
               />
               <Tooltip content={renderTooltip} />
@@ -222,12 +222,12 @@ export function ResolutionTimeMetrics({
                     key={`cell-${index}`}
                     fill={
                       index === 0
-                        ? "#10b981" // 0-7 days - green
+                        ? "#5E9427" // 0-7 days - green
                         : index === 1
-                          ? "#3b82f6" // 8-14 days - blue
+                          ? "#244850" // 8-14 days - blue
                           : index === 2
-                            ? "#f59e0b" // 15-30 days - yellow
-                            : "#ef4444" // 30+ days - red
+                            ? "#E09A2B" // 15-30 days - yellow
+                            : "#DB4F3A" // 30+ days - red
                     }
                   />
                 ))}
@@ -240,7 +240,7 @@ export function ResolutionTimeMetrics({
       {/* Monthly Trend Line Chart */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-[#0d212c]">
+          <h4 className="text-lg font-semibold text-ev-night">
             Tendencia Mensual de Tiempo de Resolución
           </h4>
           <p className="text-sm text-slate-500">
@@ -254,27 +254,27 @@ export function ResolutionTimeMetrics({
               data={data.monthlyTrend}
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#EAE8E0" />
               <XAxis
                 dataKey="month"
-                tick={{ fontSize: 12, fill: "#6b7280" }}
-                tickLine={{ stroke: "#d1d5db" }}
-                axisLine={{ stroke: "#d1d5db" }}
+                tick={{ fontSize: 12, fill: "#5A6D70" }}
+                tickLine={{ stroke: "#DCDAD1" }}
+                axisLine={{ stroke: "#DCDAD1" }}
               />
               <YAxis
-                tick={{ fontSize: 12, fill: "#6b7280" }}
-                tickLine={{ stroke: "#d1d5db" }}
-                axisLine={{ stroke: "#d1d5db" }}
+                tick={{ fontSize: 12, fill: "#5A6D70" }}
+                tickLine={{ stroke: "#DCDAD1" }}
+                axisLine={{ stroke: "#DCDAD1" }}
                 allowDecimals={false}
               />
               <Tooltip content={renderTooltip} />
               <Line
                 type="monotone"
                 dataKey="avgTime"
-                stroke="#3b82f6"
+                stroke="#244850"
                 strokeWidth={3}
-                dot={{ fill: "#3b82f6", strokeWidth: 2, r: 6 }}
-                activeDot={{ r: 8, stroke: "#3b82f6", strokeWidth: 2 }}
+                dot={{ fill: "#244850", strokeWidth: 2, r: 6 }}
+                activeDot={{ r: 8, stroke: "#244850", strokeWidth: 2 }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -284,7 +284,7 @@ export function ResolutionTimeMetrics({
       {/* Detailed Distribution List */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-[#0d212c]">
+          <h4 className="text-lg font-semibold text-ev-night">
             Análisis Detallado por Tiempo
           </h4>
           <p className="text-sm text-slate-500">

@@ -31,7 +31,7 @@ export const BurgerMenuOverlay = ({
 
   return (
     <div
-      className={`fixed inset-0 bg-black/50 lg:hidden transition-opacity duration-300 ${
+      className={`fixed inset-0 bg-ev-night/40 backdrop-blur-sm lg:hidden transition-opacity duration-300 ${
         isOpen ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
       onClick={closeMenu}

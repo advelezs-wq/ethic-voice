@@ -132,12 +132,12 @@ export function OnboardingClient() {
   // Don't render onboarding if user already has organizations
   if (currentOrganization || (organizations && organizations.length > 0)) {
     return (
-      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
+      <div className="min-h-screen bg-ev-paper flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-white text-2xl">✓</span>
           </div>
-          <h2 className="text-xl font-semibold text-[#0d212c] mb-2">
+          <h2 className="text-xl font-semibold text-ev-night mb-2">
             ¡Ya tienes una organización!
           </h2>
           <p className="text-slate-500">
@@ -207,7 +207,7 @@ export function OnboardingClient() {
 
   if (!redirectChecked || !isPlanContextReady) {
     return (
-      <div className="min-h-screen bg-[#f7faf9] flex items-center justify-center">
+      <div className="min-h-screen bg-ev-paper flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-lime-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-slate-500">Verificando estado y plan...</p>

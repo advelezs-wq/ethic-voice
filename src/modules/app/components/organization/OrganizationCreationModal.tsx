@@ -52,7 +52,7 @@ export function CreateOrganizationModal({
     >
       <ModalContent className="max-w-2xl mx-auto">
         <ModalHeader className="flex flex-col gap-1 text-center border-b">
-          <h2 className="text-2xl font-bold text-[#0d212c]">
+          <h2 className="text-2xl font-bold text-ev-night">
             Bienvenido a Ethics Line
           </h2>
           <p className="text-sm text-slate-500">

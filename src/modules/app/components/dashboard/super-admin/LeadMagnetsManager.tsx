@@ -260,11 +260,11 @@ export default function LeadMagnetsManager() {
 
   return (
     <>
-      <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
+      <Card className="border border-ev-line bg-white shadow-sm">
         <CardBody>
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-[#0d212c]">
+              <h2 className="text-xl font-semibold text-ev-night">
                 Recursos descargables
               </h2>
               <p className="text-sm text-default-500">
@@ -304,7 +304,7 @@ export default function LeadMagnetsManager() {
                 {rows.map((r) => (
                   <tr key={r.id} className="border-t border-default-100">
                     <td className="py-2 pr-4">
-                      <span className="font-medium text-[#0d212c]">{r.title}</span>
+                      <span className="font-medium text-ev-night">{r.title}</span>
                       <div className="text-xs text-default-500">
                         {new Date(r.createdAt).toLocaleDateString()}
                       </div>

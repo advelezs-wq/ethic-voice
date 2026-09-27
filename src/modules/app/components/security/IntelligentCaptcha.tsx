@@ -170,7 +170,7 @@ export function IntelligentCaptcha({
           </h3>
         </div>
         
-        <p className="text-xs text-orange-700">
+        <p className="ev-label mt-1 text-ev-mute">
           Por favor, completa la verificación para continuar. Esto nos ayuda a proteger la plataforma contra el uso automatizado.
         </p>
 

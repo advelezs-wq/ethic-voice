@@ -87,10 +87,13 @@ export function ReportsTable({
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
 
-    if (diffHours < 24) {
-      return `Hace ${diffHours}h`;
+    // Lenguaje natural: "Hace 0h" o "Hace 1 días" no se leen bien.
+    if (diffHours < 1) {
+      return "Hace menos de 1 hora";
+    } else if (diffHours < 24) {
+      return diffHours === 1 ? "Hace 1 hora" : `Hace ${diffHours} horas`;
     } else if (diffDays < 7) {
-      return `Hace ${diffDays} días`;
+      return diffDays === 1 ? "Ayer" : `Hace ${diffDays} días`;
     } else {
       return reportDate.toLocaleDateString("es-ES", {
         day: "numeric",
@@ -207,7 +210,7 @@ export function ReportsTable({
 
       if (report.source === "EMAIL") {
         // For email reports
-        title = report.aiSummary || aiAnalysis?.summary || "Reporte por email";
+        title = report.aiSummary || aiAnalysis?.summary || "Denuncia por correo";
         description = extractReportSummary(report);
         keyFindings = aiAnalysis?.keyFindings || [];
         immediateActions = aiAnalysis?.immediateActions || [];
@@ -220,11 +223,13 @@ export function ReportsTable({
         // For EthicVoice (línea ética) reports. Skip prefixing with the
         // category when it's just the "not yet classified" fallback — the
         // subtitle already shows it, so repeating it here read as duplicate text.
-        const reportedName = content.reported?.firstName || "No especificado";
+        // Título legible: el asunto si existe; si no, el tipo de conducta.
+        // La persona denunciada ya tiene su propia columna.
         title =
-          category === "Sin categorizar"
-            ? reportedName
-            : `${category} - ${reportedName}`;
+          content.subject ||
+          content.title ||
+          report.metadata?.subject ||
+          (category === "Sin categorizar" ? "Denuncia sin clasificar" : category);
         description = extractReportSummary(report);
 
         if (aiAnalysis) {
@@ -240,7 +245,7 @@ export function ReportsTable({
           content.title ||
           report.metadata?.subject ||
           report.aiSummary ||
-          "Reporte manual";
+          "Registro manual";
         description = extractReportSummary(report) || content.questionnaire?.whatHappened || "";
         if (aiAnalysis) {
           keyFindings = aiAnalysis.keyFindings || [];
@@ -314,14 +319,14 @@ export function ReportsTable({
       setDeletingReportId(reportId);
       await deleteReport(reportId);
       onSelectionChange(selectedReports.filter((id) => id !== reportId));
-      showSuccess("Reporte eliminado correctamente");
+      showSuccess("Denuncia eliminada");
       window.dispatchEvent(new CustomEvent("manual-report-created"));
       router.refresh();
     } catch (error) {
       showError(
         error instanceof Error
           ? error.message
-          : "No se pudo eliminar el reporte"
+          : "No se pudo eliminar la denuncia"
       );
     } finally {
       setDeletingReportId(null);
@@ -350,7 +355,7 @@ export function ReportsTable({
             return (
               <Card
                 key={report.id}
-                className={`border border-emerald-100 bg-white/95 transition-all hover:shadow-[0_24px_50px_-36px_rgba(5,26,36,0.78)] ${
+                className={`border border-ev-line bg-white transition-all hover:shadow-none ${
                   isSelected ? "ring-2 ring-primary" : ""
                 } ${
                   reportInfo.requiresUrgentAction
@@ -364,10 +369,10 @@ export function ReportsTable({
                     <div className="pt-1">
                       <input
                         type="checkbox"
-                        title={`Seleccionar reporte ${report.id}`}
+                        title={`Seleccionar denuncia ${report.id}`}
                         checked={isSelected}
                         onChange={() => toggleReportSelection(report.id)}
-                        className="w-4 h-4 text-primary border-emerald-100 rounded focus:ring-primary"
+                        className="w-4 h-4 text-primary border-ev-line rounded focus:ring-primary"
                       />
                     </div>
 
@@ -469,7 +474,7 @@ export function ReportsTable({
                                   );
                                   router.refresh();
                                 } catch {
-                                  showError("No se pudo archivar el reporte");
+                                  showError("No se pudo archivar la denuncia");
                                 }
                               }}
                             >
@@ -492,7 +497,7 @@ export function ReportsTable({
                         </Dropdown>
                       </div>
 
-                      <h3 className="text-base md:text-lg font-semibold text-[#0d212c] mb-2">
+                      <h3 className="text-base md:text-lg font-semibold text-ev-night mb-2">
                         {reportInfo.title}
                       </h3>
 
@@ -502,7 +507,7 @@ export function ReportsTable({
 
                       {/* Key Findings Section */}
                       {reportInfo.keyFindings.length > 0 && (
-                        <div className="mb-3 rounded-lg border border-emerald-100 bg-emerald-50/55 p-3">
+                        <div className="mb-3 rounded-lg border border-ev-line bg-ev-paper p-3">
                           <h4 className="text-xs font-semibold text-slate-600 mb-1">
                             Hallazgos clave:
                           </h4>
@@ -680,35 +685,35 @@ export function ReportsTable({
   // Enhanced Table view
   return (
     <div className="space-y-4">
-      <Card className="border border-emerald-100 bg-white/95 shadow-none">
+      <Card className="border border-ev-line bg-white shadow-none">
         <CardBody className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full table-auto min-w-[1100px]">
-              <thead className="bg-emerald-50/50">
+              <thead className="bg-ev-paper">
                 <tr>
                   <th className="p-4 text-left w-12">
                     <input
                       type="checkbox"
-                      title="Seleccionar todos los reportes"
+                      title="Seleccionar todas las denuncias"
                       checked={
                         selectedReports.length === reports.length &&
                         reports.length > 0
                       }
                       onChange={selectAllReports}
-                      className="w-4 h-4 text-primary border-emerald-100 rounded"
+                      className="w-4 h-4 text-primary border-ev-line rounded"
                     />
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-slate-600 w-24 whitespace-nowrap">
-                    ID
+                  <th className="p-4 text-left text-sm font-medium text-slate-600 w-28 whitespace-nowrap">
+                    N.º
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-slate-600 md:w-[18rem] lg:w-[20rem] xl:w-[26rem]">
-                    Asunto / Resumen
+                    Denuncia
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-slate-600 md:w-40 lg:w-48">
-                    Denunciado
+                  <th className="hidden p-4 text-left text-sm font-medium text-slate-600 2xl:table-cell 2xl:w-48">
+                    Persona denunciada
                   </th>
-                  <th className="p-4 text-left text-sm font-medium text-slate-600 min-w-[190px]">
-                    Análisis
+                  <th className="hidden p-4 text-left text-sm font-medium text-slate-600 2xl:table-cell 2xl:min-w-[190px]">
+                    Análisis IA
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-slate-600 w-24 whitespace-nowrap">
                     Severidad
@@ -717,7 +722,7 @@ export function ReportsTable({
                     Estado
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-slate-600 w-24 whitespace-nowrap">
-                    Fecha
+                    Recibida · plazo
                   </th>
                   <th
                     className={`p-4 text-left text-sm font-medium text-slate-600 md:w-40 lg:w-44 whitespace-nowrap ${
@@ -727,7 +732,7 @@ export function ReportsTable({
                         : "hidden"
                     }`}
                   >
-                    Asignado
+                    Responsable
                   </th>
                   <th className="p-4 text-left text-sm font-medium text-slate-600 w-20 whitespace-nowrap">
                     Acciones
@@ -744,7 +749,7 @@ export function ReportsTable({
                     <tr
                       key={report.id}
                       onClick={() => router.push(`/app/reports/${report.id}`)}
-                      className={`hover:bg-emerald-50/30 border-b border-emerald-100 transition-colors cursor-pointer ${
+                      className={`hover:bg-ev-paper border-b border-ev-line transition-colors cursor-pointer ${
                         isSelected ? "bg-primary-50" : ""
                       } ${
                         reportInfo.requiresUrgentAction
@@ -755,24 +760,22 @@ export function ReportsTable({
                       <td className="p-4" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="checkbox"
-                          title={`Seleccionar reporte ${report.id}`}
+                          title={`Seleccionar denuncia ${report.id}`}
                           checked={isSelected}
                           onChange={() => toggleReportSelection(report.id)}
-                          className="w-4 h-4 text-primary border-emerald-100 rounded"
+                          className="w-4 h-4 text-primary border-ev-line rounded"
                         />
                       </td>
                       <td className="p-4">
                         <div className="flex items-center gap-2">
-                          {getSourceIcon(report.source)}
-                          {getPriorityIcon(report.priority || "NORMAL")}
-                          <span className="font-medium text-[#0d212c] text-sm">
+                          <span className="whitespace-nowrap font-mono text-[0.8125rem] font-medium text-ev-night">
                             {generateReportReference(report.id)}
                           </span>
                         </div>
                       </td>
                       <td className="p-4 md:w-[28rem] whitespace-nowrap">
                         <div>
-                          <p className="font-medium text-[#0d212c] line-clamp-2 text-sm">
+                          <p className="font-medium text-ev-night line-clamp-2 text-sm">
                             {reportInfo.title}
                           </p>
                           <p className="text-sm text-slate-500 line-clamp-1">
@@ -785,14 +788,14 @@ export function ReportsTable({
                           )}
                         </div>
                       </td>
-                      <td className="p-4 md:w-48 whitespace-nowrap">
+                      <td className="hidden p-4 whitespace-nowrap 2xl:table-cell 2xl:w-48">
                         <div>
-                          <span className="text-sm text-[#0d212c] font-medium truncate block">
+                          <span className="text-sm text-ev-night font-medium truncate block">
                             {getReportedPersonName(report)}
                           </span>
                         </div>
                       </td>
-                      <td className="p-4 hidden lg:table-cell min-w-[190px]">
+                      <td className="p-4 hidden 2xl:table-cell min-w-[190px]">
                         {reportInfo.hasAiAnalysis ? (
                           <div className="space-y-1">
                             {reportInfo.keyFindings.length > 0 && (
@@ -826,7 +829,7 @@ export function ReportsTable({
                             <div className="flex items-center gap-2">
                               <Chip size="sm" variant="flat" color="primary">
                                 <i className="icon-[lucide--brain] size-3 mr-1" />
-                                AI {reportInfo.confidence}%
+                                Confianza {reportInfo.confidence}%
                               </Chip>
                               {reportInfo.requiresUrgentAction && (
                                 <Chip size="sm" variant="flat" color="danger">
@@ -1069,7 +1072,7 @@ export function ReportsTable({
                                       router.refresh();
                                     } catch {
                                       showError(
-                                        "No se pudo archivar el reporte"
+                                        "No se pudo archivar la denuncia"
                                       );
                                     }
                                   }}

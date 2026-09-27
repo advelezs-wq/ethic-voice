@@ -186,29 +186,29 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
     <FormProvider {...form}>
       <div className="container mx-auto max-w-5xl px-4 py-8 md:py-10">
         <div className="mb-6 grid gap-3 md:grid-cols-3">
-          <div className="rounded-xl border border-[#0a1e14]/10 bg-white/80 p-3 text-sm text-[#0d212c]">
-            <p className="mb-1 font-semibold text-[#0a1e14]">Confidencial</p>
-            <p className="text-xs text-[#273c46]">
+          <div className="rounded-xl border border-ev-night/10 bg-white/80 p-3 text-sm text-ev-night">
+            <p className="mb-1 font-semibold text-ev-night">Confidencial</p>
+            <p className="text-xs text-ev-mute">
               Solo personal autorizado accede al caso.
             </p>
           </div>
-          <div className="rounded-xl border border-[#0a1e14]/10 bg-white/80 p-3 text-sm text-[#0d212c]">
-            <p className="mb-1 font-semibold text-[#0a1e14]">
+          <div className="rounded-xl border border-ev-night/10 bg-white/80 p-3 text-sm text-ev-night">
+            <p className="mb-1 font-semibold text-ev-night">
               Protección de identidad
             </p>
-            <p className="text-xs text-[#273c46]">
+            <p className="text-xs text-ev-mute">
               Puedes denunciar de forma anónima.
             </p>
           </div>
-          <div className="rounded-xl border border-[#0a1e14]/10 bg-white/80 p-3 text-sm text-[#0d212c]">
-            <p className="mb-1 font-semibold text-[#0a1e14]">Integridad del reporte</p>
-            <p className="text-xs text-[#273c46]">
+          <div className="rounded-xl border border-ev-night/10 bg-white/80 p-3 text-sm text-ev-night">
+            <p className="mb-1 font-semibold text-ev-night">Integridad del reporte</p>
+            <p className="text-xs text-ev-mute">
               Validamos campos clave antes del envío.
             </p>
           </div>
         </div>
 
-        <div className="mb-8 rounded-3xl border border-[#0a1e14]/10 bg-white/90 p-5 shadow-[0_18px_55px_rgba(10,30,20,0.08)] md:p-7">
+        <div className="mb-8 rounded-3xl border border-ev-night/10 bg-white/90 p-5 shadow-[0_18px_55px_rgba(10,30,20,0.08)] md:p-7">
           {onBack && (
             <Button
               variant="light"
@@ -221,17 +221,17 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
               }
               onPress={onBack}
               isDisabled={pending}
-              className="text-[#0d212c]"
+              className="text-ev-night"
             >
               Volver
             </Button>
           )}
 
           <div className="mt-4">
-            <h1 className="text-2xl font-bold text-[#0a1e14]">
+            <h1 className="text-2xl font-bold text-ev-night">
               {organization.name}
             </h1>
-            <p className="text-[#273c46]">
+            <p className="text-ev-mute">
               Paso {currentStep} de {totalSteps} - {STEPS[currentStep - 1]}
             </p>
           </div>
@@ -242,12 +242,12 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
             className="mt-4"
             classNames={{
               track: "bg-[#e6efe9]",
-              indicator: "bg-[#0a1e14]",
+              indicator: "bg-ev-night",
             }}
           />
         </div>
 
-        <Card className="rounded-3xl border border-[#0a1e14]/10 bg-white/95 p-6 shadow-[0_20px_60px_rgba(10,30,20,0.1)] md:p-8">
+        <Card className="rounded-3xl border border-ev-night/10 bg-white/95 p-6 shadow-[0_20px_60px_rgba(10,30,20,0.1)] md:p-8">
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             {(captchaRequired || captchaError) && (
               <div className="mb-6">
@@ -273,7 +273,7 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
                 variant="bordered"
                 onPress={previousStep}
                 isDisabled={isFirstStep || pending}
-                className="border-[#0a1e14]/30 text-[#0d212c]"
+                className="border-ev-night/30 text-ev-night"
               >
                 Anterior
               </Button>
@@ -282,7 +282,7 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
                 type="submit"
                 color="primary"
                 isLoading={pending}
-                className="bg-[#0a1e14] text-white data-[hover=true]:!bg-[#0f3423]"
+                className="bg-ev-night text-white data-[hover=true]:!bg-ev-slate"
               >
                 {isLastStep ? "Enviar Reporte" : "Continuar"}
               </Button>

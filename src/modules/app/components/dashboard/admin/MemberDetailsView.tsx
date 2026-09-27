@@ -42,7 +42,7 @@ export function MemberDetailsView({ data }: MemberDetailsViewProps) {
           Volver al Equipo
         </Button>
         <div>
-          <h1 className="text-2xl font-bold text-[#0d212c]">
+          <h1 className="text-2xl font-bold text-ev-night">
             Detalles del Investigador
           </h1>
           <p className="text-slate-500">Rendimiento y estadísticas detalladas</p>
@@ -96,7 +96,7 @@ export function MemberDetailsView({ data }: MemberDetailsViewProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">Resueltos</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="ev-num text-2xl font-semibold text-ev-night">
                   {stats.totalResolved}
                 </p>
               </div>
@@ -156,14 +156,14 @@ export function MemberDetailsView({ data }: MemberDetailsViewProps) {
                 <Line
                   type="monotone"
                   dataKey="resolved"
-                  stroke="#10b981"
+                  stroke="#5E9427"
                   name="Resueltos"
                   strokeWidth={2}
                 />
                 <Line
                   type="monotone"
                   dataKey="assigned"
-                  stroke="#3b82f6"
+                  stroke="#244850"
                   name="Asignados"
                   strokeWidth={2}
                 />
@@ -176,14 +176,14 @@ export function MemberDetailsView({ data }: MemberDetailsViewProps) {
       {/* Recent Reports */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Reportes Recientes</h3>
+          <h3 className="text-lg font-semibold">Denuncias recientes</h3>
         </CardHeader>
         <CardBody>
           <div className="space-y-3">
             {recentReports.map((report) => (
               <div
                 key={report.id}
-                className="flex items-center justify-between p-3 bg-[#f7faf9] rounded-lg"
+                className="flex items-center justify-between p-3 bg-ev-paper rounded-lg"
               >
                 <div>
                   <p className="font-medium">

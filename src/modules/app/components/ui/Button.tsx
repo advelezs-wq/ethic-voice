@@ -10,23 +10,22 @@ export interface AppButtonProps extends Omit<HeroButtonProps, "color" | "variant
 }
 
 const VARIANT_CLASSNAMES: Record<AppButtonVariant, string> = {
-  // Filled lime pill — the landing page's primary CTA look.
+  // Tinta — la acción principal, como los CTAs sobrios del sitio.
   primary:
-    "bg-lime-400 text-[#0d212c] font-semibold shadow-[0_10px_24px_-12px_rgba(163,230,53,0.65)] hover:bg-lime-300 data-[hover=true]:bg-lime-300",
-  // Filled emerald pill — secondary action.
+    "bg-ev-night text-white font-medium data-[hover=true]:bg-ev-slate data-[pressed=true]:scale-[0.97]",
+  // Lima del logo — énfasis puntual (activar, confirmar algo positivo).
   secondary:
-    "bg-emerald-600 text-white font-semibold hover:bg-emerald-500 data-[hover=true]:bg-emerald-500",
-  // White pill with dark border — the landing page's "Ver la plataforma" style.
+    "bg-ev-signal text-ev-night font-medium data-[hover=true]:bg-[#a9dc66] data-[pressed=true]:scale-[0.97]",
   outline:
-    "bg-white text-[#0d212c] font-semibold border-2 border-[#0d212c]/90 hover:bg-[#0d212c]/5 data-[hover=true]:bg-[#0d212c]/5",
+    "bg-white text-ev-night font-medium border border-ev-night/15 data-[hover=true]:border-ev-night/40 data-[pressed=true]:scale-[0.97]",
   ghost:
-    "bg-transparent text-[#0d212c] font-medium hover:bg-emerald-50 data-[hover=true]:bg-emerald-50",
+    "bg-transparent text-ev-night font-medium data-[hover=true]:bg-ev-night/[0.05]",
   danger:
-    "bg-red-600 text-white font-semibold hover:bg-red-500 data-[hover=true]:bg-red-500",
+    "bg-ev-coral text-white font-medium data-[hover=true]:bg-[#B23A28] data-[pressed=true]:scale-[0.97]",
 };
 
 /**
- * Brand-styled Button — same rounded-full pill treatment as the landing page's CTAs.
+ * Botón de marca (BRAND.md § Componentes) — píldora, respuesta al presionar.
  * Thin wrapper over HeroUI's Button; pass any other HeroUI Button prop through as usual.
  */
 export const Button = forwardRef<HTMLButtonElement, AppButtonProps>(

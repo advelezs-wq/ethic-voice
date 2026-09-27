@@ -227,7 +227,7 @@ Gracias,
                 variant="light"
                 size="sm"
                 onPress={handleLogout}
-                className="text-slate-500 hover:text-[#0d212c]"
+                className="text-slate-500 hover:text-ev-night"
               >
                 Cerrar Sesión
               </Button>
@@ -235,7 +235,7 @@ Gracias,
             <p className="mb-1 text-xs font-bold uppercase tracking-widest text-emerald-700">
               Planes y precios
             </p>
-            <h2 className="text-3xl font-extrabold text-[#0d212c] mb-2">
+            <h2 className="text-3xl font-extrabold text-ev-night mb-2">
               ¡Elige tu plan ideal!
             </h2>
             <p className="text-lg text-slate-500 max-w-2xl mx-auto mb-6">
@@ -256,10 +256,10 @@ Gracias,
                 className="w-auto"
                 classNames={{
                   tabList: "bg-emerald-50 rounded-full p-1",
-                  cursor: "bg-[#0d212c] rounded-full shadow-lg",
+                  cursor: "bg-ev-night rounded-full shadow-lg",
                   tab: "px-6 py-2 text-sm font-medium rounded-full transition-all duration-300",
                   tabContent:
-                    "group-data-[selected=true]:text-white text-[#0d212c]",
+                    "group-data-[selected=true]:text-white text-ev-night",
                 }}
               >
                 <Tab key={BillingCycle.MONTHLY} title="Mensual" />
@@ -267,7 +267,7 @@ Gracias,
               </Tabs>
             </div>
 
-            <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/70 p-3">
+            <div className="mt-4 rounded-xl border border-ev-line bg-ev-paper p-3">
               <p className="text-emerald-800 text-sm font-medium flex items-center justify-center">
                 <i className="icon-[lucide--info] w-4 h-4 mr-2" />
                 Se requiere una suscripción para acceder a la plataforma
@@ -301,12 +301,12 @@ Gracias,
                     className={`relative flex min-h-[450px] flex-col rounded-2xl p-6 transition-transform duration-300 hover:-translate-y-1 ${
                       isPopular
                         ? "bg-[#0f172a] shadow-[0_24px_60px_rgba(15,23,42,0.38)] ring-2 ring-lime-400"
-                        : "border border-slate-200 bg-white hover:border-emerald-200 hover:shadow-xl"
+                        : "border border-slate-200 bg-white hover:border-ev-line hover:shadow-xl"
                     }`}
                   >
                     {isPopular && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                        <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-[#052b24] shadow-[0_8px_18px_rgba(163,230,53,0.35)]">
+                        <span className="rounded-full bg-lime-400 px-4 py-1 text-[11px] font-black uppercase tracking-wide text-ev-night shadow-[0_8px_18px_rgba(163,230,53,0.35)]">
                           Más popular
                         </span>
                       </div>
@@ -315,7 +315,7 @@ Gracias,
                     {/* Title */}
                     <div className="mb-4">
                       <h3
-                        className={`text-xl font-extrabold mb-2 ${isPopular ? "text-white" : "text-[#0d212c]"}`}
+                        className={`text-xl font-extrabold mb-2 ${isPopular ? "text-white" : "text-ev-night"}`}
                       >
                         {config.displayName}
                       </h3>
@@ -336,7 +336,7 @@ Gracias,
                     >
                       <div className="flex items-baseline flex-wrap gap-1">
                         <span
-                          className={`font-black ${isPopular ? "text-white" : "text-[#0d212c]"} ${
+                          className={`font-black ${isPopular ? "text-white" : "text-ev-night"} ${
                             priceDisplay.size === "large"
                               ? "text-2xl md:text-3xl"
                               : priceDisplay.size === "medium"
@@ -382,8 +382,8 @@ Gracias,
                         }
                         className={`w-full rounded-xl py-3.5 px-6 text-sm font-bold transition-all duration-200 ${
                           isPopular
-                            ? "bg-lime-400 text-[#052b24] shadow-[0_6px_20px_rgba(163,230,53,0.3)] hover:bg-lime-300"
-                            : "border-2 border-[#0a1e14] text-[#0a1e14] hover:bg-[#0a1e14] hover:text-white"
+                            ? "bg-lime-400 text-ev-night shadow-[0_6px_20px_rgba(163,230,53,0.3)] hover:bg-lime-300"
+                            : "border-2 border-ev-night text-ev-night hover:bg-ev-night hover:text-white"
                         }`}
                       >
                         {isCreatingSubscription && selectedPlan === planType
@@ -404,7 +404,7 @@ Gracias,
               className="mt-12 max-w-4xl mx-auto"
             >
               <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-[#0d212c] mb-3">
+                <h3 className="text-2xl font-bold text-ev-night mb-3">
                   ¿Necesitas algo más específico?
                 </h3>
                 <p className="text-slate-500">
@@ -412,7 +412,7 @@ Gracias,
                 </p>
               </div>
 
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f172a] to-[#0a1e14] p-6 shadow-xl">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0f172a] to-ev-night p-6 shadow-xl">
                 <div
                   className="pointer-events-none absolute right-0 top-0 h-64 w-64 opacity-20 blur-[80px]"
                   style={{ background: "rgba(163,230,53,0.35)" }}
@@ -440,7 +440,7 @@ Gracias,
                     <Button
                       as="a"
                       href={generateCustomPlanEmail()}
-                      className="bg-lime-400 text-[#052b24] hover:bg-lime-300 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 shadow-[0_6px_20px_rgba(163,230,53,0.3)]"
+                      className="bg-lime-400 text-ev-night hover:bg-lime-300 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 shadow-[0_6px_20px_rgba(163,230,53,0.3)]"
                     >
                       <i className="icon-[lucide--calendar] w-4 h-4 mr-2" />
                       Consulta Gratuita
@@ -515,7 +515,7 @@ Gracias,
                 </p>
               </div>
 
-              <div className="text-center mt-4 rounded-xl border border-emerald-100 bg-emerald-50/50 p-3">
+              <div className="text-center mt-4 rounded-xl border border-ev-line bg-ev-paper p-3">
                 <p className="text-slate-600 text-sm">
                   ¿No deseas suscribirte ahora?{" "}
                   <button

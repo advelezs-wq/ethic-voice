@@ -196,10 +196,10 @@ export function EnhancedInviteMemberModal({
 
   const getRoleDescription = (role: InviteMemberForm["role"]) => {
     if (role === "ADMIN")
-      return "Puede gestionar la organización, miembros, configuraciones y ver todos los reportes";
+      return "Administra la organización, los miembros y la configuración, y ve todas las denuncias";
     if (role === "VIEWER")
-      return "Ve todos los reportes y su historial completo, pero no puede editar, asignar, cerrar casos ni escribir en el chat o las tareas";
-    return "Puede ver y gestionar reportes asignados, pero no puede gestionar la organización";
+      return "Ve todas las denuncias y su historial completo, pero no puede editar, asignar, cerrar casos ni escribir en el chat o las tareas";
+    return "Ve y gestiona las denuncias que se le asignan, pero no administra la organización";
   };
 
   const getAvailableSlots = (role: InviteMemberForm["role"]) => {
@@ -276,7 +276,7 @@ export function EnhancedInviteMemberModal({
                   className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
                     form.role === "ADMIN"
                       ? "border-primary bg-primary-50"
-                      : "border-emerald-100 hover:border-emerald-200"
+                      : "border-ev-line hover:border-ev-line"
                   }`}
                   onClick={() =>
                     setForm((prev) => ({ ...prev, role: "ADMIN" }))
@@ -301,7 +301,7 @@ export function EnhancedInviteMemberModal({
                   className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
                     form.role === "MEMBER"
                       ? "border-primary bg-primary-50"
-                      : "border-emerald-100 hover:border-emerald-200"
+                      : "border-ev-line hover:border-ev-line"
                   }`}
                   onClick={() =>
                     setForm((prev) => ({ ...prev, role: "MEMBER" }))
@@ -326,7 +326,7 @@ export function EnhancedInviteMemberModal({
                   className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
                     form.role === "VIEWER"
                       ? "border-primary bg-primary-50"
-                      : "border-emerald-100 hover:border-emerald-200"
+                      : "border-ev-line hover:border-ev-line"
                   }`}
                   onClick={() =>
                     setForm((prev) => ({ ...prev, role: "VIEWER" }))
@@ -350,7 +350,7 @@ export function EnhancedInviteMemberModal({
             </div>
 
             {/* Selected Role Summary */}
-            <div className="bg-[#f7faf9] rounded-lg p-3">
+            <div className="bg-ev-paper rounded-lg p-3">
               <div className="flex items-center gap-2">
                 <i className="icon-[lucide--user-check] size-4 text-slate-500" />
                 <span className="text-sm text-slate-600">

@@ -93,10 +93,10 @@ export function ReportsFilters({
   const statusOptions = [
     { key: "all", label: "Todos" },
     { key: "pending", label: "Pendiente", color: "warning" },
-    { key: "in_progress", label: "En progreso", color: "primary" },
-    { key: "resolved", label: "Resuelto", color: "success" },
-    { key: "closed", label: "Cerrado", color: "default" },
-    { key: "archived", label: "Archivado", color: "default" },
+    { key: "in_progress", label: "En investigación", color: "primary" },
+    { key: "resolved", label: "Resuelta", color: "success" },
+    { key: "closed", label: "Cerrada", color: "default" },
+    { key: "archived", label: "Archivada", color: "default" },
   ];
 
   const severityOptions = [
@@ -130,17 +130,17 @@ export function ReportsFilters({
 
   const assigneeOptions = [
     { key: "all", label: "Todos" },
-    { key: "unassigned", label: "Sin asignar" },
-    { key: "me", label: "Asignados a mí" },
-    { key: "others", label: "Asignados a otros" },
+    { key: "unassigned", label: "Sin responsable" },
+    { key: "me", label: "Asignadas a mí" },
+    { key: "others", label: "Asignadas a otros" },
   ];
 
   const slaOptions = [
     { key: "all", label: "Todos" },
-    { key: "green", label: "SLA Verde (≤60%)" },
-    { key: "yellow", label: "SLA Amarillo (61–85%)" },
-    { key: "orange", label: "SLA Naranja (86–100%)" },
-    { key: "red", label: "SLA Rojo (>100%)" },
+    { key: "green", label: "A tiempo" },
+    { key: "yellow", label: "Más de la mitad del plazo usado" },
+    { key: "orange", label: "Por vencer" },
+    { key: "red", label: "Vencido" },
   ];
 
   return (
@@ -151,7 +151,7 @@ export function ReportsFilters({
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 min-w-[240px]">
               <Input
-                placeholder="Buscar por ID, contenido, denunciante, departamento..."
+                placeholder="Buscar por número, palabra clave o departamento"
                 value={searchText}
                 onValueChange={(value) => updateFilter("search", value)}
                 startContent={
@@ -244,7 +244,7 @@ export function ReportsFilters({
               </Select>
 
               <Select
-                label="Fuente"
+                label="Canal"
                 selectedKeys={filters.source ? [filters.source] : []}
                 onSelectionChange={(keys) =>
                   updateFilter("source", Array.from(keys)[0] as string)
@@ -269,7 +269,7 @@ export function ReportsFilters({
               </Select>
 
               <Select
-                label="Fecha"
+                label="Recibida"
                 selectedKeys={filters.dateRange ? [filters.dateRange] : []}
                 onSelectionChange={(keys) =>
                   handleDateRangeChange(Array.from(keys)[0] as string)
@@ -283,7 +283,7 @@ export function ReportsFilters({
               </Select>
 
               <Select
-                label="Asignado"
+                label="Responsable"
                 selectedKeys={filters.assignee ? [filters.assignee] : []}
                 onSelectionChange={(keys) =>
                   updateFilter("assignee", Array.from(keys)[0] as string)
@@ -301,8 +301,8 @@ export function ReportsFilters({
               </Select>
 
               <Select
-                label="SLA"
-                className="w-[130px]"
+                label="Plazo de respuesta"
+                className="w-[190px]"
                 size="sm"
                 selectedKeys={filters.sla ? [filters.sla as any] : []}
                 onSelectionChange={(keys) =>
@@ -356,7 +356,7 @@ export function ReportsFilters({
 
           {/* Advanced filters section */}
           {showAdvancedFilters && (
-            <div className="pt-4 border-t border-emerald-100">
+            <div className="pt-4 border-t border-ev-line">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Select
                   label="Prioridad"
@@ -412,7 +412,7 @@ export function ReportsFilters({
                 </Select>
 
                 <Select
-                  label="Tipo de reporte"
+                  label="Tipo de denuncia"
                   placeholder="Todos los tipos"
                   className="w-full"
                   selectedKeys={
@@ -507,7 +507,7 @@ export function ReportsFilters({
 
           {/* Active filters display */}
           {(filters.search || getActiveFiltersCount() > 0) && (
-            <div className="flex flex-wrap gap-2 pt-4 border-t border-emerald-50">
+            <div className="flex flex-wrap gap-2 pt-4 border-t border-ev-line">
               {filters.search && (
                 <Chip
                   variant="flat"

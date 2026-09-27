@@ -31,21 +31,21 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
       case "high":
       case "alta":
       case "alto":
-        return "#ef4444"; // red-500
+        return "#DB4F3A"; // red-500
       case "medium":
       case "media":
       case "medio":
-        return "#f59e0b"; // yellow-500
+        return "#E09A2B"; // yellow-500
       case "low":
       case "baja":
       case "bajo":
-        return "#10b981"; // green-500
+        return "#5E9427"; // green-500
       case "unknown":
       case "desconocido":
       case "sin clasificar":
-        return "#6b7280"; // gray-500
+        return "#5A6D70"; // gray-500
       default:
-        return "#3b82f6"; // blue-500
+        return "#244850"; // blue-500
     }
   };
 
@@ -84,8 +84,8 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
     if (props.active && props.payload && props.payload.length) {
       const data = props.payload[0].payload;
       return (
-        <div className="bg-white p-3 border border-emerald-100 rounded-lg shadow-lg">
-          <p className="font-medium text-[#0d212c]">{data.name}</p>
+        <div className="bg-white p-3 border border-ev-line rounded-lg shadow-lg">
+          <p className="font-medium text-ev-night">{data.name}</p>
           <p className="text-sm text-slate-500">
             Cantidad: <span className="font-medium">{data.count}</span>
           </p>
@@ -107,7 +107,7 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: entry.color }}
             />
-            <span className="text-sm text-slate-600">{entry.value}</span>
+            <span className="ev-label mt-1 text-ev-mute">{entry.value}</span>
           </div>
         ))}
       </div>
@@ -124,7 +124,7 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
               high: "bg-red-50 text-red-800",
               medium: "bg-yellow-50 text-yellow-800",
               low: "bg-green-50 text-green-800",
-              unknown: "bg-emerald-50/40 text-[#0d212c]",
+              unknown: "bg-ev-paper text-ev-night",
             }[item.type.toLowerCase()] || "bg-sky-50 text-sky-700";
 
           return (
@@ -145,7 +145,7 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
       {/* Pie Chart */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-[#0d212c]">
+          <h4 className="text-lg font-semibold text-ev-night">
             Distribución por Severidad
           </h4>
           <p className="text-sm text-slate-500">
@@ -181,7 +181,7 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
           <div className="text-center py-12 text-slate-400">
             <i className="icon-[lucide--pie-chart] size-12 mx-auto mb-4" />
             <p className="text-lg font-medium">No hay datos disponibles</p>
-            <p className="text-sm">No se encontraron tipos de reportes</p>
+            <p className="text-sm">Aún no hay denuncias con tipo asignado</p>
           </div>
         )}
       </div>
@@ -189,7 +189,7 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
       {/* Bar Chart Alternative View */}
       <div className="bg-white border rounded-lg p-6">
         <div className="mb-4">
-          <h4 className="text-lg font-semibold text-[#0d212c]">
+          <h4 className="text-lg font-semibold text-ev-night">
             Comparación por Severidad
           </h4>
           <p className="text-sm text-slate-500">
@@ -204,17 +204,17 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
                 data={barData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#EAE8E0" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                  tickLine={{ stroke: "#d1d5db" }}
-                  axisLine={{ stroke: "#d1d5db" }}
+                  tick={{ fontSize: 12, fill: "#5A6D70" }}
+                  tickLine={{ stroke: "#DCDAD1" }}
+                  axisLine={{ stroke: "#DCDAD1" }}
                 />
                 <YAxis
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                  tickLine={{ stroke: "#d1d5db" }}
-                  axisLine={{ stroke: "#d1d5db" }}
+                  tick={{ fontSize: 12, fill: "#5A6D70" }}
+                  tickLine={{ stroke: "#DCDAD1" }}
+                  axisLine={{ stroke: "#DCDAD1" }}
                   allowDecimals={false}
                 />
                 <Tooltip content={renderTooltip} />
@@ -243,7 +243,7 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
       {data.length > 0 && (
         <div className="bg-white border rounded-lg p-6">
           <div className="mb-4">
-            <h4 className="text-lg font-semibold text-[#0d212c]">
+            <h4 className="text-lg font-semibold text-ev-night">
               Detalle por Tipo
             </h4>
             <p className="text-sm text-slate-500">
@@ -259,7 +259,7 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
                   high: "bg-red-50 border-red-200",
                   medium: "bg-yellow-50 border-yellow-200",
                   low: "bg-green-50 border-green-200",
-                  unknown: "bg-emerald-50/40 border-emerald-100",
+                  unknown: "bg-ev-paper border-ev-line",
                 }[item.type.toLowerCase()] || "bg-sky-50 border-sky-200";
 
               return (
@@ -274,12 +274,12 @@ export function ReportTypesChart({ data }: ReportTypesChartProps) {
                     >
                       {index + 1}
                     </div>
-                    <span className="font-medium text-[#0d212c]">
+                    <span className="font-medium text-ev-night">
                       {getSeverityLabel(item.type)}
                     </span>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-[#0d212c]">{item.count}</div>
+                    <div className="font-bold text-ev-night">{item.count}</div>
                     <div className="text-sm text-slate-500">
                       {item.percentage}%
                     </div>

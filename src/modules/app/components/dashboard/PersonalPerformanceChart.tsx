@@ -58,14 +58,14 @@ export const PersonalPerformanceChart: React.FC<
               <Line
                 type="monotone"
                 dataKey="resueltos"
-                stroke="#10b981"
+                stroke="#5E9427"
                 name="Resueltos"
                 strokeWidth={2}
               />
               <Line
                 type="monotone"
                 dataKey="asignados"
-                stroke="#65a30d"
+                stroke="#5E9427"
                 name="Asignados"
                 strokeWidth={2}
               />

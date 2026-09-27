@@ -45,7 +45,7 @@ export function FileUpload({
         "border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors",
         isDragActive
           ? "border-sky-500 bg-sky-50"
-          : "border-emerald-200 hover:border-slate-400",
+          : "border-ev-line hover:border-slate-400",
         className
       )}
     >

@@ -204,7 +204,7 @@ export function AttachmentUploader({
     <div className="space-y-4">
       {/* Upload Area */}
       <div
-        className="cursor-pointer rounded-2xl border-2 border-dashed border-[#0a1e14]/20 bg-[#f7faf9] p-6 text-center transition-colors hover:border-lime-500"
+        className="cursor-pointer rounded-2xl border-2 border-dashed border-ev-night/20 bg-ev-paper p-6 text-center transition-colors hover:border-lime-500"
         onClick={(e) => {
           // Only trigger file selection if clicking outside the button
           if (
@@ -229,17 +229,17 @@ export function AttachmentUploader({
             <i className="icon-[lucide--paperclip] size-12 text-gray-400" />
           </div>
           <div>
-            <p className="text-lg font-medium text-[#0a1e14]">
+            <p className="text-lg font-medium text-ev-night">
               Arrastra archivos aquí o haz clic para seleccionar
             </p>
-            <p className="mt-1 text-sm text-[#273c46]">
+            <p className="mt-1 text-sm text-ev-mute">
               Imágenes, documentos, audio, video - Máximo 50MB por archivo
             </p>
           </div>
           <Button
             color="primary"
             variant="flat"
-            className="bg-[#0a1e14] text-white"
+            className="bg-ev-night text-white"
             onPress={() => {
               fileInputRef.current?.click();
             }}
@@ -283,8 +283,8 @@ export function AttachmentUploader({
       {isUploading && (
         <Card className="border border-lime-300 bg-lime-50 p-4">
           <div className="flex items-center gap-3">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#0a1e14] border-t-transparent" />
-            <span className="font-medium text-[#0a1e14]">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-ev-night border-t-transparent" />
+            <span className="font-medium text-ev-night">
               Subiendo archivos... Por favor espera antes de enviar el
               formulario.
             </span>
@@ -340,31 +340,31 @@ export function AttachmentUploader({
       )}
 
       {/* Info Card */}
-      <Card className="border border-[#0a1e14]/10 bg-[#f7faf9] p-4">
+      <Card className="border border-ev-night/10 bg-ev-paper p-4">
         <div className="space-y-2">
-          <h4 className="flex items-center gap-2 font-semibold text-[#0a1e14]">
+          <h4 className="flex items-center gap-2 font-semibold text-ev-night">
             <i className="icon-[lucide--info] size-4" />
             Tipos de archivos permitidos:
           </h4>
-          <ul className="space-y-1 text-sm text-[#273c46]">
+          <ul className="space-y-1 text-sm text-ev-mute">
             <li>
-              <i className="icon-[lucide--image] mr-2 inline size-4 text-[#0a1e14]" />{" "}
+              <i className="icon-[lucide--image] mr-2 inline size-4 text-ev-night" />{" "}
               <strong>Imágenes:</strong> JPG, PNG, GIF, WebP
             </li>
             <li>
-              <i className="icon-[lucide--file-text] mr-2 inline size-4 text-[#0a1e14]" />{" "}
+              <i className="icon-[lucide--file-text] mr-2 inline size-4 text-ev-night" />{" "}
               <strong>Documentos:</strong> PDF, Word, Excel, TXT
             </li>
             <li>
-              <i className="icon-[lucide--volume-2] mr-2 inline size-4 text-[#0a1e14]" />{" "}
+              <i className="icon-[lucide--volume-2] mr-2 inline size-4 text-ev-night" />{" "}
               <strong>Audio:</strong> MP3, WAV, M4A
             </li>
             <li>
-              <i className="icon-[lucide--video] mr-2 inline size-4 text-[#0a1e14]" />{" "}
+              <i className="icon-[lucide--video] mr-2 inline size-4 text-ev-night" />{" "}
               <strong>Video:</strong> MP4, AVI, MOV, WebM
             </li>
           </ul>
-          <p className="mt-2 text-xs text-[#273c46]">
+          <p className="mt-2 text-xs text-ev-mute">
             <strong>Nota:</strong> Los adjuntos se protegen como información
             sensible del caso. Comparte solo evidencia relevante para la
             investigación.

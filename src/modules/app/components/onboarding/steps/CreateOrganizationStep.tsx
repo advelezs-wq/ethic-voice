@@ -133,7 +133,7 @@ export function CreateOrganizationStep({
         <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-2xl">{organizationCreated ? "✅" : "🏢"}</span>
         </div>
-        <h2 className="text-2xl font-bold text-[#0d212c] mb-2">
+        <h2 className="text-2xl font-bold text-ev-night mb-2">
           {organizationCreated ? "¡Todo listo!" : "Crear tu organización"}
         </h2>
         <p className="text-slate-500">

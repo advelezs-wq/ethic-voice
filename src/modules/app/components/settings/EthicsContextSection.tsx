@@ -116,7 +116,7 @@ export function EthicsContextSection({
       });
       addToast({
         title: "Contexto ético guardado",
-        description: "Los cambios se aplicarán en el próximo triage de IA",
+        description: "Los cambios se aplicarán a las próximas denuncias que analice la IA",
         color: "success",
       });
     } catch (error) {
@@ -224,7 +224,7 @@ export function EthicsContextSection({
         {/* 1. Contexto de la organización */}
         <Card>
           <CardHeader>
-            <h4 className="font-semibold text-[#0d212c]">
+            <h4 className="font-semibold text-ev-night">
               1. Contexto de la organización
             </h4>
           </CardHeader>
@@ -246,7 +246,7 @@ export function EthicsContextSection({
         {/* 2. Estructura de gobierno y ética */}
         <Card>
           <CardHeader>
-            <h4 className="font-semibold text-[#0d212c]">
+            <h4 className="font-semibold text-ev-night">
               2. Estructura de gobierno y ética
             </h4>
           </CardHeader>
@@ -311,7 +311,7 @@ export function EthicsContextSection({
         {/* 3. Criterios éticos especiales */}
         <Card>
           <CardHeader>
-            <h4 className="font-semibold text-[#0d212c]">
+            <h4 className="font-semibold text-ev-night">
               3. Criterios éticos especiales
             </h4>
           </CardHeader>
@@ -382,7 +382,7 @@ export function EthicsContextSection({
       {/* 4. Documentos y políticas internas */}
       <Card>
         <CardHeader className="flex items-center justify-between w-full">
-          <h4 className="font-semibold text-[#0d212c]">
+          <h4 className="font-semibold text-ev-night">
             4. Documentos y políticas internas
           </h4>
         </CardHeader>
@@ -508,8 +508,8 @@ export function EthicsContextSection({
       </Card>
 
       {/* 5. Panel informativo */}
-      <div className="bg-secondary rounded-lg p-4">
-        <h5 className="font-medium text-[#0d212c] mb-3">
+      <div className="rounded-xl border border-ev-line bg-ev-paper p-4">
+        <h5 className="font-medium text-ev-night mb-3">
           <i className="icon-[lucide--sparkles] size-4 mr-2 inline" />
           ¿Cómo utiliza la IA esta información?
         </h5>
@@ -518,7 +518,7 @@ export function EthicsContextSection({
           <li>Consulta tus políticas y documentos internos relevantes.</li>
           <li>Compara la situación con tu marco ético y normativo.</li>
           <li>Complementa con criterios generales y buenas prácticas.</li>
-          <li>Genera el triage y recomendaciones alineadas a tu organización.</li>
+          <li>Clasifica cada denuncia y sugiere acciones alineadas a tu organización.</li>
         </ol>
         <p className="text-xs text-slate-500 mt-3">
           La información y documentos de cada organización están completamente

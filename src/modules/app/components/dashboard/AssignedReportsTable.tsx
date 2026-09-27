@@ -1,5 +1,4 @@
 import React from "react";
-import { Card, CardHeader, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import { Tooltip } from "@heroui/react";
@@ -17,10 +16,7 @@ import Link from "next/link";
 import { usePlanPermissions } from "@/modules/core/hooks/usePlanPermissions";
 import { useSafeToast } from "../../hooks/useSafeToast";
 import { useAiQueue } from "../../hooks/useAiQueue";
-import { Spinner } from "@heroui/react";
 import { EmptyState } from "@/modules/app/components/ui";
-import { useSubmissionQueueInfo } from "../../hooks/useSubmissionQueueInfo";
-import { formatEtaShort } from "../../utils/date.utils";
 import { AIQueueInlineStatus } from "../../components/ai/AIQueueInlineStatus";
 import { useRouter } from "next/navigation";
 import { deleteReport } from "@/actions/reports.actions";
@@ -58,7 +54,7 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
         null;
 
       // Extract key information
-      const title = report.subject || "Reporte sin título";
+      const title = report.subject || "Denuncia sin asunto";
       let description = "";
       let keyFindings: string[] = [];
       let immediateActions: string[] = [];
@@ -110,30 +106,6 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
     }
   };
 
-  const getSourceIcon = (source: string) => {
-    switch (source) {
-      case "EMAIL":
-        return <i className="icon-[lucide--mail] size-4 text-sky-600" />;
-      case "ETHIC_LINE":
-        return (
-          <i className="icon-[lucide--shield-check] size-4 text-green-500" />
-        );
-      default:
-        return <i className="icon-[lucide--file-text] size-4 text-slate-400" />;
-    }
-  };
-
-  const getPriorityIcon = (severity: string) => {
-    if (severity === "HIGH" || severity === "URGENT") {
-      return <i className="icon-[lucide--zap] size-4 text-red-500" />;
-    } else if (severity === "MEDIUM" || severity === "NORMAL") {
-      return (
-        <i className="icon-[lucide--chevrons-up] size-4 text-orange-500" />
-      );
-    }
-    return null;
-  };
-
   // Group reports by urgency
   const urgentReports = reports.filter((report) => {
     const info = extractReportInfo(report);
@@ -151,7 +123,7 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
 
   const handleDeleteReport = async (reportId: number, title?: string) => {
     const confirmed = window.confirm(
-      `¿Seguro que deseas eliminar este reporte${
+      `¿Seguro que deseas eliminar esta denuncia${
         title ? `: "${title}"` : ""
       }? Esta acción no se puede deshacer.`
     );
@@ -160,381 +132,218 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
     try {
       setDeletingReportId(reportId);
       await deleteReport(reportId);
-      showSuccess("Reporte eliminado correctamente");
+      showSuccess("Denuncia eliminada");
       window.dispatchEvent(new CustomEvent("manual-report-created"));
       router.refresh();
     } catch (error) {
       showError(
         error instanceof Error
           ? error.message
-          : "No se pudo eliminar el reporte"
+          : "No se pudo eliminar la denuncia"
       );
     } finally {
       setDeletingReportId(null);
     }
   };
 
+  const runAi = async (report: Report) => {
+    try {
+      setAiLoadingId(report.idTable);
+      setOptimisticQueuedIds((prev) => new Set(prev).add(report.idTable));
+      const res = await fetch("/api/ai/process/manual", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: typeof report.content === "string" ? report.content : JSON.stringify(report.content),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          source: report.source as any,
+          metadata: { submissionId: report.idTable },
+          sync: true,
+          timeoutMs: 12000,
+          fallbackToQueue: true,
+        }),
+      });
+      const payload = await res.json();
+      if (!res.ok || payload?.success === false) throw new Error("AI process failed");
+      if (payload.mode === "sync") {
+        showSuccess("Análisis de IA completado");
+        setOptimisticQueuedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(report.idTable);
+          return next;
+        });
+        window.dispatchEvent(new CustomEvent("manual-report-created"));
+      } else {
+        showWarning("El análisis quedó en cola", payload.message);
+        refreshQueue();
+      }
+    } catch {
+      showError("No se pudo procesar el análisis de IA");
+      setOptimisticQueuedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(report.idTable);
+        return next;
+      });
+    } finally {
+      setAiLoadingId(null);
+    }
+  };
+
+  const SOURCE_LABEL: Record<string, string> = {
+    ETHIC_LINE: "Línea ética",
+    CUSTOM_FORM: "Formulario",
+    EMAIL: "Correo",
+    WHATSAPP: "WhatsApp",
+    API: "Registro manual",
+  };
+
+  const PRIORITY_DOT: Record<string, string> = {
+    URGENT: "bg-ev-coral",
+    HIGH: "bg-ev-coral",
+    NORMAL: "bg-ev-amber",
+    LOW: "bg-ev-haze",
+  };
+
   return (
-    <Card className="border border-emerald-100 bg-white/95 shadow-none">
-      <CardHeader className="pb-4 border-b border-emerald-100 bg-emerald-50/50">
-        <div className="flex items-center justify-between w-full flex-wrap gap-2">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <h3 className="text-base sm:text-lg font-semibold text-[#0d212c]">
-              Reportes Recientes
-            </h3>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Chip color="danger" variant="flat" size="sm">
-                {reports.length} total
-              </Chip>
-              {urgentReports.length > 0 && (
-                <Chip color="danger" variant="solid" size="sm">
-                  <i className="icon-[lucide--alert-triangle] size-3 mr-1" />
-                  {urgentReports.length} urgentes
-                </Chip>
-              )}
-            </div>
-          </div>
-          <Button
-            as={Link}
-            href="/app/reports"
-            variant="bordered"
-            size="sm"
-            className="border-emerald-200 text-emerald-900"
-          >
-            Ver todos
-          </Button>
+    <section className="rounded-2xl border border-ev-line bg-white">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-ev-line px-6 py-4">
+        <div className="flex items-center gap-3">
+          <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+            Denuncias recientes
+          </h3>
+          {urgentReports.length > 0 && (
+            <span className="ev-label rounded-full bg-[#FBE6E1] px-2 py-0.5 text-[#9C2F1F]">
+              {urgentReports.length} {urgentReports.length === 1 ? "prioritaria" : "prioritarias"}
+            </span>
+          )}
         </div>
-      </CardHeader>
-      <CardBody>
-        <div className="space-y-3 sm:space-y-4">
+        <Link
+          href="/app/reports"
+          className="text-sm font-medium text-ev-night underline decoration-ev-line underline-offset-4 hover:decoration-ev-night"
+        >
+          Ver todas las denuncias
+        </Link>
+      </header>
+
+      {reports.length === 0 ? (
+        <div className="p-6">
+          <EmptyState
+            icon={<i className="icon-[lucide--inbox] size-6" />}
+            title="Aún no hay denuncias"
+            description="Cuando alguien reporte por la línea ética, el correo o un formulario, la verás aquí."
+          />
+        </div>
+      ) : (
+        <ul className="divide-y divide-ev-line">
           {sortedReports.map((report) => {
             const reportInfo = extractReportInfo(report);
             const deadlineInfo = report.deadline
-              ? getDeadlineInfo(
-                  report.severity,
-                  new Date(report.submittedAt),
-                  report.category
-                )
+              ? getDeadlineInfo(report.severity, new Date(report.submittedAt), report.category)
               : null;
+            const queued =
+              (optimisticQueuedIds.has(report.idTable)
+                ? "processing"
+                : submissionIdToStatus.get(report.idTable)) === "processing";
+            const isOpen = report.status !== "closed" && report.status !== "archived";
 
             return (
-              <Card
-                shadow="sm"
-                isHoverable
-                key={report.id}
-                className={`border border-emerald-100 transition-all hover:shadow-[0_20px_40px_-34px_rgba(5,26,36,0.75)] ${
-                  reportInfo.requiresUrgentAction
-                    ? "border-l-4 border-l-red-500"
-                    : ""
-                }`}
-              >
-                <CardBody className="p-3 sm:p-4">
-                  <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-                    <div className="flex-1">
-                      {/* Header Row */}
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                        <span className="text-sm font-semibold text-emerald-900/70">
-                          {report.idTable}
-                        </span>
-                        {getSourceIcon(report.source)}
-                        {getPriorityIcon(report.severity)}
-
-                        {/* Priority Chip */}
-                        <Chip
-                          color={getPriorityColor(report.severity)}
-                          size="sm"
-                          variant="flat"
-                        >
-                          <i className="icon-[lucide--flag] size-3 mr-1" />
-                          {getPriorityLabel(report.severity)}
-                        </Chip>
-
-                        {/* Status Chip */}
-                        <Chip
-                          color={getStatusColor(report.status)}
-                          size="sm"
-                          variant="flat"
-                        >
-                          {getStatusLabel(report.status)}
-                        </Chip>
-
-                        {/* Special Indicators */}
-                        {report.isAnonymous && (
-                          <Chip size="sm" variant="flat" color="secondary">
-                            <i className="icon-[lucide--user-round-check] size-3 mr-1" />
-                            Anónimo
-                          </Chip>
-                        )}
-
-                        {reportInfo.hasAiAnalysis && (
-                          <Tooltip
-                            content={`Confianza del análisis: ${reportInfo.confidence}%`}
-                          >
-                            <Chip size="sm" variant="flat" color="primary">
-                              <i className="icon-[lucide--brain] size-3 mr-1" />
-                              AI {reportInfo.confidence}%
-                            </Chip>
-                          </Tooltip>
-                        )}
-                        {!reportInfo.hasAiAnalysis &&
-                          (optimisticQueuedIds.has(report.idTable)
-                            ? "processing"
-                            : submissionIdToStatus.get(report.idTable)) ===
-                            "processing" && (
-                            <AIQueueInlineStatus
-                              submissionId={report.idTable}
-                              size="xs"
-                            />
-                          )}
-                        {!reportInfo.hasAiAnalysis &&
-                          (optimisticQueuedIds.has(report.idTable)
-                            ? "processing"
-                            : submissionIdToStatus.get(report.idTable)) !==
-                            "processing" &&
-                          planInfo?.planType &&
-                          planInfo.planType !== "STARTER" && (
-                            <Button
-                              size="sm"
-                              variant="flat"
-                              color="primary"
-                              isLoading={aiLoadingId === report.idTable}
-                              onPress={async () => {
-                                try {
-                                  setAiLoadingId(report.idTable);
-                                  setOptimisticQueuedIds((prev) => {
-                                    const next = new Set(prev);
-                                    next.add(report.idTable);
-                                    return next;
-                                  });
-                                  const res = await fetch(
-                                    "/api/ai/process/manual",
-                                    {
-                                      method: "POST",
-                                      headers: {
-                                        "Content-Type": "application/json",
-                                      },
-                                      body: JSON.stringify({
-                                        content:
-                                          typeof report.content === "string"
-                                            ? report.content
-                                            : JSON.stringify(report.content),
-                                        source: report.source as any,
-                                        metadata: {
-                                          submissionId: report.idTable,
-                                        },
-                                        sync: true,
-                                        timeoutMs: 12000,
-                                        fallbackToQueue: true,
-                                      }),
-                                    }
-                                  );
-                                  const payload = await res.json();
-                                  if (!res.ok || payload?.success === false) {
-                                    throw new Error("AI process failed");
-                                  }
-                                  if (payload.mode === "sync") {
-                                    showSuccess("Análisis de IA completado");
-                                    setOptimisticQueuedIds((prev) => {
-                                      const next = new Set(prev);
-                                      next.delete(report.idTable);
-                                      return next;
-                                    });
-                                    window.dispatchEvent(
-                                      new CustomEvent("manual-report-created")
-                                    );
-                                  } else {
-                                    showWarning(
-                                      "Análisis encolado automáticamente",
-                                      payload.message
-                                    );
-                                    refreshQueue();
-                                  }
-                                } catch (err) {
-                                  showError(
-                                    "No se pudo procesar el análisis de IA"
-                                  );
-                                  setOptimisticQueuedIds((prev) => {
-                                    const next = new Set(prev);
-                                    next.delete(report.idTable);
-                                    return next;
-                                  });
-                                } finally {
-                                  setAiLoadingId(null);
-                                }
-                              }}
-                            >
-                              Analizar con IA
-                            </Button>
-                          )}
-
-                        {reportInfo.requiresUrgentAction && (
-                          <Chip size="sm" variant="solid" color="danger">
-                            <i className="icon-[lucide--alert-triangle] size-3 mr-1" />
-                            Acción urgente
-                          </Chip>
-                        )}
-                      </div>
-
-                      {/* Title and Summary */}
-                      <h4 className="font-medium text-[#0d212c] mb-1 line-clamp-1 text-base">
-                        {reportInfo.title}
-                      </h4>
-
-                      {reportInfo.description && (
-                        <p className="text-sm text-slate-500 mb-2 line-clamp-2">
-                          {reportInfo.description}
-                        </p>
-                      )}
-
-                      {/* Key Findings - Show only if AI analysis exists */}
-                      {reportInfo.keyFindings.length > 0 && (
-                        <div className="mb-2 rounded-md border border-emerald-100 bg-emerald-50/50 p-2">
-                          <p className="text-xs font-semibold text-slate-600 mb-1">
-                            Hallazgos clave:
-                          </p>
-                          <ul className="text-xs text-slate-500 space-y-0.5">
-                            {reportInfo.keyFindings
-                              .slice(0, 2)
-                              .map((finding, idx) => (
-                                <li
-                                  key={idx}
-                                  className="flex items-start gap-1"
-                                >
-                                  <i className="icon-[lucide--check-circle] size-3 text-green-500 mt-0.5 flex-shrink-0" />
-                                  <span className="line-clamp-1">
-                                    {finding}
-                                  </span>
-                                </li>
-                              ))}
-                            {reportInfo.keyFindings.length > 2 && (
-                              <li className="text-slate-400 italic">
-                                +{reportInfo.keyFindings.length - 2} más...
-                              </li>
-                            )}
-                          </ul>
-                        </div>
-                      )}
-
-                      {/* Immediate Actions - Show for urgent reports */}
-                      {reportInfo.requiresUrgentAction &&
-                        reportInfo.immediateActions.length > 0 && (
-                          <div className="mb-2 rounded-md border border-red-200 bg-red-50 p-2">
-                            <p className="text-xs font-semibold text-red-700 mb-1">
-                              Acciones inmediatas:
-                            </p>
-                            <ul className="text-xs text-red-600 space-y-0.5">
-                              {reportInfo.immediateActions
-                                .slice(0, 1)
-                                .map((action, idx) => (
-                                  <li
-                                    key={idx}
-                                    className="flex items-start gap-1"
-                                  >
-                                    <i className="icon-[lucide--alert-circle] size-3 text-red-500 mt-0.5 flex-shrink-0" />
-                                    <span className="line-clamp-2">
-                                      {action}
-                                    </span>
-                                  </li>
-                                ))}
-                            </ul>
-                          </div>
-                        )}
-
-                      {/* Meta Information */}
-                      <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-sm text-slate-500">
+              <li key={report.id} className="group relative">
+                <div className="flex items-start gap-4 px-6 py-4 transition-colors hover:bg-ev-paper/60">
+                  <span
+                    className={`mt-2 h-2 w-2 shrink-0 rounded-full ${PRIORITY_DOT[report.severity] ?? "bg-ev-haze"}`}
+                    title={`Prioridad ${getPriorityLabel(report.severity).toLowerCase()}`}
+                    aria-hidden
+                  />
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/app/reports/${report.idTable}`}
+                      className="font-medium text-ev-night after:absolute after:inset-0 hover:underline"
+                    >
+                      {reportInfo.title}
+                    </Link>
+                    {reportInfo.description && (
+                      <p className="mt-0.5 line-clamp-1 text-sm text-ev-mute">{reportInfo.description}</p>
+                    )}
+                    <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.8125rem] text-ev-mute">
+                      <span className="font-mono text-ev-haze">#{report.idTable}</span>
+                      <span>{getReportTypeLabel(report.category)}</span>
+                      <span>· {SOURCE_LABEL[report.source] ?? "Otro canal"}</span>
+                      {report.isAnonymous && <span>· Anónima</span>}
+                      {report.department && <span>· {report.department}</span>}
+                      {report.assignments && report.assignments.length > 0 ? (
                         <span>
-                          <i className="icon-[lucide--tag] size-3 mr-1 inline" />
-                          {getReportTypeLabel(report.category)}
+                          · Responsable: {report.assignments.map((a) => a.userName).join(", ")}
                         </span>
-                        {report.department && (
-                          <>
-                            <span>•</span>
-                            <span>
-                              <i className="icon-[lucide--building-2] size-3 mr-1 inline" />
-                              {report.department}
-                            </span>
-                          </>
-                        )}
-                        {deadlineInfo && (
-                          <>
-                            <span>•</span>
-                            <span
-                              className={
-                                deadlineInfo.isOverdue
-                                  ? "text-red-600 font-medium"
-                                  : ""
-                              }
-                            >
-                              <span
-                                aria-label={`semaforo ${deadlineInfo.semaphore}`}
-                                className={`inline-block w-2.5 h-2.5 rounded-full mr-1 ${
-                                  deadlineInfo.semaphore === "green"
-                                    ? "bg-green-500"
-                                    : deadlineInfo.semaphore === "yellow"
-                                      ? "bg-yellow-500"
-                                      : deadlineInfo.semaphore === "orange"
-                                        ? "bg-orange-500"
-                                        : "bg-red-500"
-                                }`}
-                              />
-                              <i className="icon-[lucide--clock] size-3 mr-1 inline" />
-                              {deadlineInfo.text}
-                            </span>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Assignment Info */}
-                      {report.assignments && report.assignments.length > 0 && (
-                        <div className="mt-2 flex items-center gap-2">
-                          <Chip size="sm" variant="flat" color="primary">
-                            <i className="icon-[lucide--users] size-3 mr-1" />
-                            {report.assignments.length} investigador(es)
-                          </Chip>
-                        </div>
+                      ) : (
+                        isOpen && <span className="text-[#8C5C15]">· Sin responsable</span>
                       )}
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="flex-shrink-0 sm:self-auto self-end flex items-center gap-1">
-                      {canDeleteReports && (
-                        <Button
-                          isIconOnly
-                          variant="light"
-                          color="danger"
-                          size="sm"
-                          isLoading={deletingReportId === report.idTable}
-                          onPress={() =>
-                            handleDeleteReport(report.idTable, reportInfo.title)
-                          }
-                        >
-                          <i className="icon-[lucide--trash-2] size-4" />
-                        </Button>
-                      )}
-                      <Button
-                        as={Link}
-                        href={`/app/reports/${report.idTable}`}
-                        isIconOnly
-                        variant="light"
-                        size="sm"
-                      >
-                        <i className="icon-[lucide--arrow-right] size-4" />
-                      </Button>
-                    </div>
+                    </p>
                   </div>
-                </CardBody>
-              </Card>
+
+                  <div className="relative z-10 flex shrink-0 flex-col items-end gap-2">
+                    <span className="flex items-center gap-2">
+                      <Chip color={getPriorityColor(report.severity)} size="sm" variant="flat">
+                        {getPriorityLabel(report.severity)}
+                      </Chip>
+                      <Chip color={getStatusColor(report.status)} size="sm" variant="flat">
+                        {getStatusLabel(report.status)}
+                      </Chip>
+                    </span>
+                    {deadlineInfo && isOpen && (
+                      <span
+                        className={`text-[0.8125rem] ${
+                          deadlineInfo.isOverdue ? "font-medium text-[#9C2F1F]" : "text-ev-mute"
+                        }`}
+                      >
+                        {deadlineInfo.text}
+                      </span>
+                    )}
+                    <span className="flex items-center gap-1">
+                      {!reportInfo.hasAiAnalysis && queued && (
+                        <AIQueueInlineStatus submissionId={report.idTable} size="xs" />
+                      )}
+                      {!reportInfo.hasAiAnalysis &&
+                        !queued &&
+                        planInfo?.planType &&
+                        planInfo.planType !== "STARTER" && (
+                          <Button
+                            size="sm"
+                            variant="light"
+                            className="h-7 px-2 text-xs text-ev-mute"
+                            isLoading={aiLoadingId === report.idTable}
+                            startContent={
+                              aiLoadingId === report.idTable ? null : (
+                                <i className="icon-[lucide--sparkles] size-3.5" aria-hidden />
+                              )
+                            }
+                            onPress={() => runAi(report)}
+                          >
+                            Analizar con IA
+                          </Button>
+                        )}
+                      {canDeleteReports && (
+                        <Tooltip content="Eliminar denuncia">
+                          <Button
+                            isIconOnly
+                            variant="light"
+                            size="sm"
+                            aria-label="Eliminar denuncia"
+                            className="h-7 w-7 min-w-7 text-ev-haze opacity-0 transition-opacity hover:text-[#B23A28] focus-visible:opacity-100 group-hover:opacity-100"
+                            isLoading={deletingReportId === report.idTable}
+                            onPress={() => handleDeleteReport(report.idTable, reportInfo.title)}
+                          >
+                            <i className="icon-[lucide--trash-2] size-3.5" />
+                          </Button>
+                        </Tooltip>
+                      )}
+                    </span>
+                  </div>
+                </div>
+              </li>
             );
           })}
-
-          {reports.length === 0 && (
-            <EmptyState
-              icon={<i className="icon-[lucide--inbox] size-6" />}
-              title="No hay reportes recientes"
-            />
-          )}
-        </div>
-      </CardBody>
-    </Card>
+        </ul>
+      )}
+    </section>
   );
 };

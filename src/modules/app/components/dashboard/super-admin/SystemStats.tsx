@@ -37,7 +37,7 @@ export function SystemStats({ stats }: SystemStatsProps) {
       bgColor: "bg-emerald-50",
     },
     {
-      title: "Total Reportes",
+      title: "Total de denuncias",
       value: stats.totalReports,
       icon: "icon-[lucide--file-text]",
       color: "text-lime-700",
@@ -48,12 +48,12 @@ export function SystemStats({ stats }: SystemStatsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {statCards.map((stat, index) => (
-        <Card key={index} className="border border-emerald-200/60 bg-white/90 shadow-sm transition hover:shadow-md">
+        <Card key={index} className="border border-ev-line bg-white shadow-sm transition hover:shadow-md">
           <CardBody className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-default-600">{stat.title}</p>
-                <p className="text-2xl font-bold text-[#0d212c]">{stat.value}</p>
+                <p className="text-2xl font-bold text-ev-night">{stat.value}</p>
               </div>
               <div className={`p-3 rounded-lg ${stat.bgColor}`}>
                 <i className={`${stat.icon} size-6 ${stat.color}`} />

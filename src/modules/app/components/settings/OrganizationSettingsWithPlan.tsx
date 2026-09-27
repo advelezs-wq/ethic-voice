@@ -263,11 +263,11 @@ export function OrganizationSettingsWithPlan() {
                       />
 
                       {settings.logoUrl ? (
-                        <div className="rounded-lg bg-[#f7faf9] p-4">
+                        <div className="rounded-lg bg-ev-paper p-4">
                           <p className="mb-2 text-sm text-slate-500">
                             Vista previa del logo
                           </p>
-                          <div className="relative h-16 w-40 overflow-hidden rounded-md border border-emerald-100 bg-white">
+                          <div className="relative h-16 w-40 overflow-hidden rounded-md border border-ev-line bg-white">
                             <Image
                               src={settings.logoUrl}
                               alt="Vista previa del logo de la organización"
@@ -392,7 +392,7 @@ export function OrganizationSettingsWithPlan() {
                         </div>
                       </div>
 
-                      <div className="p-4 bg-[#f7faf9] rounded-lg">
+                      <div className="p-4 bg-ev-paper rounded-lg">
                         <p className="text-sm text-slate-500 mb-2">
                           Theme Preview:
                         </p>

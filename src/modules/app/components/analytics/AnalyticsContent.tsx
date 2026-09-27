@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { MetricStrip } from "@/modules/app/components/ui";
+
 import { useState, useEffect, useCallback } from "react";
 import {
   Card,
@@ -171,9 +174,9 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         }
 
         addToast({
-          title: "Reporte generado",
+          title: "Informe generado",
           description:
-            "El reporte se abrió en una nueva pestaña. Puedes guardarlo como PDF usando Ctrl+P",
+            "El informe se abrió en una nueva pestaña. Puedes guardarlo como PDF con Ctrl+P",
           color: "success",
         });
       } else {
@@ -195,7 +198,7 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
 
         addToast({
           title: "Descarga exitosa",
-          description: `El reporte ha sido descargado en formato ${format.toUpperCase()}`,
+          description: `El informe se descargó en formato ${format.toUpperCase()}`,
           color: "success",
         });
       }
@@ -203,7 +206,7 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
       pendingTab?.close();
       addToast({
         title: "Error en la descarga",
-        description: "No se pudo generar el reporte. Intenta nuevamente",
+        description: "No se pudo generar el informe. Intenta nuevamente",
         color: "danger",
       });
     } finally {
@@ -234,7 +237,7 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <div className="text-red-500 mb-4">
           <i className="icon-[lucide--alert-circle] size-12 mx-auto" />
         </div>
-        <h3 className="text-lg font-medium text-[#0d212c] mb-2">
+        <h3 className="text-lg font-medium text-ev-night mb-2">
           Error al cargar datos
         </h3>
         <p className="text-slate-500 mb-4">{error}</p>
@@ -252,30 +255,34 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
 
   return (
     <div className="space-y-8">
-      {/* SLA Alert Banner */}
-      {data && (data.slaOrangeCount || data.slaRedCount) && (
-        <div className="border rounded-md p-3 bg-yellow-50 border-yellow-200">
-          <div className="flex items-center gap-3 text-sm">
-            <i className="icon-[lucide--traffic-cone] size-4 text-yellow-600" />
-            <span className="text-[#0d212c]">
-              {data.slaRedCount ? `${data.slaRedCount} caso(s) vencidos` : ""}
-              {data.slaRedCount && data.slaOrangeCount ? " • " : ""}
-              {data.slaOrangeCount
-                ? `${data.slaOrangeCount} próximo(s) a vencer`
-                : ""}
-            </span>
-          </div>
+      {/* Aviso de plazos: frase completa y enlace a la lista filtrada */}
+      {data && (data.slaOrangeCount || data.slaRedCount) ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#F4D49D] bg-[#FDF6EA] px-4 py-3 text-sm">
+          <span className="flex items-center gap-2.5 text-ev-night">
+            <i className="icon-[lucide--clock-alert] size-4 text-[#8C5C15]" aria-hidden />
+            {data.slaRedCount
+              ? `${data.slaRedCount} ${data.slaRedCount === 1 ? "denuncia tiene" : "denuncias tienen"} el plazo de respuesta vencido`
+              : ""}
+            {data.slaRedCount && data.slaOrangeCount ? " y " : ""}
+            {data.slaOrangeCount
+              ? `${data.slaOrangeCount} ${data.slaOrangeCount === 1 ? "está por vencer" : "están por vencer"}`
+              : ""}
+            .
+          </span>
+          <Link href="/app/reports?sla=red" className="font-medium text-ev-night underline decoration-[#E09A2B] underline-offset-4">
+            Ver denuncias vencidas
+          </Link>
         </div>
-      )}
+      ) : null}
       {/* Organization Overview */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <h3 className="text-xl font-semibold text-[#0d212c]">
-              Resumen Organizacional
+            <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+              Tu equipo
             </h3>
-            <p className="text-slate-500 text-sm">
-              Métricas clave de la organización y equipo de trabajo
+            <p className="text-sm text-ev-mute">
+              Cuántas personas participan y cómo se reparte el trabajo
             </p>
           </div>
           <div className="flex gap-2">
@@ -301,58 +308,31 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
               }
             >
               <i className="icon-[lucide--download] size-4 mr-2" />
-              Descargar Resumen
+              Descargar resumen PDF
             </Button>
           </div>
         </CardHeader>
         <CardBody>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-sky-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-sky-800">
-                {data.organizationMetrics.totalMembers}
-              </div>
-              <div className="text-sm text-sky-700">Total Miembros</div>
-            </div>
-            <div className="bg-green-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-green-900">
-                {data.organizationMetrics.activeMembersWithReports}
-              </div>
-              <div className="text-sm text-green-600">Miembros Activos</div>
-            </div>
-            <div className="bg-purple-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-purple-900">
-                {data.organizationMetrics.averageReportsPerMember}
-              </div>
-              <div className="text-sm text-purple-600">Reportes/Miembro</div>
-            </div>
-            <div className="bg-orange-50 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-orange-900">
-                {data.organizationMetrics.topPerformer?.productivityScore || 0}%
-              </div>
-              <div className="text-sm text-orange-600">Top Performance</div>
-            </div>
-          </div>
-
-          {data.organizationMetrics.topPerformer && (
-            <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-green-50 border border-sky-200 rounded-lg">
-              <div className="flex items-center gap-3">
-                <i className="icon-[lucide--award] size-5 text-sky-700" />
-                <div>
-                  <h5 className="font-medium text-sky-700">Top Performer</h5>
-                  <p className="text-sm text-sky-700">
-                    {data.organizationMetrics.topPerformer.investigator} lidera
-                    con{" "}
-                    {data.organizationMetrics.topPerformer.productivityScore}%
-                    de productividad (
-                    {data.organizationMetrics.topPerformer.resolvedCount} casos
-                    resueltos de{" "}
-                    {data.organizationMetrics.topPerformer.assignedCount}{" "}
-                    asignados)
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+          <MetricStrip
+            size="md"
+            metrics={[
+              { key: "members", label: "Personas en el equipo", value: data.organizationMetrics.totalMembers, tone: "slate" },
+              {
+                key: "active",
+                label: "Con denuncias asignadas",
+                value: data.organizationMetrics.activeMembersWithReports,
+                tone: "signal",
+                caption: "Personas trabajando casos ahora",
+              },
+              {
+                key: "avg",
+                label: "Denuncias por persona",
+                value: data.organizationMetrics.averageReportsPerMember,
+                tone: "haze",
+                caption: "Carga promedio del equipo",
+              },
+            ]}
+          />
         </CardBody>
       </Card>
 
@@ -360,11 +340,11 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <h3 className="text-xl font-semibold text-[#0d212c]">
-              Total de Denuncias Recibidas
+            <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+              Denuncias recibidas
             </h3>
-            <p className="text-slate-500 text-sm">
-              Tendencia de denuncias recibidas en el tiempo
+            <p className="text-sm text-ev-mute">
+              Cuántas llegan cada mes y si van en aumento
             </p>
           </div>
           <div className="flex gap-2">
@@ -402,11 +382,11 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-[#0d212c]">
-                Estado de las Denuncias
+              <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+                En qué etapa están
               </h3>
-              <p className="text-slate-500 text-sm">
-                Distribución por estado actual
+              <p className="text-sm text-ev-mute">
+                Cuántas están pendientes, en investigación o cerradas
               </p>
             </div>
             <div className="flex gap-2">
@@ -446,11 +426,11 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-[#0d212c]">
-                Denuncias por Departamento
+              <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+                Por departamento
               </h3>
-              <p className="text-slate-500 text-sm">
-                Distribución por área organizacional
+              <p className="text-sm text-ev-mute">
+                Áreas de la organización donde se concentran los casos
               </p>
             </div>
             <div className="flex gap-2">
@@ -492,12 +472,11 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <h3 className="text-xl font-semibold text-[#0d212c]">
-              Rendimiento del Equipo de Resolución
+            <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+              Avance del equipo
             </h3>
-            <p className="text-slate-500 text-sm">
-              Métricas de productividad y eficiencia del equipo (excluye super
-              admin)
+            <p className="text-sm text-ev-mute">
+              Denuncias asignadas y resueltas por cada investigador
             </p>
           </div>
           <div className="flex gap-2">
@@ -535,11 +514,11 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-[#0d212c]">
-                Tiempo Promedio de Resolución
+              <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+                Tiempo de resolución
               </h3>
-              <p className="text-slate-500 text-sm">
-                Análisis de tiempos de respuesta
+              <p className="text-sm text-ev-mute">
+                Cuánto tardan en cerrarse los casos, de la recepción al cierre
               </p>
             </div>
             <div className="flex gap-2">
@@ -575,11 +554,11 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-[#0d212c]">
-                Tipos de Denuncias Más Comunes
+              <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+                Tipos de denuncia más comunes
               </h3>
-              <p className="text-slate-500 text-sm">
-                Categorización por tipo de irregularidad
+              <p className="text-sm text-ev-mute">
+                Las conductas más reportadas
               </p>
             </div>
             <div className="flex gap-2">
@@ -618,12 +597,11 @@ export function AnalyticsContent({ organizationId }: AnalyticsContentProps) {
         <Card>
           <CardHeader>
             <div>
-              <h3 className="text-xl font-semibold text-[#0d212c]">
-                Inteligencia de Tipologías
+              <h3 className="text-base font-semibold tracking-[-0.015em] text-ev-night">
+                Tipologías detectadas por la IA
               </h3>
-              <p className="text-slate-500 text-sm">
-                Comportamiento de las denuncias según su clasificación:
-                distribución, ranking y tendencia mensual
+              <p className="text-sm text-ev-mute">
+                Cómo cambia cada tipo de conducta mes a mes
               </p>
             </div>
           </CardHeader>

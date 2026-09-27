@@ -105,7 +105,7 @@ export function OrganizationFormStep({ context }: OrganizationFormStepProps) {
         <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-2xl">🏢</span>
         </div>
-        <h2 className="text-2xl font-bold text-[#0d212c] mb-2">
+        <h2 className="text-2xl font-bold text-ev-night mb-2">
           Información de tu organización
         </h2>
         <p className="text-slate-500">
@@ -130,7 +130,7 @@ export function OrganizationFormStep({ context }: OrganizationFormStepProps) {
               variant="bordered"
               size="lg"
               classNames={{
-                input: "text-[#0d212c]",
+                input: "text-ev-night",
                 label: "text-slate-600 font-medium",
               }}
             />
@@ -147,7 +147,7 @@ export function OrganizationFormStep({ context }: OrganizationFormStepProps) {
               minRows={3}
               maxRows={5}
               classNames={{
-                input: "text-[#0d212c]",
+                input: "text-ev-night",
                 label: "text-slate-600 font-medium",
               }}
             />
@@ -171,7 +171,7 @@ export function OrganizationFormStep({ context }: OrganizationFormStepProps) {
               size="lg"
               classNames={{
                 label: "text-slate-600 font-medium",
-                value: "text-[#0d212c]",
+                value: "text-ev-night",
               }}
             >
               {organizationTypes.map((type) => (
@@ -198,7 +198,7 @@ export function OrganizationFormStep({ context }: OrganizationFormStepProps) {
               size="lg"
               classNames={{
                 label: "text-slate-600 font-medium",
-                value: "text-[#0d212c]",
+                value: "text-ev-night",
               }}
             >
               {teamSizes.map((size) => (

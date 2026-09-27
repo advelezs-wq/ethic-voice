@@ -162,7 +162,7 @@ export const getSourceLabel = (source: string) => {
     [SUBMISSION_SOURCE.CUSTOM_FORM]: "Formulario Personalizado",
     [SUBMISSION_SOURCE.ETHIC_LINE]: "Línea Ética",
     EMAIL: "Correo electrónico",
-    API: "Reporte manual",
+    API: "Registro manual",
   };
   return labels[source as keyof typeof labels] || source;
 };

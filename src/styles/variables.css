@@ -3,52 +3,53 @@
 @layer base {
   :root {
     /* EthicVoice brand theme (fixed — mirrors the landing page, not org-customizable) */
-    --background: 160 23% 97%;
-    --foreground: 201 54% 11%;
+    --background: 50 21% 94.5%; /* ev-paper */
+    --foreground: 191 50% 8.6%; /* ev-night */
 
             /* Fixed brand hex colors — consumed by the legacy .button-primary/.card-primary
                utility classes in components.css. No longer overridden per-organization. */
-        --primary-color: #a3e635;
-        --secondary-color: #10b981;
-        --accent-color: #ecfdf5;
-        --background-color: #f7faf9;
+        --primary-color: #0b1d21;
+        --secondary-color: #98d050;
+        --accent-color: #eef6e2;
+        --background-color: #f4f3ee;
 
         /* Text colors */
-        --text-primary: #0d212c;
-        --text-secondary: #33475b;
-        --text-muted: #5b7a70;
-        --text-heading: #0d212c;
+        --text-primary: #0b1d21;
+        --text-secondary: #16323a;
+        --text-muted: #5a6d70;
+        --text-heading: #0b1d21;
 
     /* UI Component Colors */
     --card: 0 0% 100%;
-    --card-foreground: 201 54% 11%;
+    --card-foreground: 191 50% 8.6%;
     --popover: 0 0% 100%;
-    --popover-foreground: 201 54% 11%;
+    --popover-foreground: 191 50% 8.6%;
 
-    /* Interactive Elements — lime primary / emerald secondary, matching the landing page */
-    --primary: 83 78% 55%;
-    --primary-foreground: 201 54% 11%;
-    --secondary: 160 84% 39%;
-    --secondary-foreground: 0 0% 100%;
+    /* Marca (BRAND.md): primario en tinta, secundario en el lima del logo.
+       Tailwind `primary`/`secondary` salen de aquí y ganan sobre HeroUI. */
+    --primary: 191 50% 8.6%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 86 58% 56%;
+    --secondary-foreground: 191 50% 8.6%;
 
     /* Neutral Elements */
-    --muted: 160 20% 95%;
-    --muted-foreground: 201 20% 40%;
-    --accent: 160 60% 95%;
-    --accent-foreground: 201 54% 11%;
+    --muted: 48 17% 90%;
+    --muted-foreground: 188 11% 40%;
+    --accent: 86 55% 93%;
+    --accent-foreground: 191 50% 8.6%;
 
     /* Status Colors */
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 8 69% 54%;
     --destructive-foreground: 210 40% 98%;
-    --success: 142 76% 36%;
+    --success: 92 63% 28%;
     --success-foreground: 355 100% 97%;
-    --warning: 32 95% 44%;
+    --warning: 37 75% 52%;
     --warning-foreground: 210 40% 98%;
 
     /* Form Elements */
-    --border: 160 15% 89%;
-    --input: 160 15% 89%;
-    --ring: 83 78% 55%;
+    --border: 49 13% 84%;
+    --input: 49 13% 84%;
+    --ring: 86 58% 56%;
     --radius: 0.75rem;
 
     /* Sidebar */

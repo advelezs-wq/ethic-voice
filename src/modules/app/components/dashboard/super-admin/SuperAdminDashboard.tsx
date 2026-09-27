@@ -59,7 +59,7 @@ export function SuperAdminDashboard() {
         title="Panel de Super Administrador"
         subtitle="Gestión global de organizaciones, clientes y operaciones críticas."
       >
-        <div className="flex items-center justify-center rounded-2xl border border-default-200 bg-white/80 py-16">
+        <div className="flex items-center justify-center rounded-2xl border border-default-200 bg-white py-16">
           <Spinner size="lg" color="primary" />
         </div>
       </SuperAdminPanelShell>
@@ -119,7 +119,7 @@ export function SuperAdminDashboard() {
               as={Link}
               href="/app/organizations"
               color="primary"
-              className="bg-lime-400 font-semibold text-[#052b24] hover:bg-lime-500"
+              className="bg-lime-400 font-semibold text-ev-night hover:bg-lime-500"
               startContent={<i className="icon-[tabler--building-plus] size-4" />}
             >
               Gestionar Organizaciones
@@ -128,7 +128,7 @@ export function SuperAdminDashboard() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
+          <Card className="border border-ev-line bg-white shadow-sm">
             <CardBody className="space-y-3 py-4">
               <div className="flex items-center gap-2">
                 <i className="icon-[lucide--users] size-5 text-emerald-700" />
@@ -142,7 +142,7 @@ export function SuperAdminDashboard() {
               </Button>
             </CardBody>
           </Card>
-          <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
+          <Card className="border border-ev-line bg-white shadow-sm">
             <CardBody className="space-y-3 py-4">
               <div className="flex items-center gap-2">
                 <i className="icon-[lucide--wrench] size-5 text-emerald-700" />
@@ -156,7 +156,7 @@ export function SuperAdminDashboard() {
               </Button>
             </CardBody>
           </Card>
-          <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
+          <Card className="border border-ev-line bg-white shadow-sm">
             <CardBody className="space-y-3 py-4">
               <div className="flex items-center gap-2">
                 <i className="icon-[lucide--book-user] size-5 text-emerald-700" />
@@ -170,7 +170,7 @@ export function SuperAdminDashboard() {
               </Button>
             </CardBody>
           </Card>
-          <Card className="border border-emerald-200/60 bg-white/90 shadow-sm">
+          <Card className="border border-ev-line bg-white shadow-sm">
             <CardBody className="space-y-3 py-4">
               <div className="flex items-center gap-2">
                 <i className="icon-[lucide--newspaper] size-5 text-emerald-700" />
@@ -202,7 +202,7 @@ export function SuperAdminDashboard() {
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-[#0d212c]">
+            <h2 className="text-lg font-semibold text-ev-night">
               Organizaciones ({organizations.length})
             </h2>
             <Button variant="light" size="sm" onPress={loadData}>
@@ -210,7 +210,7 @@ export function SuperAdminDashboard() {
             </Button>
           </div>
           {organizations.length === 0 ? (
-            <Card className="border border-default-200 bg-white/90">
+            <Card className="border border-default-200 bg-white">
               <CardBody className="text-center py-10">
                 <p className="text-slate-400">Aún no hay organizaciones creadas</p>
                 <Button

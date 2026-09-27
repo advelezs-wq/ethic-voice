@@ -78,10 +78,10 @@ export function CreateOrganizationClient() {
   // Show loading while validating subscription
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#f7faf9]">
+      <div className="flex items-center justify-center min-h-screen bg-ev-paper">
         <div className="text-center">
           <div className="mb-4">
-            <div className="w-8 h-8 border-4 border-emerald-200 border-t-sky-600 rounded-full animate-spin mx-auto"></div>
+            <div className="w-8 h-8 border-4 border-ev-line border-t-sky-600 rounded-full animate-spin mx-auto"></div>
           </div>
           <p className="text-slate-500">Validando suscripción...</p>
         </div>

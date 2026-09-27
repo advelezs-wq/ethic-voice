@@ -27,7 +27,7 @@ export function SubmissionSuccess({
 
   return (
     <div className="container max-w-2xl mx-auto px-4 py-20">
-      <Card className="rounded-3xl border border-[#0a1e14]/10 shadow-[0_20px_60px_rgba(10,30,20,0.1)]">
+      <Card className="rounded-3xl border border-ev-night/10 shadow-[0_20px_60px_rgba(10,30,20,0.1)]">
         <CardBody className="p-8 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <i
@@ -37,20 +37,20 @@ export function SubmissionSuccess({
             />
           </div>
 
-          <h2 className="text-2xl font-bold text-[#0a1e14] mb-4">
+          <h2 className="text-2xl font-bold text-ev-night mb-4">
             ¡Reporte Enviado Exitosamente!
           </h2>
 
-          <p className="text-[#273c46] mb-8">
+          <p className="text-ev-mute mb-8">
             Tu reporte ha sido recibido y será procesado de manera confidencial.
             {!isAnonymous && " Te enviaremos una confirmación por email."}
           </p>
 
-          <div className="rounded-2xl border border-[#0a1e14]/10 bg-[#f7faf9] p-6 mb-8">
-            <h3 className="font-semibold text-[#0a1e14] mb-3">
+          <div className="rounded-2xl border border-ev-night/10 bg-ev-paper p-6 mb-8">
+            <h3 className="font-semibold text-ev-night mb-3">
               Tu Código de Seguimiento
             </h3>
-            <p className="text-sm text-[#273c46] mb-4">
+            <p className="text-sm text-ev-mute mb-4">
               Guarda este código para dar seguimiento a tu denuncia:
             </p>
 
@@ -70,7 +70,7 @@ export function SubmissionSuccess({
 
           <div className="space-y-4 mb-8">
             <div className="rounded-2xl border border-lime-200 bg-lime-50/80 p-4 text-left">
-              <h4 className="mb-1 flex items-center gap-2 font-medium text-[#0a1e14]">
+              <h4 className="mb-1 flex items-center gap-2 font-medium text-ev-night">
                 <i
                   className="icon-[lucide--info] size-4"
                   role="img"
@@ -78,7 +78,7 @@ export function SubmissionSuccess({
                 />
                 Importante
               </h4>
-              <p className="text-sm text-[#1f3d31]">
+              <p className="text-sm text-ev-ink">
                 {isAnonymous ? (
                   <>
                     Como enviaste tu denuncia de forma anónima,{" "}
@@ -93,7 +93,7 @@ export function SubmissionSuccess({
                   </>
                 )}
               </p>
-              <p className="text-sm text-[#1f3d31] mt-2">
+              <p className="text-sm text-ev-ink mt-2">
                 El equipo puede escribirte preguntas o novedades sobre tu caso.{" "}
                 <strong>
                   Guarda o marca como favorito este enlace de seguimiento
@@ -112,15 +112,15 @@ export function SubmissionSuccess({
             <Button
               variant="bordered"
               onPress={() => router.push("/")}
-              className="border-[#0a1e14]/30 text-[#0d212c]"
+              className="border-ev-night/30 text-ev-night"
             >
               Volver al Inicio
             </Button>
           </div>
 
-          <div className="mt-8 border-t border-[#0a1e14]/10 pt-8">
-            <h4 className="mb-2 font-medium text-[#0a1e14]">¿Qué sigue?</h4>
-            <ul className="mx-auto max-w-md space-y-2 text-left text-sm text-[#273c46]">
+          <div className="mt-8 border-t border-ev-night/10 pt-8">
+            <h4 className="mb-2 font-medium text-ev-night">¿Qué sigue?</h4>
+            <ul className="mx-auto max-w-md space-y-2 text-left text-sm text-ev-mute">
               <li className="flex items-start gap-2">
                 <i
                   className="icon-[lucide--check] size-4 text-emerald-600 mt-0.5 flex-shrink-0"

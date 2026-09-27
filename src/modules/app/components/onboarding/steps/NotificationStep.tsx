@@ -35,7 +35,7 @@ export function NotificationStep({ context }: NotificationStepProps) {
         <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-2xl">🔔</span>
         </div>
-        <h2 className="text-2xl font-bold text-[#0d212c] mb-2">
+        <h2 className="text-2xl font-bold text-ev-night mb-2">
           Configuración de Notificaciones
         </h2>
         <p className="text-slate-500">
@@ -46,14 +46,14 @@ export function NotificationStep({ context }: NotificationStepProps) {
 
       <Card className="mb-6">
         <CardBody className="p-6">
-          <h3 className="text-lg font-semibold text-[#0d212c] mb-4">
+          <h3 className="text-lg font-semibold text-ev-night mb-4">
             Notificaciones por Email
           </h3>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-[#0d212c]">Casos asignados</p>
+                <p className="font-medium text-ev-night">Casos asignados</p>
                 <p className="text-sm text-slate-500">
                   Cuando te asignen un nuevo caso
                 </p>
@@ -69,7 +69,7 @@ export function NotificationStep({ context }: NotificationStepProps) {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-[#0d212c]">Cambios de estado</p>
+                <p className="font-medium text-ev-night">Cambios de estado</p>
                 <p className="text-sm text-slate-500">
                   Cuando un caso cambie de estado
                 </p>
@@ -85,7 +85,7 @@ export function NotificationStep({ context }: NotificationStepProps) {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-[#0d212c]">Nuevos comentarios</p>
+                <p className="font-medium text-ev-night">Nuevos comentarios</p>
                 <p className="text-sm text-slate-500">
                   Cuando alguien comente en un caso
                 </p>
@@ -102,14 +102,14 @@ export function NotificationStep({ context }: NotificationStepProps) {
 
           <Divider className="my-6" />
 
-          <h3 className="text-lg font-semibold text-[#0d212c] mb-4">
+          <h3 className="text-lg font-semibold text-ev-night mb-4">
             Notificaciones en la Plataforma
           </h3>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-[#0d212c]">Casos asignados</p>
+                <p className="font-medium text-ev-night">Casos asignados</p>
                 <p className="text-sm text-slate-500">
                   Alertas dentro de la plataforma
                 </p>
@@ -125,7 +125,7 @@ export function NotificationStep({ context }: NotificationStepProps) {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-[#0d212c]">Cambios de estado</p>
+                <p className="font-medium text-ev-night">Cambios de estado</p>
                 <p className="text-sm text-slate-500">
                   Alertas dentro de la plataforma
                 </p>
@@ -141,7 +141,7 @@ export function NotificationStep({ context }: NotificationStepProps) {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-[#0d212c]">Nuevos comentarios</p>
+                <p className="font-medium text-ev-night">Nuevos comentarios</p>
                 <p className="text-sm text-slate-500">
                   Alertas dentro de la plataforma
                 </p>
@@ -158,7 +158,7 @@ export function NotificationStep({ context }: NotificationStepProps) {
 
           <Divider className="my-6" />
 
-          <h3 className="text-lg font-semibold text-[#0d212c] mb-4">
+          <h3 className="text-lg font-semibold text-ev-night mb-4">
             Resúmenes
           </h3>
 
@@ -166,7 +166,7 @@ export function NotificationStep({ context }: NotificationStepProps) {
             {/*
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-[#0d212c]">Resumen diario</p>
+                <p className="font-medium text-ev-night">Resumen diario</p>
                 <p className="text-sm text-slate-500">
                   Email con actividad del día
                 </p>
@@ -183,7 +183,7 @@ export function NotificationStep({ context }: NotificationStepProps) {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-[#0d212c]">Resumen semanal</p>
+                <p className="font-medium text-ev-night">Resumen semanal</p>
                 <p className="text-sm text-slate-500">
                   Email con actividad de la semana
                 </p>

@@ -27,10 +27,10 @@ interface OrganizationCardProps {
 
 export function OrganizationCard({ organization }: OrganizationCardProps) {
   return (
-    <Card className="border border-emerald-200/60 bg-white/90 shadow-sm transition hover:shadow-md">
+    <Card className="border border-ev-line bg-white shadow-sm transition hover:shadow-md">
       <CardHeader className="flex justify-between items-start">
         <div>
-          <h3 className="text-lg font-semibold text-[#0d212c]">{organization.name}</h3>
+          <h3 className="text-lg font-semibold text-ev-night">{organization.name}</h3>
           <p className="text-sm text-default-500">{organization.slug}</p>
         </div>
         <Chip
@@ -53,7 +53,7 @@ export function OrganizationCard({ organization }: OrganizationCardProps) {
               <p className="font-semibold">{organization._count.forms}</p>
             </div>
             <div>
-              <p className="text-default-600">Reportes</p>
+              <p className="text-default-600">Denuncias</p>
               <p className="font-semibold">{organization._count.complaints}</p>
             </div>
             <div>

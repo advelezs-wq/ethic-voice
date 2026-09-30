@@ -22,7 +22,39 @@ export async function GET(
 
     const jobId = `submission-${orgId}-${submissionId}`;
 
-    const job = await submissionQueue.getJob(jobId);
+    // Primero la base de datos: ahí queda el resultado del análisis aunque la
+    // cola (Redis) no esté disponible. Antes esta ruta dependía solo de Redis
+    // y respondía 500 cada vez que el panel la consultaba si Redis fallaba.
+    const [submission, lastJob] = await Promise.all([
+      prisma.formSubmission.findFirst({
+        where: { id: submissionId, orgId },
+        select: { aiSummary: true, processedAt: true },
+      }),
+      prisma.aiProcessingJob.findFirst({
+        where: { submissionId, orgId },
+        orderBy: { createdAt: "desc" },
+        select: { status: true },
+      }),
+    ]);
+    if (!submission) {
+      return NextResponse.json({ error: "Denuncia no encontrada" }, { status: 404 });
+    }
+    if (submission.aiSummary || lastJob?.status === "completed") {
+      return NextResponse.json({ status: "completed", position: null, eta: null, jobId });
+    }
+    if (lastJob?.status === "failed") {
+      return NextResponse.json({ status: "failed", position: null, eta: null, jobId });
+    }
+
+    let job: Awaited<ReturnType<typeof submissionQueue.getJob>> | null = null;
+    try {
+      job = await Promise.race([
+        submissionQueue.getJob(jobId),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 2000)),
+      ]);
+    } catch {
+      job = null;
+    }
     if (!job) {
       return NextResponse.json({
         status: "unknown",
@@ -31,7 +63,10 @@ export async function GET(
       });
     }
 
-    const state = await job.getState();
+    const state = await Promise.race([
+      job.getState(),
+      new Promise<string>((resolve) => setTimeout(() => resolve("unknown"), 2000)),
+    ]).catch(() => "unknown");
 
     // Compute waiting position (1-based). If active, position = 0
     let position = 0;

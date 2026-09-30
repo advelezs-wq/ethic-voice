@@ -575,6 +575,10 @@ export async function submitEthicLineReport(
         content,
         source: SubmissionSource.ETHIC_LINE,
         status: "PENDING",
+        // Tipo elegido por el denunciante: la denuncia aparece clasificada desde
+        // el primer momento, aunque el análisis con IA tarde o falle (antes se
+        // veía "Denuncia sin clasificar" hasta que la IA la procesaba).
+        type: sanitizedFormData.irregularityType || null,
         isAnonymous: reporterInfo.isAnonymous,
         reporterName: reporterInfo.isAnonymous ? null : reporterInfo.name,
         reporterEmail: reporterInfo.isAnonymous ? null : reporterInfo.email,

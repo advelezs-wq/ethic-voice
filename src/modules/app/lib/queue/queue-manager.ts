@@ -390,6 +390,15 @@ export async function scheduleEmailChecks() {
 }
 
 // Get comprehensive queue statistics
+// Las consultas a BullMQ reintentan para siempre si Redis no responde; con
+// esto una caída de Redis devuelve error en segundos en vez de colgar la petición.
+function withQueueTimeout<T>(promise: Promise<T>, ms = 3000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error(`Redis sin respuesta en ${ms} ms`)), ms)),
+  ]);
+}
+
 export async function getQueueStats() {
   try {
     if (!QUEUE_ENABLED) {
@@ -408,7 +417,7 @@ export async function getQueueStats() {
       submissionActive,
       submissionCompleted,
       submissionFailed,
-    ] = await Promise.all([
+    ] = await withQueueTimeout(Promise.all([
       emailQueue.getWaitingCount(),
       emailQueue.getActiveCount(),
       emailQueue.getCompletedCount(),
@@ -417,7 +426,7 @@ export async function getQueueStats() {
       submissionQueue.getActiveCount(),
       submissionQueue.getCompletedCount(),
       submissionQueue.getFailedCount(),
-    ]);
+    ]));
 
     return {
       email: {

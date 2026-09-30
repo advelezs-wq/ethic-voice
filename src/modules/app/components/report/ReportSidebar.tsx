@@ -186,6 +186,8 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
 
   /* handlers */
   const handleStatusChange = async (newStatus: string) => {
+    // Volver a elegir el estado actual lo "deselecciona" y llega vacío: se ignora.
+    if (!newStatus || newStatus === report.status) return;
     setStatusLoading(true);
     try {
       if (newStatus === ReportStatus.CLOSED) await updateProcessedAt();
@@ -200,6 +202,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
   };
 
   const handlePriorityChange = async (newPriority: string) => {
+    if (!newPriority || newPriority === report.priority) return;
     setPriorityLoading(true);
     try {
       await updatePriority(newPriority);
@@ -413,6 +416,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
                 to "Cerrado" would bypass all of that. */}
             <Select
               label="Estado"
+              disallowEmptySelection
               size="sm"
               selectedKeys={[report.status]}
               onChange={(e) => handleStatusChange(e.target.value)}
@@ -433,6 +437,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
             {/* Prioridad */}
             <Select
               label="Prioridad"
+              disallowEmptySelection
               size="sm"
               selectedKeys={[report.priority]}
               onChange={(e) => handlePriorityChange(e.target.value)}
@@ -474,6 +479,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
             {/* Categoría */}
             <Select
               label="Categoría"
+              disallowEmptySelection
               size="sm"
               placeholder="Selecciona categoría"
               selectedKeys={[report.type || ""]}
@@ -494,6 +500,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
             {/* Departamento */}
             <Select
               label="Departamento"
+              disallowEmptySelection
               size="sm"
               placeholder="Asignar departamento"
               selectedKeys={[report.departmentId || ""]}

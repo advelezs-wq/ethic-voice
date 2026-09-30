@@ -32,11 +32,12 @@ export function TrackingSearch({
   };
 
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Alphanumeric token, 12 chars (see FormSubmission.trackingToken)
-    const value = e.target.value
-      .replace(/[^A-Za-z0-9]/g, "")
-      .slice(0, 12)
-      .toUpperCase();
+    // Alphanumeric token, 12 chars (see FormSubmission.trackingToken).
+    // Acepta el código completo pegado ("REP-1F7C3E7F0BFF", lo que copia el
+    // botón de la pantalla de envío): quita el prefijo REP- en vez de
+    // truncarlo, que antes dejaba "REP-REP1F7C3E7F0" y daba "no encontrado".
+    let value = e.target.value.trim().toUpperCase().replace(/^REP[-\s]*/, "");
+    value = value.replace(/[^A-Z0-9]/g, "").slice(0, 12);
     setCode(value);
   };
 
@@ -59,7 +60,6 @@ export function TrackingSearch({
           placeholder="A1B2C3D4E5F6"
           value={code}
           onChange={handleCodeChange}
-          maxLength={12}
           disabled={isLoading}
           className="h-full min-w-0 flex-1 bg-transparent pl-1 pr-4 font-mono text-lg tracking-[0.08em] text-ev-night outline-none placeholder:text-ev-line"
         />

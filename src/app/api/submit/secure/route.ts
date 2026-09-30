@@ -96,10 +96,22 @@ export async function POST(request: NextRequest) {
     if (idempotencyKey) {
       await securityManager.updateIdempotencyStats('attempts');
       lockKey = `submit:idempotency:lock:${organizationId}:${idempotencyKey}`;
-      const lockResult = await appRedis.set(lockKey, "1", 'EX', 60, 'NX');
+      // El candado en Redis evita dobles clics simultáneos. Si Redis no
+      // responde, la denuncia NO debe perderse: se sigue sin candado (la
+      // acción ya descarta duplicados por idempotencyKey en la base de datos).
+      let lockResult: string | null | "unavailable" = "unavailable";
+      try {
+        lockResult = await Promise.race([
+          appRedis.set(lockKey, "1", 'EX', 60, 'NX'),
+          new Promise<"unavailable">((resolve) => setTimeout(() => resolve("unavailable"), 2500)),
+        ]);
+      } catch (redisError) {
+        console.error('[SUBMIT] Redis no disponible para el candado de idempotencia:', redisError);
+      }
+      if (lockResult === "unavailable") lockKey = null;
       lockAcquired = lockResult === "OK";
 
-      if (!lockAcquired) {
+      if (lockResult !== "unavailable" && !lockAcquired) {
         await securityManager.updateIdempotencyStats('collisions');
         return NextResponse.json(
           { error: 'Ya hay un envío en curso. Por favor espera un momento.' },
@@ -203,7 +215,7 @@ export async function POST(request: NextRequest) {
       });
     } finally {
       if (lockAcquired && lockKey) {
-        await appRedis.del(lockKey);
+        await appRedis.del(lockKey).catch(() => undefined);
       }
     }
 

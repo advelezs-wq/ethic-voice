@@ -212,7 +212,49 @@ async function notifyAdminsOfPermanentFailure(
 }
 
 // Enhanced submission queue function with better error handling and deduplication
+/**
+ * Encola el análisis con IA de una denuncia. Si Redis no responde en pocos
+ * segundos (caído o inaccesible), la denuncia no puede quedarse esperando:
+ * el análisis se ejecuta directamente en este servidor, después de responder
+ * al denunciante, con el mismo procesador que usa el worker.
+ */
 export async function addSubmissionToQueue(data: DirectSubmissionJob) {
+  const TIMEOUT_MS = 5000;
+  try {
+    return await Promise.race([
+      enqueueSubmission(data),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`Redis sin respuesta en ${TIMEOUT_MS} ms`)), TIMEOUT_MS)
+      ),
+    ]);
+  } catch (error) {
+    console.error("⚠️ [QUEUE] Cola no disponible; se procesa la denuncia directamente:", error);
+    await processSubmissionInline(data);
+    return { id: `inline-${data.metadata?.submissionId ?? Date.now()}` } as unknown as Job<DirectSubmissionJob>;
+  }
+}
+
+async function processSubmissionInline(data: DirectSubmissionJob) {
+  const run = async () => {
+    try {
+      const { submissionProcessor } = await import("@/modules/app/services/submission-processor.service");
+      const result = await submissionProcessor.processSubmission(data);
+      console.log(`✅ [QUEUE] (directo) Denuncia procesada: ${result?.trackingCode ?? ""}`);
+    } catch (error) {
+      console.error("❌ [QUEUE] (directo) Falló el análisis de la denuncia:", error);
+    }
+  };
+  try {
+    // Dentro de una petición: se ejecuta después de enviar la respuesta.
+    const { after } = await import("next/server");
+    after(run);
+  } catch {
+    // Fuera de una petición (p. ej. un script): se ejecuta en segundo plano.
+    void run();
+  }
+}
+
+async function enqueueSubmission(data: DirectSubmissionJob) {
   try {
     if (!data.orgId || typeof data.orgId !== "string") {
       throw new Error("Invalid orgId for submission queue");

@@ -141,13 +141,26 @@ export function OrganizationProvider({
 
       setOrganizations(transformedOrgs);
 
-      // Set the first organization as current if none is set and persist cookie for server
+      // Respeta la organización ya elegida (cookie ev_org que puso el selector
+      // o el superadmin al "entrar" a un cliente). Antes siempre se imponía la
+      // primera de la lista y se sobrescribía la cookie, así que el superadmin
+      // terminaba viendo (y pudiendo modificar) otra organización.
       if (transformedOrgs.length > 0) {
-        const firstOrg = transformedOrgs[0];
-        setCurrentOrganization(firstOrg);
-        try {
-          document.cookie = `ev_org=${firstOrg.id}; path=/; max-age=${60 * 60 * 24 * 30}`;
-        } catch {}
+        const cookieOrgId = (() => {
+          try {
+            return document.cookie.match(/(?:^|;\s*)ev_org=([^;]+)/)?.[1] ?? null;
+          } catch {
+            return null;
+          }
+        })();
+        const chosen =
+          transformedOrgs.find((o) => o.id === cookieOrgId) ?? transformedOrgs[0];
+        setCurrentOrganization(chosen);
+        if (chosen.id !== cookieOrgId) {
+          try {
+            document.cookie = `ev_org=${chosen.id}; path=/; max-age=${60 * 60 * 24 * 30}`;
+          } catch {}
+        }
       }
 
       // Mark onboarding as completed

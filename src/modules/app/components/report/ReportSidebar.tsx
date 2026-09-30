@@ -321,7 +321,7 @@ export const ReportSidebar: React.FC<ReportSidebarProps> = ({
           source: report.source,
           metadata: { submissionId: report.id },
           sync: true,
-          timeoutMs: 12000,
+          timeoutMs: 90000,
           fallbackToQueue: true,
         }),
       });

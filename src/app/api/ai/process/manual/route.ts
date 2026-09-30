@@ -12,7 +12,7 @@ const ManualProcessSchema = z.object({
   source: z.nativeEnum(SubmissionSource).default(SubmissionSource.API),
   metadata: z.record(z.any()).optional(),
   sync: z.boolean().default(false),
-  timeoutMs: z.number().int().min(3000).max(30000).default(12000),
+  timeoutMs: z.number().int().min(3000).max(120000).default(12000),
   fallbackToQueue: z.boolean().default(true),
 });
 
@@ -22,6 +22,9 @@ class SyncTimeoutError extends Error {
     this.name = "SyncTimeoutError";
   }
 }
+
+// El análisis sincrónico tarda ~30-60 s; se le da margen dentro del límite de Vercel.
+export const maxDuration = 180;
 
 export async function POST(req: NextRequest) {
   try {

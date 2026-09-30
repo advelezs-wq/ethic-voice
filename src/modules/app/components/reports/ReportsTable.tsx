@@ -904,7 +904,7 @@ export function ReportsTable({
                                               submissionId: report.id,
                                             },
                                             sync: true,
-                                            timeoutMs: 12000,
+                                            timeoutMs: 90000,
                                             fallbackToQueue: true,
                                           }),
                                         }

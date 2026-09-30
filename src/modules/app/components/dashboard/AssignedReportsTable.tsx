@@ -159,7 +159,7 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
           source: report.source as any,
           metadata: { submissionId: report.idTable },
           sync: true,
-          timeoutMs: 12000,
+          timeoutMs: 90000,
           fallbackToQueue: true,
         }),
       });

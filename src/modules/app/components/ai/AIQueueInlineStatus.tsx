@@ -35,12 +35,30 @@ export const AIQueueInlineStatus: React.FC<AIQueueInlineStatusProps> = ({
   // El nombre de la columna ("Análisis") ya da el contexto, así que el texto
   // aquí solo necesita el estado — repetir "Análisis AI en cola" forzaba un
   // párrafo largo dentro de una celda angosta.
+  if (info?.status === "failed") {
+    return (
+      <div className={`flex flex-col items-start gap-1 ${className || ""}`}>
+        <span className={`${textSize} text-red-700 whitespace-nowrap`}>
+          No se pudo completar el análisis
+        </span>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className={`${textSize} underline text-red-700`}
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={`flex flex-col items-start gap-1 ${className || ""}`}>
       <Tooltip content="ETA aprox.">
         <span className={`${textSize} text-sky-700 whitespace-nowrap`}>
           {loading && <Spinner size="sm" className="mr-1 inline" />}
-          En cola{pos ? ` #${pos}` : ""}
+          {info?.status === "active" ? "Analizando" : "En cola"}
+          {pos ? ` #${pos}` : ""}
           {info?.status === "active" && relativeMinutes
             ? ` · ${relativeMinutes}`
             : etaText

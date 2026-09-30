@@ -266,6 +266,13 @@ export class ModernPDFGeneratorService {
         // Local/dev: try system Chrome or chromium.executablePath()
         let executablePath: string | undefined =
           process.env.PUPPETEER_EXECUTABLE_PATH || undefined;
+        // @sparticuz/chromium solo trae binario Linux; en macOS usamos Chrome.
+        const macChrome =
+          "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+        if (!executablePath && process.platform === "darwin") {
+          const { existsSync } = await import("fs");
+          if (existsSync(macChrome)) executablePath = macChrome;
+        }
         if (!executablePath) {
           try {
             executablePath = await chromium.executablePath();

@@ -93,7 +93,6 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
   const handleAnalyzeAI = async () => {
     try {
       setAiLoading(true);
-      setOptimisticQueued(true);
       const content =
         typeof report.content === "string"
           ? report.content
@@ -106,7 +105,7 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
           source: report.source,
           metadata: { submissionId: report.id },
           sync: true,
-          timeoutMs: 12000,
+          timeoutMs: 90000,
           fallbackToQueue: true,
         }),
       });
@@ -117,6 +116,7 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
         setOptimisticQueued(false);
         router.refresh();
       } else {
+        setOptimisticQueued(true);
         showWarning("Análisis encolado", payload.message);
         refreshQueue();
       }
@@ -301,7 +301,7 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
                       isLoading={aiLoading}
                       onPress={handleAnalyzeAI}
                     >
-                      Analizar con IA
+                      {aiLoading ? "Analizando con IA… (≈1 min)" : "Analizar con IA"}
                     </Button>
                   )}
                 </>

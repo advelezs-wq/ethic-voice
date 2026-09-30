@@ -232,7 +232,11 @@ export class SubmissionProcessorService {
                 // Update with AI fields
                 aiSeverity: analysis.severity as Severity,
                 aiSummary: analysis.summary,
-                priority: analysis.priority as Priority,
+                // Un caso que ya se está gestionando conserva la prioridad
+                // que le puso el equipo.
+                ...(existingSubmission.status === "PENDING"
+                  ? { priority: analysis.priority as Priority }
+                  : {}),
                 type: analysis.irregularityType,
                 processedAt: new Date(),
 
@@ -843,8 +847,23 @@ export class SubmissionProcessorService {
     orgId: string,
     analysis: any
   ) {
+    // Si el caso ya lo tocó una persona (reanálisis con "Analizar con IA",
+    // responsable asignado, cambio de estado o cierre), la IA no reasigna ni
+    // cambia estado/prioridad/departamento: antes esto fallaba por la
+    // asignación duplicada y además podía reabrir un caso cerrado.
+    const current = await tx.formSubmission.findUnique({
+      where: { id: submissionId },
+      select: {
+        status: true,
+        departmentId: true,
+        _count: { select: { assignments: true } },
+      },
+    });
+    const untouched =
+      !!current && current.status === "PENDING" && current._count.assignments === 0;
+
     // Auto-assign cases to ORG admins (excluding super admins) with load balancing by fewest open assignments
-    const shouldAssign = true; // assign all cases automatically
+    const shouldAssign = untouched;
     if (shouldAssign) {
       const admins = await tx.organizationMembership.findMany({
         where: {
@@ -879,16 +898,15 @@ export class SubmissionProcessorService {
         const highOrUrgent = analysis.severity === "HIGH" || analysis.requiresUrgentAction === true;
         const targetAdmins = highOrUrgent ? sortedAdmins : sortedAdmins.slice(0, Math.min(2, sortedAdmins.length));
 
-        for (const admin of targetAdmins) {
-          await tx.reportAssignment.create({
-            data: {
-              reportId: submissionId,
-              userId: admin.userId,
-              userName: `${admin.user.firstName || ""} ${admin.user.lastName || ""}`.trim() || admin.user.email,
-              createdBy: "ai-compliance-system",
-            },
-          });
-        }
+        await tx.reportAssignment.createMany({
+          data: targetAdmins.map((admin: any) => ({
+            reportId: submissionId,
+            userId: admin.userId,
+            userName: `${admin.user.firstName || ""} ${admin.user.lastName || ""}`.trim() || admin.user.email,
+            createdBy: "ai-compliance-system",
+          })),
+          skipDuplicates: true,
+        });
 
         // Update status based on severity/urgency
         await tx.formSubmission.update({
@@ -918,7 +936,7 @@ export class SubmissionProcessorService {
     }
 
     // Assign to suggested department
-    if (analysis.suggestedDepartment) {
+    if (analysis.suggestedDepartment && current && !current.departmentId) {
       const department = await tx.department.findFirst({
         where: {
           orgId,

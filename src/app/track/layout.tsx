@@ -1,13 +1,7 @@
-import { MarketingPageShell } from "@/modules/landig-page/components/MarketingPageShell";
 import React from "react";
 
-const TrackLayout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    // Seguimiento anónimo del caso — mismo criterio que submit/layout.tsx.
-    <MarketingPageShell showStickyCta={false} showFooter={false} showWhatsApp={false} hideUtility>
-      {children}
-    </MarketingPageShell>
-  );
-};
-
-export default TrackLayout;
+// El cromo del canal (marca EthicVoice o la de la organización) lo pone cada
+// página con <ChannelShell>, porque depende de la organización del enlace.
+export default function ChannelLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}

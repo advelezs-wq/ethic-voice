@@ -16,10 +16,8 @@ import {
   BillingCycle,
   formatPriceForUI,
 } from "@/types/subscription.types";
-import CheckoutSidebar from "../checkout/CheckoutSidebar";
 import { useClerk } from "@clerk/nextjs";
 import { motion } from "framer-motion";
-import { addToast } from "@/modules/core/utils/safe-toast";
 
 interface InPlatformPricingModalProps {
   isOpen: boolean;
@@ -47,17 +45,6 @@ export default function InPlatformPricingModal({
     billingCycle,
   });
 
-  const [checkoutData, setCheckoutData] = useState<{
-    isOpen: boolean;
-    subscription: {
-      id: number;
-      planName: string;
-      price: number;
-      currency: "USD" | "COP";
-      returnUrl: string;
-      paymentUrl?: string;
-    } | null;
-  }>({ isOpen: false, subscription: null });
 
   const handleBillingToggle = (cycle: BillingCycle) => {
     setBillingCycle(cycle);
@@ -74,82 +61,13 @@ export default function InPlatformPricingModal({
     return price;
   };
 
+  // El pago se hace en /checkout con Wompi.
   const handleSelectPlan = async (planType: PlanType) => {
     setSelectedPlan(planType);
     setIsCreatingSubscription(true);
-
-    try {
-      console.log(
-        "🔄 Creating subscription for plan:",
-        planType,
-        "with billing:",
-        billingCycle
-      );
-
-      const response = await fetch("/api/subscriptions/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          planType,
-          billingCycle: billingCycle,
-          openSidebar: true,
-          returnUrl: "/app",
-        }),
-      });
-
-      const data = await response.json();
-      console.log("📋 Subscription creation response:", data);
-
-      if (response.ok && data.subscription) {
-        console.log(
-          "✅ [PRICING-MODAL] Subscription created successfully:",
-          data
-        );
-
-        // Verify subscription ID exists
-        if (!data.subscription.id) {
-          console.error("❌ [PRICING-MODAL] No subscription ID in response!");
-          addToast({
-            title: "No se recibió el ID de la suscripción. Intenta de nuevo.",
-            color: "danger",
-          });
-          return;
-        }
-
-        // Open checkout sidebar with subscription data
-        setCheckoutData({
-          isOpen: true,
-          subscription: {
-            id: data.subscription.id,
-            planName: data.subscription.planName,
-            price: data.subscription.price,
-            currency: data.subscription.currency,
-            returnUrl: data.subscription.returnUrl,
-            paymentUrl: data.subscription.paymentUrl,
-          },
-        });
-      } else {
-        console.error("❌ Failed to create subscription:", data);
-        addToast({
-          title: "No se pudo crear la suscripción. Intenta de nuevo.",
-          color: "danger",
-        });
-      }
-    } catch (error) {
-      console.error("❌ Error creating subscription:", error);
-      addToast({
-        title: "Ocurrió un error. Intenta de nuevo.",
-        color: "danger",
-      });
-    } finally {
-      setIsCreatingSubscription(false);
-    }
+    window.location.href = `/checkout?plan=${planType}&billing=${billingCycle}`;
   };
 
-  const handleCheckoutClose = () => {
-    setCheckoutData({ isOpen: false, subscription: null });
-    setSelectedPlan(null);
-  };
 
   const handleLogout = async () => {
     try {
@@ -532,12 +450,6 @@ Gracias,
         </ModalContent>
       </Modal>
 
-      {/* Checkout Sidebar */}
-      <CheckoutSidebar
-        isOpen={checkoutData.isOpen}
-        onClose={handleCheckoutClose}
-        subscription={checkoutData.subscription}
-      />
     </>
   );
 }

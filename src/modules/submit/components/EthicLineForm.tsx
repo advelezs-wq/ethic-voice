@@ -228,9 +228,18 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
           )}
 
           <div className="mt-4">
-            <h1 className="text-2xl font-bold text-ev-night">
-              {organization.name}
-            </h1>
+            <div className="flex items-center gap-3">
+              {organization.logoUrl && (
+                <img
+                  src={organization.logoUrl}
+                  alt=""
+                  className="h-11 w-11 shrink-0 rounded-lg bg-white object-contain p-1 ring-1 ring-ev-line"
+                />
+              )}
+              <h1 className="text-2xl font-bold text-ev-night">
+                {organization.name}
+              </h1>
+            </div>
             <p className="text-ev-mute">
               Paso {currentStep} de {totalSteps} - {STEPS[currentStep - 1]}
             </p>
@@ -242,7 +251,7 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
             className="mt-4"
             classNames={{
               track: "bg-[#e6efe9]",
-              indicator: "bg-ev-night",
+              indicator: "bg-[var(--org-accent)]",
             }}
           />
         </div>
@@ -282,9 +291,9 @@ export function EthicLineForm({ organization, onBack }: EthicLineFormProps) {
                 type="submit"
                 color="primary"
                 isLoading={pending}
-                className="bg-ev-night text-white data-[hover=true]:!bg-ev-slate"
+                className="bg-[var(--org-accent)] text-[var(--org-accent-fg)] data-[hover=true]:opacity-90"
               >
-                {isLastStep ? "Enviar Reporte" : "Continuar"}
+                {isLastStep ? "Enviar denuncia" : "Continuar"}
               </Button>
             </div>
           </form>

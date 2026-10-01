@@ -63,38 +63,8 @@ export default function UpgradePage() {
     setSelectedPlan(plan.type);
     setIsProcessing(true);
 
-    try {
-      // Crear la suscripción de mejora en Mercado Pago
-      const response = await fetch("/api/subscriptions/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          planType: plan.type,
-          billingCycle: billingCycle,
-          returnUrl: "/app",
-          openSidebar: true,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create upgrade subscription");
-      }
-
-      const data = await response.json();
-      if (data?.subscription?.paymentUrl) {
-        window.location.href = data.subscription.paymentUrl;
-      } else {
-        window.location.href = "/app";
-      }
-    } catch (error) {
-      console.error("Error creating upgrade:", error);
-      window.location.href = `/pricing?upgrade=true&plan=${plan.type}`;
-    } finally {
-      setIsProcessing(false);
-      setSelectedPlan(null);
-    }
+    // El pago se hace en /checkout con Wompi (descuenta los días no usados).
+    window.location.href = `/checkout?plan=${plan.type}&billing=${billingCycle}`;
   };
 
   if (isProcessing) {

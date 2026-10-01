@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { SubscriptionManagement } from "@/modules/app/components/subscription/SubscriptionManagement";
+import { BillingManager } from "@/modules/app/components/subscription/BillingManager";
 import { PageHero } from "@/modules/app/components/ui";
 
 export default function BillingPage() {
@@ -10,9 +10,9 @@ export default function BillingPage() {
       <PageHero
         kicker="Suscripción"
         title="Plan y facturación"
-        description="Administra tu plan, pagos e historial de facturación."
+        description="Tu plan, el próximo cobro, la tarjeta y el historial de pagos."
       />
-      <SubscriptionManagement />
+      <BillingManager />
     </section>
   );
 }

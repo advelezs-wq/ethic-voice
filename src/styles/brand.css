@@ -5,6 +5,9 @@
  */
 
 :root {
+  /* Color de marca del cliente en el canal de denuncias (ChannelShell lo reemplaza). */
+  --org-accent: #0b1d21;
+  --org-accent-fg: #ffffff;
   --ev-night: #0b1d21;
   --ev-deep: #12292e;
   --ev-ink: #16323a;

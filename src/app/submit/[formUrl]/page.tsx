@@ -5,6 +5,21 @@ import { SubmitPageWrapper } from "@/modules/submit/components/SubmitPageWrapper
 import prisma from "@/modules/prisma/lib/prisma";
 import { PlanType } from "@/types/subscription.types";
 import { notFound, redirect } from "next/navigation";
+import { ChannelShell } from "@/modules/submit/components/ChannelShell";
+import { getChannelBrandingByOrgId } from "@/modules/core/utils/org-branding.server";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ formUrl: string }> }): Promise<Metadata> {
+  const { formUrl } = await params;
+  const org =
+    (await prisma.organization.findFirst({ where: { slug: formUrl }, select: { id: true } })) ??
+    (await prisma.form.findFirst({ where: { shareURL: formUrl }, select: { orgId: true } }).then((f) => (f ? { id: f.orgId } : null)));
+  const b = await getChannelBrandingByOrgId(org?.id);
+  if (!b) return { title: "Canal de denuncias" };
+  const title = `Línea ética de ${b.orgName}`;
+  // Con marca blanca el título no lleva "EthicVoice".
+  return { title: b.whiteLabel ? { absolute: title } : title, robots: { index: false } };
+}
 
 const SubmitPage = async ({
   params,
@@ -25,8 +40,10 @@ const SubmitPage = async ({
 
   if (form) {
     const formContent = JSON.parse(form.content) as FormElementInstance[];
+    const branding = await getChannelBrandingByOrgId(form.organization.id);
 
     return (
+      <ChannelShell branding={branding}>
       <div className="mx-auto w-full max-w-[var(--ev-max)] px-[var(--ev-gutter)] pb-24 pt-10 sm:pt-14">
         <div className="ev-label flex items-center justify-between border-b border-ev-line pb-4 text-ev-mute">
           <span>Canal de denuncias</span>
@@ -56,6 +73,7 @@ const SubmitPage = async ({
           </main>
         </div>
       </div>
+      </ChannelShell>
     );
   }
 
@@ -84,9 +102,9 @@ const SubmitPage = async ({
   }
 
   return (
-    <div>
+    <ChannelShell branding={await getChannelBrandingByOrgId(organization.id)}>
       <SubmitPageWrapper initialOrganization={organization} />
-    </div>
+    </ChannelShell>
   );
 };
 

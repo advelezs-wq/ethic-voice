@@ -75,13 +75,13 @@ src/app/
     billing/            ← Subscription management
     superadmin/         ← Superadmin panel (gated by NEXT_PUBLIC_SUPER_ADMIN_EMAILS)
   api/                  ← API routes
-    webhooks/           ← Clerk, MercadoPago, email providers
+    webhooks/           ← Clerk, Wompi, email providers
     admin/              ← Cron-triggered admin routes (validated via Vercel-cron header or ADMIN_API_KEY)
     ai/                 ← AI processing endpoints
   submit/[formUrl]/     ← Public form submission (unauthenticated)
   track/[code]/         ← Anonymous report tracking (unauthenticated)
   auth/                 ← Clerk sign-in / sign-up pages
-  checkout/             ← Legacy URL; redirects to /pricing
+  checkout/             ← Wompi checkout (/checkout?plan=GROW&billing=MONTHLY)
 ```
 
 ### Middleware (`src/proxy.ts`)
@@ -100,7 +100,7 @@ Superadmins are identified by email addresses listed in `NEXT_PUBLIC_SUPER_ADMIN
 
 Plans: `STARTER`, `GROW`, `GROW_PRO`, `PREMIUM`. Features like AI processing, email channel, chatbot, and phone channel are toggled as booleans on the `Organization` model. The `SubscriptionGuard` component and `usePlanPermissions` hook enforce plan limits client-side; the middleware enforces them server-side.
 
-Payment gateway: **MercadoPago** is the only gateway (subscriptions via preapprovals; webhook at `src/app/api/webhooks/mercadopago/`). Rebill was removed; the `REBILL` value remains in the Prisma `PaymentGateway` enum only because historical rows may reference it.
+Payment gateway: **Wompi** (Bancolombia), charged in COP. Wompi stores the card; EthicVoice charges each period itself (`modules/app/services/billing.service.ts`, daily from `/api/admin/daily-runner`). Checkout at `/checkout`, billing at `/app/billing`, webhook at `src/app/api/webhooks/wompi/`. See `WOMPI_SETUP.md`. Mercado Pago and Rebill were removed; their values remain in the Prisma `PaymentGateway` enum only because historical rows may reference them.
 
 ### Background processing
 
@@ -122,14 +122,14 @@ Local dev Redis via Docker (`docker compose up -d`). Production uses two Redis i
 | `PUSHER_*` / `NEXT_PUBLIC_PUSHER_*` | Real-time notifications |
 | `RESEND_API_KEY` | Transactional email |
 | `CLOUDINARY_*` | File/logo uploads |
-| `MERCADOPAGO_ACCESS_TOKEN` + `MP_*_PLAN_ID` | MercadoPago subscriptions |
+| `NEXT_PUBLIC_WOMPI_PUBLIC_KEY` / `WOMPI_PRIVATE_KEY` / `WOMPI_INTEGRITY_SECRET` / `WOMPI_EVENTS_SECRET` | Wompi payments (see `WOMPI_SETUP.md`) |
 | `ADMIN_API_KEY` | Secures `/api/admin/*` endpoints |
 | `NEXT_PUBLIC_SUPER_ADMIN_EMAILS` | Comma-separated superadmin emails |
 | `NEXT_PUBLIC_DEMO_MODE` | Enables synthetic analytics data (`dev:demo`) |
 
 ### Vercel Cron jobs (vercel.json)
 
-- `0 5 * * *` → `/api/admin/daily-runner` (daily maintenance + SLA alerts)
+- `0 5 * * *` → `/api/admin/daily-runner` (Wompi renewals/retries, daily maintenance + SLA alerts)
 - `0 6 * * 1` → `/api/digest/weekly` (weekly email digest)
 
 ### Testing
@@ -138,7 +138,7 @@ There is no automated test suite (no Jest/Vitest configured). `bun run lint` and
 
 ### Feature setup docs
 
-Several features have their own deep-dive setup doc at the repo root — check these before re-deriving how a subsystem is wired: `PRICING_SETUP_GUIDE.md` / `PRICING_QUICKSTART.md`, `QUEUE_SETUP.md`, `ANALYTICS_SETUP.md` / `GA4_SETUP.md` / `CLARITY_SETUP.md`, `NOTIFICATIONS_SETUP.md`, `DEMO_MODE_SETUP.md`, `MULTIMEDIA_ATTACHMENTS_SETUP.md`, `BOT_PROTECTION_SETUP.md`, `EMAIL_ROUTING_SETUP.md`, `DIGEST_SETUP.md`, `ERROR_PAGES_SETUP.md`, and `ENVIRONMENT_SETUP.md`.
+Several features have their own deep-dive setup doc at the repo root — check these before re-deriving how a subsystem is wired: `WOMPI_SETUP.md`, `PRICING_SETUP_GUIDE.md` / `PRICING_QUICKSTART.md`, `QUEUE_SETUP.md`, `ANALYTICS_SETUP.md` / `GA4_SETUP.md` / `CLARITY_SETUP.md`, `NOTIFICATIONS_SETUP.md`, `DEMO_MODE_SETUP.md`, `MULTIMEDIA_ATTACHMENTS_SETUP.md`, `BOT_PROTECTION_SETUP.md`, `EMAIL_ROUTING_SETUP.md`, `DIGEST_SETUP.md`, `ERROR_PAGES_SETUP.md`, and `ENVIRONMENT_SETUP.md`.
 
 ### Key conventions
 

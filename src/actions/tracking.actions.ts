@@ -3,6 +3,8 @@
 import prisma from "@/modules/prisma/lib/prisma";
 
 export interface PublicReportData {
+  /** Solo para aplicar la marca del canal; no se muestra. */
+  organizationId?: string;
   id: string;
   reportId: number;
   status: string;
@@ -137,6 +139,7 @@ export async function getReportByTrackingCode(
       status: submission.status.toLowerCase(),
       submissionDate: submission.submittedAt.toISOString(),
       organizationName: submission.organization.name,
+      organizationId: submission.orgId,
       type: submission.type || "Denuncia general",
       lastUpdate:
         latestActivity?.createdAt || submission.updatedAt.toISOString(),

@@ -100,8 +100,10 @@ class PricingSystemTester {
 
   async testEnvironmentVariables() {
     const requiredEnvs = [
-      "NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY",
-      "MERCADO_PAGO_ACCESS_TOKEN",
+      "NEXT_PUBLIC_WOMPI_PUBLIC_KEY",
+      "WOMPI_PRIVATE_KEY",
+      "WOMPI_INTEGRITY_SECRET",
+      "WOMPI_EVENTS_SECRET",
       "NEXT_PUBLIC_APP_URL",
       "DATABASE_URL",
     ];
@@ -117,16 +119,16 @@ class PricingSystemTester {
 
       // Check if using test credentials
       const isTestMode =
-        process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY?.startsWith("TEST-");
+        !process.env.NEXT_PUBLIC_WOMPI_PUBLIC_KEY?.startsWith("pub_prod_");
       if (isTestMode) {
         this.addResult(
-          "MercadoPago Mode",
+          "Wompi Mode",
           "PASS",
           "Using TEST credentials (good for development)"
         );
       } else {
         this.addResult(
-          "MercadoPago Mode",
+          "Wompi Mode",
           "PASS",
           "Using LIVE credentials (production mode)"
         );
@@ -167,9 +169,9 @@ class PricingSystemTester {
 
   async testSubscriptionAPIEndpoints() {
     try {
-      // Test create-subscription endpoint (should fail without auth, but endpoint should exist)
+      // Checkout endpoint (should fail without auth, but endpoint should exist)
       const createResponse = await fetch(
-        `${this.baseUrl}/api/payments/create-subscription`,
+        `${this.baseUrl}/api/billing/subscribe`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -197,7 +199,7 @@ class PricingSystemTester {
 
       // Test webhook endpoint
       const webhookResponse = await fetch(
-        `${this.baseUrl}/api/webhooks/mercadopago`,
+        `${this.baseUrl}/api/webhooks/wompi`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -205,15 +207,16 @@ class PricingSystemTester {
         }
       );
 
-      if (webhookResponse.status === 200 || webhookResponse.status === 400) {
+      // Sin firma válida debe responder 401.
+      if (webhookResponse.status === 401) {
         this.addResult(
-          "MercadoPago Webhook",
+          "Wompi Webhook",
           "PASS",
-          "Webhook endpoint accessible"
+          "Webhook endpoint rejects unsigned events"
         );
       } else {
         this.addResult(
-          "MercadoPago Webhook",
+          "Wompi Webhook",
           "FAIL",
           "Webhook endpoint error",
           { status: webhookResponse.status }
@@ -351,50 +354,21 @@ class PricingSystemTester {
     }
   }
 
-  async testMercadoPagoConfiguration() {
-    if (!process.env.MERCADO_PAGO_ACCESS_TOKEN) {
-      this.addResult(
-        "MercadoPago Config",
-        "SKIP",
-        "No access token configured"
-      );
+  async testWompiConfiguration() {
+    if (!process.env.WOMPI_PRIVATE_KEY) {
+      this.addResult("Wompi Config", "SKIP", "No Wompi keys configured");
       return;
     }
-
     try {
-      // Optional require to avoid type resolution during build environments without SDK/types
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const mp: any = require("mercadopago");
-      const MercadoPagoConfig = mp.MercadoPagoConfig;
-
-      if (!MercadoPagoConfig) {
-        this.addResult(
-          "MercadoPago SDK",
-          "SKIP",
-          "SDK not available in this environment"
-        );
-        return;
+      const res = await fetch(`${this.baseUrl}/api/billing/acceptance`);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.acceptanceToken) {
+        this.addResult("Wompi Config", "PASS", `Acceptance tokens fetched (${data.sandbox ? "sandbox" : "production"})`);
+      } else {
+        this.addResult("Wompi Config", "FAIL", "Could not fetch acceptance tokens", data);
       }
-
-      // Test configuration (would fail with invalid token, but validates setup path)
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const _config = new MercadoPagoConfig({
-        accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN!,
-        options: { timeout: 5000 },
-      });
-
-      this.addResult(
-        "MercadoPago Config",
-        "PASS",
-        "MercadoPago configuration created successfully"
-      );
     } catch (error) {
-      this.addResult(
-        "MercadoPago SDK",
-        "SKIP",
-        "MercadoPago SDK not installed",
-        error
-      );
+      this.addResult("Wompi Config", "FAIL", "Acceptance endpoint unreachable", error);
     }
   }
 
@@ -409,7 +383,7 @@ class PricingSystemTester {
     await this.testPlanPermissionsLogic();
     await this.testSecurityUtilities();
     await this.testComponentsExist();
-    await this.testMercadoPagoConfiguration();
+    await this.testWompiConfiguration();
 
     this.printSummary();
   }
@@ -447,7 +421,7 @@ class PricingSystemTester {
     if (failed === 0) {
       console.log("🎉 ALL TESTS PASSED! Your pricing system is ready to go!");
       console.log("\nNext steps:");
-      console.log("1. Configure MercadoPago webhooks");
+      console.log("1. Configure the Wompi events URL (/api/webhooks/wompi)");
       console.log("2. Test the complete payment flow");
       console.log("3. Deploy to production");
     } else {

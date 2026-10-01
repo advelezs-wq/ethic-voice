@@ -8,8 +8,6 @@ import {
   BillingCycle,
   formatPriceForUI,
 } from "@/types/subscription.types";
-import { useExchangeRate } from "@/modules/core/hooks/useExchangeRate";
-import CheckoutSidebar from "@/modules/app/components/checkout/CheckoutSidebar";
 import { useCalendlyGate } from "@/lib/cookie-consent/useCalendlyGate";
 import {
   Button,
@@ -17,7 +15,6 @@ import {
   buttonClasses,
   reveal,
 } from "@/modules/brand/components/primitives";
-import { showError } from "@/modules/core/utils/safe-toast";
 
 interface PricingPlansProps {
   billingCycle: BillingCycle;
@@ -26,21 +23,9 @@ interface PricingPlansProps {
 export default function PricingPlans({ billingCycle }: PricingPlansProps) {
   const { openCalendly } = useCalendlyGate();
   const { isSignedIn, isLoaded } = useUser();
-  const { rates } = useExchangeRate({ base: "USD", symbols: ["COP"] });
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null);
-  const [checkoutSidebarOpen, setCheckoutSidebarOpen] = useState(false);
   const autoFlowTriggeredRef = useRef(false);
-  const [subscription, setSubscription] = useState<{
-    id: number;
-    planName: string;
-    price: number;
-    currency: "USD" | "COP";
-    returnUrl: string;
-    paymentUrl?: string;
-    planType?: PlanType | string;
-    billingCycle?: BillingCycle | string;
-  } | null>(null);
 
   const getPrice = (planType: PlanType) => {
     const config = PLAN_CONFIGS[planType];
@@ -72,63 +57,15 @@ export default function PricingPlans({ billingCycle }: PricingPlansProps) {
   const redirectToSignUp = (planType: PlanType, cycle: BillingCycle) => {
     localStorage.setItem("selectedPlan", planType);
     localStorage.setItem("selectedBillingCycle", cycle);
-    const returnUrl = encodeURIComponent(
-      `${window.location.origin}/pricing?plan=${planType}&billing=${cycle}`,
-    );
+    const returnUrl = encodeURIComponent(`/checkout?plan=${planType}&billing=${cycle}`);
     window.location.href = `/auth/sign-up?redirect_url=${returnUrl}`;
   };
 
+  // El cobro se hace en /checkout con Wompi (tarjeta + nombre de la organización).
   const startCheckoutFlow = async (planType: PlanType, cycle: BillingCycle) => {
     setIsProcessing(true);
     setSelectedPlan(planType);
-
-    try {
-      const response = await fetch("/api/subscriptions/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          planType,
-          billingCycle: cycle,
-          returnUrl: "/app",
-          openSidebar: true,
-          fromLanding: true,
-        }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo crear la suscripción");
-      }
-
-      if (data.alreadyActive) {
-        window.location.href = data.redirectUrl || "/app";
-        return;
-      }
-
-      if (data.subscription) {
-        setSubscription({
-          id: data.subscription.id,
-          planName: data.subscription.planName,
-          price: data.subscription.price,
-          currency: data.subscription.currency,
-          returnUrl: data.subscription.returnUrl || "/app",
-          paymentUrl: data.subscription.paymentUrl,
-          ...(planType ? { planType } : {}),
-          billingCycle: cycle,
-        });
-        setCheckoutSidebarOpen(true);
-      }
-    } catch (error) {
-      console.error("❌ Subscription error:", error);
-      showError(
-        "Error al procesar la suscripción",
-        error instanceof Error ? error.message : "Intenta de nuevo",
-      );
-      autoFlowTriggeredRef.current = false;
-    } finally {
-      setIsProcessing(false);
-      setSelectedPlan(null);
-    }
+    window.location.href = `/checkout?plan=${planType}&billing=${cycle}`;
   };
 
   const handlePlanSelect = async (planType: PlanType) => {
@@ -154,10 +91,6 @@ export default function PricingPlans({ billingCycle }: PricingPlansProps) {
     await startCheckoutFlow(planType, billingCycle);
   };
 
-  const handleCloseSidebar = () => {
-    setCheckoutSidebarOpen(false);
-    setSubscription(null);
-  };
 
   // Generate email template for custom plan
   const generateCustomPlanEmail = () => {
@@ -267,8 +200,6 @@ Gracias,
               const price = getPrice(planType);
               const popular = !!config.isPopular;
               const priceDisplay = formatPriceForUI(price ?? 0);
-              const monthlyUsd =
-                billingCycle === BillingCycle.YEARLY ? (price ?? 0) / 12 : (price ?? 0);
 
               return (
                 <article
@@ -303,8 +234,8 @@ Gracias,
                     </span>
                   </p>
                   <p className={`ev-label mt-3 min-h-[1rem] ${popular ? "text-white/45" : "text-ev-haze"}`}>
-                    {rates?.COP
-                      ? `≈ ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(Math.round(monthlyUsd * rates.COP))} COP/mes`
+                    {config.priceCop.monthly
+                      ? `Se cobra ${new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(billingCycle === BillingCycle.YEARLY ? config.priceCop.yearly : config.priceCop.monthly)} COP/${billingCycle === BillingCycle.YEARLY ? "año" : "mes"}`
                       : "\u00a0"}
                   </p>
 
@@ -368,13 +299,6 @@ Gracias,
         </Container>
       </section>
 
-      {checkoutSidebarOpen && subscription && (
-        <CheckoutSidebar
-          isOpen={checkoutSidebarOpen}
-          onClose={handleCloseSidebar}
-          subscription={subscription}
-        />
-      )}
     </>
   );
 }

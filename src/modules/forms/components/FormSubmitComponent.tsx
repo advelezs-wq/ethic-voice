@@ -107,11 +107,11 @@ export const FormSubmitComponent = ({
           onPress={() => {
             startTransition(submitForm);
           }}
-          className="mt-8 bg-black text-white"
+          className="mt-8 bg-[var(--org-accent)] text-[var(--org-accent-fg)] data-[hover=true]:opacity-90"
           fullWidth
           isLoading={pending}
         >
-          Submit
+          Enviar denuncia
         </Button>
       </div>
     </div>

@@ -57,10 +57,12 @@ export async function POST(
   });
 
   const org = await prisma.organization.findUnique({ where: { id: orgId } });
-  await sendOrganizationInvitationEmail(updated, org?.name ?? null);
+  const delivery = await sendOrganizationInvitationEmail(updated, org?.name ?? null);
 
   return NextResponse.json({
     success: true,
+    emailSent: delivery.sent,
+    acceptUrl: delivery.sent ? undefined : delivery.acceptUrl,
     invitation: {
       id: updated.id,
       email: updated.email,

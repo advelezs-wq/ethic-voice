@@ -14,8 +14,12 @@ export async function POST(
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { orgId } = await context.params;
-  const { email, role } = await req.json();
-  if (!email) return NextResponse.json({ error: "Email requerido" }, { status: 400 });
+  const body = await req.json().catch(() => ({}));
+  const email = String(body?.email || "").trim().toLowerCase();
+  const role = body?.role;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: "Escribe un correo válido." }, { status: 400 });
+  }
 
   // Check permission: requester must be ADMIN of org (or a superadmin
   // browsing "por org", who has no membership row of their own)
@@ -99,6 +103,25 @@ export async function POST(
     // If plan lookup fails, continue but do not block unexpectedly
   }
 
+  // Sin duplicados: ni alguien que ya es miembro ni una segunda invitación vigente.
+  const alreadyMember = await prisma.organizationMembership.findFirst({
+    where: { orgId, user: { email: { equals: email, mode: "insensitive" } } },
+    select: { id: true },
+  });
+  if (alreadyMember) {
+    return NextResponse.json({ error: "Esa persona ya es miembro de la organización." }, { status: 409 });
+  }
+  const pending = await prisma.organizationInvitation.findFirst({
+    where: { orgId, email: { equals: email, mode: "insensitive" }, status: "pending", expiresAt: { gt: new Date() } },
+    select: { id: true },
+  });
+  if (pending) {
+    return NextResponse.json(
+      { error: "Ya hay una invitación pendiente para ese correo. Puedes reenviarla desde la lista de invitaciones.", invitationId: pending.id },
+      { status: 409 },
+    );
+  }
+
   // Create invitation
   const invitedRole =
     role === "ADMIN" ? "ADMIN" : role === "VIEWER" ? "VIEWER" : "MEMBER";
@@ -117,9 +140,15 @@ export async function POST(
 
   const org = await prisma.organization.findUnique({ where: { id: orgId } });
 
-  await sendOrganizationInvitationEmail(invitation, org?.name ?? null);
+  const delivery = await sendOrganizationInvitationEmail(invitation, org?.name ?? null);
 
-  return NextResponse.json({ success: true, invitationId: invitation.id });
+  return NextResponse.json({
+    success: true,
+    invitationId: invitation.id,
+    emailSent: delivery.sent,
+    // Si el correo no salió, el administrador puede compartir el enlace directamente.
+    acceptUrl: delivery.sent ? undefined : delivery.acceptUrl,
+  });
 }
 
 

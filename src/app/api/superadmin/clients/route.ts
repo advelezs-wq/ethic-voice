@@ -41,7 +41,7 @@ export async function GET() {
             id: sub.id,
             status: sub.status,
             endDate: sub.endDate,
-            billing: sub.providerSubscriptionId ? "mercadopago" : "manual",
+            billing: (sub.metadata as Record<string, unknown> | null)?.gateway === "WOMPI" ? "wompi" : "manual",
           }
         : null,
       adminEmail: admin?.user?.email ?? org.invitations[0]?.email ?? null,

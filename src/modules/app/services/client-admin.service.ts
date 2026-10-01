@@ -7,8 +7,8 @@
  *    y dejaba la organización huérfana y el usuario de Clerk creados.
  *  - applyPlan: asignar un plan sin cobro (contratos gestionados por el equipo
  *    comercial). Antes se reutilizaba el flujo del cliente, que exigía ser
- *    miembro y redirigía al superadmin a pagar en Mercado Pago.
- *  - deleteClient: eliminar todo, cancelando Mercado Pago y el alias de correo
+ *    miembro y redirigía al superadmin a pagar.
+ *  - deleteClient: eliminar todo, incluido el alias de correo
  *    en ImprovMX (antes el alias quedaba reenviando correos).
  */
 import { randomUUID } from "crypto";
@@ -16,7 +16,6 @@ import { OrganizationRole, type Prisma } from "@prisma/client";
 import { Resend } from "resend";
 import prisma from "@/modules/prisma/lib/prisma";
 import { BillingCycle, PLAN_CONFIGS, PlanType } from "@/types/subscription.types";
-import mercadoPagoService from "@/modules/app/services/mercadopago.service";
 import { enforcePlanLimits } from "@/modules/core/utils/plan-enforcement.utils";
 import { deleteImprovMxAliasByName } from "@/modules/app/lib/improvmx-client";
 import { emailRoutingProvider } from "@/modules/app/lib/email-routing";
@@ -50,7 +49,7 @@ function toSlug(s: string) {
     .slice(0, 40);
 }
 
-async function uniqueSlug(name: string) {
+export async function uniqueSlug(name: string) {
   const base = toSlug(name) || "organizacion";
   for (let i = 0; i < 5; i++) {
     const candidate = i === 0 ? base : `${base}-${Math.random().toString(36).slice(2, 6)}`;
@@ -105,7 +104,7 @@ function planSubscriptionFields(planType: PlanType, billingCycle: BillingCycle) 
   };
 }
 
-function orgPlanFields(planType: PlanType) {
+export function orgPlanFields(planType: PlanType) {
   const f = PLAN_CONFIGS[planType].features;
   return {
     currentPlan: planType,
@@ -170,19 +169,23 @@ export async function applyPlan(
     });
     subscriptionId = updated.id;
 
-    // Si el cliente paga con Mercado Pago, el cobro debe seguir al nuevo plan.
-    if (current.providerSubscriptionId) {
-      if (!mercadoPagoService.isConfigured()) {
-        warnings.push("Mercado Pago no está configurado: actualiza el monto del cobro manualmente.");
-      } else {
-        const res = await mercadoPagoService.updatePreapproval(current.providerSubscriptionId, {
-          preapproval_plan_id: mercadoPagoService.getPlanId(planType, billingCycle),
-          status: "authorized",
-        });
-        if (!res.success) {
-          warnings.push(`No se pudo actualizar el cobro en Mercado Pago: ${res.error || "error desconocido"}.`);
-        }
-      }
+    // Si el cliente paga con tarjeta (Wompi), los próximos cobros siguen al
+    // nuevo plan: el valor se toma del plan en cada renovación.
+    if (meta.gateway === "WOMPI") {
+      const cop = billingCycle === BillingCycle.YEARLY ? PLAN_CONFIGS[planType].priceCop.yearly : PLAN_CONFIGS[planType].priceCop.monthly;
+      await prisma.subscription.update({
+        where: { id: current.id },
+        data: {
+          currency: "COP",
+          monthlyPrice: billingCycle === BillingCycle.MONTHLY ? cop : null,
+          yearlyPrice: billingCycle === BillingCycle.YEARLY ? cop : null,
+        },
+      });
+      warnings.push(
+        cop
+          ? `El cliente paga con tarjeta: su próximo cobro será de $ ${cop.toLocaleString("es-CO")} COP.`
+          : "El cliente paga con tarjeta y este plan no tiene precio en línea: cancela su cobro y gestiona la facturación manualmente.",
+      );
     }
   } else {
     const created = await prisma.subscription.create({
@@ -421,7 +424,6 @@ export async function deleteClient(orgId: string, confirmName: unknown) {
   const o = await prisma.organization.findUnique({
     where: { id: orgId },
     include: {
-      subscriptions: { where: { providerSubscriptionId: { not: null }, status: { not: "CANCELED" } } },
       emailConfigurations: { select: { emailAlias: true } },
     },
   });
@@ -432,18 +434,8 @@ export async function deleteClient(orgId: string, confirmName: unknown) {
 
   const warnings: string[] = [];
 
-  // 1) Detener cobros en Mercado Pago
-  for (const s of o.subscriptions) {
-    if (!s.providerSubscriptionId) continue;
-    const res = await mercadoPagoService.updatePreapproval(s.providerSubscriptionId, { status: "cancelled" });
-    if (!res.success) {
-      throw new ClientAdminError(
-        `No se pudo cancelar el cobro en Mercado Pago (${res.error || "error desconocido"}). No se eliminó nada para evitar cobros a una cuenta inexistente.`,
-        502,
-      );
-    }
-  }
-
+  // 1) Cobros: los de Wompi los hace nuestro cron sobre las suscripciones de
+  //    la base; al borrarlas no se vuelve a cobrar.
   // 2) Quitar el alias de correo en ImprovMX (con Cloudflare no hay alias por
   //    cliente: al borrar la configuración, el webhook rebota esos correos).
   const domain = process.env.FORWARDING_DOMAIN || "ethicvoice.co";

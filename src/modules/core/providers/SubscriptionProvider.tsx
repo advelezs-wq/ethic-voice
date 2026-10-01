@@ -10,7 +10,7 @@ import React, {
   useRef,
 } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Spinner } from "@heroui/react";
 import { Subscription } from "@/types/subscription.types";
 
@@ -38,7 +38,6 @@ export function SubscriptionProvider({
   const { user, isLoaded: userLoaded } = useUser();
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,14 +47,9 @@ export function SubscriptionProvider({
   const [userStatus, setUserStatus] = useState<any>(null);
 
   const fetchedSubscription = useRef(false);
-  const processedSuccess = useRef(false);
 
   // Check if user is in onboarding flow
   const isInOnboardingFlow = pathname?.includes("/onboarding") || false;
-
-  // Check if this is a subscription success redirect
-  const isSubscriptionSuccessPage =
-    pathname === "/app" && searchParams.get("payment") === "success";
 
   const hasOrgs = false; // do not infer from Clerk; rely on DB flags
 
@@ -150,64 +144,6 @@ export function SubscriptionProvider({
       fetchSubscriptionStatus();
     }
   }, [userLoaded, user?.id]);
-
-  // Handle subscription success redirect
-  useEffect(() => {
-    if (
-      isSubscriptionSuccessPage &&
-      !processedSuccess.current &&
-      userLoaded &&
-      user?.id
-    ) {
-      const subscriptionId = searchParams.get("subscription_id");
-
-      if (subscriptionId) {
-        console.log(
-          "🎉 [SUBSCRIPTION-PROVIDER] Processing payment success:",
-          subscriptionId
-        );
-        processedSuccess.current = true;
-
-        // Store subscription ID for linking during onboarding
-        localStorage.setItem("pendingSubscriptionId", subscriptionId);
-
-        // Verify the subscription
-        const verifyPayment = async () => {
-          try {
-            const response = await fetch("/api/payments/verify-subscription", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ subscriptionId }),
-            });
-
-            if (response.ok) {
-              const result = await response.json();
-              console.log(
-                "✅ [SUBSCRIPTION-PROVIDER] Payment verified:",
-                result
-              );
-
-              // Refresh subscription status
-              await refreshSubscriptionStatus();
-
-              // Clean URL parameters
-              const newUrl = new URL(window.location.href);
-              newUrl.searchParams.delete("payment");
-              newUrl.searchParams.delete("subscription_id");
-              window.history.replaceState({}, "", newUrl.toString());
-            }
-          } catch (error) {
-            console.error(
-              "❌ [SUBSCRIPTION-PROVIDER] Payment verification failed:",
-              error
-            );
-          }
-        };
-
-        verifyPayment();
-      }
-    }
-  }, [isSubscriptionSuccessPage, searchParams, userLoaded, user?.id, pathname]);
 
   // Calculate values from userStatus or fallback
   // ✅ CRITICAL: Only treat ACTIVE subscriptions as truly active

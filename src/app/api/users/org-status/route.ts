@@ -325,11 +325,26 @@ export async function GET() {
         debugData.syncStatus.subscriptionLinkedToOrg = !!activeSubscription.orgId;
       }
 
-      // Compute cancellation data from most recent subscription with CANCELED
-      const cancelled = subscriptions.find((s) => s.status === "CANCELED");
+      // Cancellation notice. With Wompi every declined checkout attempt and
+      // every plan change leaves a CANCELED row behind, so only two cases count:
+      // the active plan is set to cancel at period end, or there is no active
+      // plan and the latest cancelled one was actually paid (not replaced).
+      const metaOf = (s: { metadata: unknown }) => (s.metadata as Record<string, unknown> | null) ?? {};
+      const cancelling = activeSubscription && metaOf(activeSubscription).cancelAtPeriodEnd ? activeSubscription : null;
+      const cancelled =
+        cancelling ??
+        (activeSubscription
+          ? null
+          : subscriptions.find(
+              (s) =>
+                s.status === "CANCELED" &&
+                !metaOf(s).replacedBySubscriptionId &&
+                (metaOf(s).gateway !== "WOMPI" || s.paymentTransactions.some((t) => t.status === "SUCCEEDED")),
+            ));
       let cancellationInfo: any = null;
       if (cancelled) {
-        const endsAt = cancelled.endDate ?? null;
+        const periodEnd = metaOf(cancelled).currentPeriodEnd;
+        const endsAt = cancelling ? (typeof periodEnd === "string" ? new Date(periodEnd) : null) : cancelled.endDate ?? null;
         let daysRemaining: number | null = null;
         if (endsAt) {
           const diffMs = new Date(endsAt as unknown as string).getTime() - Date.now();

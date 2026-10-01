@@ -18,17 +18,20 @@ export type TokenizedCard = {
   personalAuthToken: string;
 };
 
+async function fetchAcceptance(): Promise<Acceptance> {
+  const r = await fetch("/api/billing/acceptance", { cache: "no-store" });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j?.error || "Los pagos en línea no están disponibles.");
+  return j;
+}
+
 /** Términos de Wompi + llave pública (necesarios para guardar una tarjeta). */
 export function useWompiAcceptance() {
   const [data, setData] = useState<Acceptance | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    fetch("/api/billing/acceptance", { cache: "no-store" })
-      .then(async (r) => {
-        const j = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(j?.error || "Los pagos en línea no están disponibles.");
-        setData(j);
-      })
+    fetchAcceptance()
+      .then(setData)
       .catch((e) => setError(e instanceof Error ? e.message : "Los pagos en línea no están disponibles."));
   }, []);
   return { acceptance: data, acceptanceError: error };
@@ -101,11 +104,14 @@ export function WompiCardForm({
     setTokenizing(true);
     try {
       const t = await tokenizeCard(acceptance.publicKey, { number: digits, cvc, expMonth: mm, expYear: yy, holder: holder.trim() });
+      // Wompi acepta cada token de aceptación una sola vez: sin tokens nuevos,
+      // un segundo intento (otra tarjeta tras un rechazo) falla con INPUT_VALIDATION_ERROR.
+      const fresh = await fetchAcceptance();
       await onTokenized({
         cardToken: t.id,
         card: { brand: t.brand, last4: t.last4, expMonth: mm, expYear: yy },
-        acceptanceToken: acceptance.acceptanceToken,
-        personalAuthToken: acceptance.personalAuthToken,
+        acceptanceToken: fresh.acceptanceToken,
+        personalAuthToken: fresh.personalAuthToken,
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo procesar la tarjeta.");

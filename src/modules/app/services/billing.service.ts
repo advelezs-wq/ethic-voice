@@ -299,6 +299,22 @@ export async function applyTransaction(tx: WompiTransaction) {
 
   const sub = pt.subscription;
   const meta = metaOf(sub);
+
+  // Cobro que Wompi resolvió después de que la suscripción se cerrara (p. ej. un
+  // primer intento que quedó en proceso y el cliente volvió a pagar). No se
+  // reactiva: quedaría cobrando en paralelo a la vigente. Si se aprobó, queda
+  // marcado para reembolsarlo desde el panel de Wompi.
+  if (sub.status === "CANCELED") {
+    if (tx.status === "APPROVED") {
+      console.error(`[billing] Cobro ${tx.id} aprobado sobre la suscripción cerrada ${sub.id}: reembolsar en Wompi`);
+      await prisma.subscription.update({
+        where: { id: sub.id },
+        data: { metadata: { ...meta, refundTransactionId: tx.id } as Prisma.InputJsonValue },
+      });
+    }
+    return { changed: false };
+  }
+
   const isInitial = sub.status === "TRIALING";
   const card = tx.payment_method?.extra?.last_four
     ? { ...meta.card, brand: tx.payment_method.extra.brand, last4: tx.payment_method.extra.last_four }

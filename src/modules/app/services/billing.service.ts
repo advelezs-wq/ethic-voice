@@ -238,7 +238,9 @@ export async function startSubscription(input: {
   }
 
   try {
-    const tx = await recordCharge(sub, amount, meta, false);
+    // COF: el primer cobro por el valor completo inicia la recurrencia (mismo
+    // monto cada periodo); un cambio de plan prorrateado es un monto distinto.
+    const tx = await recordCharge(sub, amount, meta, amount === price);
     const fresh = await prisma.paymentTransaction.findFirst({ where: { providerTransactionId: tx.id } });
     return {
       subscriptionId: sub.id,

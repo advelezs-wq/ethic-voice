@@ -126,7 +126,11 @@ export async function chargePaymentSource(input: {
   amountCop: number;
   customerEmail: string;
   reference: string;
-  /** true = cobro periódico por el mismo valor (Credential On File). */
+  /**
+   * Credential On File (solo Visa/Mastercard procesadas por RBM; si no aplica,
+   * Wompi cobra igual sin COF). true = cobros periódicos por el mismo valor;
+   * false = tarjeta guardada, montos variables sin periodicidad.
+   */
   recurrent: boolean;
 }) {
   const amountInCents = Math.round(input.amountCop * 100);

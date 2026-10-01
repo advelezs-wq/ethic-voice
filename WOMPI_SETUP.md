@@ -38,7 +38,10 @@ Todas están en comercios.wompi.co → Desarrolladores → Llaves / Secretos par
 ## Configuración en Wompi (una vez)
 
 1. comercios.wompi.co → Desarrolladores → **URL de eventos**: `https://www.ethicvoice.co/api/webhooks/wompi` (sandbox y producción).
-2. Para cobros recurrentes con Visa/Mastercard, pedir a Wompi habilitar **COF (Credential on File)** en el comercio.
+2. No hay que solicitar nada para los cobros recurrentes: guardar la tarjeta (`/payment_sources`) y cobrarla
+   está disponible para cualquier comercio. Los cobros se marcan como **COF (Credential on File)** con `recurrent`
+   (`true` en el primer cobro y las renovaciones, `false` en cambios de plan prorrateados), lo que sube la tasa
+   de aprobación con Visa/Mastercard cuando el procesador del comercio es RBM; si no lo es, Wompi cobra igual sin COF.
 
 ## Pruebas (sandbox)
 

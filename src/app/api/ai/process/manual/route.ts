@@ -5,7 +5,10 @@ import { z } from "zod";
 import { addSubmissionToQueue } from "@/modules/app/lib/queue/queue-manager";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
 import { submissionProcessor } from "@/modules/app/services/submission-processor.service";
-import { resolveOrgId } from "@/modules/core/utils/org-resolver";
+import {
+  assertUserCanAccessReport,
+  resolveOrgId,
+} from "@/modules/core/utils/org-resolver";
 
 const ManualProcessSchema = z.object({
   content: z.string().min(10),
@@ -29,14 +32,31 @@ export const maxDuration = 180;
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await auth();
-    const orgId = await resolveOrgId();
-
-    if (!userId || !orgId) {
+    if (!userId) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 });
     }
 
     const body = await req.json();
     const validatedData = ManualProcessSchema.parse(body);
+
+    // Analyzing an existing report must run under the report's own org — not
+    // the session's active org, which is a different org in the superadmin
+    // "all organizations" view — and only for someone who can access it.
+    let orgId: string | null;
+    const submissionId = Number(validatedData.metadata?.submissionId);
+    if (Number.isInteger(submissionId) && submissionId > 0) {
+      try {
+        ({ orgId } = await assertUserCanAccessReport(submissionId));
+      } catch {
+        return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+      }
+    } else {
+      orgId = await resolveOrgId();
+    }
+
+    if (!orgId) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
 
     // Gate by plan (only Grow/Grow Pro/Premium have AI processing)
     const planInfo = await getOrganizationPlanInfo(orgId);
@@ -44,7 +64,8 @@ export async function POST(req: NextRequest) {
     if (!canUseAi) {
       return NextResponse.json({
         success: false,
-        message: "AI processing not available for this organization's plan",
+        reason: "plan_without_ai",
+        message: "El plan de esta organización no incluye análisis con IA",
         plan: planInfo?.planType || "STARTER",
       }, { status: 403 });
     }

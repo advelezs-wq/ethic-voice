@@ -425,13 +425,8 @@ async function createSubmission({
     return submission;
   });
 
-  // Alert admins as soon as the report is saved — not after AI analysis,
-  // which can fail or be unavailable on the org's plan.
-  try {
-    await notificationsService.notifyReportCreated(submission.id, orgId);
-  } catch (notifyError) {
-    console.error("[SUBMISSION] Error notifying admins of new report:", notifyError);
-  }
+  // Confirm to the reporter and alert admins now, not after AI analysis.
+  await notificationsService.notifyReportReceived(submission);
 
   // Add to AI processing queue (non-blocking)
   try {
@@ -599,13 +594,8 @@ export async function submitEthicLineReport(
       },
     });
 
-    // Alert admins as soon as the report is saved — not after AI analysis,
-    // which can fail or be unavailable on the org's plan.
-    try {
-      await notificationsService.notifyReportCreated(submission.id, validatedData.organizationId);
-    } catch (notifyError) {
-      console.error("[ETHIC_LINE] Error notifying admins of new report:", notifyError);
-    }
+    // Confirm to the reporter and alert admins now, not after AI analysis.
+    await notificationsService.notifyReportReceived(submission);
 
     // Decide whether to enqueue AI job based on plan
     let aiEnqueued = false;

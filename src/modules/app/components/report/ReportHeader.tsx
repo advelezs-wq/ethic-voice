@@ -110,7 +110,10 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
         }),
       });
       const payload = await res.json();
-      if (!res.ok || payload?.success === false) throw new Error("AI process failed");
+      if (!res.ok || payload?.success === false) {
+        // Surface the plan restriction instead of a generic failure.
+        throw new Error(payload?.reason === "plan_without_ai" ? payload.message : "");
+      }
       if (payload.mode === "sync") {
         showSuccess("Análisis de IA completado");
         setOptimisticQueued(false);
@@ -120,8 +123,11 @@ export const ReportHeader: React.FC<ReportHeaderProps> = ({
         showWarning("Análisis encolado", payload.message);
         refreshQueue();
       }
-    } catch {
-      showError("No se pudo procesar el análisis de IA");
+    } catch (e) {
+      showError(
+        "No se pudo procesar el análisis de IA",
+        (e instanceof Error && e.message) || undefined
+      );
       setOptimisticQueued(false);
     } finally {
       setAiLoading(false);

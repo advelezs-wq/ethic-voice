@@ -520,13 +520,8 @@ export class EmailWebhookService {
       },
     });
 
-    // Alert admins as soon as the report is saved — not after AI analysis,
-    // which can fail or be unavailable on the org's plan.
-    try {
-      await notificationsService.notifyReportCreated(submission.id, emailConfig.orgId);
-    } catch (notifyError) {
-      console.error("[EMAIL_WEBHOOK] Error notifying admins of new report:", notifyError);
-    }
+    // Confirm to the reporter and alert admins now, not after AI analysis.
+    await notificationsService.notifyReportReceived(submission);
 
     // The case record above is already durably saved in Postgres — queueing
     // it for AI analysis is a separate, best-effort step that depends on

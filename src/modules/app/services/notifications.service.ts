@@ -759,6 +759,36 @@ export class NotificationsService {
     });
   }
 
+  // Everything that should happen as soon as a channel saves a new report:
+  // confirm receipt to an identified reporter and alert the org's admins.
+  // Called on creation rather than after AI analysis, which can fail or be
+  // outside the org's plan. Never throws — the report is already saved.
+  async notifyReportReceived(report: {
+    id: number;
+    orgId: string;
+    trackingToken: string;
+    reporterEmail?: string | null;
+    isAnonymous?: boolean | null;
+  }): Promise<void> {
+    if (report.reporterEmail && !report.isAnonymous) {
+      try {
+        await this.sendConfirmationEmail(
+          report.reporterEmail,
+          `REP-${report.trackingToken}`,
+          report.orgId
+        );
+      } catch (error) {
+        console.error(`Error sending confirmation for report ${report.id}:`, error);
+      }
+    }
+
+    try {
+      await this.notifyReportCreated(report.id, report.orgId);
+    } catch (error) {
+      console.error(`Error notifying admins of report ${report.id}:`, error);
+    }
+  }
+
   // Notify a non-anonymous reporter by email that the team replied on their
   // report's public chat. Anonymous reporters have no email on file, so the
   // "new message" signal for them lives entirely on the /track/[code] page.

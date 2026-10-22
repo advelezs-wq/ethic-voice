@@ -911,7 +911,12 @@ export function ReportsTable({
                                       );
                                       const payload = await res.json();
                                       if (!res.ok || payload?.success === false) {
-                                        throw new Error("AI process failed");
+                                        // Surface the plan restriction instead of a generic failure.
+                                        throw new Error(
+                                          payload?.reason === "plan_without_ai"
+                                            ? payload.message
+                                            : ""
+                                        );
                                       }
                                       if (payload.mode === "sync") {
                                         showSuccess("Análisis de IA completado");
@@ -931,7 +936,9 @@ export function ReportsTable({
                                       }
                                     } catch (e) {
                                       showError(
-                                        "No se pudo procesar el análisis de IA"
+                                        "No se pudo procesar el análisis de IA",
+                                        (e instanceof Error && e.message) ||
+                                          undefined
                                       );
                                       // Revertir optimismo si falló
                                       setOptimisticQueuedIds((prev) => {

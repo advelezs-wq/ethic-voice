@@ -164,7 +164,10 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
         }),
       });
       const payload = await res.json();
-      if (!res.ok || payload?.success === false) throw new Error("AI process failed");
+      if (!res.ok || payload?.success === false) {
+        // Surface the plan restriction instead of a generic failure.
+        throw new Error(payload?.reason === "plan_without_ai" ? payload.message : "");
+      }
       if (payload.mode === "sync") {
         showSuccess("Análisis de IA completado");
         setOptimisticQueuedIds((prev) => {
@@ -177,8 +180,11 @@ export const AssignedReportsTable: React.FC<AssignedReportsTableProps> = ({
         showWarning("El análisis quedó en cola", payload.message);
         refreshQueue();
       }
-    } catch {
-      showError("No se pudo procesar el análisis de IA");
+    } catch (e) {
+      showError(
+        "No se pudo procesar el análisis de IA",
+        (e instanceof Error && e.message) || undefined
+      );
       setOptimisticQueuedIds((prev) => {
         const next = new Set(prev);
         next.delete(report.idTable);

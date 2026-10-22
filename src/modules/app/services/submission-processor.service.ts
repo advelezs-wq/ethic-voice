@@ -457,19 +457,19 @@ export class SubmissionProcessorService {
 
       // Send notifications after successful processing
       try {
-        // Send confirmation email to reporter if email provided
-        if (safeReporter?.email && !isAnonymous) {
-          await notificationsService.sendConfirmationEmail(
-            safeReporter.email,
-            result.trackingCode,
-            orgId
-          );
-        }
-
-        // Notify admins about new report. Reports created by a channel
-        // (form, ethic line, email, manual) already notified admins when
-        // they were saved, so the alert doesn't depend on AI succeeding.
+        // Reports saved by a channel (form, ethic line, email, manual) were
+        // already confirmed to the reporter and announced to admins on
+        // creation, so that doesn't depend on AI succeeding. Only a report
+        // this processor creates itself still needs it here.
         if (!existingSubmission) {
+          if (safeReporter?.email && !isAnonymous) {
+            await notificationsService.sendConfirmationEmail(
+              safeReporter.email,
+              result.trackingCode,
+              orgId
+            );
+          }
+
           await notificationsService.notifyReportCreated(
             result.submissionId,
             orgId

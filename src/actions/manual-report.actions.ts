@@ -170,13 +170,8 @@ export async function createManualReport(
       return newSubmission;
     });
 
-    // Alert admins as soon as the report is saved — not after AI analysis,
-    // which can fail or be unavailable on the org's plan.
-    try {
-      await notificationsService.notifyReportCreated(submission.id, organizationId);
-    } catch (notifyError) {
-      console.error("[MANUAL] Error notifying admins of new report:", notifyError);
-    }
+    // Confirm to the reporter and alert admins now, not after AI analysis.
+    await notificationsService.notifyReportReceived(submission);
 
     // Add to AI processing queue (similar to ETHIC_LINE reports)
     try {

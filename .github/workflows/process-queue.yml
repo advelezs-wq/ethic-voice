@@ -1,9 +1,10 @@
 name: Process Redis Queue
 
 on:
-  schedule:
-    # Run every minute (GitHub Actions cron format: min hour day month dayofweek)
-    - cron: "* * * * *"
+  # The schedule was removed: the queue is processed by the
+  # ethicvoice-ai-worker container on the verdata server (see
+  # scripts/deploy-worker.sh), and this cron failed on every run for lack of
+  # the VERCEL_DEPLOYMENT_URL secret.
   workflow_dispatch: # Allow manual trigger
 
 jobs:

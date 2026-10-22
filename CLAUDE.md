@@ -110,6 +110,8 @@ A separate worker process (`workers/index.ts`) runs BullMQ workers against Redis
 
 Local dev Redis via Docker (`docker compose up -d`). Production uses two Redis instances: Upstash REST API (rate limiting / cache via `@upstash/redis`) and a BullMQ-compatible Redis URL (`REDIS_URL` / `UPSTASH_REDIS_URL`).
 
+In production the workers do **not** run on Vercel: they run in the `ethicvoice-ai-worker` Docker container on the verdata server (`ssh -p 22222 verdata@186.115.101.10`, code in `~/ethicvoice-ai-worker`, not a git checkout). A push to `main` does not update them — after changing anything the workers import (AI processor, submission processor, notifications, queue), deploy with `scripts/deploy-worker.sh [commit]`.
+
 ### Key environment variables
 
 | Variable | Purpose |

@@ -999,12 +999,14 @@ model NotificationSettings {
   userId String  @unique
   orgId  String?
 
-  // Email notification preferences - gentle defaults for better UX
-  emailReportCreated       Boolean @default(false)
+  // Email notification preferences. New-report and urgent-report emails are
+  // on by default: only org admins receive them, and an ethics line that
+  // doesn't tell anyone a report arrived is broken.
+  emailReportCreated       Boolean @default(true)
   emailReportAssigned      Boolean @default(true)
   emailReportStatusChanged Boolean @default(false)
   emailReportComment       Boolean @default(false)
-  emailSystemAlerts        Boolean @default(false)
+  emailSystemAlerts        Boolean @default(true)
 
   // In-app notification preferences  
   inAppReportCreated       Boolean @default(true)

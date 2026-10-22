@@ -573,11 +573,11 @@ export class NotificationsService {
     
     return {
       // Email notifications - more conservative by default
-      emailReportCreated: false, // Off by default for better UX
+      emailReportCreated: true, // New reports must reach admins (only admins get it)
       emailReportAssigned: true, // Important - keep on
       emailReportStatusChanged: false, // Off by default - can be overwhelming
       emailReportComment: false, // Off by default - can be overwhelming  
-      emailSystemAlerts: false, // Off by default
+      emailSystemAlerts: true, // Urgent-report alerts (only admins get them)
 
       // In-app notifications - more permissive 
       inAppReportCreated: isAdmin, // Only for admins

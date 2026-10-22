@@ -8,6 +8,7 @@ import { SubmissionSource, SubmissionMetadata } from "@/types/submission.types";
 import { z } from "zod";
 import { addSubmissionToQueue } from "@/modules/app/lib/queue/queue-manager";
 import { createTrackingCode } from "@/actions/tracking.actions";
+import { notificationsService } from "@/modules/app/services/notifications.service";
 
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
 import {
@@ -424,6 +425,14 @@ async function createSubmission({
     return submission;
   });
 
+  // Alert admins as soon as the report is saved — not after AI analysis,
+  // which can fail or be unavailable on the org's plan.
+  try {
+    await notificationsService.notifyReportCreated(submission.id, orgId);
+  } catch (notifyError) {
+    console.error("[SUBMISSION] Error notifying admins of new report:", notifyError);
+  }
+
   // Add to AI processing queue (non-blocking)
   try {
     const aiAllowed = await canUseAiProcessing(orgId);
@@ -589,6 +598,14 @@ export async function submitEthicLineReport(
         },
       },
     });
+
+    // Alert admins as soon as the report is saved — not after AI analysis,
+    // which can fail or be unavailable on the org's plan.
+    try {
+      await notificationsService.notifyReportCreated(submission.id, validatedData.organizationId);
+    } catch (notifyError) {
+      console.error("[ETHIC_LINE] Error notifying admins of new report:", notifyError);
+    }
 
     // Decide whether to enqueue AI job based on plan
     let aiEnqueued = false;

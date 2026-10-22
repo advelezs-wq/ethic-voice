@@ -7,6 +7,7 @@ import { addSubmissionToQueue } from "@/modules/app/lib/queue/queue-manager";
 import { SubmissionSource } from "@/types/submission.types";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
 import { createTrackingCode } from "@/actions/tracking.actions";
+import { notificationsService } from "@/modules/app/services/notifications.service";
 import {
   createManualReportSchema,
   type CreateManualReportData,
@@ -168,6 +169,14 @@ export async function createManualReport(
 
       return newSubmission;
     });
+
+    // Alert admins as soon as the report is saved — not after AI analysis,
+    // which can fail or be unavailable on the org's plan.
+    try {
+      await notificationsService.notifyReportCreated(submission.id, organizationId);
+    } catch (notifyError) {
+      console.error("[MANUAL] Error notifying admins of new report:", notifyError);
+    }
 
     // Add to AI processing queue (similar to ETHIC_LINE reports)
     try {

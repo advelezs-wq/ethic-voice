@@ -5,6 +5,7 @@ import { addSubmissionToQueue } from "@/modules/app/lib/queue/queue-manager";
 import { getOrganizationPlanInfo } from "@/modules/core/utils/subscription.utils";
 import { sanitizeSubmissionText } from "@/lib/security/submission-security";
 import { SubmissionSource } from "@/types/submission.types";
+import { notificationsService } from "@/modules/app/services/notifications.service";
 import { userHasPermission } from "@/modules/core/utils/permissions";
 import { upsertImprovMxAlias } from "@/modules/app/lib/improvmx-client";
 import { emailRoutingProvider } from "@/modules/app/lib/email-routing";
@@ -518,6 +519,14 @@ export class EmailWebhookService {
         },
       },
     });
+
+    // Alert admins as soon as the report is saved — not after AI analysis,
+    // which can fail or be unavailable on the org's plan.
+    try {
+      await notificationsService.notifyReportCreated(submission.id, emailConfig.orgId);
+    } catch (notifyError) {
+      console.error("[EMAIL_WEBHOOK] Error notifying admins of new report:", notifyError);
+    }
 
     // The case record above is already durably saved in Postgres — queueing
     // it for AI analysis is a separate, best-effort step that depends on

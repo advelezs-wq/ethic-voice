@@ -466,11 +466,15 @@ export class SubmissionProcessorService {
           );
         }
 
-        // Notify admins about new report
-        await notificationsService.notifyReportCreated(
-          result.submissionId,
-          orgId
-        );
+        // Notify admins about new report. Reports created by a channel
+        // (form, ethic line, email, manual) already notified admins when
+        // they were saved, so the alert doesn't depend on AI succeeding.
+        if (!existingSubmission) {
+          await notificationsService.notifyReportCreated(
+            result.submissionId,
+            orgId
+          );
+        }
 
         // If urgent, send urgent notifications
         if (analysis.requiresUrgentAction || analysis.severity === "HIGH") {

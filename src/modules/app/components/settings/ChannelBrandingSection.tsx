@@ -155,7 +155,7 @@ export function ChannelBrandingSection({ organizationId }: { organizationId: str
                 <span className="font-mono">cname.vercel-dns.com</span>.
               </li>
               <li>
-                Escríbenos a <a className="underline" href="mailto:support@ethicvoice.co">support@ethicvoice.co</a> para activarlo; te confirmamos cuando el certificado esté listo.
+                Escríbenos a <a className="underline" href="mailto:info@ethicvoice.co">info@ethicvoice.co</a> para activarlo; te confirmamos cuando el certificado esté listo.
               </li>
             </ol>
           )}

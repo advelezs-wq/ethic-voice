@@ -128,7 +128,7 @@ Gracias,
 [Tu teléfono]
 [Tu email corporativo]`;
 
-    return `mailto:ventas@ethicvoice.co?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    return `mailto:info@ethicvoice.co?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   // Check if user returned from sign-in with a selected plan

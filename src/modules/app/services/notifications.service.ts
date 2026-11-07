@@ -26,6 +26,7 @@ export interface EmailTemplateData {
   requesterName?: string;
   reportUrl?: string;
   dashboardUrl?: string;
+  receivedAt?: string;
 }
 
 export class NotificationsService {
@@ -201,13 +202,14 @@ export class NotificationsService {
 
       case NotificationType.REPORT_CREATED:
         return {
-          subject: `Nuevo Reporte Creado - ${orgName}`,
+          subject: `Nueva denuncia pendiente de revisión - ${orgName}`,
           html: this.getReportCreatedTemplate({
             orgName,
-            reportId: reportId?.toString(),
             reportTitle: data.metadata?.reportTitle || `REP-${String(reportId).padStart(6, '0')}`,
-            reportUrl: reportId ? `${baseUrl}/app/reports/${reportId}` : undefined,
-            dashboardUrl: `${baseUrl}/app/reports`,
+            reportUrl: reportId ? `${baseUrl}/app/reports/${reportId}` : `${baseUrl}/app/reports`,
+            receivedAt: formatBogotaDateTime(
+              data.metadata?.receivedAt ? new Date(data.metadata.receivedAt) : new Date()
+            ),
           }),
         };
 
@@ -317,49 +319,52 @@ export class NotificationsService {
    * Email template for new report created (for admins)
    */
   private getReportCreatedTemplate(data: EmailTemplateData): string {
+    // Deliberately carries no report content (category, description, people
+    // involved, reporter): only the org, the receipt date and a link that
+    // requires signing in.
+    const logoUrl = `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || ''}/brand/logo-nobg.png`;
     return `
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nuevo Reporte</title>
+  <title>Nueva denuncia pendiente de revisión</title>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="text-align:center; margin-bottom:16px;">
-    <img src="${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BASE_URL || ''}/brand/logo-nobg.png" alt="EthicVoice" width="120" />
-  </div>
-  <div style="background: #f7fafc; padding: 30px; border-radius: 10px; margin-bottom: 20px;">
-    <h1 style="color: #2d3748; margin-bottom: 20px;">📝 Nuevo Reporte Creado</h1>
-    
-    <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #4299e1;">
-      <p><strong>Se ha creado un nuevo reporte en ${data.orgName}</strong></p>
-      
-      <div style="background: #edf2f7; padding: 15px; border-radius: 6px; margin: 20px 0;">
-        <p style="margin: 5px 0;"><strong>ID del Reporte:</strong> ${data.reportTitle}</p>
-        <p style="margin: 5px 0;"><strong>Organización:</strong> ${data.orgName}</p>
-        <p style="margin: 5px 0;"><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CO')}</p>
-      </div>
-      
-      <p>Un nuevo reporte requiere su atención. Por favor revise los detalles y tome las acciones necesarias.</p>
-      
-      ${data.reportUrl ? `
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="${data.reportUrl}" style="background: #4299e1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
-          📋 Revisar Reporte
-        </a>
-      </div>
-      ` : ''}
-      
-      ${data.dashboardUrl ? `
-      <div style="text-align: center; margin: 10px 0;">
-        <a href="${data.dashboardUrl}" style="background: #38a169; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
-          📊 Ir al Dashboard
-        </a>
-      </div>
-      ` : ''}
-    </div>
-  </div>
+<body style="margin:0; padding:0; background:#f4f3ef; font-family: Arial, Helvetica, sans-serif; color:#0b1d21;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f3ef; padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px; background:#ffffff; border-radius:12px; overflow:hidden;">
+        <tr><td style="padding:28px 32px 0; text-align:center;">
+          <img src="${logoUrl}" alt="EthicVoice" width="150" style="display:inline-block; max-width:150px; height:auto;" />
+        </td></tr>
+        <tr><td style="padding:24px 32px 8px;">
+          <h1 style="margin:0 0 12px; font-size:22px; line-height:1.3; color:#0b1d21;">Tienes una nueva denuncia pendiente de revisión</h1>
+          <p style="margin:0; font-size:15px; line-height:1.6; color:#3d5257;">
+            Se registró un nuevo reporte en el canal ético de <strong>${escapeHtml(data.orgName || '')}</strong>. Ingresa a EthicVoice para revisarlo.
+          </p>
+        </td></tr>
+        <tr><td style="padding:16px 32px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f3ef; border-radius:8px;">
+            <tr><td style="padding:14px 18px; font-size:14px; line-height:1.7; color:#0b1d21;">
+              <strong>Organización:</strong> ${escapeHtml(data.orgName || '')}<br>
+              <strong>Fecha de recepción:</strong> ${escapeHtml(data.receivedAt || '')}<br>
+              <strong>Referencia:</strong> ${escapeHtml(data.reportTitle || '')}
+            </td></tr>
+          </table>
+        </td></tr>
+        <tr><td align="center" style="padding:12px 32px 28px;">
+          <a href="${data.reportUrl}" style="display:inline-block; background:#0b1d21; color:#ffffff; text-decoration:none; font-weight:bold; font-size:15px; padding:14px 28px; border-radius:999px;">
+            Ingresar a EthicVoice
+          </a>
+        </td></tr>
+        <tr><td style="padding:0 32px 28px; font-size:12px; line-height:1.6; color:#6b7c80; border-top:1px solid #e7e5df;">
+          <p style="margin:16px 0 0;">Por confidencialidad, este correo no incluye el contenido de la denuncia. Solo los usuarios autorizados pueden consultarlo dentro de la plataforma.</p>
+          <p style="margin:8px 0 0;">Recibes este aviso porque eres administrador de ${escapeHtml(data.orgName || '')} en EthicVoice.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
 </body>
 </html>
     `;
@@ -602,7 +607,11 @@ export class NotificationsService {
 
     switch (type) {
       case NotificationType.REPORT_CREATED:
-        return settings.emailReportCreated;
+        // Mandatory: only org admins get it, and an ethics line that doesn't
+        // tell its admins a report arrived is broken. Old settings rows still
+        // carry emailReportCreated=false from the previous default, so the
+        // stored preference is deliberately ignored here.
+        return true;
       case NotificationType.REPORT_ASSIGNED:
         return settings.emailReportAssigned;
       case NotificationType.REPORT_STATUS_CHANGED:
@@ -816,30 +825,49 @@ export class NotificationsService {
 
   // Report created notification for admins
   async notifyReportCreated(reportId: number, orgId: string): Promise<void> {
-    const admins = await prisma.organizationMembership.findMany({
-      where: {
-        orgId,
-        role: 'ADMIN',
-      },
-      include: {
-        user: true,
-      },
-    });
-
-    for (const admin of admins) {
-      await this.createNotification({
-        userId: admin.userId,
-        orgId,
-        type: NotificationType.REPORT_CREATED,
-        title: 'Nuevo Reporte Creado',
-        message: `Se ha creado un nuevo reporte que requiere revisión`,
-        actionUrl: `/app/reports/${reportId}`,
-        reportId,
-        channel: NotificationChannel.BOTH,
-        metadata: {
-          reportTitle: `REP-${String(reportId).padStart(6, '0')}`,
+    const [admins, report] = await Promise.all([
+      prisma.organizationMembership.findMany({
+        where: {
+          orgId,
+          role: 'ADMIN',
         },
-      });
+        include: {
+          user: true,
+        },
+      }),
+      prisma.formSubmission.findUnique({
+        where: { id: reportId },
+        select: { createdAt: true },
+      }),
+    ]);
+
+    if (admins.length === 0) {
+      console.warn(`[NOTIFY] Org ${orgId} has no admins to notify of report ${reportId}`);
+    }
+
+    // One admin's failure (bad address, DB hiccup) must not stop the rest.
+    for (const admin of admins) {
+      try {
+        await this.createNotification({
+          userId: admin.userId,
+          orgId,
+          type: NotificationType.REPORT_CREATED,
+          title: 'Nueva denuncia recibida',
+          message: `Tienes un nuevo reporte pendiente de revisión`,
+          actionUrl: `/app/reports/${reportId}`,
+          reportId,
+          channel: NotificationChannel.BOTH,
+          metadata: {
+            reportTitle: `REP-${String(reportId).padStart(6, '0')}`,
+            receivedAt: (report?.createdAt ?? new Date()).toISOString(),
+          },
+        });
+      } catch (error) {
+        console.error(
+          `[NOTIFY] Failed to notify admin ${admin.userId} of report ${reportId}:`,
+          error
+        );
+      }
     }
   }
 
@@ -903,4 +931,21 @@ export class NotificationsService {
 }
 
 // Export singleton instance
-export const notificationsService = new NotificationsService(); 
+export const notificationsService = new NotificationsService();
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/** "7 de noviembre de 2026, 3:42 p. m." in Colombia time. */
+export function formatBogotaDateTime(date: Date): string {
+  return new Intl.DateTimeFormat("es-CO", {
+    timeZone: "America/Bogota",
+    dateStyle: "long",
+    timeStyle: "short",
+  }).format(date);
+}

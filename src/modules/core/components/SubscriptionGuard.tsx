@@ -58,7 +58,7 @@ export function SubscriptionGuard({ children }: SubscriptionGuardProps) {
           <h1 className="mt-3 text-xl font-semibold text-ev-night">El acceso de tu organización está suspendido</h1>
           <p className="mt-2 text-sm text-ev-mute">
             Tus datos se conservan. Escríbenos a{" "}
-            <a className="underline" href="mailto:support@ethicvoice.co">support@ethicvoice.co</a> para reactivarlo.
+            <a className="underline" href="mailto:info@ethicvoice.co">info@ethicvoice.co</a> para reactivarlo.
           </p>
         </div>
       </div>

@@ -175,7 +175,7 @@ export function BillingManager() {
             {s.billing === "manual" ? (
               <p className="mt-6 rounded-xl bg-ev-paper p-4 text-sm text-ev-mute">
                 Tu plan está gestionado directamente por el equipo de EthicVoice (contrato o facturación manual). Para cambios en el cobro escríbenos a{" "}
-                <a className="underline" href="mailto:support@ethicvoice.co">support@ethicvoice.co</a>.
+                <a className="underline" href="mailto:info@ethicvoice.co">info@ethicvoice.co</a>.
               </p>
             ) : (
               <dl className="mt-6 grid gap-4 border-t border-ev-line pt-6 sm:grid-cols-3">

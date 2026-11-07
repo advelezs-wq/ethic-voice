@@ -27,12 +27,12 @@ const TABS: {
   icon: string;
   adminOnly?: boolean;
 }[] = [
-  // Orden del trabajo real: leer la denuncia → hablar con quien reporta →
+  // Orden del trabajo real: leer la denuncia → coordinar en el chat interno →
   // repartir tareas → registrar avances. El historial automático va al final.
   { key: "overview", label: "Denuncia", icon: "icon-[lucide--file-text]" },
   {
     key: "chat",
-    label: "Chat con el denunciante",
+    label: "Chat interno",
     icon: "icon-[lucide--message-circle]",
   },
   { key: "tasks", label: "Tareas", icon: "icon-[lucide--check-square]" },

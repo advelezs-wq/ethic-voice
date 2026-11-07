@@ -49,7 +49,7 @@ export default function AppNotFound() {
           <p className="text-sm text-slate-400">
             ¿Necesitas ayuda?{" "}
             <a
-              href="mailto:support@ethicvoice.co"
+              href="mailto:info@ethicvoice.co"
               className="text-primary hover:underline font-medium"
             >
               Contáctanos

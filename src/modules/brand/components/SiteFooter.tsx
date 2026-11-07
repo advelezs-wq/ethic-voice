@@ -64,13 +64,13 @@ export function SiteFooter() {
                 </dd>
               </div>
               <div className="flex gap-3">
-                <dt className="w-20 shrink-0">Partners</dt>
+                <dt className="w-20 shrink-0">Correo</dt>
                 <dd>
                   <a
-                    href="mailto:partners@ethicvoice.co"
+                    href="mailto:info@ethicvoice.co"
                     className="normal-case text-white/75 hover:text-white"
                   >
-                    partners@ethicvoice.co
+                    info@ethicvoice.co
                   </a>
                 </dd>
               </div>
@@ -106,6 +106,9 @@ export function SiteFooter() {
             </Link>
             <Link href="/terms" className="hover:text-white">
               Términos
+            </Link>
+            <Link href="/politica-habeas-data" className="hover:text-white">
+              Habeas Data
             </Link>
             <Link href="/sitemap" className="hover:text-white">
               Mapa del sitio

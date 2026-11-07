@@ -27,8 +27,8 @@ export default function NotFound() {
       footnote={
         <>
           ¿Necesitas ayuda?{" "}
-          <a href="mailto:support@ethicvoice.co" className="text-ev-night underline decoration-ev-signal decoration-2 underline-offset-4">
-            support@ethicvoice.co
+          <a href="mailto:info@ethicvoice.co" className="text-ev-night underline decoration-ev-signal decoration-2 underline-offset-4">
+            info@ethicvoice.co
           </a>
         </>
       }

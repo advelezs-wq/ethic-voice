@@ -57,7 +57,11 @@ export function Testimonials() {
               {t.quote}
             </blockquote>
             <figcaption className="mt-12 flex items-center gap-4 border-t border-ev-line pt-6">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ev-night font-wordmark text-sm text-ev-signal">
+              <span
+                translate="no"
+                aria-hidden
+                className="notranslate flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ev-night font-wordmark text-sm text-ev-signal"
+              >
                 {t.initials}
               </span>
               <span>

@@ -130,7 +130,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={publicBlogContext?.locale ?? "en"} className="light">
+    <html lang={publicBlogContext?.locale ?? "es"} className="light">
       <head>
         <JsonLd />
         {/* Píxeles GA / Clarity / Meta: solo tras consentimiento (ConsentGatedScripts) */}

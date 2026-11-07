@@ -10,13 +10,13 @@ import { trackCta, useDemoCta } from "../hooks/useDemoCta";
 export const NAV_LINKS = [
   { href: "/#como-funciona", label: "Cómo funciona" },
   { href: "/platform", label: "Plataforma" },
+  { href: "/services", label: "Servicios" },
   { href: "/#seguridad", label: "Seguridad" },
   { href: "/pricing", label: "Precios" },
   { href: "/blog", label: "Recursos" },
 ] as const;
 
 export const MOBILE_SECONDARY_LINKS = [
-  { href: "/services", label: "Servicios" },
   { href: "/about", label: "Empresa" },
   { href: "/partners", label: "Partners" },
   { href: "/guia-canal-denuncias", label: "Guía gratuita" },

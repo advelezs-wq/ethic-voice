@@ -71,7 +71,7 @@ export default function BuilderErrorPage({
           <p className="text-sm text-slate-400">
             Si el problema persiste, por favor{" "}
             <a
-              href="mailto:support@ethicvoice.co"
+              href="mailto:info@ethicvoice.co"
               className="text-primary hover:underline font-medium"
             >
               contáctanos

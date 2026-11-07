@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       name: "EthicVoice",
       nit: process.env.ETHICVOICE_NIT || "N/A",
       address: process.env.ETHICVOICE_ADDRESS || "",
-      email: process.env.ETHICVOICE_EMAIL || "support@ethicvoice.co",
+      email: process.env.ETHICVOICE_EMAIL || "info@ethicvoice.co",
       phone: process.env.ETHICVOICE_PHONE || "",
     };
 

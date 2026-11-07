@@ -24,7 +24,7 @@ export default function CareersPage() {
         title={["Construye la herramienta", <>que protege a quien <Voice>habla.</Voice></>]}
         lead="Buscamos personas apasionadas por el impacto, la tecnología y el cumplimiento. Creemos en el trabajo colaborativo, el aprendizaje continuo y el crecimiento profesional."
         actions={
-          <a href="mailto:talento@ethicvoice.com" className={buttonClasses("signal", "lg")}>
+          <a href="mailto:info@ethicvoice.co" className={buttonClasses("signal", "lg")}>
             Enviar CV <Arrow />
           </a>
         }
@@ -43,8 +43,8 @@ export default function CareersPage() {
             <p className="text-lg leading-relaxed text-white/65">
               Escríbenos y cuéntanos cómo puedes aportar.
             </p>
-            <a href="mailto:talento@ethicvoice.com" className={buttonClasses("signal", "lg", "mt-8")}>
-              talento@ethicvoice.com <Arrow />
+            <a href="mailto:info@ethicvoice.co" className={buttonClasses("signal", "lg", "mt-8")}>
+              info@ethicvoice.co <Arrow />
             </a>
           </div>
         </div>

@@ -78,7 +78,7 @@ export default function GlobalError({
               <p className="text-sm text-gray-500">
                 Si el problema persiste, por favor{" "}
                 <a
-                  href="mailto:support@ethicvoice.co"
+                  href="mailto:info@ethicvoice.co"
                   className="text-primary hover:underline font-medium"
                 >
                   contáctanos

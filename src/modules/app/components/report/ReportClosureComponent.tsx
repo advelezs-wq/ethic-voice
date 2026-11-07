@@ -522,7 +522,7 @@ export const ReportClosureComponent: React.FC<ReportClosureComponentProps> = ({
               </Button>
               <p className="mt-2 text-xs leading-snug text-ev-mute">
                 {isAdmin
-                  ? "Registrarás el resultado de la investigación. El chat con el denunciante quedará cerrado."
+                  ? "Registrarás el resultado de la investigación. El chat del caso quedará cerrado."
                   : "Un administrador deberá aprobar el cierre antes de que el caso quede cerrado."}
               </p>
             </div>

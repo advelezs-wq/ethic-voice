@@ -40,6 +40,10 @@ function processToastQueue() {
 
   const queueItem = toastQueue.shift()!;
   const { message } = queueItem;
+  if (isStaleErrorOnAuthPage(message)) {
+    processingTimeout = toastQueue.length > 0 ? setTimeout(processToastQueue, 0) : null;
+    return;
+  }
   lastToastTime = now;
 
   try {
@@ -71,8 +75,19 @@ function processToastQueue() {
  * Safe wrapper for addToast that prevents DOM manipulation errors
  * Implements queuing, debouncing, and error handling
  */
+/** Error toasts from dashboard requests that fail mid sign-out don't belong on the auth screens. */
+function isStaleErrorOnAuthPage(message: ToastMessage): boolean {
+  return (
+    message.color === "danger" &&
+    typeof window !== "undefined" &&
+    window.location.pathname.startsWith("/auth")
+  );
+}
+
 export function addToast(message: ToastMessage): void {
   try {
+    if (isStaleErrorOnAuthPage(message)) return;
+
     // Generate unique ID for deduplication
     const id = `toast-${Date.now()}-${Math.random()}`;
 

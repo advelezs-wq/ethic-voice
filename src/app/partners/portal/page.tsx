@@ -18,7 +18,7 @@ export default function PartnersPortalPage() {
         lead={
           <>
             Accede al espacio exclusivo para socios de EthicVoice. Si aún no
-            tienes acceso, escríbenos a partners@ethicvoice.co.
+            tienes acceso, escríbenos a info@ethicvoice.co.
           </>
         }
         actions={
@@ -26,7 +26,7 @@ export default function PartnersPortalPage() {
             <ButtonLink href="/auth/sign-in" variant="ink" size="lg" arrow>
               Iniciar sesión
             </ButtonLink>
-            <a href="mailto:partners@ethicvoice.co" className={buttonClasses("outline", "lg")}>
+            <a href="mailto:info@ethicvoice.co" className={buttonClasses("outline", "lg")}>
               Solicitar acceso <Arrow />
             </a>
           </>

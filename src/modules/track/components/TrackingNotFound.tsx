@@ -88,7 +88,7 @@ export function TrackingNotFound({ code }: TrackingNotFoundProps) {
                 variant="bordered"
                 size="sm"
                 as="a"
-                href="mailto:soporte@ethicvoice.co"
+                href="mailto:info@ethicvoice.co"
               >
                 Contactar Soporte
               </Button>

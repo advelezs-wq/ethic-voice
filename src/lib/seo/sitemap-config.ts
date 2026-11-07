@@ -1,3 +1,5 @@
+import { SERVICES } from "@/modules/landig-page/services/services.data";
+
 export type StaticSitemapRoute = {
   path: string;
   changeFrequency:
@@ -15,6 +17,11 @@ export const PUBLIC_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/", changeFrequency: "daily", priority: 1 },
   { path: "/platform", changeFrequency: "weekly", priority: 0.9 },
   { path: "/services", changeFrequency: "weekly", priority: 0.85 },
+  ...SERVICES.map((s) => ({
+    path: `/services/${s.slug}`,
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  })),
   { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
   { path: "/about", changeFrequency: "monthly", priority: 0.7 },
   { path: "/careers", changeFrequency: "weekly", priority: 0.6 },
@@ -25,6 +32,7 @@ export const PUBLIC_STATIC_ROUTES: StaticSitemapRoute[] = [
   { path: "/blog", changeFrequency: "daily", priority: 0.9 },
   { path: "/privacidad", changeFrequency: "yearly", priority: 0.3 },
   { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/politica-habeas-data", changeFrequency: "yearly", priority: 0.3 },
   { path: "/sitemap", changeFrequency: "weekly", priority: 0.2 },
 ];
 

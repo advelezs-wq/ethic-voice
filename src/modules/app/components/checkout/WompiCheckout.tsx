@@ -153,7 +153,7 @@ export function WompiCheckout({ planType, billingCycle }: { planType: PlanType; 
             </div>
           ) : acceptanceError ? (
             <p className="rounded-xl bg-[#FCEEEB] p-4 text-sm text-[#862B1D]">
-              {acceptanceError} Escríbenos a <a className="underline" href="mailto:support@ethicvoice.co">support@ethicvoice.co</a>.
+              {acceptanceError} Escríbenos a <a className="underline" href="mailto:info@ethicvoice.co">info@ethicvoice.co</a>.
             </p>
           ) : ctx.isMemberElsewhere ? (
             <p className="rounded-xl bg-[#FBF0DC] p-4 text-sm text-[#8C5C15]">

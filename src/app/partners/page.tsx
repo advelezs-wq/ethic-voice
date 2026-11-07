@@ -40,7 +40,7 @@ export default function PartnersPage() {
         lead="La transparencia no es solo un requisito legal: es una ventaja competitiva. Ofrece a tus clientes un canal de denuncias confidencial, anónimo y seguro."
         actions={
           <>
-            <a href="mailto:partners@ethicvoice.co" className={buttonClasses("signal", "lg")}>
+            <a href="mailto:info@ethicvoice.co" className={buttonClasses("signal", "lg")}>
               Escríbenos <Arrow />
             </a>
             <a href="/partners/portal" className={buttonClasses("outline", "lg")}>
@@ -83,7 +83,7 @@ export default function PartnersPage() {
         </ul>
         <Container className="!px-0">
           <p className="ev-label mt-10 flex flex-wrap gap-x-8 gap-y-2 text-ev-mute">
-            <span>partners@ethicvoice.co</span>
+            <span>info@ethicvoice.co</span>
             <span>+57 322 414 5120</span>
           </p>
         </Container>

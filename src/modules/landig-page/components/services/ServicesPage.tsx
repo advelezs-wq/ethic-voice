@@ -1,51 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import React, { useMemo } from "react";
+import React from "react";
 import {
+  Arrow,
   Button,
-  ButtonLink,
   Container,
+  Eyebrow,
   Voice,
+  buttonClasses,
+  reveal,
 } from "@/modules/brand/components/primitives";
 import { PageHero } from "@/modules/brand/components/sections";
 import { useDemoCta } from "@/modules/brand/hooks/useDemoCta";
 import {
-  serviceGroups,
-  services,
-  type ServiceItem,
+  SERVICES,
+  SERVICE_CONDITIONS,
+  serviceInfoMailto,
+  type Service,
 } from "@/modules/landig-page/services/services.data";
 
-export interface ServicesPageProps {
-  initialCategory?: string;
-}
-
-const DEV_GROUP_SLUG = "desarrollo-software";
-const MAIN_DEV_ID = "desarrollo-tecnologico-medida";
+const pad = (n: number) => String(n).padStart(2, "0");
 
 /**
- * Portafolio de servicios como índice editorial: filtros por categoría
- * (enlaces con ?category=) y cada servicio como fila desplegable.
+ * Portafolio de servicios: el servicio destacado (gestión tercerizada) en un
+ * bloque propio y los 12 servicios como tarjetas, cada una con su detalle.
  */
-export const ServicesPage: React.FC<ServicesPageProps> = ({ initialCategory }) => {
+export const ServicesPage: React.FC = () => {
   const demo = useDemoCta();
-  const selectedGroup = serviceGroups.find((g) => g.slug === initialCategory)?.slug;
-
-  const list: ServiceItem[] = useMemo(() => {
-    // Los sub-servicios de software se agrupan bajo el servicio principal.
-    const base = services.filter(
-      (s) => s.groupSlug !== DEV_GROUP_SLUG || s.id === MAIN_DEV_ID,
-    );
-    if (!selectedGroup) {
-      return [...base].sort((a, b) =>
-        a.id === MAIN_DEV_ID ? 1 : b.id === MAIN_DEV_ID ? -1 : 0,
-      );
-    }
-    return base.filter((s) => s.groupSlug === selectedGroup);
-  }, [selectedGroup]);
-
-  const groupTitle = (slug: string) =>
-    serviceGroups.find((g) => g.slug === slug)?.title ?? "";
+  const featured = SERVICES.find((s) => s.featured);
 
   return (
     <>
@@ -57,100 +40,185 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ initialCategory }) =
             cumplimiento, <Voice>a tu lado.</Voice>
           </>,
         ]}
-        lead="Además de la plataforma, te acompañamos con investigación, programas de cumplimiento, gobernanza, asesoría legal y desarrollo a medida."
+        lead="Soluciones tecnológicas y servicios especializados para recibir y gestionar denuncias, investigar posibles irregularidades y fortalecer la cultura ética de las organizaciones."
         actions={
           <>
             <Button variant="signal" size="lg" arrow onClick={demo("services_hero", "services")}>
-              Hablar con el equipo
+              Agendar demo
             </Button>
-            <ButtonLink href="/platform" variant="outline" size="lg">
-              Ver la plataforma
-            </ButtonLink>
+            <a href="#portafolio" className={buttonClasses("outline", "lg")}>
+              Ver los 12 servicios
+            </a>
           </>
         }
       />
 
-      <section className="bg-white py-20 sm:py-28">
-        <Container>
-          {/* Filtros */}
-          <nav aria-label="Categorías de servicios" className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2">
-            {[{ slug: "", title: "Todos" }, ...serviceGroups].map((g) => {
-              const active = (g.slug || undefined) === selectedGroup;
-              return (
-                <Link
-                  key={g.slug || "todos"}
-                  href={g.slug ? `/services?category=${g.slug}` : "/services"}
-                  scroll={false}
-                  aria-current={active ? "page" : undefined}
-                  className={`ev-press shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm transition-colors ${
-                    active
-                      ? "border-ev-night bg-ev-night text-white"
-                      : "border-ev-line text-ev-ink hover:border-ev-night/40"
-                  }`}
-                >
-                  {g.title}
-                </Link>
-              );
-            })}
-          </nav>
+      {featured ? <FeaturedService service={featured} /> : null}
 
-          <p className="ev-label mt-10 text-ev-mute">
-            {list.length} {list.length === 1 ? "servicio" : "servicios"}
-            {selectedGroup ? ` · ${groupTitle(selectedGroup)}` : ""}
+      <section id="portafolio" className="scroll-mt-20 bg-white py-20 sm:py-28">
+        <Container>
+          <div className="grid gap-6 lg:grid-cols-12">
+            <div className="lg:col-span-3">
+              <Eyebrow index="02">Portafolio</Eyebrow>
+            </div>
+            <div className="lg:col-span-9">
+              <h2 className="ev-h2">
+                12 servicios, <Voice>un mismo equipo.</Voice>
+              </h2>
+              <p className="ev-lead mt-6 max-w-2xl">
+                Contrata la plataforma, los servicios o ambos. Toca una tarjeta para ver
+                la descripción, el alcance y cómo se contrata.
+              </p>
+            </div>
+          </div>
+
+          <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {SERVICES.map((s, i) => (
+              <li key={s.slug} {...reveal((i % 3) * 70)}>
+                <ServiceCard service={s} />
+              </li>
+            ))}
+          </ul>
+
+          <p className="mt-12 max-w-3xl border-t border-ev-line pt-6 text-[0.9375rem] leading-relaxed text-ev-mute">
+            <span className="font-medium text-ev-night">Condiciones de prestación.</span>{" "}
+            {SERVICE_CONDITIONS}
           </p>
 
-          {/* Índice */}
-          <div className="mt-4 border-b border-ev-line">
-            {list.map((s, i) => (
-              <details key={s.id} id={s.id} className="ev-faq group scroll-mt-28 border-t border-ev-line" name="services">
-                <summary className="grid cursor-pointer list-none grid-cols-[2.5rem_1fr_auto] items-baseline gap-4 py-7 sm:grid-cols-[4rem_1fr_16rem_auto] sm:gap-6 [&::-webkit-details-marker]:hidden">
-                  <span className="ev-label text-ev-haze">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="text-[clamp(1.35rem,2.4vw,2rem)] font-medium leading-tight tracking-[-0.035em] text-ev-night transition-colors group-hover:text-ev-slate">
-                    {s.title}
-                  </span>
-                  <span className="ev-label hidden text-ev-mute sm:block">{groupTitle(s.groupSlug)}</span>
-                  <span className="relative h-5 w-5 self-center transition-transform duration-300 ease-ev-out group-open:rotate-45" aria-hidden>
-                    <span className="absolute left-1/2 top-0 h-full w-[1.5px] -translate-x-1/2 bg-ev-night" />
-                    <span className="absolute left-0 top-1/2 h-[1.5px] w-full -translate-y-1/2 bg-ev-night" />
-                  </span>
-                </summary>
-                <div className="ev-faq-body">
-                  <div className="grid gap-10 pb-10 sm:pl-[5.5rem] lg:grid-cols-12">
-                    <p className="ev-lead lg:col-span-5">{s.description}</p>
-                    <div className="lg:col-span-4">
-                      <p className="ev-label text-ev-moss">Qué incluye</p>
-                      <ul className="mt-3 space-y-2 text-[0.975rem] text-ev-ink">
-                        {s.offerings.map((o) => (
-                          <li key={o} className="flex gap-3">
-                            <span className="mt-[0.6em] h-1 w-1 shrink-0 bg-ev-signal" />
-                            {o}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="lg:col-span-3">
-                      <p className="ev-label text-ev-moss">Beneficios</p>
-                      <ul className="mt-3 space-y-2 text-[0.975rem] text-ev-mute">
-                        {s.benefits.map((b) => (
-                          <li key={b}>{b}</li>
-                        ))}
-                      </ul>
-                      <Button
-                        variant="ink"
-                        arrow
-                        className="mt-8"
-                        onClick={demo(`service_${s.id}`, "services_list")}
-                      >
-                        Solicitar este servicio
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </details>
-            ))}
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Button variant="ink" size="lg" arrow onClick={demo("services_bottom", "services")}>
+              Agendar demo
+            </Button>
+            <a href={serviceInfoMailto()} className={buttonClasses("outline", "lg")}>
+              Solicitar información
+            </a>
           </div>
         </Container>
       </section>
     </>
   );
 };
+
+function ServiceCard({ service: s }: { service: Service }) {
+  return (
+    <Link
+      href={`/services/${s.slug}`}
+      className={`group/btn flex h-full flex-col rounded-2xl border p-6 transition-colors sm:p-7 ${
+        s.featured
+          ? "border-ev-night bg-ev-night text-white hover:bg-ev-slate"
+          : "border-ev-line bg-ev-paper text-ev-night hover:border-ev-night/40 hover:bg-white"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <span className={`ev-label ${s.featured ? "text-ev-signal" : "text-ev-moss"}`}>
+          {pad(s.number)}
+        </span>
+        {s.featured ? (
+          <span className="ev-label -my-1 rounded-full bg-ev-signal px-2.5 py-1 text-ev-night">
+            Destacado
+          </span>
+        ) : null}
+      </div>
+      <h3 className="mt-6 text-[1.3125rem] font-medium leading-snug tracking-[-0.025em]">
+        {s.title}
+      </h3>
+      <p
+        className={`mt-3 flex-1 text-[0.95rem] leading-relaxed ${
+          s.featured ? "text-white/70" : "text-ev-mute"
+        }`}
+      >
+        {s.summary}
+      </p>
+      {s.tags?.length ? (
+        <div className="mt-5 flex flex-wrap gap-2">
+          {s.tags.map((t) => (
+            <span
+              key={t}
+              className={`rounded-full border px-2.5 py-1 text-xs ${
+                s.featured ? "border-white/20 text-white/80" : "border-ev-line text-ev-ink"
+              }`}
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      ) : null}
+      <span
+        className={`mt-6 inline-flex items-center gap-2 text-sm font-medium ${
+          s.featured ? "text-ev-signal" : "text-ev-night"
+        }`}
+      >
+        Ver detalle <Arrow />
+      </span>
+    </Link>
+  );
+}
+
+function FeaturedService({ service: s }: { service: Service }) {
+  const demo = useDemoCta();
+  return (
+    <section className="ev-grain ev-grain-dark relative overflow-hidden bg-ev-night py-20 text-white sm:py-28">
+      <Container>
+        <div className="grid gap-10 lg:grid-cols-12">
+          <div className="lg:col-span-3">
+            <Eyebrow index="01" tone="dark">
+              Servicio destacado
+            </Eyebrow>
+          </div>
+          <div className="lg:col-span-9">
+            <h2 className="ev-h2 max-w-4xl">
+              {s.title.replace(/ de canales de denuncia$/, "")}{" "}
+              <Voice className="text-ev-signal">de canales de denuncia.</Voice>
+            </h2>
+            <p className="ev-lead mt-6 max-w-2xl !text-white/70">{s.summary}</p>
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/15 p-6">
+                <p className="ev-label text-ev-signal">Sobre la plataforma EthicVoice</p>
+                <p className="mt-3 text-[0.975rem] leading-relaxed text-white/75">
+                  Operamos tu canal en EthicVoice de punta a punta: recepción, clasificación,
+                  seguimiento e informes, con trazabilidad completa.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/15 p-6">
+                <p className="ev-label text-ev-signal">Sobre tus canales actuales</p>
+                <p className="mt-3 text-[0.975rem] leading-relaxed text-white/75">
+                  Si ya tienes línea ética, correo o formulario, nuestro equipo los gestiona
+                  donde están. Puede contratarse sin adquirir la plataforma.
+                </p>
+              </div>
+            </div>
+
+            <ul className="mt-10 grid gap-x-8 sm:grid-cols-2">
+              {s.scope.map((item) => (
+                <li
+                  key={item}
+                  className="flex gap-3 border-t border-white/10 py-3 text-[0.975rem] text-white/85"
+                >
+                  <span className="mt-[0.6em] h-1.5 w-1.5 shrink-0 bg-ev-signal" aria-hidden />
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href={`/services/${s.slug}`}
+                className={buttonClasses("signal", "lg")}
+              >
+                Ver el servicio <Arrow />
+              </Link>
+              <Button
+                variant="outline-dark"
+                size="lg"
+                onClick={demo(`service_${s.slug}`, "services_featured")}
+              >
+                Agendar demo
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}

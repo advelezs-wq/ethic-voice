@@ -33,7 +33,9 @@ export function ChatInput({
 }: ChatInputProps) {
   const { user } = useUser();
   const [message, setMessage] = useState("");
-  const [isInternal, setIsInternal] = useState(false);
+  // Internal by default: a message only leaves the investigation team when
+  // someone deliberately unticks "Mensaje interno".
+  const [isInternal, setIsInternal] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [attachments, setAttachments] = useState<File[]>([]);
   const [uploadedAttachmentIds, setUploadedAttachmentIds] = useState<number[]>(
@@ -105,7 +107,7 @@ export function ChatInput({
       setUploadedAttachmentIds([]);
       setReplyToId(null);
       setMentions([]);
-      setIsInternal(false);
+      setIsInternal(true);
 
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
@@ -271,12 +273,12 @@ export function ChatInput({
         </label>
         {isInternal ? (
           <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
-            Solo visible para el equipo
+            Solo visible para el equipo investigador
           </span>
         ) : (
-          <span className="text-xs text-sky-700 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+          <span className="text-xs text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full flex items-center gap-1">
             <i className="icon-[lucide--eye] size-3" />
-            Visible para quien denunció
+            Atención: este mensaje también lo verá quien hizo el reporte
           </span>
         )}
       </div>

@@ -57,11 +57,11 @@ export function Step4Evidence({ organizationId }: Step4EvidenceProps) {
                 Declaro que la información proporcionada es verídica y autorizo
                 su uso para la investigación correspondiente, de acuerdo con la{" "}
                 <Link
-                  href="/privacidad"
+                  href="/politica-habeas-data"
                   target="_blank"
                   className="font-semibold text-ev-night underline underline-offset-2"
                 >
-                  política de privacidad
+                  política de tratamiento de datos personales
                 </Link>{" "}
                 y los{" "}
                 <Link

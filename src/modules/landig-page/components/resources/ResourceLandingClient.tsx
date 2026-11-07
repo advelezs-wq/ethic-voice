@@ -228,7 +228,7 @@ export function ResourceLandingClient({ resource, utm }: Props) {
               <span>
                 Acepto la{" "}
                 <Link
-                  href="/privacidad"
+                  href="/politica-habeas-data"
                   target="_blank"
                   className="text-ev-night underline decoration-ev-signal decoration-2 underline-offset-4"
                 >

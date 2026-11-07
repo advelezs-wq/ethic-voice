@@ -33,7 +33,7 @@ export function OnboardingLayout({
     const body = encodeURIComponent(
       "Estimado equipo de soporte,\n\nMe gustaría solicitar asistencia técnica para la plataforma EthicVoice.\n\nDescripción del problema o solicitud:\n-\n\nDatos de contacto:\nNombre: \nEmpresa/Organización: \nTeléfono: \n\nGracias."
     );
-    window.location.href = `mailto:soporte@ethicvoice.co?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:info@ethicvoice.co?subject=${subject}&body=${body}`;
   };
 
   // Build steps dynamically based on availableSteps from context

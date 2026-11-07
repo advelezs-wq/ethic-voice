@@ -51,8 +51,8 @@ export default function ErrorPage({
       footnote={
         <>
           Si el problema persiste, escríbenos a{" "}
-          <a href="mailto:support@ethicvoice.co" className="text-ev-night underline decoration-ev-signal decoration-2 underline-offset-4">
-            support@ethicvoice.co
+          <a href="mailto:info@ethicvoice.co" className="text-ev-night underline decoration-ev-signal decoration-2 underline-offset-4">
+            info@ethicvoice.co
           </a>
           {error.digest ? <span className="ev-label ml-3 text-ev-haze">Ref. {error.digest}</span> : null}
         </>

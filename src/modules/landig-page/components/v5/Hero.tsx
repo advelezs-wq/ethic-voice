@@ -121,15 +121,15 @@ function CaseCard() {
   );
 }
 
-// `top` coincide con la altura de cada línea del isotipo (y / 51 del viewBox).
+// `top` coincide con la altura de cada línea del isotipo (y / 54 del viewBox).
 const ANNOTATIONS = [
-  { n: "01", label: "Identidad protegida", top: "23.5%" },
-  { n: "02", label: "Cifrado AES-256", top: "40.2%" },
-  { n: "03", label: "Clasificada por IA", top: "56.9%" },
+  { n: "01", label: "Identidad protegida", top: "24.1%" },
+  { n: "02", label: "Cifrado AES-256", top: "41.1%" },
+  { n: "03", label: "Clasificada por IA", top: "58.1%" },
 ] as const;
 
 const BUBBLE_PATH =
-  "M11 0H37C43.075 0 48 4.925 48 11V29C48 35.075 43.075 40 37 40H17.5C14.2 40 11.6 42.2 9.6 45.6L8.1 48.2C6.9 50.3 3.9 49.8 3.4 47.4C3 45.4 1.9 42.6 1 40.4C0.35 38.8 0 37 0 35.2V11C0 4.925 4.925 0 11 0Z";
+  "M10 0H38A10 10 0 0 1 48 10V35A10 10 0 0 1 38 45H19C17.6 45 16.6 46 16.6 47.4V51.3C16.6 53.1 14.9 54.3 13.2 53.7C5.6 51 0 44.6 0 36.2V10A10 10 0 0 1 10 0Z";
 
 /**
  * Composición del hero: el isotipo a escala monumental, fiel al logotipo
@@ -142,7 +142,7 @@ function HeroSignal() {
       {/* Burbuja monumental; a su derecha queda el margen de anotación */}
       <div className="relative ml-auto w-[72%] sm:ml-0 sm:w-[58%]">
         <svg
-          viewBox="0 0 48 51"
+          viewBox="0 0 48 54"
           fill="none"
           className="ev-hero-bubble block h-auto w-full overflow-visible"
           aria-hidden
@@ -172,24 +172,24 @@ function HeroSignal() {
 
           {(
             [
-              { d: "M10.5 12H37.5", delay: 650 },
-              { d: "M10.5 20.5H37.5", delay: 850 },
-              { d: "M10.5 29H23", delay: 1050 },
+              { d: "M10 13H38", delay: 650 },
+              { d: "M10 22.2H38", delay: 850 },
+              { d: "M10 31.4H23", delay: 1050 },
             ] as const
           ).map((l) => (
             <path
               key={l.d}
               d={l.d}
               stroke="#98D050"
-              strokeWidth="4.4"
+              strokeWidth="4.2"
               strokeLinecap="round"
               pathLength={1}
               data-draw
               style={{ "--d": l.delay } as CSSProperties}
             />
           ))}
-          <circle cx="30.6" cy="29" r="2.5" fill="#98D050" className="ev-hero-dot" style={{ "--d": 1450 } as CSSProperties} />
-          <circle cx="37.4" cy="29" r="2.5" fill="#98D050" className="ev-hero-dot" style={{ "--d": 1600 } as CSSProperties} />
+          <circle cx="30" cy="31.4" r="2.25" fill="#98D050" className="ev-hero-dot" style={{ "--d": 1450 } as CSSProperties} />
+          <circle cx="36.4" cy="31.4" r="2.25" fill="#98D050" className="ev-hero-dot" style={{ "--d": 1600 } as CSSProperties} />
         </svg>
 
         {/* Anotaciones de registro: nacen en el canto de la burbuja, a la altura de cada línea */}

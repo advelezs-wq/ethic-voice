@@ -59,7 +59,7 @@ export function NotificationPreferences() {
     
     return {
       // Email notifications - more conservative by default
-      emailReportCreated: relevantNotifications.reportCreated && false, // Off by default for better UX
+      emailReportCreated: relevantNotifications.reportCreated, // Mandatory for admins (enforced server-side)
       emailReportAssigned: true, // Important - keep on
       emailReportStatusChanged: false, // Off by default - can be overwhelming
       emailReportComment: false, // Off by default - can be overwhelming  
@@ -210,12 +210,13 @@ export function NotificationPreferences() {
           <div className="space-y-3 pl-6">
             {relevantNotifications?.reportCreated && (
               <div className="flex items-center justify-between">
-                <span className="text-sm">Nueva denuncia recibida</span>
-                <Switch
-                  isSelected={localSettings.emailReportCreated ?? false}
-                  onValueChange={(checked) => handleSettingChange('emailReportCreated', checked)}
-                  size="sm"
-                />
+                <span className="text-sm">
+                  Nueva denuncia recibida
+                  <span className="block text-xs text-default-400">
+                    Siempre activo para administradores
+                  </span>
+                </span>
+                <Switch isSelected isDisabled size="sm" aria-label="Nueva denuncia recibida (siempre activo)" />
               </div>
             )}
             

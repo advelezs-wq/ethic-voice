@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -125,6 +125,11 @@ type PendingAction =
 
 export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) {
   const { organization, stats } = data;
+  // Stats arrive as a server prop whose identity changes on every router
+  // refresh (sign-out triggers one); read them through a ref so analytics
+  // isn't re-fetched — and doesn't fail — while the session is closing.
+  const statsRef = useRef(stats);
+  statsRef.current = stats;
   const router = useRouter();
   const searchParams = useSearchParams();
   const [section, setSectionState] = useState<OrgSection>(
@@ -212,6 +217,7 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
           getRecentReports(organization.id, 10),
         ]);
 
+      const stats = statsRef.current;
       const totalReports = Math.max(1, stats.totalReports || 0);
       setAnalytics({
         organizationId: organization.id,
@@ -245,7 +251,7 @@ export function OrganizationDetailsView({ data }: OrganizationDetailsViewProps) 
     } finally {
       setLoadingAnalytics(false);
     }
-  }, [organization.id, stats]);
+  }, [organization.id]);
 
   const loadReports = useCallback(async () => {
     setReportsLoading(true);

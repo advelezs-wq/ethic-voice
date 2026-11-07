@@ -94,21 +94,21 @@ export const TESTIMONIALS = [
     quote:
       "Un programa de compliance efectivo no depende únicamente de las políticas. Requiere procesos claros, investigaciones imparciales y decisiones oportunas que fortalezcan la confianza en la organización.",
     author: "Francy Lorena Beltrán Rodríguez",
-    role: "Director of Corporate Risk, Ethics & Compliance",
+    role: "Directora de Riesgos Corporativos, Ética y Cumplimiento",
     initials: "FB",
   },
   {
     quote:
       "La cultura ética se construye cuando cada colaborador entiende que su voz es escuchada, respetada y protegida. Esa confianza es el verdadero motor del cumplimiento.",
     author: "Catalina Zamudio Leiva",
-    role: "Director of Organizational Culture & Sustainability",
+    role: "Directora de Cultura Organizacional y Sostenibilidad",
     initials: "CZ",
   },
   {
     quote:
       "La tecnología debe simplificar el trabajo del Oficial de Cumplimiento, automatizando tareas repetitivas y permitiendo que el equipo concentre sus esfuerzos en el análisis y la toma de decisiones.",
     author: "Yecid Ávila",
-    role: "Technology Director",
+    role: "Director de Tecnología",
     initials: "YA",
   },
 ] as const;

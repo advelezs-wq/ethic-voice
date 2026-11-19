@@ -289,11 +289,11 @@ export const PLAN_CONFIGS: Record<PlanType, PlanConfig> = {
       "Plan básico para organizaciones con hasta 50 empleados. Canal web básico y analíticas esenciales.",
     targetAudience: "Para organizaciones pequeñas",
     price: {
-      monthly: 50,
-      yearly: 540,
+      monthly: 80,
+      yearly: 864,
       currency: "USD",
     },
-    priceCop: { monthly: 165000, yearly: 1782000 },
+    priceCop: { monthly: 264000, yearly: 2851200 },
     features: {
       // Channel access
       hasWebForm: true,
@@ -359,11 +359,11 @@ export const PLAN_CONFIGS: Record<PlanType, PlanConfig> = {
       "Plan popular para organizaciones con hasta 200 empleados. Incluye canal email y procesamiento IA.",
     targetAudience: "Para organizaciones en crecimiento",
     price: {
-      monthly: 120,
-      yearly: 1296,
+      monthly: 150,
+      yearly: 1620,
       currency: "USD",
     },
-    priceCop: { monthly: 395000, yearly: 4266000 },
+    priceCop: { monthly: 495000, yearly: 5346000 },
     features: {
       // Channel access
       hasWebForm: true,
